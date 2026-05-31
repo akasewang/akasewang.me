@@ -119,6 +119,9 @@ export function BackToTop() {
           onClick={handleAction}
           aria-label={mode === 'down' ? 'Scroll to next section' : commonContent.backToTop}
           variants={buttonVariants}
+          initial="initial"
+          animate="animate"
+          exit="exit"
           transition={SMOOTH_SPRING_TRANSITION}
           whileTap={{ scale: 0.95 }}
           whileHover={{ scale: 1.05 }}
@@ -158,6 +161,9 @@ export function BackToTop() {
                 key={mode}
                 custom={mode === 'down'}
                 variants={iconVariants}
+                initial="initial"
+                animate="animate"
+                exit="exit"
                 transition={SPRING_TRANSITION}
                 className="absolute flex items-center justify-center text-muted-foreground transition-colors duration-500 group-hover:text-primary"
               >

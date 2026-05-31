@@ -31,6 +31,7 @@ export function EmptyState({ title, message, children, className }: EmptyStatePr
       variants={animationVariants}
       initial="initial"
       animate="animate"
+      exit="exit"
       transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
       className={cn(
         'relative flex flex-col items-center justify-center overflow-hidden rounded-3xl px-4 py-20 text-center select-none',
