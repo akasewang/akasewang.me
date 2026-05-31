@@ -27,7 +27,7 @@ export function HeroSection() {
     <section id="hero" className="animate-page-simple space-y-8">
       <div className="flex items-center gap-4 pb-2">
         <Image
-          src="/profpic.png"
+          src="/profpic.jpg"
           alt={FULL_NAME}
           width={64}
           height={64}

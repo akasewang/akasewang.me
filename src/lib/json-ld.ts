@@ -15,7 +15,7 @@ const PERSON_SCHEMA = {
   url: SITE_URL,
   jobTitle: ROLES[0],
   description: SITE_DESCRIPTION,
-  image: `${SITE_URL}/profpic.png`,
+  image: `${SITE_URL}/profpic.jpg`,
   knowsAbout: [...CORE_TECHS, ...SECONDARY_TECHS],
   sameAs: activeSocials.map((social) => social.href),
 };
