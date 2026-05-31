@@ -26,7 +26,7 @@ export const experiences: TimelineItemProps[] = [
     startDate: '05.2026',
     description: [
       'Provide ongoing technical consulting for SKEI Bangalore, troubleshooting system workflows, advising on software integrations, and resolving technical queries.',
-      'Designed and developed a new website for SKEI Bangalore, including custom, role-based dashboards for their team and ours to track admission leads.',
+      'Designed and developed a separate, dedicated website for [SKEI Bengaluru\'s admission season](https://skei-website.vercel.app/) (independent of their main site), including custom role-based dashboards to track leads.',
       'Built an automated lead tracking system by integrating Ajax controllers with Google Apps Script to securely log admission data directly into Google Sheets.',
       'Assisted in the final development phases of an enterprise-level CRM system, helping the team successfully deploy the completed product.',
     ],
