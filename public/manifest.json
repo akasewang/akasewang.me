@@ -1,7 +1,7 @@
 {
   "name": "Akash Dewangan",
   "short_name": "Akash",
-  "description": "Software engineer who designs on the side. Welcome to my portfolio. It features my projects, writing, and proof that I finally figured out how to center a div.",
+  "description": "Software engineer who designs on the side. Welcome to my portfolio. It features my projects, some UI components, and writing.",
   "start_url": "/",
   "display": "standalone",
   "theme_color": "#000000",

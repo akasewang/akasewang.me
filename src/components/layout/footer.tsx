@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { ViewCounter } from '@/components/common/view-counter'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { footerContent } from '@/data/content/layout-content'
+import { useKeyboardShortcut } from '@/hooks/use-keyboard-shortcut'
 
 const { license, licenseHref, ownerName } = footerContent
 const currentYear = new Date().getFullYear()
@@ -13,6 +14,12 @@ const currentYear = new Date().getFullYear()
  * Displays licensing, copyright, and global site visitor metrics.
  */
 export function Footer() {
+  useKeyboardShortcut('l', () => {
+    if (licenseHref) {
+      window.open(licenseHref, '_blank', 'noopener,noreferrer')
+    }
+  })
+
   return (
     <footer className="py-6">
       <div className="mx-auto flex max-w-[800px] flex-col items-center justify-between gap-2 px-8 sm:flex-row">
@@ -31,7 +38,9 @@ export function Footer() {
                       {license}
                     </Link>
                   </TooltipTrigger>
-                  <TooltipContent side="top">View License</TooltipContent>
+                  <TooltipContent side="top" shortcut="L">
+                    View License
+                  </TooltipContent>
                 </Tooltip>
               ) : (
                 license

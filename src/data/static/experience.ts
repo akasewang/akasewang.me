@@ -31,14 +31,7 @@ export const experiences: TimelineItemProps[] = [
       'Assisted in the final development phases of an enterprise-level CRM system, helping the team successfully deploy the completed product.',
     ],
     defaultExpanded: true,
-    tech: [
-      'TypeScript',
-      'Next.js',
-      'Prisma',
-      'Google Apps Script',
-      'PostgreSQL',
-      'AWS',
-    ],
+    tech: ['TypeScript', 'Next.js', 'Prisma', 'Google Apps Script', 'PostgreSQL', 'AWS'],
     links: [
       {
         text: 'Innovun Global',

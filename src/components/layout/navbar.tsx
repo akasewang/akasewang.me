@@ -2,9 +2,12 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { useKeyboardShortcut } from '@/hooks/use-keyboard-shortcut'
+import { useGithubStars } from '@/hooks/use-github-stars'
 import { Icons } from '@/components/ui/icons'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { navbarContent } from '@/data/content/layout-content'
+import { USERNAME, SITE } from '@/constants/constants'
 import { cn } from '@/utils/utils'
 
 const NAV_ITEMS = [
@@ -15,7 +18,7 @@ const NAV_ITEMS = [
 ]
 
 const ICON_BUTTON_STYLES =
-  'relative flex size-8 items-center justify-center rounded-lg bg-transparent text-secondary ring-1 ring-transparent retina:ring-[0.5px] transition-[background-color,color,transform,scale,opacity,box-shadow] duration-300 hover:bg-accent hover:ring-accent-border hover:text-primary active:scale-[0.95] active:duration-200'
+  'relative flex size-8 items-center justify-center rounded-lg bg-transparent text-secondary ring-1 ring-transparent transition-[background-color,color,transform,scale,opacity,box-shadow] duration-300 hover:bg-accent hover:text-primary hover:ring-accent-border active:scale-[0.95] active:duration-200 retina:ring-[0.5px]'
 
 /**
  * Global navigation header.
@@ -24,6 +27,20 @@ const ICON_BUTTON_STYLES =
  */
 export function Navbar() {
   const pathname = usePathname()
+  const {
+    count: githubStars,
+    shortCount: formattedStarsShort,
+    fullCount: formattedStarsFull,
+  } = useGithubStars()
+  const githubUrl = `https://github.com/${USERNAME}/${SITE}`
+
+  useKeyboardShortcut('g', () => {
+    window.open(githubUrl, '_blank', 'noopener,noreferrer')
+  })
+
+  useKeyboardShortcut('r', () => {
+    window.open('/feed.xml', '_blank', 'noopener,noreferrer')
+  })
 
   return (
     <nav className="absolute inset-x-0 top-0 z-50">
@@ -38,7 +55,6 @@ export function Navbar() {
           </Link>
 
           <div className="flex items-center gap-4 md:gap-5">
-            {}
             {NAV_ITEMS.map(({ href, label, Icon }) => (
               <Link
                 key={href}
@@ -56,17 +72,48 @@ export function Navbar() {
 
             <Tooltip>
               <TooltipTrigger asChild>
-                <Link
+                <a
+                  href={githubUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="GitHub Repository"
+                  className={cn(
+                    ICON_BUTTON_STYLES,
+                    'hidden md:flex',
+                    '-ml-[10px]',
+                    githubStars !== null && 'w-auto px-2.5',
+                  )}
+                >
+                  <div className="flex items-center gap-1.5">
+                    <Icons.github className="size-4.5" />
+                    {formattedStarsShort !== null && (
+                      <span className="text-xs font-semibold tracking-wide text-muted-foreground">
+                        {formattedStarsShort}
+                      </span>
+                    )}
+                  </div>
+                </a>
+              </TooltipTrigger>
+              <TooltipContent side="bottom" shortcut="G">
+                {formattedStarsFull !== null ? `${formattedStarsFull} Stars` : 'Source Code'}
+              </TooltipContent>
+            </Tooltip>
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <a
                   href="/feed.xml"
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="RSS Feed"
-                  className={cn(ICON_BUTTON_STYLES, 'hidden md:flex', '-ml-[5px]')}
+                  className={cn(ICON_BUTTON_STYLES, '-ml-[5px] md:-ml-[15px]')}
                 >
-                  <Icons.rss className="size-[22px]" />
-                </Link>
+                  <Icons.rss className="size-[21.5px]" />
+                </a>
               </TooltipTrigger>
-              <TooltipContent side="bottom">RSS Feed</TooltipContent>
+              <TooltipContent side="bottom" shortcut="R">
+                RSS Feed
+              </TooltipContent>
             </Tooltip>
           </div>
         </div>

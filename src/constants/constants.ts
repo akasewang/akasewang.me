@@ -11,7 +11,7 @@ export const USERNAME = 'akasewang'
 export const SITE = 'akasewang.me'
 export const EMAIL = 'hi@akasewang.me'
 export const SITE_DESCRIPTION =
-  'Software engineer who designs on the side. Welcome to my portfolio. It features my projects, writing, and proof that I finally figured out how to center a div.'
+  'Software engineer who designs on the side. Welcome to my portfolio. It features my projects, some UI components, and writing.'
 
 /**
  * Date, Time & Reading Metrics
