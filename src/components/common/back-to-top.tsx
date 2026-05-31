@@ -60,7 +60,7 @@ export function BackToTop() {
 
   const measureDOM = useCallback(() => {
     const sections = Array.from(document.querySelectorAll('main section[id]')) as HTMLElement[]
-    const offsets = sections.map((s) => s.offsetTop)
+    const offsets = sections.map((s) => s.getBoundingClientRect().top + window.scrollY)
 
     domMetrics.current = {
       sectionOffsets: offsets,
@@ -92,12 +92,19 @@ export function BackToTop() {
       return window.scrollTo({ top: 0, behavior: 'smooth' })
     }
 
-    const currentScroll = scrollY.get()
-    const { sectionOffsets } = domMetrics.current
-    const nextOffset = sectionOffsets.find((offset) => offset > currentScroll + 100)
+    const currentScroll = window.scrollY
+
+    /** Recalculate on click to ensure we don't use stale positions if page height changed */
+    const sections = Array.from(document.querySelectorAll('main section[id]')) as HTMLElement[]
+    const freshOffsets = sections.map((s) => s.getBoundingClientRect().top + window.scrollY)
+
+    const nextOffset = freshOffsets.find((offset) => offset > currentScroll + 100)
+
+    /** Stop 80px above the section for visual breathing room */
+    const targetTop = nextOffset !== undefined ? nextOffset - 80 : document.body.scrollHeight
 
     window.scrollTo({
-      top: nextOffset !== undefined ? nextOffset : document.body.scrollHeight,
+      top: targetTop,
       behavior: 'smooth',
     })
   }, [mode, scrollY])
