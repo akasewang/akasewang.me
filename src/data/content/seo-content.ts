@@ -7,7 +7,7 @@ import type { SeoContent } from '@/types/site'
  * Injected into the generic layout SEO configuration to construct dynamic meta tags and Open Graph data.
  */
 export const homeSeoContent: SeoContent = {
-  title: FULL_NAME,
+  title: `${FULL_NAME} | Software Engineer`,
   description: SITE_DESCRIPTION,
   imageAlt: SITE_NAME,
   ogTitle: 'Software engineer who designs on the side.',

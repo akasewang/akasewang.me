@@ -38,6 +38,7 @@ export function HeroSection() {
 
         <div className="flex flex-col">
           <h1 className="text-balance text-2xl font-semibold leading-snug tracking-tighter text-primary">
+            <span className="sr-only">Software Engineer & Designer</span>
             <span className="mr-1">{hero.firstName}</span>
             <span className="inline-block">
               {hero.lastName}

@@ -30,6 +30,9 @@ export async function generateMetadata(): Promise<Metadata> {
     creator: FULL_NAME,
     metadataBase: new URL(SITE_URL),
     manifest: '/manifest.json',
+    icons: {
+      apple: '/profpic.jpg',
+    },
     alternates: {
       canonical: SITE_URL,
       types: {
