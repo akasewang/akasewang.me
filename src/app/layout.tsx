@@ -1,4 +1,6 @@
 import type { Metadata } from 'next'
+import { SpeedInsights } from '@vercel/speed-insights/next'
+import { Analytics } from '@vercel/analytics/react'
 
 import { Navbar } from '@/components/layout/navbar'
 import { Footer } from '@/components/layout/footer'
@@ -94,6 +96,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <BackToTop />
           <Toaster position="bottom-center" />
           <div className="bottom-blur-fade" />
+          <SpeedInsights />
+          <Analytics />
         </TooltipProvider>
       </body>
     </html>

@@ -58,7 +58,7 @@ export function ComponentCard({
         </div>
 
         {description && (
-          <p className="mt-1 line-clamp-2 text-pretty text-[13px] leading-relaxed text-foreground sm:text-sm">
+          <p className="mt-1 line-clamp-2 text-pretty text-sm leading-relaxed text-foreground">
             {description}
           </p>
         )}

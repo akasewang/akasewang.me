@@ -47,7 +47,7 @@ export function BlogPostCard({
         </div>
 
         {excerpt && (
-          <p className="line-clamp-2 text-pretty text-[13px] leading-relaxed text-foreground sm:text-sm mt-1">
+          <p className="line-clamp-2 text-pretty text-sm leading-relaxed text-foreground mt-1">
             {excerpt}
           </p>
         )}
