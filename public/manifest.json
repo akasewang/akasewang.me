@@ -1,0 +1,26 @@
+{
+  "name": "Akash Dewangan",
+  "short_name": "Akash",
+  "description": "Software engineer who designs on the side. Welcome to my portfolio. It features my projects, writing, and proof that I finally figured out how to center a div.",
+  "start_url": "/",
+  "display": "standalone",
+  "theme_color": "#000000",
+  "background_color": "#000000",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "48x48",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "/initials.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "/initials-bg.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

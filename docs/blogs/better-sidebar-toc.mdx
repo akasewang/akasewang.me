@@ -1,0 +1,230 @@
+---
+title: 'A Better Sidebar TOC'
+excerpt: 'Why standard Intersection Observers often break in fast scrolling or short section layouts and how to build a robust, passive active heading scroll spy using requestAnimationFrame.'
+date: '2025-09-28'
+slug: active-sidebar-toc
+type: technical
+tags: ['nextjs', 'react', 'performance', 'ux']
+---
+
+If you are building a technical blog or a documentation website, a sticky Table of Contents (TOC) sidebar is practically a necessity. It provides readers with spatial awareness, letting them know exactly where they are in a long post and gives them a quick way to jump between sections.
+
+The industry standard way to build this is with the `IntersectionObserver` API. It sounds perfect on paper: you observe every heading element on the page and when one enters the viewport, you highlight its corresponding entry in the sidebar.
+
+But in practice, **Intersection Observers are notoriously frustrating for scroll spying.**
+
+If you have short sections, scroll quickly or resize the window, the active heading highlight will frequently skip, lag or flicker between multiple headings at once.
+
+Here is why I threw out `IntersectionObserver` on my personal portfolio and how I built a robust, high performance scroll spy using passive scroll listeners and `requestAnimationFrame`.
+
+
+## The Core Problem with IntersectionObserver
+
+The `IntersectionObserver` API reports when an element crosses a specific boundary of the viewport. However, scroll spying is not a question of _crossing boundaries_; it is a question of _dominant visual focus_.
+
+Consider these two common edge cases:
+
+1. **The Short Section Trap**: You have a heading followed by just two sentences, which is immediately followed by another heading. Both headings are visible in the viewport at the same time. Which one should be active?
+2. **The Fast Scroll Skip**: When a user scrolls rapidly, the browser fires layout checks in discrete frames. If they scroll past three headings in a single frame, the observer might fail to register some crossing events, causing the sidebar highlights to lag.
+
+Additionally, managing an array of independent observers and synchronizing their entry/exit times to determine a single "active" state often leads to messy React code.
+
+<Callout type="info" title="The Mental Shift">
+  Instead of asking, *"Which heading just crossed into view?"*, we should ask, *"At this exact
+  scroll position, which heading is the closest preceding coordinate to our reading line?"*
+</Callout>
+
+
+## The Mathematical Approach
+
+To find the current dominant heading, we can use a simpler, more deterministic approach:
+
+1. Retrieve the vertical coordinates (`y position`) of every heading on the page.
+2. Determine a "reading offset line", for example, `120px` from the top of the viewport (roughly where a reader's eyes naturally rest).
+3. Scan through our list of headings from bottom to top. The first heading that has scrolled _above_ that offset line is our active heading.
+
+Let's look at this concept in action:
+
+```text
+[Viewport Top] ------------------------------- y = 0
+                      ↕  Offset (e.g. 120px)
+[Reading line] =============================== active activeId = "heading-2"
+
+  # Heading 1 (y = 50px)   ←  Scrolled past offset line
+
+  # Heading 2 (y = 100px)  ←  Closest heading above reading line (ACTIVE)
+
+----------------------------------------------
+  # Heading 3 (y = 350px)  ←  Below reading line (INACTIVE)
+```
+
+
+## The Implementation
+
+To make this performant and prevent browser layout thrashing, we combine this mathematical loop with two critical scroll optimizations:
+
+1. **Passive Event Listeners**: We add `{ passive: true }` to our scroll listener, which tells the browser that our handler will not prevent default scrolling, allowing the browser to scroll smoothly at 120 FPS without waiting for our JavaScript.
+2. **requestAnimationFrame Debouncing**: We debounce our calculations using `requestAnimationFrame`, ensuring our scroll spying math runs at most once per screen refresh frame.
+
+Let's check the core React hook that handles this logic:
+
+```ts
+import { useEffect, useState } from 'react'
+
+export function useActiveHeading(items: { id: string }[], offset = 120): string {
+  const [activeId, setActiveId] = useState('')
+
+  useEffect(() => {
+    if (!items.length) return
+
+    // 1. Gather all heading elements in the DOM
+    const headingElements = items
+      .map((item) => ({ id: item.id, el: document.getElementById(item.id) }))
+      .filter((h): h is { id: string; el: HTMLElement } => h.el !== null)
+
+    let ticking = false
+
+    const handleScroll = () => {
+      if (!ticking) {
+        // 2. Debounce math execution inside the next render frame
+        window.requestAnimationFrame(() => {
+          let current = ''
+          const isAtBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 10
+          
+          if (isAtBottom && headingElements.length > 0) {
+            current = headingElements[headingElements.length - 1].id
+          } else {
+            // 3. Scan bottom to top to find the closest element above our offset line
+            for (let i = headingElements.length - 1; i >= 0; i--) {
+              if (headingElements[i].el.getBoundingClientRect().top <= offset) {
+                current = headingElements[i].id
+                break
+              }
+            }
+          }
+
+          setActiveId(current)
+          ticking = false
+        })
+        ticking = true
+      }
+    }
+
+    // 4. Register passive scroll listener
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    handleScroll() // Trigger initial check
+
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [items, offset])
+
+  return activeId
+}
+```
+
+## Smooth Scrolling with Offsets
+
+When a reader clicks a link in the TOC, we want to scroll them to the section. However, standard browser `scrollTo` or anchor tags (`href="#id"`) will place the heading at the absolute top of the viewport (`y = 0`).
+
+This is problematic because:
+
+- It looks visually cramped (no padding above the title).
+- Our active heading calculation has an offset of `120px`, meaning if the heading sits exactly at `y = 0`, it might not trigger correctly or could conflict with a sticky header.
+
+To solve this, we implement a custom, smooth scrolling helper that scrolls to the heading with a comfortable negative padding offset:
+
+```ts
+export function scrollToHeading(id: string, yOffset = -100): void {
+  const element = document.getElementById(id)
+
+  if (element) {
+    window.scrollTo({
+      top: element.getBoundingClientRect().top + window.scrollY + yOffset,
+      behavior: 'smooth',
+    })
+  }
+}
+```
+
+## Putting it Together in a Sticky Navigation
+
+We can now wire up our `useActiveHeading` hook inside our sticky sidebar.
+
+Because we only want to display the Table of Contents on larger desktops, we use Tailwind's responsive breakpoints (`hidden xl:block`) and mark it as `fixed` so it floats along with the text.
+
+Here is the simplified layout of our [AsideTOC](https://github.com/akasewang/akasewang.me/blob/main/src/components/common/mdx-components/aside-toc.tsx) component:
+
+```tsx
+'use client'
+
+import { useMemo } from 'react'
+import { cn } from '@/utils/utils'
+import { parseTocFromContent } from './utils/parse-toc'
+import { useActiveHeading, scrollToHeading } from './hooks/use-active-heading'
+import { Icons } from '@/components/ui/icons'
+
+interface AsideTOCProps {
+  content?: string
+  className?: string
+}
+
+/**
+ * Sidebar navigation component that dynamically generates and displays a Table of Contents (TOC).
+ * Uses a scroll-spying hook to highlight the currently active heading as the user scrolls.
+ * Only visible on large screens (xl breakpoint).
+ */
+export const AsideTOC = ({ content, className }: AsideTOCProps) => {
+  const items = useMemo(() => (content ? parseTocFromContent(content) : []), [content])
+  const activeId = useActiveHeading(items)
+
+  if (!items.length) return null
+
+  return (
+    <nav
+      className={cn(
+        'not-prose hidden xl:block fixed left-0 top-24 z-50 h-[calc(100vh-6rem)] w-64 pt-4 pl-8',
+        className,
+      )}
+    >
+      <div className="flex flex-col gap-4">
+        {/* Visual indicator icon */}
+        <Icons.menu className="size-[18px] text-muted-foreground transition-colors duration-300 hover:text-primary group-hover/blog:text-primary" />
+        
+        {/* Reveal TOC on hover for a cleaner reading experience */}
+        <div className="flex flex-col gap-2.5 opacity-0 transition-opacity duration-300 ease-in-out hover:opacity-100 group-hover/blog:opacity-100">
+          {items.map(({ id, level, text }) => (
+            <button
+              key={id}
+              onClick={() => scrollToHeading(id)}
+              className={cn('group block text-left', level > 2 && 'ml-6')}
+            >
+              <span
+                className={cn(
+                  'block truncate text-xs leading-tight tracking-tight transition-colors duration-200 ease-out',
+                  activeId === id
+                    ? 'text-primary font-medium'
+                    : 'text-muted-foreground group-hover:text-primary/90',
+                )}
+              >
+                {text}
+              </span>
+            </button>
+          ))}
+        </div>
+      </div>
+    </nav>
+  )
+}
+```
+
+<Callout type="success" title="UX Benefits Achieved">
+  * **Deterministic Active State**: Scroll highlights snap instantly and accurately, never getting
+  lost or caught between two headings. * **Passive Performance**: Zero layout thrashing or stutter
+  during scroll events. * **Offset Comfort**: Smooth scrolling leaves `100px` of breathing room
+  above titles, preventing them from colliding with top navigation bars.
+</Callout>
+
+## Summary
+
+`IntersectionObserver` is a fantastic API for lazy loading images, infinite lists or reporting view logs. But for scroll spies, it is the wrong abstraction.
+
+By returning to standard, passive scroll listeners optimized via `requestAnimationFrame` and `getBoundingClientRect()`, we get complete deterministic control over the reading offset line, a lighter code bundle and a vastly superior reading experience.

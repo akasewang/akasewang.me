@@ -1,0 +1,237 @@
+---
+title: 'Building a Better View Counter'
+excerpt: 'How to track and display live post analytics on statically compiled Next.js routes using debounced client batching, session caching and atomic database upserts.'
+date: '2026-01-05'
+slug: edge-view-counter
+type: technical
+tags: ['nextjs', 'serverless', 'drizzle-orm', 'database']
+---
+
+Statically generated web applications (SSG) are incredibly fast. By compiling your pages into HTML and JSON during the build process, you can serve them directly from a global Content Delivery Network (CDN) with sub millisecond load times.
+
+But static sites have a major limitation: **they are static.**
+
+Adding dynamic features (like a view counter that increments every time a reader opens a post) requires bringing in server side operations.
+
+If you implement a view counter naively in Next.js, you'll run into serious performance issues:
+
+- **The Listing Page N+1 Problem**: If your blog listing page displays 10 posts, rendering a view counter for each card can trigger 10 independent database queries during page load, slamming your database connections.
+- **Double Counting**: If a reader refreshes the browser or opens multiple tabs, their view count will artificially tick up, skewing your metrics.
+- **Static Hydration Flashing**: If the page loads static HTML but queries the database on the client, you'll see a jarring visual flicker where the number suddenly jumps from a blank loader to the count.
+
+Here is how I engineered an end to end, edge ready view counting system in my Next.js portfolio that combines **client side debounced batching, session deduplication and atomic Drizzle ORM database upserts.**
+
+## The Core Architecture
+
+To keep the application highly responsive, we separate our view counter into three distinct layers:
+
+```text
+[ React Component ] → [ Views Provider (Context) ]
+                            ↓ (Debounces & batches slugs for 50ms)
+                    [ Next.js Server Action ]
+                            ↓ (Single DB roundtrip via inArray)
+                    [ Neon Serverless Postgres ] (Atomic .onConflictDoUpdate)
+```
+
+## 1. Client Side Debounced Batching
+
+When a user visits `/blogs`, we render a list of cards, each displaying its own view counter.
+
+Instead of allowing every [ViewCounter](https://github.com/akasewang/akasewang.me/blob/main/src/components/common/view-counter.tsx) component to fire a database call immediately, they register their slugs with a centralized [ViewsProvider](https://github.com/akasewang/akasewang.me/blob/main/src/components/providers/views-context.tsx).
+
+The provider waits for `50ms` (`BATCH_DELAY`). If multiple view requests arrive within that window, it aggregates their slugs into a `Set` and fires a **single, unified database query** rather than N individual calls.
+
+Let's examine how the [ViewsProvider](https://github.com/akasewang/akasewang.me/blob/main/src/components/providers/views-context.tsx) implements this:
+
+```tsx
+const BATCH_DELAY = 50
+
+/**
+ * Context provider that manages view counts across the application.
+ * Implements a batching strategy to group multiple view requests into a single API call,
+ * preventing network spam when rendering large lists of items (e.g., the component registry).
+ * Also caches view counts locally to optimize navigation.
+ *
+ * @param children - The React tree to wrap with the provider.
+ */
+export function ViewsProvider({ children }: { children: ReactNode }) {
+  const [viewsMap, setViewsMap] = useState<Record<string, number | null>>({})
+  const viewsMapRef = useRef<Record<string, number | null>>({})
+
+  const pendingSlugsRef = useRef<Set<string>>(new Set())
+  const fetchingRef = useRef<Set<string>>(new Set())
+  const batchTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+
+  const prefetchViews = useCallback(
+    async (slugs: string[]) => {
+      // 1. Filter out slugs that are already cached or currently being fetched
+      const newSlugs = slugs.filter(
+        (slug) =>
+          !(slug in viewsMapRef.current) &&
+          !fetchingRef.current.has(slug) &&
+          !pendingSlugsRef.current.has(slug),
+      )
+
+      if (!newSlugs.length) return
+
+      // 2. Add slugs to the pending batch queue
+      newSlugs.forEach((slug) => pendingSlugsRef.current.add(slug))
+
+      if (batchTimeoutRef.current) clearTimeout(batchTimeoutRef.current)
+
+      // 3. Debounce fetch trigger by 50ms
+      batchTimeoutRef.current = setTimeout(() => {
+        const slugsToFetch = Array.from(pendingSlugsRef.current)
+        pendingSlugsRef.current.clear()
+        if (slugsToFetch.length) fetchBatch(slugsToFetch)
+      }, BATCH_DELAY)
+    },
+    [fetchBatch],
+  )
+
+  // ...
+}
+```
+
+This simple debouncer reduces database connection pressure by up to 90% on high traffic listing pages.
+
+## 2. Preventing Reload Double Counting
+
+To prevent users from falsely inflating metrics by spamming the browser reload button, we implement a double layer cache system:
+
+1. **`localStorage` (Global Cache)**: We store retrieved view counts in `localStorage` with a `5 minute` TTL (`CACHE_DURATION = 5 * 60 * 1000`). If a user navigates back and forth between pages, we serve view counts instantly from the local cache, eliminating database queries entirely.
+2. **`sessionStorage` (Increment Lock)**: When a user visits an article, we attempt to increment the view count. We write a unique key (`viewed-${slug}`) to the browser's `sessionStorage`. If that key already exists, we know they've already viewed the post during this session, so we fall back to a safe, read only query.
+
+```tsx
+const incrementViews = useCallback(
+  async (slug: string) => {
+    const sessionKey = `viewed-${slug}`
+
+    // 1. Guard check: If viewed in current session, perform read-only fetch
+    if (typeof window !== 'undefined' && sessionStorage.getItem(sessionKey)) {
+      requestView(slug)
+      return
+    }
+
+    try {
+      // 2. Perform write to server
+      const data = await incrementViewAction(slug)
+
+      setViewsMap((prev) => {
+        const next = { ...prev, [slug]: data.views ?? null }
+        viewsMapRef.current = next
+        syncCache(next) // Synchronize with global localStorage cache
+        return next
+      })
+
+      // 3. Lock increment trigger for this session
+      if (data.views !== null && typeof window !== 'undefined') {
+        sessionStorage.setItem(sessionKey, 'true')
+      }
+    } catch (error) {
+      console.error('Error incrementing views:', error)
+    }
+  },
+  [requestView],
+)
+```
+
+## 3. Atomic Database Upserts inside Server Actions
+
+On the backend, our Next.js Server Action needs to handle writes securely.
+
+If multiple users open the same article simultaneously, standard read and then write code can cause a race condition, where one user overwrites another's increment, losing tracking counts.
+
+To make the operation atomic, we utilize Drizzle ORM to perform a high performance **Upsert** query (`.onConflictDoUpdate()`).
+
+If the slug has never been visited, we insert a new record with `count = 1`. If it has been visited, we increment the count atomically _in the database engine_ using raw SQL: `count = count + 1`.
+
+Let's check the Server Action code inside [views.ts](https://github.com/akasewang/akasewang.me/blob/main/src/lib/actions/views.ts):
+
+```ts
+'use server'
+
+import { sql } from 'drizzle-orm'
+import { db } from '@/lib/db/drizzle'
+import { views } from '@/lib/db/schema'
+
+/**
+ * Server action that atomically increments the view count for a specific route slug.
+ * Uses a Postgres upsert (`ON CONFLICT DO UPDATE`) operation to prevent race conditions.
+ *
+ * @param slug - The unique identifier/path of the page being viewed.
+ * @returns An object containing the new total `views` count.
+ */
+export async function incrementViewAction(slug: string) {
+  if (!slug) return { views: null }
+
+  try {
+    const [result] = await db
+      .insert(views)
+      .values({ slug, count: 1 })
+      .onConflictDoUpdate({
+        target: views.slug,
+        set: { count: sql`${views.count} + 1` }, // Atomic increment
+      })
+      .returning({ count: views.count })
+
+    return { views: result?.count ?? 0 }
+  } catch (error) {
+    console.error('Error incrementing view count:', error)
+    return { views: null }
+  }
+}
+```
+
+This single roundtrip handles the insert, update and return queries inside a single, secure database transaction.
+
+## 4. High Performance Batch Fetching
+
+Similarly, our batch retrieval uses the SQL `IN` operator to fetch all post counts in a single database roundtrip, converting the database response array back into an optimized index map:
+
+```ts
+import { inArray } from 'drizzle-orm'
+
+/**
+ * Server action to efficiently fetch the view counts for multiple route slugs in a single query.
+ * Optimized for grid/list views where showing views for dozens of items at once is necessary.
+ *
+ * @param slugs - An array of unique page identifiers.
+ * @returns A dictionary mapping each slug to its current view count.
+ */
+export async function getViewsBatchAction(slugs: string[]) {
+  if (!slugs?.length) return { views: {} }
+
+  try {
+    const result = await db
+      .select({ slug: views.slug, count: views.count })
+      .from(views)
+      .where(inArray(views.slug, slugs))
+
+    // Pre-initialize map with 0 counts for missing items
+    const viewsMap: Record<string, number> = Object.fromEntries(slugs.map((slug) => [slug, 0]))
+
+    for (const row of result) {
+      viewsMap[row.slug] = row.count
+    }
+
+    return { views: viewsMap }
+  } catch (error) {
+    console.error('Error fetching view batch:', error)
+    return { views: null }
+  }
+}
+```
+
+<Callout type="success" title="Performance Milestones">
+  * **Zero N+1 DB Queries**: Main blogs page loads arbitrary card lists in exactly one network call.
+  * **Race Condition Free**: Atomic `.onConflictDoUpdate()` protects database integrity from
+  concurrent traffic bursts. * **Offline Resilient**: If the database goes offline or network drops,
+  counters fall back gracefully to a silent, offline badge without throwing runtime page crashes.
+</Callout>
+
+## Summary
+
+Adding dynamic tracking to a static website doesn't require sacrificing page loading speed or database stability.
+
+By centralizing view state inside a debounced client context, caching counts locally and relying on atomic Upserts inside Server Actions, we can build a highly performant, serverless view tracking system that scales effortlessly from zero to millions of page views.

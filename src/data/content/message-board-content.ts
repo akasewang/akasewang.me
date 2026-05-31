@@ -1,0 +1,31 @@
+import type { MessageBoardContent } from '@/types/message-board'
+
+/**
+ * Message Board Content Data Dictionary.
+ * Centralized static configuration and text definitions.
+ */
+export const messageBoardContent: MessageBoardContent = {
+  title: 'message board.',
+  subtitle: 'Your message is safe with me (and the entire internet).',
+  formPlaceholder: 'Leave a message...',
+  namePlaceholder: 'Your name',
+  recentMessagesLabel: 'recent messages.',
+  noMessagesLabel: 'No messages yet. Be the first to leave a message!',
+  buttonLoading: 'saving',
+  buttonSuccess: 'added!',
+  buttonDefault: 'leave a message',
+  loadingMore: 'Loading more...',
+  endOfMessages: 'No more messages.',
+  offline: 'Database offline. Cannot load messages right now.',
+  connectionLost: "Connection lost. Couldn't load more messages.",
+  retry: 'Retry',
+  admin: {
+    delete: 'Delete',
+    reply: 'Reply',
+    editReply: 'Edit Reply',
+    textareaPlaceholder: 'Write your reply...',
+    cancel: 'Cancel',
+    sending: 'Sending...',
+    send: 'Send',
+  },
+}

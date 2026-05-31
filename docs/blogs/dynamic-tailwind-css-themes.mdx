@@ -1,0 +1,163 @@
+---
+title: 'Dynamic Themes in Tailwind v4'
+excerpt: 'How to pass runtime components variables to Tailwind v4 layouts using CSS custom properties, OKLCH color spaces and modern color mix values without stylesheet bloat.'
+date: '2026-04-01'
+slug: dynamic-tailwind-css-variables
+type: technical
+tags: ['css', 'tailwind', 'frontend', 'design-system']
+---
+
+Tailwind CSS has completely transformed how we write styles. By providing an incredibly cohesive set of utility classes, it allows developers to build responsive, beautiful interfaces without ever leaving their HTML or React files.
+
+But when you need **dynamic, runtime styling**, Tailwind starts to feel awkward.
+
+Imagine you are building a custom [Callout](https://github.com/akasewang/akasewang.me/blob/main/src/components/common/mdx-components/callout.tsx) alert box component. The component supports multiple variants (`info`, `success`, `warn`, `error`), each with its own distinct color scheme.
+
+If you handle this naively, you usually end up with two sub optimal patterns:
+
+1. **Dynamic Class Interpolation (The Tailwind Anti Pattern)**: You attempt to interpolate classes: `bg-${color}-500/20`. Tailwind's static compiler cannot parse dynamic strings, meaning these styles will often fail to compile unless you safelist every combination.
+2. **Gigantic Mapping Objects**: You write hundreds of lines of static mapping coordinates:
+
+```tsx
+const CLASSES = {
+  info: 'bg-blue-600/10 border-blue-500/30 text-blue-300',
+  success: 'bg-emerald-600/10 border-emerald-500/30 text-emerald-300',
+  // ... and so on for every single variant and child element.
+}
+```
+
+This bloats your JavaScript bundle and forces you to replicate classes for borders, backgrounds, icons, links and code blocks inside every variant.
+
+Here is a look at how to build a dynamic, themeable callout component using **Tailwind v4 `@theme` integrations, native CSS variables and the modern `color-mix()` function** to manage dynamic layouts with absolute precision.
+
+## The Concept: Runtime Variables inside CSS Classes
+
+Instead of generating unique Tailwind classes for every color theme, we pass a single dynamic color parameter, a color hue coordinate, to our layout wrapper via standard React inline styles.
+
+Then, inside our Tailwind utility classes, we reference this CSS custom property using standard CSS functions.
+
+Because Tailwind CSS v4 supports native integration of standard CSS custom properties directly inside bracket notation, we can write a single, unified stylesheet layout that adjusts all colors automatically!
+
+```text
+[ React Component ] → inline style: style={{ '--callout-hue': 'oklch(0.7 0.15 60)' }}
+                              ↓
+[ Tailwind v4 Class ] ← bg-[color-mix(in oklab, var(--callout-hue) 6%, transparent)]
+```
+
+## 1. OKLCH Color Spaces
+
+To understand why this is so powerful, we must look at the **OKLCH** color format.
+
+Unlike traditional RGB or HSL, OKLCH is designed around **human perception**. It defines color using three values:
+
+- **L (Lightness)**: How bright the color is.
+- **C (Chroma)**: How saturated or intense the color is.
+- **H (Hue)**: The color wheel coordinate (0 to 360).
+
+Because OKLCH is perceptually uniform, changing _just_ the Hue while keeping Lightness and Chroma constant gives you a different color that has the **exact same visual weight**.
+
+This makes OKLCH the absolute ultimate tool for dynamic themes, allowing us to swap colors without worrying about contrast ratio glitches.
+
+## 2. Using Color Mix inside Tailwind
+
+The modern CSS `color-mix()` function allows you to blend two colors directly in the browser.
+
+We can use it to mix our dynamic `--callout-hue` parameter with our theme’s dark background to calculate a clean, semi transparent background color on the fly, without generating custom opacity classes:
+
+```css
+/* Mix 6% of our dynamic hue with 94% of our dark container background */
+background-color: color-mix(in oklab, var(--callout-hue) 6%, oklch(0.23 0 0 / 0.3));
+```
+
+By wrapping this inside Tailwind’s bracket notation, we can write a single unified wrapper class that formats all alert boxes perfectly!
+
+Let's check the core code of [callout.tsx](https://github.com/akasewang/akasewang.me/blob/main/src/components/common/mdx-components/callout.tsx):
+
+```tsx
+import { useId, type CSSProperties, type ReactNode } from 'react'
+import { Icons } from '@/components/ui/icons'
+import { cn } from '@/utils/utils'
+
+export type CalloutType = 'info' | 'tip' | 'warn' | 'error' | 'success'
+
+interface CalloutProps {
+  type?: CalloutType
+  title?: ReactNode
+  children: ReactNode
+  className?: string
+}
+
+const VARIANTS: Record<
+  CalloutType,
+  { icon: keyof typeof Icons; label: string; accent: string; hue: string }
+> = {
+  info: { icon: 'question', label: 'Note', accent: 'text-blue-300', hue: 'oklch(0.6 0.17 250)' },
+  tip: { icon: 'lightbulb', label: 'Tip', accent: 'text-violet-300', hue: 'oklch(0.6 0.17 300)' },
+  warn: { icon: 'alertTriangle', label: 'Warning', accent: 'text-amber-300', hue: 'oklch(0.7 0.15 60)' },
+  error: { icon: 'alertCircle', label: 'Error', accent: 'text-rose-300', hue: 'oklch(0.6 0.18 20)' },
+  success: { icon: 'checkCircle', label: 'Success', accent: 'text-emerald-300', hue: 'oklch(0.6 0.16 160)' },
+}
+
+/**
+ * Renders a styled block for displaying auxiliary information, warnings, or tips in MDX content.
+ * Automatically injects the correct icon, accent color, and base hue based on the `type` prop.
+ */
+export const Callout = ({ type = 'info', title, children, className }: CalloutProps) => {
+  const { icon, label, accent, hue } = VARIANTS[type]
+  const Icon = Icons[icon] as React.ComponentType<{ className?: string }>
+  const labelId = useId()
+
+  return (
+    <div
+      role="note"
+      aria-labelledby={labelId}
+      // 1. Pass the dynamic OKLCH color to the stylesheet
+      style={{ '--callout-hue': hue } as CSSProperties}
+      // 2. Mix background and borders using a single unified layout
+      className={cn(
+        'relative isolate not-prose my-6 overflow-hidden rounded-xl bg-[color-mix(in_oklab,var(--callout-hue)_6%,oklch(0.23_0_0_/_0.3))] motion-safe:animate-in motion-safe:fade-in-0 motion-safe:duration-300',
+        className,
+      )}
+    >
+      <div className="flex select-none items-center gap-3 px-4 pb-0 pt-3">
+        <Icon className={cn('size-3.5 shrink-0 opacity-80', accent)} aria-hidden />
+        <span id={labelId} className="text-xs font-medium tracking-tight text-primary opacity-90">
+          {title ?? label}
+        </span>
+      </div>
+
+      {/* 3. Inherit spacing, link text colors and code block themes automatically */}
+      <div
+        className={cn(
+          'pl-10.5 pr-4 pb-3 pt-1.5 text-pretty text-xs leading-relaxed text-foreground/90',
+          '[&>[role=paragraph]]:my-0 [&>[role=paragraph]+[role=paragraph]]:mt-3 [&_[role=paragraph]]:text-xs',
+          '[&>ol]:ml-0 [&>ol]:my-0 [&>ol]:list-decimal [&>ol]:pl-5',
+          '[&>ul]:ml-0 [&>ul]:my-0 [&>ul]:list-disc [&>ul]:pl-5',
+          '[&_li:first-child]:mt-0 [&_li]:mb-0 [&_li]:mt-1 [&_li]:text-xs',
+          '[&_a]:font-medium [&_a]:text-foreground [&_a]:underline [&_a]:decoration-1 [&_a]:underline-offset-[3px] [&_a]:[text-decoration-color:color-mix(in_oklab,var(--callout-hue)_45%,transparent)] hover:[&_a]:[text-decoration-color:var(--callout-hue)]',
+          '[&_code]:rounded [&_code]:bg-[color-mix(in_oklab,var(--callout-hue)_12%,transparent)] [&_code]:px-[0.35em] [&_code]:py-[0.1em] [&_code]:font-mono [&_code]:text-[0.875em]',
+        )}
+      >
+        {children}
+      </div>
+    </div>
+  )
+}
+```
+
+## 3. Dynamically Styling Nested Elements
+
+One of the coolest features of CSS custom properties is **inheritance**. Any child element inside our Callout div can read the active `--callout-hue` value.
+
+This means we can write standard global layout rules inside our utility classes that format complex nested elements (like inline code blocks, links, list points and blockquotes) using the exact same color scheme automatically!
+
+For example:
+
+- **Inline Code Blocks**: We style them with `[&_code]:bg-[color-mix(in_oklab,var(--callout-hue)_12%,transparent)]`. If the callout is a Warning (Amber), the code block background automatically blends into an amber tint. If it is an Error (Rose), the code block matches the rose tint.
+- **Link Decorations**: We style nested hyperlinks with a custom decoration color: `[&_a]:[text-decoration-color:color-mix(in_oklab,var(--callout-hue)_45%,transparent)]`. The link underline matches the callout scheme automatically!
+
+## Summary
+
+Combining standard CSS custom properties with Tailwind v4 utility classes allows us to get the absolute best of both worlds: **the ease of utility classes and the dynamic flexibility of native CSS.**
+
+By relying on OKLCH color wheel hue coordinates, passing parameters inside React inline styles and blending colors directly in the browser via `color-mix()`, we can build highly adaptive, gorgeous interfaces with extremely small, clean stylesheets.

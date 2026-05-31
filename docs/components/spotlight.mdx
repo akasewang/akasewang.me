@@ -1,0 +1,43 @@
+---
+title: Spotlight
+date: 2026-05-28
+excerpt: A dynamic radial gradient that tracks cursor position to create premium ambient lighting and interactive text reveal masking effects.
+tech: [React, Tailwind CSS]
+dependencies: [clsx, tailwind-merge]
+files:
+  - path: src/registry/components/spotlight.tsx
+    type: registry:component
+    target: "@components/ui/spotlight.tsx"
+  - path: src/registry/hooks/use-spotlight.ts
+    type: registry:hook
+    target: "@hooks/use-spotlight.ts"
+---
+
+The Spotlight component adds an interactive, reactive ambient light effect that follows the user's cursor across a container. It's incredibly effective for premium, modern design aesthetics.
+
+<ComponentPreview slug="spotlight" />
+
+## Installation
+
+<ComponentInstall slug="spotlight" />
+
+## Usage
+
+Simply wrap your content inside the `SpotlightCard` component. It automatically handles the cursor tracking, refs, and overflow masking for you.
+
+```tsx
+import { SpotlightCard } from '@/components/ui/spotlight'
+```
+
+```tsx
+export function MyComponent() {
+  return (
+    <SpotlightCard className="flex h-48 w-64 flex-col justify-between rounded-xl border bg-card p-6">
+      <h3 className="font-semibold">Interactive Card</h3>
+      <p className="text-sm text-muted-foreground">
+        Hover over this card to see the spotlight effect follow your cursor.
+      </p>
+    </SpotlightCard>
+  )
+}
+```

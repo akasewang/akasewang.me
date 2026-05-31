@@ -1,0 +1,33 @@
+'use client'
+
+import { motion } from 'framer-motion'
+import { cn } from '@/utils/utils'
+import { SPRING_TRANSITION } from '@/constants/ui'
+
+interface NewTagProps {
+  className?: string
+}
+
+/**
+ * @param className - Optional CSS classes for custom sizing or positioning.
+ */
+export function NewTag({ className }: NewTagProps) {
+  return (
+    <motion.div
+      initial={{ scale: 0.8, opacity: 0 }}
+      animate={{ scale: 1, opacity: 1 }}
+      transition={SPRING_TRANSITION}
+      className={cn('relative inline-flex shrink-0 select-none', className)}
+    >
+      <div className="relative flex items-center overflow-hidden rounded-full bg-gradient-to-b from-verified to-blue-600 py-[1px] pl-4 pr-3 shadow-[inset_0_1px_1px_oklch(100%_0_0/0.2),inset_0_-1px_1px_oklch(0%_0_0/0.1)]">
+        <div className="absolute inset-0 z-0 -translate-x-full animate-[shimmer_2s_infinite] bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+
+        <span className="absolute left-2 top-1/2 z-10 size-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-gradient-to-br from-white to-zinc-400 ring-[0.5px] ring-black/20 shadow-[0_1.5px_2px_oklch(0%_0_0/0.5),inset_0_-1px_1px_oklch(0%_0_0/0.2)]" />
+
+        <span className="relative z-10 text-[10px] font-bold uppercase tracking-wider text-white [text-shadow:0_1px_1px_oklch(0%_0_0/0.1)]">
+          New
+        </span>
+      </div>
+    </motion.div>
+  )
+}

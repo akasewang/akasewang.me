@@ -1,0 +1,208 @@
+---
+title: "Automating Next.js Sitemaps"
+excerpt: "How to programmatically generate valid XML sitemaps and RSS feeds directly from dynamic MDX folders using Next.js App Router Route Handlers and Edge Cache control."
+date: '2026-05-18'
+slug: dynamic-rss-sitemaps-nextjs
+type: technical
+tags: ['nextjs', 'seo', 'rss', 'automation']
+---
+
+Search Engine Optimization (SEO) and feed discoverability are critical for any technical website. If you write articles, you want Google to index them immediately and you want RSS feed readers (like Feedly or NetNewsWire) to alert your subscribers as soon as you hit publish.
+
+The standard solution is to use static generator plugins or manually maintain dynamic XML arrays. 
+
+But as your site expands (adding blogs, projects, handbooks and dynamic listings), this manual approach falls apart:
+* **Stale Sitemaps**: You publish a new post, but forget to update the `sitemap.xml` file. Search engine spiders won't know the route exists until they happen to discover a link.
+* **Complex Build Hacks**: Running post build scripts to compile XML strings during Next.js exports is brittle and often fails during edge runtime checks.
+* **Database / API Bottlenecks**: Querying different content directories sequentially inside sitemap routes slows down response times and creates build blocks.
+
+Here is how to solve this by creating **dynamic sitemaps and RSS XML feeds inside Next.js App Router Route Handlers (`route.ts`)**, utilizing concurrent queries, custom response headers and stale while revalidate edge caching.
+
+## 1. Sitemaps in Next.js App Router
+
+Next.js features excellent sitemap support, but writing a custom Route Handler gives us complete, granular control over metadata priorities, change frequencies and header parameters.
+
+To build our sitemap:
+1. We define a standard dynamic GET Route Handler.
+2. We query both static page locations and local MDX files (projects and blogs).
+3. We assemble a valid XML structure and return it with the correct `'Content-Type': 'application/xml'` HTTP headers.
+
+Let's look at the core structure of our sitemap handler in [sitemap.xml/route.ts](https://github.com/akasewang/akasewang.me/blob/main/src/app/sitemap.xml/route.ts):
+
+```ts
+import { getAllBlogPosts } from '@/lib/managers/blog-manager'
+import { getAllProjects } from '@/lib/managers/project-manager'
+import { parseDate } from '@/utils/utils'
+import { SITE_URL } from '@/constants/constants'
+
+/**
+ * Generates an XML Sitemap for search engine crawlers (Googlebot, Bingbot, etc.).
+ * Dynamically aggregates all static routes, blog posts, and projects to ensure 
+ * accurate and up-to-date indexing of the site's content.
+ *
+ * @returns An XML Response containing the full URL set.
+ */
+export async function GET(): Promise<Response> {
+  // 1. Fetch both blogs and projects concurrently to optimize connection pools
+  const [blogPosts, projectPosts] = await Promise.all([
+    getAllBlogPosts(),
+    getAllProjects(),
+  ])
+
+  const currentDate = new Date().toISOString()
+
+  // 2. Define static routes with priority and change frequencies
+  const staticPages = [
+    { path: '', priority: '1.0', changefreq: 'weekly' },
+    { path: '/blogs', priority: '0.9', changefreq: 'daily' },
+    { path: '/components', priority: '0.9', changefreq: 'weekly' },
+    { path: '/projects', priority: '0.8', changefreq: 'weekly' },
+    { path: '/message-board', priority: '0.6', changefreq: 'monthly' },
+    { path: '/newsletter', priority: '0.8', changefreq: 'monthly' },
+    { path: '/photos', priority: '0.4', changefreq: 'monthly' },
+    { path: '/catalog', priority: '0.4', changefreq: 'monthly' },
+    { path: '/skills', priority: '0.8', changefreq: 'monthly' },
+    { path: '/testimonials', priority: '0.7', changefreq: 'monthly' },
+  ]
+
+  // 3. Map dynamic posts to exact XML schemas
+  const urls = [
+    ...staticPages.map(({ path, priority, changefreq }) => ({
+      url: `${SITE_URL}${path}`,
+      lastModified: currentDate,
+      priority,
+      changefreq,
+    })),
+    ...blogPosts.map((post) => ({
+      url: `${SITE_URL}/blogs/${post.slug}`,
+      lastModified: parseDate(post.date),
+      priority: '0.8',
+      changefreq: 'weekly',
+    })),
+    ...projectPosts.map((project) => ({
+      url: `${SITE_URL}/projects/${project.slug}`,
+      lastModified: parseDate(project.date),
+      priority: '0.8',
+      changefreq: 'weekly',
+    })),
+  ]
+
+  // 4. Compile sitemap XML string
+  const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${urls
+  .map(
+    (page) => `  <url>
+    <loc>${page.url}</loc>
+    <lastmod>${page.lastModified}</lastmod>
+    <priority>${page.priority}</priority>
+    <changefreq>${page.changefreq}</changefreq>
+  </url>`
+  )
+  .join('\n')}
+</urlset>`
+
+  // 5. Send programmatic Response with XML Content-Type header
+  return new Response(sitemap, {
+    headers: {
+      'Content-Type': 'application/xml',
+    },
+  })
+}
+```
+
+
+## 2. Dynamic RSS Feed Compilation
+
+Similarly, we can expose a dynamic RSS feed at `/feed.xml` that lets subscribers fetch updates automatically.
+
+Using standard libraries like `rss`, we configure our base channel properties (title, site URL, generator tags) and map each MDX post to an RSS feed item:
+
+Let's examine how the RSS feed is compiled inside [feed.xml/route.ts](https://github.com/akasewang/akasewang.me/blob/main/src/app/feed.xml/route.ts):
+
+```ts
+import RSS from 'rss'
+import type { BlogPost } from '@/types/blog'
+import { getAllBlogPosts } from '@/lib/managers/blog-manager'
+import { parseDate } from '@/utils/utils'
+import { SITE_URL, FULL_NAME } from '@/constants/constants'
+import { getOgImageUrl } from '@/lib/metadata'
+import { homeSeoContent } from '@/data/content/seo-content'
+
+/**
+ * Generates an RSS XML feed for the blog.
+ * Scans all published blog posts and compiles them into a standard RSS 2.0 format.
+ * Includes caching headers to prevent regenerating the XML on every request.
+ *
+ * @returns An XML Response containing the full RSS feed.
+ */
+export async function GET() {
+  const feed = new RSS({
+    title: `${FULL_NAME}'s Blog`,
+    description: 'Web development insights and tutorials',
+    site_url: SITE_URL,
+    feed_url: `${SITE_URL}/feed.xml`,
+    language: 'en',
+    generator: 'Next.js using RSS',
+    pubDate: new Date(),
+    copyright: `© ${new Date().getFullYear()} ${FULL_NAME}. All rights reserved.`,
+    image_url: getOgImageUrl(homeSeoContent.ogTitle),
+    webMaster: FULL_NAME,
+  })
+
+  try {
+    const allPosts: BlogPost[] = await getAllBlogPosts()
+    const blogPosts = allPosts
+
+    // Map posts into standard RSS items
+    blogPosts.forEach((post) => {
+      feed.item({
+        title: post.title,
+        description: post.excerpt,
+        url: `${SITE_URL}/blogs/${post.slug}`,
+        date: parseDate(post.date),
+        guid: post.slug,
+        author: FULL_NAME,
+        categories: post.type ? [post.type] : [],
+      })
+    })
+
+    // Return the generated XML with headers
+    return new Response(feed.xml({ indent: true }), {
+      headers: {
+        'Content-Type': 'application/xml',
+        'Cache-Control': 's-maxage=3600, stale-while-revalidate',
+      },
+    })
+  } catch (error) {
+    return new Response('Error generating feed', { status: 500 })
+  }
+}
+```
+
+
+## 3. High Performance Edge Caching
+
+Because sitemaps and RSS feeds are requested frequently by search bots and RSS parsers, recalculating the XML string and fetching filesystem assets on *every single request* creates unnecessary CPU cycles.
+
+To maximize page speed, we apply a robust CDN edge cache header to our responses:
+
+```ts
+'Cache-Control': 's-maxage=3600, stale-while-revalidate'
+```
+
+* **`s-maxage=3600`**: Tells our global CDN cache edge (like Vercel or Cloudflare) to keep the generated sitemap XML in its high speed memory for 1 hour. Any bot visiting the site within that hour gets the XML file instantly under a few milliseconds.
+* **`stale-while-revalidate`**: If the cache has expired, the CDN immediately serves the stale (older) sitemap file to the bot so they aren't kept waiting, while silently triggering a background build to fetch new MDX articles and update the cache for the next visitor.
+
+<Callout type="success" title="Performance & SEO Milestones achieved">
+* **Instant Feed Generation**: Concurrently querying static, blog and project paths avoids N+1 blocking bottlenecks.
+* **No Manual Operations**: Publishing a new MDX post instantly updates the sitemap and feed routes without re compiling the site.
+* **Zero Database Slamming**: Stale while revalidate caching offloads 99% of requests directly to the CDN edge.
+</Callout>
+
+
+## Summary
+
+Discoverability is the cornerstone of great blogs and portfolios. 
+
+By writing dynamic App Router XML handlers, fetching metadata concurrently, returning the correct mime type headers and caching the outcomes on the CDN edge, we can build search resilient discovery channels that keep search engine bots and tech subscribers instantly informed, all with zero manual maintenance.

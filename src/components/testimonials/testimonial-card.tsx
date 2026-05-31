@@ -1,0 +1,129 @@
+'use client'
+
+import Image from 'next/image'
+import { VerifiedIcon } from '@/components/ui/icons'
+import { GradientAvatar } from '@/components/ui/gradient-avatar'
+import { SpotlightCard } from '@/components/ui/spotlight'
+import { cn } from '@/utils/utils'
+import type { Testimonial } from '@/types/home'
+
+interface TestimonialCardProps {
+  testimonial: Testimonial
+  className?: string
+}
+
+const TESTIMONIAL_CARD_BASE_CLASSES =
+  'group relative flex h-full select-none flex-col overflow-hidden rounded-2xl px-6 py-5 focus:outline-none bg-card ring-1 ring-ring retina:ring-[0.5px] transition-transform duration-300 ease-out'
+
+const TESTIMONIAL_FIGURE_CLASSES = 'flex h-full flex-col justify-between'
+
+const TESTIMONIAL_QUOTE_CLASSES =
+  'grow text-pretty font-serif text-sm font-medium italic leading-relaxed antialiased'
+
+const TESTIMONIAL_ROLE_CLASSES = 'truncate font-mono text-xs font-medium tracking-tight'
+
+/**
+ * Testimonial Card Component.
+ * Displays a client or peer review.
+ * Dynamically renders a provided image or a fallback `GradientAvatar` if no image is supplied.
+ */
+export function TestimonialCard({
+  testimonial: { url, quote, author, role, image },
+  className,
+}: TestimonialCardProps) {
+  const isLink = !!url
+
+  const renderContent = (isReveal: boolean = false) => (
+    <figure className={cn(TESTIMONIAL_FIGURE_CLASSES, isReveal ? 'px-6 py-5' : 'relative z-10')}>
+      <blockquote
+        className={cn(TESTIMONIAL_QUOTE_CLASSES, isReveal ? 'text-primary' : 'text-foreground')}
+      >
+        {quote}
+      </blockquote>
+
+      <figcaption className="mt-4 grid grid-cols-[auto_1fr] items-center gap-x-3">
+        {isReveal ? (
+          <div className="size-9 shrink-0" />
+        ) : (
+          <AuthorAvatar image={image} author={author} isLink={isLink} />
+        )}
+
+        <div className="flex min-w-0 flex-col">
+          <div className="flex items-center gap-1.5 text-[13px] font-semibold leading-relaxed tracking-tight text-primary">
+            <span className="truncate">{author}</span>
+            <VerifiedIcon className="size-3 -mt-[1px] shrink-0 text-verified" />
+          </div>
+
+          {role && (
+            <div
+              className={cn(
+                TESTIMONIAL_ROLE_CLASSES,
+                isReveal ? 'text-foreground' : 'text-muted-foreground',
+              )}
+            >
+              {role}
+            </div>
+          )}
+        </div>
+      </figcaption>
+    </figure>
+  )
+
+  const commonProps = {
+    revealLayer: isLink ? renderContent(true) : undefined,
+    outerSize: 250,
+    className: cn(
+      TESTIMONIAL_CARD_BASE_CLASSES,
+      isLink && 'active:scale-[0.98] active:duration-200',
+      className,
+    ),
+  }
+
+  if (isLink) {
+    return (
+      <SpotlightCard as="a" href={url} target="_blank" rel="noopener noreferrer" {...commonProps}>
+        {renderContent()}
+      </SpotlightCard>
+    )
+  }
+
+  return (
+    <SpotlightCard as="div" {...commonProps}>
+      {renderContent()}
+    </SpotlightCard>
+  )
+}
+
+/**
+ * Internal rendering helper for the testimonial author's avatar.
+ * Conditionally renders a Next.js optimized Image or a fallback GradientAvatar.
+ */
+function AuthorAvatar({
+  image,
+  author,
+  isLink,
+}: {
+  image?: string
+  author: string
+  isLink: boolean
+}) {
+  const ringClasses = cn(
+    'rounded-full ring-1 ring-ring/80 transition-shadow duration-300 retina:ring-[0.5px]',
+    isLink && 'group-hover:ring-ring',
+  )
+
+  return image ? (
+    <Image
+      src={image}
+      alt={author}
+      width={36}
+      height={36}
+      draggable={false}
+      className={cn('size-9 bg-muted object-cover', ringClasses)}
+    />
+  ) : (
+    <div className={ringClasses}>
+      <GradientAvatar name={author} size={36} />
+    </div>
+  )
+}

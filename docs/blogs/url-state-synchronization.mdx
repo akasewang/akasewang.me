@@ -1,0 +1,150 @@
+---
+title: 'Put Your State in the URL'
+excerpt: 'Why keeping dashboard filter states inside local state creates bad UX and how to build deep linkable, reload proof category and search queries using Next.js URL state synchronization.'
+date: '2026-02-22'
+slug: url-state-synchronization
+type: technical
+tags: ['nextjs', 'react', 'ux', 'dashboard']
+---
+
+When building list grids or search dashboards (like a portfolio project grid, a product listing page or an article index) developers naturally reach for React’s `useState` hook.
+
+It makes absolute sense at first. You create a state for the search query, another for the active category tab and a third for the sort dropdown:
+
+```tsx
+const [searchQuery, setSearchQuery] = useState('')
+const [category, setCategory] = useState('all')
+const [sortBy, setSortBy] = useState('date-desc')
+```
+
+This works perfectly on your local machine. But as soon as you deploy your application, you'll spot a massive **UX friction point**:
+
+- **Unshareable Filters**: A user spends three minutes searching, sorting and narrowing down your list. They find a great set of results and copy the browser link to send to a teammate. When the teammate opens the link, the filters are gone and they are back to the default list.
+- **Lost History**: A user clicks into an item in the list, reads the page and clicks the browser's "Back" button. Instead of returning to their filtered list, the page reloads from scratch, forcing them to re enter their search.
+- **Stale Navigation**: Browser history acts as the ultimate state machine. If filtering your page doesn't update the URL, you are breaking the core mechanics of the web.
+
+Here is how to solve this by moving your interactive dashboard state entirely into the **URL query string**, utilizing Next.js App Router hooks to build reload proof, deep linkable grid systems.
+
+## The Core Concept: The URL as the Single Source of Truth
+
+Instead of storing search parameters in React state, we store them directly in the browser's address bar.
+
+When a user selects a filter or types a search query:
+
+1. We intercept the input event.
+2. We update the URL query string (`/projects?q=interactive&category=web&sort=views-desc`) without triggering a full page reload.
+3. Our list page reads the URL parameters during rendering and instantly filters the items.
+
+```text
+[ User Interaction ] → [ Update URL Query String ]
+                                  ↓ (pushState / replaceState)
+[ Render Phase ]   ←   [ Read SearchParams from URL ]
+```
+
+This ensures that the URL is _always_ the single source of truth. Copying the link, refreshing the page or going backward and forward in history preserves the user's view exactly.
+
+## The Next.js URL Sync Helper
+
+To implement this dynamically, we can write a reusable callback inside our layout that reads the active query string using `useSearchParams`, merges new updates and writes them back to the router using Next.js’s `useRouter` hook.
+
+To ensure that updating the URL doesn't cause a jarring vertical jump to the top of the page (which Next.js does by default on page changes), we pass `{ scroll: false }` to the router update:
+
+Let's examine how this parameter merging is structured in [project-tabs.tsx](https://github.com/akasewang/akasewang.me/blob/main/src/components/projects/project-tabs.tsx):
+
+```tsx
+'use client'
+
+import { useState, useEffect, useCallback } from 'react'
+import { useSearchParams, useRouter } from 'next/navigation'
+import type { ProjectPostData, ProjectCategory } from '@/types/project'
+
+export function ProjectTabs({ projects }: { projects: ProjectPostData[] }) {
+  const searchParams = useSearchParams()
+  const router = useRouter()
+
+  // 1. Read parameters directly from URL and synchronize them with local state
+  // to avoid Next.js static hydration mismatches
+  const categoryParam = searchParams.get('category')
+  const [category, setCategory] = useState<ProjectCategory>(
+    categoryParam ? (categoryParam as ProjectCategory) : 'all',
+  )
+  
+  // (Additional effects synchronize URL changes back to local state)
+
+  // 2. Define a clean parameter-merging callback
+  const updateParams = useCallback(
+    (updates: Record<string, string | null>) => {
+      // Read the current active browser parameters
+      const params = new URLSearchParams(searchParams)
+
+      Object.entries(updates).forEach(([key, value]) => {
+        if (value === null || value === 'all' || (key === 'sort' && value === 'date-desc')) {
+          // Clean up URL: remove default values to keep strings short and elegant
+          params.delete(key)
+        } else {
+          params.set(key, value)
+        }
+      })
+
+      // 3. Replace the active URL state without resetting viewport scroll position
+      router.replace(`/projects?${params.toString()}`, { scroll: false })
+    },
+    [searchParams, router],
+  )
+
+  // ...
+}
+```
+
+## Reading URL State in UI Components
+
+By binding our state triggers directly to this parameter merger, our inputs and tabs remain fully synchronized with the address bar.
+
+When a user types or clicks, we update the URL, Next.js re renders the component with the new `searchParams` and our layout filters the items.
+
+```tsx
+const handleCategoryChange = (val: string) => {
+  updateParams({ category: val })
+}
+
+const handleSearchChange = (val: string) => {
+  updateParams({ q: val || null }) // Clear parameter if search query is empty
+}
+
+const handleSortChange = (val: string) => {
+  updateParams({ sort: val })
+}
+```
+
+## Filtering and Sorting on Render
+
+To keep the page lightning fast, we filter and sort our project array directly inside a React `useMemo` block, ensuring that we only recalculate list coordinates when the projects or active sorting parameters change:
+
+```tsx
+  const sortedProjects = useMemo(() => {
+    let result = [...projects]
+
+    // Sort results dynamically based on URL parameter
+    if (sortBy === 'date-asc') {
+      result.reverse()
+    } else if (sortBy === 'views-desc') {
+      result.sort((a, b) => (getViews(b.slug) || 0) - (getViews(a.slug) || 0))
+    } else if (sortBy === 'views-asc') {
+      result.sort((a, b) => (getViews(a.slug) || 0) - (getViews(b.slug) || 0))
+    }
+
+    return result
+  }, [projects, sortBy, getViews])
+```
+
+<Callout type="success" title="UX Advantages">
+* **True Deep linking**: Share your exact view state, active categories and search inputs with a single URL string.
+* **Native History Support**: Navigating back via browser gestures returns you to your exact layout coordinates without reloading search results.
+* **Scroll Boundary Protection**: Using `{ scroll: false }` guarantees the reader's viewport remains stationary during click filtering, avoiding unexpected vertical page jumping.
+</Callout>
+
+## Summary
+
+Synchronizing interactive states directly with the browser URL is one of the easiest ways to elevate your application's user experience.
+
+By treating the URL query string as your single source of truth, merging changes dynamically with `URLSearchParams` and avoiding scroll shifts using router overlays, you can build bookmarkable, history resilient dashboards that feel fast, clean and perfectly suited to the web.
