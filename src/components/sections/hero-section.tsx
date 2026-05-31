@@ -27,11 +27,10 @@ export function HeroSection() {
     <section id="hero" className="animate-page-simple space-y-8">
       <div className="flex items-center gap-4 pb-2">
         <Image
-          src="/profpic.jpg"
+          src="/profpic.png"
           alt={FULL_NAME}
           width={64}
           height={64}
-          unoptimized
           priority
           className="shrink-0 rounded-full transition duration-300"
         />

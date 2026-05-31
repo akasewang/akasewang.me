@@ -41,7 +41,7 @@ export async function generateMetadata(): Promise<Metadata> {
     metadataBase: new URL(SITE_URL),
     manifest: "/manifest.json",
     icons: {
-      apple: "/profpic.jpg",
+      apple: "/profpic.png",
     },
     alternates: {
       canonical: SITE_URL,
@@ -95,7 +95,7 @@ export default async function RootLayout({
       data-scroll-behavior="smooth"
     >
       <head>
-        <link rel="preload" href="/profpic.jpg" as="image" />
+        <link rel="preload" href="/profpic.png" as="image" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}

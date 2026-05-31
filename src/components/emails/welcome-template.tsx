@@ -154,7 +154,7 @@ export const WelcomeTemplate = ({
     .replaceAll("/", ".");
 
   const unsubscribeUrl = `${SITE_URL}/unsubscribe?token=${unsubscribeToken}`;
-  const profilePicUrl = `${SITE_URL}/profpic.jpg`;
+  const profilePicUrl = `${SITE_URL}/profpic.png`;
   const handle = `${USERNAME}.me`;
 
   return (

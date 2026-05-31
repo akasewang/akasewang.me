@@ -30,7 +30,6 @@ export function SkillCard({ skill: { url, icon, name }, className }: SkillCardPr
             alt={name}
             width={13}
             height={13}
-            unoptimized
             draggable={false}
             className="relative z-10 size-[13px] shrink-0 object-contain"
           />

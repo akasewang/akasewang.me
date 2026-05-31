@@ -154,7 +154,7 @@ export const WeeklySummaryTemplate = ({
     .format(summaryDate ? new Date(summaryDate) : new Date())
     .replaceAll("/", ".");
 
-  const profilePicUrl = `${SITE_URL}/profpic.jpg`;
+  const profilePicUrl = `${SITE_URL}/profpic.png`;
   const handle = `${USERNAME}.me`;
 
   const headingText =
