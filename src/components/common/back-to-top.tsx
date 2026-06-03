@@ -46,7 +46,7 @@ const iconVariants: Variants = {
  */
 export function BackToTop() {
   const { scrollYProgress, scrollY } = useScroll()
-  const dashoffset = useTransform(scrollYProgress, [0, 0.95], [BACK_TO_TOP_CIRCUMFERENCE, 0])
+  const dashoffset = useTransform(scrollYProgress, [0, 0.90], [BACK_TO_TOP_CIRCUMFERENCE, 0])
 
   const [isVisible, setIsVisible] = useState(false)
   const [mode, setMode] = useState<'down' | 'up'>('down')
@@ -99,7 +99,9 @@ export function BackToTop() {
     const isAtLastSection =
       lastSectionOffset > 0 && scrollY.get() + windowHeight * 0.4 > lastSectionOffset
 
-    setMode(latest > 0.95 || isAtLastSection ? 'up' : 'down')
+    const isNearBottom = scrollY.get() + windowHeight >= document.documentElement.scrollHeight - 150
+
+    setMode(latest > 0.90 || isNearBottom || isAtLastSection ? 'up' : 'down')
   })
 
   const handleAction = useCallback(() => {
