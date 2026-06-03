@@ -26,14 +26,16 @@ export function HeroSection() {
   return (
     <section id="hero" className="animate-page-simple space-y-8">
       <div className="flex items-center gap-4 pb-2">
-        <Image
-          src="/profpic.png"
-          alt={FULL_NAME}
-          width={64}
-          height={64}
-          priority
-          className="shrink-0 rounded-full transition duration-300"
-        />
+        <div className="profile-slime-container">
+          <Image
+            src="/profpic.png"
+            alt={FULL_NAME}
+            width={64}
+            height={64}
+            priority
+            className="profile-slime-image"
+          />
+        </div>
 
         <div className="flex flex-col">
           <h1 className="text-balance text-2xl font-semibold leading-snug tracking-tighter text-primary">

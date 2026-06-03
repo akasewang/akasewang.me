@@ -69,3 +69,22 @@ ehthumbs.db
 Thumbs.db
 Desktop.ini
 $RECYCLE.BIN/
+
+# React Email
+.react-email/
+
+# AI Assistants & Tools
+.claude/
+.cursor/
+.aider/
+
+# Databases
+*.sqlite
+*.sqlite3
+*.db
+*.db-shm
+*.db-wal
+
+# Linters / Cache
+.eslintcache
+.turbo/

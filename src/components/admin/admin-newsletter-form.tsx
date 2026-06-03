@@ -22,7 +22,7 @@ export function AdminNewsletterForm({ blogs }: { blogs: BlogPost[] }) {
   const [adminSecret, setAdminSecret] = useState('')
   const [selectedBlogSlug, setSelectedBlogSlug] = useState(blogs[0]?.slug || '')
   const [loading, setLoading] = useState(false)
-  const { success, countdown, startCountdown, resetStatus } = useStatusTimer()
+  const { success, countdown, startCountdown, resetStatus } = useStatusTimer('admin-newsletter')
 
   async function handleSubmit(e: React.SyntheticEvent) {
     e.preventDefault()

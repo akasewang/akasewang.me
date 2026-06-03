@@ -46,25 +46,23 @@ const iconVariants: Variants = {
  */
 export function BackToTop() {
   const { scrollYProgress, scrollY } = useScroll()
-  const dashoffset = useTransform(scrollYProgress, [0, 1], [BACK_TO_TOP_CIRCUMFERENCE, 0])
+  const dashoffset = useTransform(scrollYProgress, [0, 0.95], [BACK_TO_TOP_CIRCUMFERENCE, 0])
 
   const [isVisible, setIsVisible] = useState(false)
   const [mode, setMode] = useState<'down' | 'up'>('down')
 
   const domMetrics = useRef({
-    sectionOffsets: [] as number[],
     lastSectionOffset: 0,
     isScrollable: false,
     windowHeight: 0,
   })
 
   const measureDOM = useCallback(() => {
-    const sections = Array.from(document.querySelectorAll('main section[id]')) as HTMLElement[]
-    const offsets = sections.map((s) => s.getBoundingClientRect().top + window.scrollY)
+    const sections = document.querySelectorAll('main section[id]')
+    const lastSection = sections[sections.length - 1] as HTMLElement | undefined
 
     domMetrics.current = {
-      sectionOffsets: offsets,
-      lastSectionOffset: offsets.length > 0 ? offsets[offsets.length - 1] : 0,
+      lastSectionOffset: lastSection ? lastSection.getBoundingClientRect().top + window.scrollY : 0,
       isScrollable: document.documentElement.scrollHeight - window.innerHeight > 100,
       windowHeight: window.innerHeight,
     }
@@ -72,19 +70,36 @@ export function BackToTop() {
 
   useEffect(() => {
     measureDOM()
-    window.addEventListener('resize', measureDOM)
-    return () => window.removeEventListener('resize', measureDOM)
+    
+    let timeoutId: number
+    const handleResize = () => {
+      window.clearTimeout(timeoutId)
+      timeoutId = window.setTimeout(measureDOM, 150)
+    }
+
+    const observer = new ResizeObserver(handleResize)
+    observer.observe(document.body)
+
+    return () => {
+      observer.disconnect()
+      window.clearTimeout(timeoutId)
+    }
   }, [measureDOM])
 
   useMotionValueEvent(scrollYProgress, 'change', (latest) => {
     const { isScrollable, lastSectionOffset, windowHeight } = domMetrics.current
 
-    setIsVisible(latest > 0.05 && isScrollable)
+    if (!isScrollable) {
+      setIsVisible(false)
+      return
+    }
+
+    setIsVisible(latest > 0.05)
 
     const isAtLastSection =
       lastSectionOffset > 0 && scrollY.get() + windowHeight * 0.4 > lastSectionOffset
 
-    setMode(latest > 0.98 || isAtLastSection ? 'up' : 'down')
+    setMode(latest > 0.95 || isAtLastSection ? 'up' : 'down')
   })
 
   const handleAction = useCallback(() => {
@@ -93,21 +108,24 @@ export function BackToTop() {
     }
 
     const currentScroll = window.scrollY
+    const sections = document.querySelectorAll('main section[id]')
+    let nextOffset: number | undefined
 
-    /** Recalculate on click to ensure we don't use stale positions if page height changed */
-    const sections = Array.from(document.querySelectorAll('main section[id]')) as HTMLElement[]
-    const freshOffsets = sections.map((s) => s.getBoundingClientRect().top + window.scrollY)
+    for (let i = 0; i < sections.length; i++) {
+      const offset = sections[i].getBoundingClientRect().top + window.scrollY
+      if (offset > currentScroll + 100) {
+        nextOffset = offset
+        break
+      }
+    }
 
-    const nextOffset = freshOffsets.find((offset) => offset > currentScroll + 100)
-
-    /** Stop 80px above the section for visual breathing room */
     const targetTop = nextOffset !== undefined ? nextOffset - 80 : document.body.scrollHeight
 
     window.scrollTo({
       top: targetTop,
       behavior: 'smooth',
     })
-  }, [mode, scrollY])
+  }, [mode])
 
   const Icon = mode === 'down' ? Icons.arrowDownward : Icons.doubleArrowUp
 
