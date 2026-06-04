@@ -1,7 +1,7 @@
 'use client'
 
 import { type ElementType } from 'react'
-import { motion, type HTMLMotionProps } from 'framer-motion'
+import { m, type HTMLMotionProps } from 'framer-motion'
 import { Icons } from '@/components/ui/icons'
 import { AnimatedArrow } from '@/components/ui/animated-arrow'
 import { cn } from '@/utils/utils'
@@ -121,7 +121,7 @@ export function Button({
   }
 
   return (
-    <motion.button
+    <m.button
       {...props}
       onClick={handleClick}
       disabled={isDisabled}
@@ -159,6 +159,6 @@ export function Button({
           {renderRightContent()}
         </span>
       )}
-    </motion.button>
+    </m.button>
   )
 }

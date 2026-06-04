@@ -2,7 +2,7 @@
 
 import { useMemo, useEffect } from 'react'
 import { usePathname } from 'next/navigation'
-import { AnimatePresence, motion } from 'framer-motion'
+import { m, AnimatePresence } from 'framer-motion'
 import { ViewAll } from '@/components/ui/view-all'
 import { ComponentCard } from '@/components/registry/component-card'
 import { useViews } from '@/components/providers/views-context'
@@ -44,9 +44,9 @@ export function FeaturedComponents({ components }: FeaturedComponentsProps) {
 
       <AnimatePresence mode="popLayout">
         {displayed.length > 0 ? (
-          <motion.div key="component-list" layout className="space-y-4">
+          <m.div key="component-list" layout className="space-y-4">
             {displayed.map((component) => (
-              <motion.div
+              <m.div
                 key={component.slug}
                 layout
                 initial={{ opacity: 0, scale: 0.98 }}
@@ -55,9 +55,9 @@ export function FeaturedComponents({ components }: FeaturedComponentsProps) {
                 transition={SPRING_TRANSITION}
               >
                 <ComponentCard item={component} />
-              </motion.div>
+              </m.div>
             ))}
-          </motion.div>
+          </m.div>
         ) : (
           <EmptyState key="no-components" message="no components found." />
         )}

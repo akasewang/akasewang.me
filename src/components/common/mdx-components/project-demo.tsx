@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect, type MouseEvent } from 'react'
 import Image from 'next/image'
-import { motion, AnimatePresence } from 'framer-motion'
+import { m, AnimatePresence } from 'framer-motion'
 import { Icons } from '@/components/ui/icons'
 
 interface ProjectDemoProps {
@@ -117,13 +117,13 @@ export function ProjectDemo({ image, video, title }: ProjectDemoProps) {
               />
               <AnimatePresence>
                 {state.isBuffering && (
-                  <motion.div
+                  <m.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
                     className="absolute inset-0 z-20 flex items-center justify-center bg-background/40 backdrop-blur-md"
                   >
-                    <motion.svg
+                    <m.svg
                       viewBox="0 0 50 50"
                       className="size-7"
                       animate={{ rotate: 360 }}
@@ -142,7 +142,7 @@ export function ProjectDemo({ image, video, title }: ProjectDemoProps) {
                         strokeWidth="4"
                         className="text-primary/10"
                       />
-                      <motion.circle
+                      <m.circle
                         cx="25"
                         cy="25"
                         r="20"
@@ -165,18 +165,18 @@ export function ProjectDemo({ image, video, title }: ProjectDemoProps) {
                           ease: 'easeInOut',
                         }}
                       />
-                    </motion.svg>
-                  </motion.div>
+                    </m.svg>
+                  </m.div>
                 )}
                 {(state.isHovered || state.showControls) && !state.isBuffering && (
-                  <motion.div
+                  <m.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
                     transition={{ duration: 0.2 }}
                     className="absolute inset-0 z-10 flex items-center justify-center bg-black/10 backdrop-blur-[2px]"
                   >
-                    <motion.div
+                    <m.div
                       initial={{ scale: 0.8, opacity: 0 }}
                       animate={{ scale: 1, opacity: 1 }}
                       whileTap={{ scale: 0.9 }}
@@ -192,21 +192,21 @@ export function ProjectDemo({ image, video, title }: ProjectDemoProps) {
                       ) : (
                         <Icons.play className="size-6 fill-current" />
                       )}
-                    </motion.div>
-                    <motion.div
+                    </m.div>
+                    <m.div
                       initial={{ opacity: 0, y: 5 }}
                       animate={{ opacity: 1, y: 0 }}
                       className="absolute bottom-0 left-0 h-1.5 w-full bg-black/20 transition-[height] duration-200 hover:h-2.5"
                       onClick={handleSeek}
                     >
-                      <motion.div
+                      <m.div
                         className="h-full bg-primary"
                         style={{
                           width: `${time.duration > 0 ? (time.current / time.duration) * 100 : 0}%`,
                         }}
                       />
-                    </motion.div>
-                  </motion.div>
+                    </m.div>
+                  </m.div>
                 )}
               </AnimatePresence>
             </>

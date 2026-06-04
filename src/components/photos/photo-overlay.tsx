@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react'
 import Image from 'next/image'
-import { motion, AnimatePresence } from 'framer-motion'
+import { m, AnimatePresence } from 'framer-motion'
 import { Portal } from '@/components/ui/portal'
 import { ZOOM_EASE } from '@/constants/ui'
 import type { Photo } from '@/types/photos'
@@ -17,6 +17,7 @@ interface PhotoOverlayProps {
 /**
  * A fullscreen portal overlay that displays a high-resolution version of a photo.
  * Locks the body scroll and traps focus/escape keys while open.
+ * Uses Framer Motion's 'm' component to inherit the LazyMotion engine from the parent.
  */
 export function PhotoOverlay({ photo, isOpen, onClose }: PhotoOverlayProps) {
   useScrollLock(isOpen)
@@ -37,7 +38,7 @@ export function PhotoOverlay({ photo, isOpen, onClose }: PhotoOverlayProps) {
       <AnimatePresence>
         {isOpen && photo && (
           <div className="fixed inset-0 z-[100] flex cursor-zoom-out items-center justify-center">
-            <motion.div
+            <m.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -45,10 +46,19 @@ export function PhotoOverlay({ photo, isOpen, onClose }: PhotoOverlayProps) {
               onClick={onClose}
               className="absolute inset-0 bg-background/80 backdrop-blur-md"
             />
-            <motion.div
+
+            <m.div
               layoutId={`photo-${photo.id}`}
               transition={ZOOM_EASE}
-              className="relative z-10 flex overflow-hidden shadow-2xl bg-muted/20"
+              className="relative z-10 flex transform-gpu overflow-hidden bg-muted/20 shadow-2xl will-change-transform"
+              style={{
+                // Derive the box size from the photo's aspect ratio so the layout
+                // target is known synchronously on mount. Without this, the box would
+                // collapse until the high-res image downloads, breaking the first
+                // (uncached) zoom animation. Fits within 90vw x 90vh, keeping ratio.
+                aspectRatio: `${photo.width} / ${photo.height}`,
+                width: `min(90vw, calc(90vh * ${photo.width} / ${photo.height}))`,
+              }}
               onClick={onClose}
             >
               <Image
@@ -56,10 +66,10 @@ export function PhotoOverlay({ photo, isOpen, onClose }: PhotoOverlayProps) {
                 alt={photo.alt}
                 width={photo.width}
                 height={photo.height}
-                className="max-h-[90vh] max-w-[90vw] w-auto h-auto object-cover"
+                className="size-full object-cover"
                 priority
               />
-            </motion.div>
+            </m.div>
           </div>
         )}
       </AnimatePresence>

@@ -2,7 +2,7 @@
 
 import { useCallback, useMemo } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
-import { m, AnimatePresence, LazyMotion, domMax } from 'framer-motion'
+import { m, AnimatePresence } from 'framer-motion'
 import { skillRows } from '@/data/static/skills'
 import { SKILL_CATEGORIES } from '@/constants/categories'
 import { CategoryFilter } from '@/components/common/category-filter'
@@ -16,6 +16,8 @@ const allSkills = [...skillRows.firstRow, ...skillRows.secondRow]
 /**
  * Skills Grid Component.
  * The primary interface for the detailed skills directory.
+ * Uses Framer Motion's lightweight `m` component to handle layout shifts
+ * when filtering by category without bloating the bundle.
  */
 export function SkillsGrid() {
   const searchParams = useSearchParams()
@@ -55,7 +57,7 @@ export function SkillsGrid() {
         onChange={handleCategoryChange}
       />
 
-      <LazyMotion features={domMax}>
+      <>
         <AnimatePresence mode="popLayout">
           {filteredSkills.length > 0 ? (
             <m.div key="skills-grid" layout className="flex flex-wrap gap-2.5">
@@ -76,7 +78,7 @@ export function SkillsGrid() {
             <EmptyState key="no-skills" message="no skills found in this category." />
           )}
         </AnimatePresence>
-      </LazyMotion>
+      </>
     </div>
   )
 }

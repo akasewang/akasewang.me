@@ -1,7 +1,7 @@
 'use client'
 
 import { type ReactNode } from 'react'
-import { motion } from 'framer-motion'
+import { m } from 'framer-motion'
 import { BackButton } from '@/components/ui/back-button'
 import { cn } from '@/utils/utils'
 import { SMOOTH_SPRING_TRANSITION } from '@/constants/ui'
@@ -18,7 +18,7 @@ interface PageFooterProps {
  */
 export function PageFooter({ text, backButtonHref = '/', className }: PageFooterProps) {
   return (
-    <motion.footer
+    <m.footer
       layout
       transition={SMOOTH_SPRING_TRANSITION}
       className={cn('space-y-4 pt-8', className)}
@@ -29,6 +29,6 @@ export function PageFooter({ text, backButtonHref = '/', className }: PageFooter
         </p>
       )}
       <BackButton href={backButtonHref} />
-    </motion.footer>
+    </m.footer>
   )
 }

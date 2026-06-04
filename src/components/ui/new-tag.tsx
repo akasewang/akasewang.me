@@ -1,6 +1,6 @@
 'use client'
 
-import { motion } from 'framer-motion'
+import { m } from 'framer-motion'
 import { cn } from '@/utils/utils'
 import { SPRING_TRANSITION } from '@/constants/ui'
 
@@ -13,7 +13,7 @@ interface NewTagProps {
  */
 export function NewTag({ className }: NewTagProps) {
   return (
-    <motion.div
+    <m.div
       initial={{ scale: 0.8, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
       transition={SPRING_TRANSITION}
@@ -28,6 +28,6 @@ export function NewTag({ className }: NewTagProps) {
           New
         </span>
       </div>
-    </motion.div>
+    </m.div>
   )
 }

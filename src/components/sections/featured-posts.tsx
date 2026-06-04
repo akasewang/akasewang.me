@@ -2,7 +2,7 @@
 
 import { useMemo, useEffect } from 'react'
 import { usePathname } from 'next/navigation'
-import { AnimatePresence, motion } from 'framer-motion'
+import { m, AnimatePresence } from 'framer-motion'
 import { ViewAll } from '@/components/ui/view-all'
 import { BlogPostCard } from '@/components/blogs/blog-post-card'
 import { useViews } from '@/components/providers/views-context'
@@ -62,9 +62,9 @@ export function FeaturedPosts({ filterType, searchQuery, posts }: FeaturedPostsP
 
       <AnimatePresence mode="popLayout">
         {displayed.length > 0 ? (
-          <motion.div key="post-list" layout className="space-y-4">
+          <m.div key="post-list" layout className="space-y-4">
             {displayed.map((post) => (
-              <motion.div
+              <m.div
                 key={post.slug}
                 layout
                 initial={{ opacity: 0, scale: 0.98 }}
@@ -73,9 +73,9 @@ export function FeaturedPosts({ filterType, searchQuery, posts }: FeaturedPostsP
                 transition={SPRING_TRANSITION}
               >
                 <BlogPostCard post={post} />
-              </motion.div>
+              </m.div>
             ))}
-          </motion.div>
+          </m.div>
         ) : (
           <EmptyState key="no-posts" message="no posts found." />
         )}

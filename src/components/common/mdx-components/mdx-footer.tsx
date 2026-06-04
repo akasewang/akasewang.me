@@ -1,6 +1,6 @@
 'use client'
 
-import { motion } from 'framer-motion'
+import { m } from 'framer-motion'
 import { BackButton } from '@/components/ui/back-button'
 import { SMOOTH_SPRING_TRANSITION } from '@/constants/ui'
 import { cn } from '@/utils/utils'
@@ -20,7 +20,7 @@ interface MdxFooterProps {
  */
 export function MdxFooter({ quote, backHref = '/', backLabel, className }: MdxFooterProps) {
   return (
-    <motion.footer
+    <m.footer
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={SMOOTH_SPRING_TRANSITION}
@@ -32,6 +32,6 @@ export function MdxFooter({ quote, backHref = '/', backLabel, className }: MdxFo
         </blockquote>
       )}
       <BackButton href={backHref} label={backLabel} />
-    </motion.footer>
+    </m.footer>
   )
 }

@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { cn } from '@/utils/utils'
 import { PhotoOverlay } from '@/components/photos/photo-overlay'
-import { motion } from 'framer-motion'
+import { m } from 'framer-motion'
 import { ZOOM_EASE } from '@/constants/ui'
 import type { Photo } from '@/types/photos'
 
@@ -50,7 +50,7 @@ export function ZoomableImage({
         onClick={() => setIsOpen(true)}
         className="block w-full cursor-zoom-in overflow-hidden rounded-xl text-left"
       >
-        <motion.div
+        <m.div
           layoutId={`photo-${photo.id}`}
           transition={ZOOM_EASE}
           className="relative h-full w-full"
@@ -64,7 +64,7 @@ export function ZoomableImage({
             loading="lazy"
             {...props}
           />
-        </motion.div>
+        </m.div>
       </button>
 
       {alt && (

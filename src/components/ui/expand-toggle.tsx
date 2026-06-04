@@ -1,6 +1,6 @@
 'use client'
 
-import { motion } from 'framer-motion'
+import { m } from 'framer-motion'
 import { Icons } from '@/components/ui/icons'
 import { cn } from '@/utils/utils'
 
@@ -23,23 +23,23 @@ export function ExpandToggle({ isExpanded, className }: ExpandToggleProps) {
       aria-hidden="true"
       className={cn('relative flex size-4 items-center justify-center', className)}
     >
-      <motion.div
+      <m.div
         initial={false}
         animate={{ y: isExpanded ? 3 : -3 }}
         transition={FLUID_SPRING}
         className="absolute flex items-center justify-center"
       >
         <Icons.chevronUp className="size-3.5 stroke-[2.5]" />
-      </motion.div>
+      </m.div>
 
-      <motion.div
+      <m.div
         initial={false}
         animate={{ y: isExpanded ? -3 : 3 }}
         transition={FLUID_SPRING}
         className="absolute flex items-center justify-center"
       >
         <Icons.chevronDown className="size-3.5 stroke-[2.5]" />
-      </motion.div>
+      </m.div>
     </div>
   )
 }

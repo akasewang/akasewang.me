@@ -1,7 +1,7 @@
 'use client'
 
 import { Children, useEffect, useState, type ElementType, type ReactNode } from 'react'
-import { AnimatePresence, motion, type Transition, type Variants } from 'framer-motion'
+import { m, AnimatePresence, type Transition, type Variants } from 'framer-motion'
 import { cn } from '@/utils/utils'
 import { SMOOTH_SPRING_TRANSITION } from '@/constants/ui'
 
@@ -21,13 +21,13 @@ interface TextFlipProps {
 }
 
 /**
- * @param as - The HTML element or Framer Motion component to render as (defaults to `motion.span`).
+ * @param as - The HTML element or Framer Motion component to render as (defaults to `m.span`).
  * @param interval - Time in seconds between each flip.
  * @param transition - Custom Framer Motion transition config.
  * @param variants - Custom Framer Motion variants for the entrance/exit animations.
  */
 export function TextFlip({
-  as: Component = motion.span,
+  as: Component = m.span,
   className,
   children,
   interval = 3,

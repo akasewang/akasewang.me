@@ -8,6 +8,7 @@ import { ViewsProvider } from '@/components/providers/views-context'
 import { Toaster } from '@/components/ui/sonner'
 import { BackToTop } from '@/components/common/back-to-top'
 import { TooltipProvider } from '@/components/ui/tooltip'
+import { MotionProvider } from '@/components/providers/motion-provider'
 
 import { fontSans, fontSerif, fontMono } from '@/lib/fonts'
 import { getPersonSchema, getWebsiteSchema, getProfilePageSchema } from '@/lib/json-ld'
@@ -88,20 +89,22 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         />
       </head>
       <body className="bg-background font-sans text-foreground antialiased">
-        <TooltipProvider delayDuration={0}>
-          <ViewsProvider>
-            <div className="mx-auto flex min-h-screen max-w-[800px] flex-col pb-20 pt-12 md:pb-12">
-              <Navbar />
-              <main className="flex-grow px-8 py-12">{children}</main>
-              <Footer />
-            </div>
-          </ViewsProvider>
-          <BackToTop />
-          <Toaster position="bottom-center" />
-          <div className="bottom-blur-fade" />
-          <SpeedInsights />
-          <Analytics />
-        </TooltipProvider>
+        <MotionProvider>
+          <TooltipProvider delayDuration={0}>
+            <ViewsProvider>
+              <div className="mx-auto flex min-h-screen max-w-[800px] flex-col pb-20 pt-12 md:pb-12">
+                <Navbar />
+                <main className="flex-grow px-8 py-12">{children}</main>
+                <Footer />
+              </div>
+            </ViewsProvider>
+            <BackToTop />
+            <Toaster position="bottom-center" />
+            <div className="bottom-blur-fade" />
+            <SpeedInsights />
+            <Analytics />
+          </TooltipProvider>
+        </MotionProvider>
       </body>
     </html>
   )

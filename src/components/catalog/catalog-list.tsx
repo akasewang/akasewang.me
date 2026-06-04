@@ -2,7 +2,7 @@
 
 import { useCallback, useMemo } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
-import { motion, AnimatePresence } from 'framer-motion'
+import { m, AnimatePresence } from 'framer-motion'
 import { CategoryFilter } from '@/components/common/category-filter'
 import { EmptyState } from '@/components/common/empty-state'
 import { CATALOG_CATEGORIES } from '@/constants/categories'
@@ -56,9 +56,9 @@ export function CatalogList() {
       />
       <AnimatePresence mode="popLayout">
         {filteredItems.length > 0 ? (
-          <motion.div key="catalog-grid" layout className="flex flex-col">
+          <m.div key="catalog-grid" layout className="flex flex-col">
             {filteredItems.map((item) => (
-              <motion.div
+              <m.div
                 key={`${item.category}-${item.title}`}
                 layout
                 initial={{ opacity: 0, scale: 0.98 }}
@@ -75,9 +75,9 @@ export function CatalogList() {
                     {item.author}
                   </span>
                 )}
-              </motion.div>
+              </m.div>
             ))}
-          </motion.div>
+          </m.div>
         ) : (
           <EmptyState key="empty" message="no entries found in this category." />
         )}

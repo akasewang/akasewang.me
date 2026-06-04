@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useMemo, type ReactNode } from 'react'
-import { motion, AnimatePresence, type Transition } from 'framer-motion'
+import { m, AnimatePresence, type Transition } from 'framer-motion'
 import { Icons } from '@/components/ui/icons'
 import { sharedContent } from '@/data/content/landing-content'
 import { cn } from '@/utils/utils'
@@ -36,7 +36,7 @@ export function ExpandableList<T>({ items, renderItem, initialCount = 3 }: Expan
         <>
           <AnimatePresence initial={false}>
             {showAll && (
-              <motion.div
+              <m.div
                 key="expanded-list"
                 initial={{ height: 0, opacity: 0 }}
                 animate={{ height: 'auto', opacity: 1 }}
@@ -47,24 +47,24 @@ export function ExpandableList<T>({ items, renderItem, initialCount = 3 }: Expan
                 <div className="flex flex-col gap-6 pt-6">
                   {hiddenItems.map((item, index) => renderItem(item, initialCount + index))}
                 </div>
-              </motion.div>
+              </m.div>
             )}
           </AnimatePresence>
 
-          <motion.button
+          <m.button
             layout
             transition={smoothTransition}
             onClick={() => setShowAll((prev) => !prev)}
             className="group mt-6 inline-flex self-start items-center gap-1.5 text-sm text-muted-foreground transition-colors duration-300 hover:text-primary"
             aria-expanded={showAll}
           >
-            <motion.span
+            <m.span
               layout
               transition={smoothTransition}
               className="relative flex items-center after:absolute after:-bottom-0.5 after:left-0 after:h-px after:w-0 after:bg-primary after:transition-[width] after:duration-300 group-hover:after:w-full"
             >
               <AnimatePresence mode="popLayout" initial={false}>
-                <motion.span
+                <m.span
                   key={showAll ? 'less' : 'more'}
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -73,9 +73,9 @@ export function ExpandableList<T>({ items, renderItem, initialCount = 3 }: Expan
                   className="inline-block whitespace-nowrap"
                 >
                   {showAll ? sharedContent.less : sharedContent.more}
-                </motion.span>
+                </m.span>
               </AnimatePresence>
-            </motion.span>
+            </m.span>
 
             <Icons.arrowForward
               aria-hidden="true"
@@ -84,7 +84,7 @@ export function ExpandableList<T>({ items, renderItem, initialCount = 3 }: Expan
                 showAll ? 'group-hover:-rotate-90' : 'group-hover:rotate-90',
               )}
             />
-          </motion.button>
+          </m.button>
         </>
       )}
     </div>

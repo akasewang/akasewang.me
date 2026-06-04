@@ -1,6 +1,6 @@
 'use client'
 
-import { m, LazyMotion, domMax, AnimatePresence } from 'framer-motion'
+import { m, AnimatePresence } from 'framer-motion'
 import { ComponentCard } from './component-card'
 import type { RegistryItem } from '@/types/registry'
 import { SPRING_TRANSITION } from '@/constants/ui'
@@ -11,14 +11,17 @@ interface RegistryListProps {
 }
 
 /**
+ * Renders a staggered, animated list of registry component cards.
+ * Uses Framer Motion's `AnimatePresence` with `mode="popLayout"` to ensure smooth
+ * filtering transitions by instantly pulling exiting items out of the document flow,
+ * preventing layout jumps. Heavily relies on the global `MotionProvider` for animation capabilities.
+ *
  * @param components - Array of registry items to be rendered as cards.
  */
-
 export function RegistryList({ components }: RegistryListProps) {
   return (
-    <LazyMotion features={domMax}>
+    <>
       <div className="flex flex-col gap-2">
-        {/* Use popLayout so exiting elements are immediately removed from document flow to prevent jumpy layout shifts during filtering */}
         <AnimatePresence mode="popLayout">
           {components.length > 0 ? (
             components.map((item, index) => (
@@ -48,6 +51,6 @@ export function RegistryList({ components }: RegistryListProps) {
           )}
         </AnimatePresence>
       </div>
-    </LazyMotion>
+    </>
   )
 }

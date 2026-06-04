@@ -1,7 +1,7 @@
 'use client'
 
 import { useId } from 'react'
-import { motion } from 'framer-motion'
+import { m } from 'framer-motion'
 import { cn } from '@/utils/utils'
 import { SPRING_TRANSITION, SMOOTH_SPRING_TRANSITION } from '@/constants/ui'
 
@@ -31,7 +31,7 @@ export function CategoryFilter<T extends string>({
         const isActive = value === catValue
 
         return (
-          <motion.button
+          <m.button
             key={catValue}
             type="button"
             whileTap={{ scale: 0.97 }}
@@ -44,13 +44,13 @@ export function CategoryFilter<T extends string>({
           >
             <span className="relative z-10">{label}</span>
             {isActive && (
-              <motion.div
+              <m.div
                 layoutId={`active-tab-${id}`}
                 className="absolute inset-0 rounded-none bg-primary"
                 transition={SMOOTH_SPRING_TRANSITION}
               />
             )}
-          </motion.button>
+          </m.button>
         )
       })}
     </div>

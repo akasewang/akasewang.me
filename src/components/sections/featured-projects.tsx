@@ -2,7 +2,7 @@
 
 import { useMemo, useEffect } from 'react'
 import { usePathname } from 'next/navigation'
-import { AnimatePresence, m, LazyMotion, domMax } from 'framer-motion'
+import { AnimatePresence, m } from 'framer-motion'
 import { useViews } from '@/components/providers/views-context'
 import { ViewAll } from '@/components/ui/view-all'
 import { ProjectCard } from '@/components/projects/project-card'
@@ -22,8 +22,9 @@ const { featuredProjects } = landingPageContent.sections
 
 /**
  * Featured Projects Section.
- * A dual-purpose component that renders a subset of projects on the home page.
+ * A dual-purpose component that renders a subset of projects on the home page
  * or acts as the fully searchable/filterable grid on the main `/projects` listing.
+ * Animates using the lightweight `m` component injected from the root `MotionProvider`.
  */
 export function FeaturedProjects({
   filterType,
@@ -58,7 +59,7 @@ export function FeaturedProjects({
     <section id="projects" className="space-y-8 animate-page-simple">
       {isHomePage && <SectionTitle>{featuredProjects.title}</SectionTitle>}
 
-      <LazyMotion features={domMax}>
+      <>
         <AnimatePresence mode="popLayout">
           {displayed.length > 0 ? (
             <m.div key="project-grid" layout className="grid grid-cols-1 gap-6 sm:grid-cols-2">
@@ -79,7 +80,7 @@ export function FeaturedProjects({
             <EmptyState key="no-projects" message="no projects found in this category." />
           )}
         </AnimatePresence>
-      </LazyMotion>
+      </>
 
       {isHomePage && <ViewAll href="/projects" label={featuredProjects.viewAll} />}
     </section>

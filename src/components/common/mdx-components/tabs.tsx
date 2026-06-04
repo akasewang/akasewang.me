@@ -10,7 +10,7 @@ import {
   type ReactNode,
 } from 'react'
 import * as RadixTabs from '@radix-ui/react-tabs'
-import { motion } from 'framer-motion'
+import { m } from 'framer-motion'
 import { cn } from '@/utils/utils'
 import { SPRING_TRANSITION, SMOOTH_SPRING_TRANSITION } from '@/constants/ui'
 
@@ -63,7 +63,7 @@ export const Tabs = ({ items, defaultIndex = 0, className, children }: TabsProps
           const isActive = activeTab === value
           return (
             <RadixTabs.Trigger key={value} value={value} asChild>
-              <motion.button
+              <m.button
                 type="button"
                 whileTap={{ scale: 0.97 }}
                 transition={SPRING_TRANSITION}
@@ -74,13 +74,13 @@ export const Tabs = ({ items, defaultIndex = 0, className, children }: TabsProps
               >
                 <span className="relative z-10">{label}</span>
                 {isActive && (
-                  <motion.div
+                  <m.div
                     layoutId={`active-tab-${id}`}
                     className="absolute inset-0 z-0 rounded-lg bg-background"
                     transition={SMOOTH_SPRING_TRANSITION}
                   />
                 )}
-              </motion.button>
+              </m.button>
             </RadixTabs.Trigger>
           )
         })}

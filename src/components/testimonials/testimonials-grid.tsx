@@ -1,6 +1,6 @@
 'use client'
 
-import { m, LazyMotion, domAnimation } from 'framer-motion'
+import { m } from 'framer-motion'
 import { testimonials } from '@/data/static/testimonials'
 import { TestimonialCard } from '@/components/testimonials/testimonial-card'
 
@@ -9,10 +9,11 @@ const allTestimonials = [...testimonials.topRow, ...testimonials.bottomRow]
 /**
  * Testimonials Grid Component.
  * The primary interface for the detailed testimonials directory.
+ * Utilizes the lightweight `m.div` for entrance animations to maintain optimal performance.
  */
 export function TestimonialsGrid() {
   return (
-    <LazyMotion features={domAnimation}>
+    <>
       <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,320px),1fr))] gap-4">
         {allTestimonials.map((item) => (
           <m.div
@@ -26,6 +27,6 @@ export function TestimonialsGrid() {
           </m.div>
         ))}
       </div>
-    </LazyMotion>
+    </>
   )
 }

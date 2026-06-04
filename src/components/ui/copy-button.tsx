@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
-import { motion, AnimatePresence, type HTMLMotionProps } from 'framer-motion'
+import { m, AnimatePresence, type HTMLMotionProps } from 'framer-motion'
 import { Icons } from '@/components/ui/icons'
 import { cn } from '@/utils/utils'
 
@@ -45,7 +45,7 @@ export function CopyButton({
   const ActiveIcon = (isCopied ? Icons.check : Icons.copy) as React.ElementType
 
   return (
-    <motion.button
+    <m.button
       type="button"
       onClick={handleCopy}
       whileTap={{ scale: 0.94 }}
@@ -61,7 +61,7 @@ export function CopyButton({
     >
       <span className="relative" style={{ width: iconSize, height: iconSize }}>
         <AnimatePresence initial={false} mode="popLayout">
-          <motion.span
+          <m.span
             key={isCopied ? 'check' : 'copy'}
             initial={{ scale: 0.5, opacity: 0, rotate: -45 }}
             animate={{ scale: 1, opacity: 1, rotate: 0 }}
@@ -70,9 +70,9 @@ export function CopyButton({
             className="absolute inset-0 flex items-center justify-center"
           >
             <ActiveIcon size={iconSize} />
-          </motion.span>
+          </m.span>
         </AnimatePresence>
       </span>
-    </motion.button>
+    </m.button>
   )
 }

@@ -3,7 +3,7 @@
 import { useRef, useEffect, memo } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { motion, useInView } from 'framer-motion'
+import { m, useInView } from 'framer-motion'
 import { SPRING_TRANSITION } from '@/constants/ui'
 import { ViewCounter } from '@/components/common/view-counter'
 import { NewTag } from '@/components/ui/new-tag'
@@ -40,7 +40,7 @@ export const ProjectCard = memo(function ProjectCard({ project }: ProjectCardPro
     : formatDateString(date)
 
   return (
-    <motion.div
+    <m.div
       layout
       initial={{ opacity: 0, scale: 0.98 }}
       animate={{ opacity: 1, scale: 1 }}
@@ -115,6 +115,6 @@ export const ProjectCard = memo(function ProjectCard({ project }: ProjectCardPro
           </div>
         </div>
       </Link>
-    </motion.div>
+    </m.div>
   )
 })

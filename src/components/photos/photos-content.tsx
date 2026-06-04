@@ -1,9 +1,9 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useMemo, useState, useCallback, memo } from 'react'
 import Image from 'next/image'
 import { useSearchParams, useRouter } from 'next/navigation'
-import { motion, AnimatePresence } from 'framer-motion'
+import { m, AnimatePresence } from 'framer-motion'
 import { cn } from '@/utils/utils'
 import { Icons } from '@/components/ui/icons'
 import { photos } from '@/data/static/photos'
@@ -12,13 +12,12 @@ import { EmptyState } from '@/components/common/empty-state'
 import { ZOOM_EASE } from '@/constants/ui'
 import { PageLayout } from '@/components/layout/page-layout'
 import { PHOTO_CATEGORIES } from '@/constants/categories'
-import type { Category } from '@/types/photos'
+import type { Photo, Category } from '@/types/photos'
 import { PhotoOverlay } from './photo-overlay'
 
-/**
- * and a dynamic layout toggle (aspect ratio vs strict square cropping).
- * Connects directly with the PhotoOverlay component for image lightboxing.
- */
+// 1. HOISTED STATIC MAP: Evaluates exactly once in memory, never on re-renders.
+const PHOTO_BY_ID = new Map(photos.map((p) => [p.id, p]))
+
 export function PhotosContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
@@ -26,6 +25,11 @@ export function PhotosContent() {
   const [view, setView] = useState<'cover' | 'contain'>('cover')
   const [zoomedPhotoId, setZoomedPhotoId] = useState<string | null>(null)
   const [isToggling, setIsToggling] = useState(false)
+  const [preloadIds, setPreloadIds] = useState<Set<string>>(new Set())
+
+  const preloadPhoto = useCallback((id: string) => {
+    setPreloadIds((prev) => (prev.has(id) ? prev : new Set(prev).add(id)))
+  }, [])
 
   const categoryParam = searchParams.get('category')
   const activeCategory = useMemo(() => {
@@ -34,27 +38,24 @@ export function PhotosContent() {
       : 'all'
   }, [categoryParam])
 
-  const handleCategoryChange = (val: Category) => {
-    const params = new URLSearchParams(searchParams)
-    if (val === 'all') {
-      params.delete('category')
-    } else {
-      params.set('category', val)
-    }
-    router.replace(`/photos?${params.toString()}`, { scroll: false })
-  }
+  const handleCategoryChange = useCallback(
+    (val: Category) => {
+      const params = new URLSearchParams(searchParams)
+      if (val === 'all') params.delete('category')
+      else params.set('category', val)
+      router.replace(`/photos?${params.toString()}`, { scroll: false })
+    },
+    [searchParams, router],
+  )
 
-  const handleToggleView = () => {
+  const handleToggleView = useCallback(() => {
     setIsToggling(true)
     setView((v) => (v === 'cover' ? 'contain' : 'cover'))
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        setIsToggling(false)
-      })
-    })
-  }
+    setTimeout(() => setIsToggling(false), 50)
+  }, [])
 
-  const zoomedPhoto = useMemo(() => photos.find((p) => p.id === zoomedPhotoId), [zoomedPhotoId])
+  // Fast O(1) lookup using the hoisted map
+  const zoomedPhoto = zoomedPhotoId ? PHOTO_BY_ID.get(zoomedPhotoId) : undefined
 
   const filteredPhotos = useMemo(
     () => (activeCategory === 'all' ? photos : photos.filter((p) => p.category === activeCategory)),
@@ -68,7 +69,7 @@ export function PhotosContent() {
         footerText="Taking photos so I don't have to remember things."
         className="relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] min-h-screen w-screen overflow-hidden px-8 pb-12 pt-2 md:px-28 md:pt-12"
       >
-        <div className="z-50 mb-6 md:fixed md:left-8 md:top-24 md:mb-0 animate-page-simple">
+        <div className="z-50 mb-6 animate-page-simple md:fixed md:left-8 md:top-24 md:mb-0">
           <button
             onClick={handleToggleView}
             className="relative flex h-8 shrink-0 items-center justify-center text-sm font-medium text-muted-foreground transition-colors duration-300 hover:text-primary"
@@ -93,60 +94,30 @@ export function PhotosContent() {
           </div>
           <AnimatePresence mode="popLayout">
             {filteredPhotos.length > 0 ? (
-              <motion.div
+              <m.div
                 key="photo-grid"
                 className="columns-1 gap-4 space-y-4 sm:columns-2 lg:columns-3 xl:columns-4"
               >
-                {filteredPhotos.map((photo, idx) => (
-                  <motion.div
-                    key={photo.id ?? idx}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={ZOOM_EASE}
-                    className="break-inside-avoid"
-                  >
-                    <div
-                      onClick={() => setZoomedPhotoId(photo.id)}
-                      style={
-                        view === 'contain'
-                          ? { aspectRatio: `${photo.width} / ${photo.height}` }
-                          : undefined
-                      }
-                      className={cn(
-                        'group relative w-full cursor-zoom-in overflow-hidden bg-muted/20',
-                        view === 'cover' && 'aspect-square',
-                      )}
-                    >
-                      <div className="absolute inset-0 z-10 bg-muted/10 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-
-                      <motion.div
-                        layoutId={`photo-${photo.id}`}
-                        transition={isToggling ? { duration: 0 } : ZOOM_EASE}
-                        className="relative h-full w-full overflow-hidden"
-                      >
-                        <Image
-                          src={photo.url}
-                          alt={photo.alt}
-                          width={photo.width}
-                          height={photo.height}
-                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw"
-                          className={cn(
-                            'h-full w-full',
-                            view === 'contain' ? 'object-cover' : 'object-cover',
-                          )}
-                        />
-                      </motion.div>
-                    </div>
-                  </motion.div>
+                {filteredPhotos.map((photo) => (
+                  <PhotoCard
+                    key={photo.id}
+                    photo={photo}
+                    view={view}
+                    isToggling={isToggling}
+                    onZoom={setZoomedPhotoId}
+                    onPreload={preloadPhoto}
+                  />
                 ))}
-              </motion.div>
+              </m.div>
             ) : (
               <EmptyState key="no-photos" message="no photos found in this category." />
             )}
           </AnimatePresence>
         </div>
       </PageLayout>
+
+      {/* 3. ISOLATED PRELOADER: Hovering photos no longer triggers PageLayout re-renders */}
+      <PreloadRenderer ids={preloadIds} />
 
       <PhotoOverlay
         photo={zoomedPhoto ?? null}
@@ -156,3 +127,82 @@ export function PhotosContent() {
     </>
   )
 }
+
+const PhotoCard = memo(function PhotoCard({
+  photo,
+  view,
+  isToggling,
+  onZoom,
+  onPreload,
+}: {
+  photo: Photo
+  view: 'cover' | 'contain'
+  isToggling: boolean
+  onZoom: (id: string) => void
+  onPreload: (id: string) => void
+}) {
+  return (
+    <m.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={ZOOM_EASE}
+      className="break-inside-avoid"
+    >
+      <div
+        onClick={() => onZoom(photo.id)}
+        onPointerEnter={() => onPreload(photo.id)}
+        onPointerDown={() => onPreload(photo.id)}
+        style={view === 'contain' ? { aspectRatio: `${photo.width} / ${photo.height}` } : undefined}
+        className={cn(
+          'group relative w-full cursor-zoom-in overflow-hidden bg-muted/20',
+          view === 'cover' && 'aspect-square',
+        )}
+      >
+        <div className="absolute inset-0 z-10 bg-muted/10 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+
+        <m.div
+          layoutId={`photo-${photo.id}`}
+          transition={isToggling ? { duration: 0 } : ZOOM_EASE}
+          className="relative size-full overflow-hidden"
+        >
+          <Image
+            src={photo.url}
+            alt={photo.alt}
+            width={photo.width}
+            height={photo.height}
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw"
+            className="size-full object-cover"
+          />
+        </m.div>
+      </div>
+    </m.div>
+  )
+})
+
+const PreloadRenderer = memo(function PreloadRenderer({ ids }: { ids: Set<string> }) {
+  if (ids.size === 0) return null
+
+  return (
+    <div
+      aria-hidden
+      className="pointer-events-none fixed -left-px -top-px h-px w-px overflow-hidden opacity-0"
+    >
+      {Array.from(ids).map((id) => {
+        const p = PHOTO_BY_ID.get(id)
+        if (!p) return null
+        return (
+          <Image
+            key={`preload-${p.id}`}
+            src={p.url}
+            alt=""
+            width={p.width}
+            height={p.height}
+            loading="eager"
+            decoding="async"
+          />
+        )
+      })}
+    </div>
+  )
+})

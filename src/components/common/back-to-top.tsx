@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react'
 import {
-  motion,
+  m,
   AnimatePresence,
   useScroll,
   useTransform,
@@ -134,7 +134,7 @@ export function BackToTop() {
   return (
     <AnimatePresence>
       {isVisible && (
-        <motion.button
+        <m.button
           type="button"
           onClick={handleAction}
           aria-label={mode === 'down' ? 'Scroll to next section' : commonContent.backToTop}
@@ -161,7 +161,7 @@ export function BackToTop() {
               strokeWidth={1.5}
               className="text-muted"
             />
-            <motion.circle
+            <m.circle
               cx={BACK_TO_TOP_CENTER}
               cy={BACK_TO_TOP_CENTER}
               r={BACK_TO_TOP_RADIUS}
@@ -177,7 +177,7 @@ export function BackToTop() {
 
           <div className="relative mb-[1px] flex size-full items-center justify-center overflow-hidden rounded-full">
             <AnimatePresence initial={false}>
-              <motion.div
+              <m.div
                 key={mode}
                 custom={mode === 'down'}
                 variants={iconVariants}
@@ -188,10 +188,10 @@ export function BackToTop() {
                 className="absolute flex items-center justify-center text-muted-foreground transition-colors duration-500 group-hover:text-primary"
               >
                 <Icon className="size-6.5" strokeWidth={2} />
-              </motion.div>
+              </m.div>
             </AnimatePresence>
           </div>
-        </motion.button>
+        </m.button>
       )}
     </AnimatePresence>
   )
