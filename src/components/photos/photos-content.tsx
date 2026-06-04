@@ -2,7 +2,7 @@
 
 import { useMemo, useState, useCallback, memo } from 'react'
 import Image from 'next/image'
-import { useSearchParams, useRouter } from 'next/navigation'
+import { useSearchParams, useRouter, usePathname } from 'next/navigation'
 import { m, AnimatePresence } from 'framer-motion'
 import { cn } from '@/utils/utils'
 import { Icons } from '@/components/ui/icons'
@@ -15,12 +15,23 @@ import { PHOTO_CATEGORIES } from '@/constants/categories'
 import type { Photo, Category } from '@/types/photos'
 import { PhotoOverlay } from './photo-overlay'
 
-// 1. HOISTED STATIC MAP: Evaluates exactly once in memory, never on re-renders.
 const PHOTO_BY_ID = new Map(photos.map((p) => [p.id, p]))
 
+/**
+ * Main container for the Photos gallery page.
+ * Manages URL-based category filtering, 'cover' vs 'contain' view modes, and fullscreen zooming.
+ *
+ * Performance features:
+ * - Uses `new URLSearchParams(searchParams.toString())` to safely update URL state without trailing `?`.
+ * - Hoists the static `PHOTO_BY_ID` map to prevent O(N) lookups on every render when zooming.
+ * - Suppresses layout morphing animations during view mode toggling via `isToggling`.
+ * - Dispatches image preloading to an isolated renderer so hovering over images doesn't trigger
+ *   costly root-level React re-renders.
+ */
 export function PhotosContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
+  const pathname = usePathname()
 
   const [view, setView] = useState<'cover' | 'contain'>('cover')
   const [zoomedPhotoId, setZoomedPhotoId] = useState<string | null>(null)
@@ -40,12 +51,19 @@ export function PhotosContent() {
 
   const handleCategoryChange = useCallback(
     (val: Category) => {
-      const params = new URLSearchParams(searchParams)
-      if (val === 'all') params.delete('category')
-      else params.set('category', val)
-      router.replace(`/photos?${params.toString()}`, { scroll: false })
+      const params = new URLSearchParams(searchParams.toString())
+      if (val === 'all') {
+        params.delete('category')
+      } else {
+        params.set('category', val)
+      }
+
+      const query = params.toString()
+      const newUrl = query ? `${pathname}?${query}` : pathname
+
+      router.replace(newUrl, { scroll: false })
     },
-    [searchParams, router],
+    [searchParams, router, pathname],
   )
 
   const handleToggleView = useCallback(() => {
@@ -54,7 +72,6 @@ export function PhotosContent() {
     setTimeout(() => setIsToggling(false), 50)
   }, [])
 
-  // Fast O(1) lookup using the hoisted map
   const zoomedPhoto = zoomedPhotoId ? PHOTO_BY_ID.get(zoomedPhotoId) : undefined
 
   const filteredPhotos = useMemo(
@@ -116,7 +133,6 @@ export function PhotosContent() {
         </div>
       </PageLayout>
 
-      {/* 3. ISOLATED PRELOADER: Hovering photos no longer triggers PageLayout re-renders */}
       <PreloadRenderer ids={preloadIds} />
 
       <PhotoOverlay
@@ -128,6 +144,16 @@ export function PhotosContent() {
   )
 }
 
+/**
+ * Individual photo item within the gallery grid.
+ *
+ * @param view - 'cover' forces a square aspect ratio. 'contain' uses the native image ratio.
+ * @param isToggling - If true, temporarily overrides the `layout` transition to `duration: 0`
+ *                     to instantly snap the image to its new grid shape without a morph animation.
+ *                     This keeps the zoom animation smooth while making grid changes instantaneous.
+ * @param onZoom - Dispatches the ID to open the `PhotoOverlay`.
+ * @param onPreload - Registers the ID in the `PreloadRenderer` on pointer enter/down.
+ */
 const PhotoCard = memo(function PhotoCard({
   photo,
   view,
@@ -180,6 +206,13 @@ const PhotoCard = memo(function PhotoCard({
   )
 })
 
+/**
+ * An invisible component that forces the browser to begin downloading high-res images
+ * before the user actually clicks on them. Rendered in a separate isolated component tree
+ * to prevent the main `PhotosContent` from re-rendering whenever a new ID is added.
+ *
+ * @param ids - Set of photo IDs that the user has hovered over.
+ */
 const PreloadRenderer = memo(function PreloadRenderer({ ids }: { ids: Set<string> }) {
   if (ids.size === 0) return null
 

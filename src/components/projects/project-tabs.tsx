@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useMemo, useCallback } from 'react'
-import { useSearchParams, useRouter } from 'next/navigation'
+import { useSearchParams, useRouter, usePathname } from 'next/navigation'
 import { ContentFilter, type SortOption } from '@/components/common/content-filter'
 import { FeaturedProjects } from '@/components/sections/featured-projects'
 import { PROJECT_CATEGORIES } from '@/constants/categories'
@@ -17,6 +17,7 @@ import type { ProjectPostData, ProjectCategory } from '@/types/project'
 export function ProjectTabs({ projects }: { projects: ProjectPostData[] }) {
   const searchParams = useSearchParams()
   const router = useRouter()
+  const pathname = usePathname()
   const { getViews, prefetchViews } = useViews()
 
   const categoryParam = searchParams.get('category')
@@ -58,7 +59,7 @@ export function ProjectTabs({ projects }: { projects: ProjectPostData[] }) {
 
   const updateParams = useCallback(
     (updates: Record<string, string | null>) => {
-      const params = new URLSearchParams(searchParams)
+      const params = new URLSearchParams(searchParams.toString())
       Object.entries(updates).forEach(([key, value]) => {
         if (value === null || value === 'all' || (key === 'sort' && value === 'date-desc')) {
           params.delete(key)
@@ -66,9 +67,13 @@ export function ProjectTabs({ projects }: { projects: ProjectPostData[] }) {
           params.set(key, value)
         }
       })
-      router.replace(`/projects?${params.toString()}`, { scroll: false })
+
+      const query = params.toString()
+      const newUrl = query ? `${pathname}?${query}` : pathname
+
+      router.replace(newUrl, { scroll: false })
     },
-    [searchParams, router],
+    [searchParams, router, pathname],
   )
 
   const handleCategoryChange = (val: ProjectCategory) => {

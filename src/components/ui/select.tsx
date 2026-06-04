@@ -1,6 +1,13 @@
 'use client'
 
-import { forwardRef, type ComponentRef, type ComponentPropsWithoutRef } from 'react'
+import {
+  forwardRef,
+  useRef,
+  useCallback,
+  type ComponentRef,
+  type ComponentPropsWithoutRef,
+} from 'react'
+import { MenuHighlight } from '@/components/ui/menu-highlight'
 import {
   Root,
   Value,
@@ -43,33 +50,51 @@ const SelectTrigger = forwardRef<
 ))
 SelectTrigger.displayName = Trigger.displayName
 
+/**
+ * Renders the select menu panel.
+ * Automatically injects the `MenuHighlight` background for zero-lag fluid hover effects.
+ */
 const SelectContent = forwardRef<
   ComponentRef<typeof Content>,
   ComponentPropsWithoutRef<typeof Content>
->(({ className, children, position = 'popper', ...props }, ref) => (
-  <Portal>
-    <Content
-      ref={ref}
-      position={position}
-      sideOffset={6}
-      className={cn(
-        'select-content-elegant relative z-50 max-h-96 overflow-hidden rounded-xl bg-dropdown-background p-1.5 shadow-xl ring-1 ring-ring retina:ring-[0.5px]',
-        position === 'popper' && 'w-[var(--radix-select-trigger-width)]',
-        className,
-      )}
-      {...props}
-    >
-      <Viewport
+>(({ className, children, position = 'popper', ...props }, forwardedRef) => {
+  const internalRef = useRef<HTMLDivElement>(null)
+
+  const ref = useCallback(
+    (node: HTMLDivElement | null) => {
+      internalRef.current = node
+      if (typeof forwardedRef === 'function') forwardedRef(node)
+      else if (forwardedRef) forwardedRef.current = node
+    },
+    [forwardedRef],
+  )
+
+  return (
+    <Portal>
+      <Content
+        ref={ref}
+        position={position}
+        sideOffset={6}
         className={cn(
-          'flex flex-col gap-0.5',
-          position === 'popper' && 'h-[var(--radix-select-content-available-height)]',
+          'select-content-elegant relative z-50 max-h-96 overflow-hidden rounded-xl bg-dropdown-background shadow-xl ring-1 ring-ring retina:ring-[0.5px]',
+          position === 'popper' && 'w-[var(--radix-select-trigger-width)]',
+          className,
         )}
+        {...props}
       >
-        {children}
-      </Viewport>
-    </Content>
-  </Portal>
-))
+        <Viewport
+          className={cn(
+            'relative flex flex-col gap-0.5 p-1.5',
+            position === 'popper' && 'h-[var(--radix-select-content-available-height)]',
+          )}
+        >
+          <MenuHighlight parentRef={internalRef} />
+          {children}
+        </Viewport>
+      </Content>
+    </Portal>
+  )
+})
 SelectContent.displayName = Content.displayName
 
 const SelectItem = forwardRef<ComponentRef<typeof Item>, ComponentPropsWithoutRef<typeof Item>>(
@@ -77,16 +102,18 @@ const SelectItem = forwardRef<ComponentRef<typeof Item>, ComponentPropsWithoutRe
     <Item
       ref={ref}
       className={cn(
-        'group relative flex w-full select-none items-center gap-2.5 whitespace-nowrap rounded-lg px-2.5 py-1.5 pr-8 text-left text-xs font-medium tracking-tight text-secondary outline-none ring-1 ring-inset ring-transparent transition-[color,background-color,box-shadow] duration-200 ease-in-out',
+        'group relative flex w-full select-none items-center gap-2.5 whitespace-nowrap rounded-lg px-2.5 py-1.5 pr-8 text-left text-xs font-medium tracking-tight text-secondary outline-none ring-1 ring-inset ring-transparent transition-colors duration-200 ease-in-out',
         'data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
-        'data-[highlighted]:z-10 data-[highlighted]:bg-overlay-accent data-[highlighted]:text-primary data-[highlighted]:ring-overlay-accent-border',
+        'data-[highlighted]:z-10 data-[highlighted]:text-primary',
         'data-[state=checked]:text-primary',
         className,
       )}
       {...props}
     >
-      <ItemText>{children}</ItemText>
-      <span className="absolute right-2.5 flex size-3.5 items-center justify-center">
+      <span className="relative z-10 flex w-full items-center gap-2">
+        <ItemText>{children}</ItemText>
+      </span>
+      <span className="absolute right-2.5 z-10 flex size-3.5 items-center justify-center">
         <ItemIndicator className="select-check-elegant">
           <Icons.check size={16} className="shrink-0 text-primary" />
         </ItemIndicator>

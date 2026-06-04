@@ -1,12 +1,18 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useMemo } from 'react'
 
 import { toast } from 'sonner'
 import { Icons } from '@/components/ui/icons'
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip'
 import { cn } from '@/utils/utils'
 import { USERNAME } from '@/constants/constants'
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from '@/components/ui/dropdown-menu'
 
 interface SocialShareProps {
   url: string
@@ -64,26 +70,13 @@ const getShareUrl = (network: string, url: string, title: string) => {
  */
 export function SocialShare({ url, title, className }: SocialShareProps) {
   const [isOpen, setIsOpen] = useState(false)
-  const [shouldRender, setShouldRender] = useState(false)
   const [copied, setCopied] = useState(false)
-  const dropdownRef = useRef<HTMLDivElement>(null)
 
-  useEffect(() => {
-    if (isOpen) setShouldRender(true)
-  }, [isOpen])
-
-  useEffect(() => {
-    if (!isOpen) return
-
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsOpen(false)
-      }
-    }
-
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [isOpen])
+  const shareLinks = useMemo(
+    () =>
+      SHARE_NETWORKS.map((option) => ({ ...option, href: getShareUrl(option.name, url, title) })),
+    [url, title],
+  )
 
   const handleCopyLink = async () => {
     try {
@@ -115,73 +108,57 @@ export function SocialShare({ url, title, className }: SocialShareProps) {
   )
 
   return (
-    <div className={cn('relative inline-block', className)} ref={dropdownRef}>
-      {isOpen ? (
-        triggerButton
-      ) : (
+    <div className={cn('relative inline-block', className)}>
+      <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
         <Tooltip>
-          <TooltipTrigger asChild>{triggerButton}</TooltipTrigger>
+          <TooltipTrigger asChild>
+            <DropdownMenuTrigger asChild>{triggerButton}</DropdownMenuTrigger>
+          </TooltipTrigger>
           <TooltipContent side="bottom" align="center" sideOffset={6}>
             Share post
           </TooltipContent>
         </Tooltip>
-      )}
 
-      {shouldRender && (
-        <div
-          data-state={isOpen ? 'open' : 'closed'}
-          onAnimationEnd={() => {
-            if (!isOpen) setShouldRender(false)
-          }}
-          className="dropdown-elegant absolute left-1/2 top-full z-50 mt-2 w-max -translate-x-1/2 rounded-xl ring-1 ring-ring bg-dropdown-background p-1.5 shadow-xl"
+        <DropdownMenuContent
+          align="center"
+          sideOffset={6}
+          onCloseAutoFocus={(e) => e.preventDefault()}
         >
-          <div className="flex flex-col gap-1">
-            <button
-              onClick={handleCopyLink}
-              className={cn(
-                'group flex w-full items-center gap-2.5 rounded-lg px-2.5 py-1 text-left text-xs tracking-tight outline-none ring-1 ring-transparent transition-[color,background-color,transform,scale,box-shadow] duration-200 ease-in-out whitespace-nowrap active:scale-[0.98]',
-                copied
-                  ? 'bg-success/10 ring-success/30 font-medium text-success'
-                  : 'text-secondary hover:bg-overlay-accent hover:ring-overlay-accent-border hover:text-primary',
-              )}
+          <div className="flex flex-col gap-0.5">
+            <DropdownMenuItem
+              onSelect={(e) => {
+                e.preventDefault()
+                handleCopyLink()
+              }}
+              className={copied ? 'text-success data-[highlighted]:text-success' : ''}
             >
-              {copied ? (
-                <Icons.check size={16} className="shrink-0 text-success" />
-              ) : (
-                <Icons.link
-                  size={16}
-                  className="shrink-0 text-secondary transition-colors group-hover:text-primary"
-                />
-              )}
+              {copied ? <Icons.check className="text-success" /> : <Icons.link />}
               <span>{copied ? 'copied!' : 'copy link'}</span>
-            </button>
+            </DropdownMenuItem>
 
-            {SHARE_NETWORKS.map((option) => {
+            {shareLinks.map((option) => {
               const Icon = option.icon
               const actionText = option.actionText || 'share on'
 
               return (
-                <a
-                  key={option.name}
-                  href={getShareUrl(option.name, url, title)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={() => setIsOpen(false)}
-                  className="group flex w-full items-center gap-2.5 rounded-lg px-2.5 py-1 text-left text-xs tracking-tight text-secondary outline-none ring-1 ring-transparent transition-[color,background-color,transform,scale,box-shadow] duration-200 ease-in-out whitespace-nowrap hover:bg-overlay-accent hover:ring-overlay-accent-border hover:text-primary active:scale-[0.98]"
-                >
-                  <Icon
-                    size={16}
-                    className="shrink-0 text-secondary transition-colors group-hover:text-primary"
-                  />
-                  <span>
-                    {actionText} {option.name.toLowerCase()}
-                  </span>
-                </a>
+                <DropdownMenuItem key={option.name} asChild>
+                  <a
+                    href={option.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    <Icon />
+                    <span>
+                      {actionText} {option.name.toLowerCase()}
+                    </span>
+                  </a>
+                </DropdownMenuItem>
               )
             })}
           </div>
-        </div>
-      )}
+        </DropdownMenuContent>
+      </DropdownMenu>
     </div>
   )
 }

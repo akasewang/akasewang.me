@@ -52,10 +52,6 @@ export function PhotoOverlay({ photo, isOpen, onClose }: PhotoOverlayProps) {
               transition={ZOOM_EASE}
               className="relative z-10 flex transform-gpu overflow-hidden bg-muted/20 shadow-2xl will-change-transform"
               style={{
-                // Derive the box size from the photo's aspect ratio so the layout
-                // target is known synchronously on mount. Without this, the box would
-                // collapse until the high-res image downloads, breaking the first
-                // (uncached) zoom animation. Fits within 90vw x 90vh, keeping ratio.
                 aspectRatio: `${photo.width} / ${photo.height}`,
                 width: `min(90vw, calc(90vh * ${photo.width} / ${photo.height}))`,
               }}

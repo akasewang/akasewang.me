@@ -1,6 +1,5 @@
 'use client'
 
-import Image from 'next/image'
 import { LinkText } from '@/components/ui/link-text'
 import { Icons, VerifiedIcon } from '@/components/ui/icons'
 import { useRouter } from 'next/navigation'
@@ -12,6 +11,7 @@ import { FULL_NAME, EMAIL } from '@/constants/constants'
 import { TextFlip } from '@/components/ui/text-flip'
 import { Button } from '@/components/ui/button'
 import { SectionTitle } from '@/components/layout/section-title'
+import { ProfilePicture } from '@/components/ui/profile-picture'
 
 /**
  * Hero Section Component.
@@ -26,17 +26,7 @@ export function HeroSection() {
   return (
     <section id="hero" className="animate-page-simple space-y-8">
       <div className="flex items-center gap-4 pb-2">
-        <div className="profile-slime-container">
-          <Image
-            src="/profpic.png"
-            alt={FULL_NAME}
-            width={64}
-            height={64}
-            priority
-            unoptimized
-            className="profile-slime-image"
-          />
-        </div>
+        <ProfilePicture src="/profpic.png" alt={FULL_NAME} />
 
         <div className="flex flex-col">
           <h1 className="text-balance text-2xl font-semibold leading-snug tracking-tighter text-primary">

@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback, useMemo } from 'react'
-import { useSearchParams, useRouter } from 'next/navigation'
+import { useSearchParams, useRouter, usePathname } from 'next/navigation'
 import { m, AnimatePresence } from 'framer-motion'
 import { CategoryFilter } from '@/components/common/category-filter'
 import { EmptyState } from '@/components/common/empty-state'
@@ -18,6 +18,7 @@ import type { FilterCategory } from '@/types/catalog'
 export function CatalogList() {
   const searchParams = useSearchParams()
   const router = useRouter()
+  const pathname = usePathname()
 
   const categoryParam = searchParams.get('category')
 
@@ -28,15 +29,19 @@ export function CatalogList() {
 
   const handleCategoryChange = useCallback(
     (val: string) => {
-      const params = new URLSearchParams(searchParams)
+      const params = new URLSearchParams(searchParams.toString())
       if (val === 'All') {
         params.delete('category')
       } else {
         params.set('category', val)
       }
-      router.replace(`/catalog?${params.toString()}`, { scroll: false })
+
+      const query = params.toString()
+      const newUrl = query ? `${pathname}?${query}` : pathname
+
+      router.replace(newUrl, { scroll: false })
     },
-    [searchParams, router],
+    [searchParams, router, pathname],
   )
 
   const filteredItems = useMemo(

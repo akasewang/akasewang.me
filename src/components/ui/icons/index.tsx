@@ -66,6 +66,11 @@ export const Icons = {
   ),
 
   /** Category: Remix Icons */
+  circle: ({ size = 24, ...props }: IconProps) => (
+    <svg viewBox="0 0 24 24" fill="currentColor" width={size} height={size} {...props}>
+      <path d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10s-4.477 10-10 10m0-2a8 8 0 1 0 0-16a8 8 0 0 0 0 16" />
+    </svg>
+  ),
   chevronRight: ({ size = 24, ...props }: IconProps) => (
     <svg viewBox="0 0 24 24" fill="currentColor" width={size} height={size} {...props}>
       <path d="m13.172 12l-4.95-4.95l1.414-1.413L16 12l-6.364 6.364l-1.414-1.415z" />

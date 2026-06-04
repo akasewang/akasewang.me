@@ -357,27 +357,27 @@
 
   .tooltip-elegant {
     &:is([data-state='delayed-open'], [data-state='instant-open']) {
-      &[data-side='top'] { animation: tooltip-in-top 260ms cubic-bezier(0.22, 1, 0.36, 1) both; }
-      &[data-side='bottom'] { animation: tooltip-in-bottom 260ms cubic-bezier(0.22, 1, 0.36, 1) both; }
-      &[data-side='left'] { animation: tooltip-in-left 260ms cubic-bezier(0.22, 1, 0.36, 1) both; }
-      &[data-side='right'] { animation: tooltip-in-right 260ms cubic-bezier(0.22, 1, 0.36, 1) both; }
+      &[data-side='top'] { animation: tooltip-in-top 400ms cubic-bezier(0.175, 0.885, 0.32, 1.15) both; }
+      &[data-side='bottom'] { animation: tooltip-in-bottom 400ms cubic-bezier(0.175, 0.885, 0.32, 1.15) both; }
+      &[data-side='left'] { animation: tooltip-in-left 400ms cubic-bezier(0.175, 0.885, 0.32, 1.15) both; }
+      &[data-side='right'] { animation: tooltip-in-right 400ms cubic-bezier(0.175, 0.885, 0.32, 1.15) both; }
     }
-    &[data-state='closed'] { animation: fade-scale-out 140ms cubic-bezier(0.4, 0, 1, 1) both; }
+    &[data-state='closed'] { animation: fade-scale-out 200ms cubic-bezier(0.4, 0, 1, 1) both; }
   }
 
   .dropdown-elegant {
     will-change: opacity, transform;
     transform-origin: top center;
-    &[data-state='open'] { animation: dropdown-in 260ms cubic-bezier(0.22, 1, 0.36, 1) both; }
-    &[data-state='closed'] { animation: fade-scale-out 140ms cubic-bezier(0.4, 0, 1, 1) both; }
+    &[data-state='open'] { animation: dropdown-in 400ms cubic-bezier(0.175, 0.885, 0.32, 1.15) both; }
+    &[data-state='closed'] { animation: fade-scale-out 200ms cubic-bezier(0.4, 0, 1, 1) both; }
   }
 
   .select-content-elegant {
     &[data-state='open'] {
-      &[data-side='bottom'] { animation: select-content-in-bottom 400ms cubic-bezier(0.16, 1, 0.3, 1) both; }
-      &[data-side='top'] { animation: select-content-in-top 400ms cubic-bezier(0.16, 1, 0.3, 1) both; }
-      &[data-side='left'] { animation: select-content-in-left 400ms cubic-bezier(0.16, 1, 0.3, 1) both; }
-      &[data-side='right'] { animation: select-content-in-right 400ms cubic-bezier(0.16, 1, 0.3, 1) both; }
+      &[data-side='bottom'] { animation: select-content-in-bottom 400ms cubic-bezier(0.175, 0.885, 0.32, 1.15) both; }
+      &[data-side='top'] { animation: select-content-in-top 400ms cubic-bezier(0.175, 0.885, 0.32, 1.15) both; }
+      &[data-side='left'] { animation: select-content-in-left 400ms cubic-bezier(0.175, 0.885, 0.32, 1.15) both; }
+      &[data-side='right'] { animation: select-content-in-right 400ms cubic-bezier(0.175, 0.885, 0.32, 1.15) both; }
     }
     &[data-state='closed'] { animation: fade-scale-out 200ms cubic-bezier(0.4, 0, 0.2, 1) both; }
   }
@@ -436,18 +436,18 @@
   95%, to { stroke-dasharray: 0 350px; }
 }
 
-@keyframes tooltip-in-top { from { opacity: 0; transform: translateY(4px) scale(0.96); } to { opacity: 1; transform: translateY(0) scale(1); } }
-@keyframes tooltip-in-bottom { from { opacity: 0; transform: translateY(-4px) scale(0.96); } to { opacity: 1; transform: translateY(0) scale(1); } }
-@keyframes tooltip-in-left { from { opacity: 0; transform: translateX(4px) scale(0.96); } to { opacity: 1; transform: translateX(0) scale(1); } }
-@keyframes tooltip-in-right { from { opacity: 0; transform: translateX(-4px) scale(0.96); } to { opacity: 1; transform: translateX(0) scale(1); } }
-@keyframes dropdown-in { from { opacity: 0; transform: translateY(-4px) scale(0.96); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@keyframes tooltip-in-top { from { opacity: 0; transform: translateY(15px) scale(0); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@keyframes tooltip-in-bottom { from { opacity: 0; transform: translateY(-15px) scale(0); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@keyframes tooltip-in-left { from { opacity: 0; transform: translateX(15px) scale(0); } to { opacity: 1; transform: translateX(0) scale(1); } }
+@keyframes tooltip-in-right { from { opacity: 0; transform: translateX(-15px) scale(0); } to { opacity: 1; transform: translateX(0) scale(1); } }
+@keyframes dropdown-in { from { opacity: 0; transform: translateY(-15px) scale(0); } to { opacity: 1; transform: translateY(0) scale(1); } }
 
-@keyframes select-content-in-bottom { from { opacity: 0; transform: translateY(-8px) scale(0.96); } to { opacity: 1; transform: translateY(0) scale(1); } }
-@keyframes select-content-in-top { from { opacity: 0; transform: translateY(8px) scale(0.96); } to { opacity: 1; transform: translateY(0) scale(1); } }
-@keyframes select-content-in-left { from { opacity: 0; transform: translateX(8px) scale(0.96); } to { opacity: 1; transform: translateX(0) scale(1); } }
-@keyframes select-content-in-right { from { opacity: 0; transform: translateX(-8px) scale(0.96); } to { opacity: 1; transform: translateX(0) scale(1); } }
+@keyframes select-content-in-bottom { from { opacity: 0; transform: translateY(-15px) scale(0); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@keyframes select-content-in-top { from { opacity: 0; transform: translateY(15px) scale(0); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@keyframes select-content-in-left { from { opacity: 0; transform: translateX(15px) scale(0); } to { opacity: 1; transform: translateX(0) scale(1); } }
+@keyframes select-content-in-right { from { opacity: 0; transform: translateX(-15px) scale(0); } to { opacity: 1; transform: translateX(0) scale(1); } }
 
-@keyframes fade-scale-out { from { opacity: 1; transform: scale(1); } to { opacity: 0; transform: scale(0.98); } }
+@keyframes fade-scale-out { from { opacity: 1; transform: scale(1); } to { opacity: 0; transform: scale(0); } }
 
 @keyframes select-check-in { from { opacity: 0; transform: scale(0.3) translateY(2px); } to { opacity: 1; transform: scale(1) translateY(0); } }
 
@@ -455,48 +455,6 @@
   0% { opacity: 0; transform: translateY(12px); }
   100% { opacity: 1; transform: translateY(0); }
 }
-
-@keyframes slime-morph {
-  0% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
-  25% { border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%; }
-  50% { border-radius: 70% 30% 40% 60% / 60% 70% 40% 40%; }
-  75% { border-radius: 30% 70% 60% 40% / 50% 40% 70% 60%; }
-  100% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
-}
-
-@keyframes slime-spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-.profile-slime-container {
-  position: relative;
-  width: 64px;
-  height: 64px;
-  flex-shrink: 0;
-  z-index: 10;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.profile-slime-container::before {
-  content: "";
-  position: absolute;
-  inset: -4px;
-  border: 1.5px solid var(--primary);
-  background: transparent;
-  opacity: 0.6;
-  z-index: -1;
-  animation: slime-morph 12s ease-in-out infinite, slime-spin 8s linear infinite;
-}
-
-.profile-slime-image {
-  animation: slime-morph 8s ease-in-out infinite;
-  border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
-}
-
 
 /** Page entry sliding fade-in entrance animation utility. */
 .animate-page-simple {

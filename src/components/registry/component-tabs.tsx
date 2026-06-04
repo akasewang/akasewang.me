@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useMemo, useEffect, useCallback, useDeferredValue, useRef } from 'react'
-import { useSearchParams, useRouter } from 'next/navigation'
+import { useSearchParams, useRouter, usePathname } from 'next/navigation'
 import { ContentFilter, type SortOption } from '@/components/common/content-filter'
 import { RegistryList } from '@/components/registry/registry-list'
 import { useViews } from '@/components/providers/views-context'
@@ -26,6 +26,7 @@ const VALID_SORTS = new Set<SortOption>(['date-desc', 'date-asc', 'views-desc', 
 export function ComponentTabs({ allComponents }: ComponentTabsProps) {
   const searchParams = useSearchParams()
   const router = useRouter()
+  const pathname = usePathname()
   const { getViews } = useViews()
 
   const categoryParam = searchParams.get('category')
@@ -63,7 +64,7 @@ export function ComponentTabs({ allComponents }: ComponentTabsProps) {
 
   const updateParams = useCallback(
     (updates: Record<string, string | null>) => {
-      const params = new URLSearchParams(searchParams)
+      const params = new URLSearchParams(searchParams.toString())
       Object.entries(updates).forEach(([key, value]) => {
         if (!value || value === 'all' || (key === 'sort' && value === 'date-desc')) {
           params.delete(key)
@@ -71,9 +72,13 @@ export function ComponentTabs({ allComponents }: ComponentTabsProps) {
           params.set(key, value)
         }
       })
-      router.replace(`/components?${params.toString()}`, { scroll: false })
+
+      const query = params.toString()
+      const newUrl = query ? `${pathname}?${query}` : pathname
+
+      router.replace(newUrl, { scroll: false })
     },
-    [searchParams, router],
+    [searchParams, router, pathname],
   )
 
   const debouncedUpdateParams = useCallback(

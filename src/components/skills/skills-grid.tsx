@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback, useMemo } from 'react'
-import { useSearchParams, useRouter } from 'next/navigation'
+import { useSearchParams, useRouter, usePathname } from 'next/navigation'
 import { m, AnimatePresence } from 'framer-motion'
 import { skillRows } from '@/data/static/skills'
 import { SKILL_CATEGORIES } from '@/constants/categories'
@@ -22,6 +22,7 @@ const allSkills = [...skillRows.firstRow, ...skillRows.secondRow]
 export function SkillsGrid() {
   const searchParams = useSearchParams()
   const router = useRouter()
+  const pathname = usePathname()
 
   const categoryParam = searchParams.get('category')
 
@@ -38,15 +39,19 @@ export function SkillsGrid() {
 
   const handleCategoryChange = useCallback(
     (value: string) => {
-      const params = new URLSearchParams(searchParams)
+      const params = new URLSearchParams(searchParams.toString())
       if (value === 'all') {
         params.delete('category')
       } else {
         params.set('category', value)
       }
-      router.replace(`/skills?${params.toString()}`, { scroll: false })
+
+      const query = params.toString()
+      const newUrl = query ? `${pathname}?${query}` : pathname
+
+      router.replace(newUrl, { scroll: false })
     },
-    [searchParams, router],
+    [searchParams, router, pathname],
   )
 
   return (

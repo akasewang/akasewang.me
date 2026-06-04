@@ -7,6 +7,7 @@ import {
   useScroll,
   useTransform,
   useMotionValueEvent,
+  useSpring,
   type Variants,
 } from 'framer-motion'
 import { Icons } from '@/components/ui/icons'
@@ -46,7 +47,8 @@ const iconVariants: Variants = {
  */
 export function BackToTop() {
   const { scrollYProgress, scrollY } = useScroll()
-  const dashoffset = useTransform(scrollYProgress, [0, 0.9], [BACK_TO_TOP_CIRCUMFERENCE, 0])
+  const springProgress = useSpring(scrollYProgress, { stiffness: 250, damping: 40, bounce: 0 })
+  const dashoffset = useTransform(springProgress, [0, 0.9], [BACK_TO_TOP_CIRCUMFERENCE, 0])
 
   const [isVisible, setIsVisible] = useState(false)
   const [mode, setMode] = useState<'down' | 'up'>('down')
