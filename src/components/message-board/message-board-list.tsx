@@ -17,18 +17,20 @@ import { toast } from 'sonner'
 import { MESSAGES_PER_PAGE } from '@/constants/constants'
 import { cn } from '@/utils/utils'
 
+/** Props for {@link MessageBoardList}; `null` signals the server query failed (offline). */
 interface MessageBoardListProps {
   messages: MessageBoardEntry[] | null
 }
 
+/** Frosted-glass panel styling for the loading indicator. */
 const GLASS_PANEL_CLASS = 'bg-muted/40 backdrop-blur-md ring-1 ring-inset ring-ring/80'
 
 /**
- * A client-side infinite-scrolling list that displays message board entries.
- * Manages admin state to allow real-time deletion and replying to messages if authenticated.
- * Subscribes to realtime updates (or polls) to dynamically insert new messages.
+ * A client-side, infinite-scrolling list of message board entries. It seeds from the
+ * server-rendered first page and loads older messages as the sentinel scrolls into view.
+ * When an admin is authenticated, it enables inline delete and reply actions.
  *
- * @param messages - The initial array of messages pre-fetched by the server component.
+ * @param messages - The initial page of messages pre-fetched by the server component.
  */
 export function MessageBoardList({ messages: initialMessages }: MessageBoardListProps) {
   const { adminKey, logoutAdmin } = useAdmin()

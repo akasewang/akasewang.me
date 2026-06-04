@@ -12,8 +12,8 @@ import { SectionTitle } from '../layout/section-title'
 import { newsletterContent } from '@/data/content/newsletter-content'
 
 /**
- * A form component for subscribing to the site's newsletter.
- * via the `useStatusTimer` hook to prevent rapid re-submissions.
+ * A form for subscribing to the newsletter, with a post-submit cooldown (via `useStatusTimer`)
+ * to prevent rapid re-submissions.
  *
  * @param hideHeader - If true, hides the title and description, rendering only the input and button.
  */

@@ -9,6 +9,7 @@ import React from 'react'
 
 let resendInstance: Resend | null = null
 
+/** Lazily instantiates a singleton Resend client, throwing if the API key is not configured. */
 function getResend() {
   if (!resendInstance) {
     if (!process.env.RESEND_API_KEY) throw new Error('Missing RESEND_API_KEY')
@@ -17,7 +18,9 @@ function getResend() {
   return resendInstance
 }
 
+/** From-address for outgoing mail, falling back to Resend's onboarding sender. */
 const SENDER_EMAIL = process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev'
+/** Recipient for the weekly summary (the site admin); the route 500s if it's unset. */
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL
 
 /**

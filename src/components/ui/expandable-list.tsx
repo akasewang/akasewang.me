@@ -1,11 +1,13 @@
 'use client'
 
-import { useState, useMemo, type ReactNode } from 'react'
+import { useRef, useState, useMemo, type ReactNode } from 'react'
 import { m, AnimatePresence, type Transition } from 'framer-motion'
+import { HoverHighlight } from '@/components/ui/hover-highlight'
 import { Icons } from '@/components/ui/icons'
 import { sharedContent } from '@/data/content/landing-content'
 import { cn } from '@/utils/utils'
 
+/** Props for {@link ExpandableList}. */
 interface ExpandableListProps<T> {
   items: T[]
   renderItem: (item: T, index: number) => ReactNode
@@ -28,8 +30,11 @@ export function ExpandableList<T>({ items, renderItem, initialCount = 3 }: Expan
   const visibleItems = useMemo(() => items.slice(0, initialCount), [items, initialCount])
   const hiddenItems = useMemo(() => items.slice(initialCount), [items, initialCount])
 
+  const listRef = useRef<HTMLDivElement>(null)
+
   return (
-    <div className="flex w-full flex-col">
+    <div ref={listRef} className="relative flex w-full flex-col">
+      <HoverHighlight parentRef={listRef} />
       <div className="flex flex-col gap-6">{visibleItems.map(renderItem)}</div>
 
       {hasMore && (

@@ -17,7 +17,9 @@ export const TooltipProvider = ({
   ...props
 }: ComponentProps<typeof Provider>) => <Provider delayDuration={delayDuration} {...props} />
 
+/** Tooltip root; wraps a trigger and content pair. */
 export const Tooltip = Root
+/** Element that opens the tooltip on hover/focus. */
 export const TooltipTrigger = Trigger
 
 /**

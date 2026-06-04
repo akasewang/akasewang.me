@@ -1,10 +1,13 @@
 import { useRef, useState, useEffect } from 'react'
 
 /**
- * Calculates an ease-out cubic intensity curve based on mouse movement speed.
+ * Drives a velocity-reactive spotlight effect. Tracks the cursor inside the container and
+ * writes its position (`--mx`/`--my`) and an ease-out-cubic intensity (`--spotlight-intensity`)
+ * as CSS custom properties, flaring brighter on faster movement and settling as it slows.
+ * Updates are batched into `requestAnimationFrame` to avoid layout thrashing.
  *
- * @returns {object} ref - Attach this to the container element.
- * @returns {boolean} isHovering - Whether the cursor is currently inside the container.
+ * @returns ref - Attach this to the container element being spotlit.
+ * @returns isHovering - Whether the cursor is currently inside the container.
  */
 export function useSpotlight<T extends HTMLElement = HTMLElement>() {
   const ref = useRef<T>(null)

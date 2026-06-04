@@ -5,6 +5,7 @@ import { m, AnimatePresence, type HTMLMotionProps } from 'framer-motion'
 import { Icons } from '@/components/ui/icons'
 import { cn } from '@/utils/utils'
 
+/** Props for {@link CopyButton}. */
 interface CopyButtonProps extends HTMLMotionProps<'button'> {
   value: string
   iconSize?: number
@@ -12,7 +13,8 @@ interface CopyButtonProps extends HTMLMotionProps<'button'> {
 }
 
 /**
- * Can be used in a controlled or uncontrolled state.
+ * A button that copies `value` to the clipboard, swapping the copy icon for a check on success.
+ * Works uncontrolled (manages its own brief "copied" state) or controlled (via the `copied` prop).
  *
  * @param value - The text string to copy to the clipboard.
  * @param iconSize - The pixel size of the rendered icon.

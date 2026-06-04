@@ -1,6 +1,7 @@
 import type { ComponentProps } from 'react'
 import { cn } from '@/utils/utils'
 
+/** A small dot used as an inline separator or list marker. */
 export function Bullet({ className, ...props }: ComponentProps<'div'>) {
   return (
     <div

@@ -3,11 +3,16 @@
 import { forwardRef, useImperativeHandle, useState, type ComponentProps } from 'react'
 import { m } from 'framer-motion'
 
+/** Imperative handle to drive the volume icon's sound-wave animation from a parent. */
 export interface VolumeIconHandle {
   startAnimation: () => void
   stopAnimation: () => void
 }
 
+/**
+ * A speaker icon whose sound waves animate in when `startAnimation()` is called via its ref.
+ * Used to give audio feedback (e.g. the name-pronunciation button).
+ */
 export const VolumeIcon = forwardRef<VolumeIconHandle, ComponentProps<'svg'>>((props, ref) => {
   const [isPlaying, setIsPlaying] = useState(false)
 

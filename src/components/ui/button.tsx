@@ -9,6 +9,7 @@ import { toast } from 'sonner'
 import { toastContent } from '@/data/content/toast-content'
 import { SPRING_TRANSITION } from '@/constants/ui'
 
+/** Props for {@link Button}. */
 interface ButtonProps extends HTMLMotionProps<'button'> {
   isPending?: boolean
   isSuccess?: boolean

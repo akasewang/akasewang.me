@@ -15,6 +15,7 @@ import { PHOTO_CATEGORIES } from '@/constants/categories'
 import type { Photo, Category } from '@/types/photos'
 import { PhotoOverlay } from './photo-overlay'
 
+/** Static id→photo lookup, hoisted so zoom/preload don't do O(N) scans on every render. */
 const PHOTO_BY_ID = new Map(photos.map((p) => [p.id, p]))
 
 /**

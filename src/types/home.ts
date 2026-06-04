@@ -3,7 +3,7 @@ import { SKILL_CATEGORIES } from '@/constants/categories'
 
 /**
  * Hero Section
- * Content schema for the top landing banner and intro text
+ * Content schema for the top landing banner and intro text.
  */
 export interface HeroContent {
   firstName: string
@@ -21,7 +21,7 @@ export interface HeroContent {
   scheduleMeetUrl: string
 }
 
-/** Testimonials */
+/** A single testimonial quote with its attribution and optional link/avatar. */
 export interface Testimonial {
   id: string
   quote: string
@@ -31,6 +31,7 @@ export interface Testimonial {
   image?: string
 }
 
+/** Testimonials split into two rows for the scrolling marquee wall. */
 export interface TestimonialRows {
   topRow: Testimonial[]
   bottomRow: Testimonial[]
@@ -38,10 +39,11 @@ export interface TestimonialRows {
 
 /**
  * Skills & Technologies
- * Type definitions for tech stack badges and categorization
+ * Type definitions for tech stack badges and categorization.
  */
 export type SkillCategory = (typeof SKILL_CATEGORIES)[number]['value']
 
+/** A single tech-stack skill: its name, icon, optional link, and category. */
 export interface Skill {
   id: string
   name: string
@@ -50,6 +52,7 @@ export interface Skill {
   category: SkillCategory
 }
 
+/** Skills split into two rows for the scrolling marquee. */
 export interface SkillRows {
   firstRow: Skill[]
   secondRow: Skill[]
@@ -57,7 +60,7 @@ export interface SkillRows {
 
 /**
  * Landing Page Layout
- * High-level configuration tying all home sections together
+ * High-level configuration tying all home sections together.
  */
 export interface LandingPageContent {
   hero: HeroContent

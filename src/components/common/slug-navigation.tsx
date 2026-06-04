@@ -11,11 +11,13 @@ import { SocialShare } from '@/components/common/mdx-components/social-share'
 import { cn } from '@/utils/utils'
 import { useKeyboardShortcut } from '@/hooks/use-keyboard-shortcut'
 
+/** A single prev/next navigation target (slug + title). */
 interface NavItem {
   slug: string
   title: string
 }
 
+/** Props for {@link SlugNavigation}. */
 interface SlugNavigationProps {
   prev?: NavItem
   next?: NavItem

@@ -3,11 +3,14 @@
 import { Icons } from '@/components/ui/icons'
 import { cn } from '@/utils/utils'
 
+/** Props for {@link AnimatedArrow}. */
 interface AnimatedArrowProps {
   className?: string
 }
 
 /**
+ * An outward arrow that slides away and back in on hover/active. Expects a `group` parent.
+ *
  * @param className - Optional CSS classes for custom sizing or positioning.
  */
 export function AnimatedArrow({ className }: AnimatedArrowProps) {

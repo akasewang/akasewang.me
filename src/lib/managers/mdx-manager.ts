@@ -23,6 +23,7 @@ export function createMdxManager<T extends { date: string }>(
 ) {
   const directory = path.join(process.cwd(), 'docs', subDirectory)
 
+  /** Lists the slugs of every MDX document in the directory (for static params). */
   const getSlugs = async () => {
     return getMdxSlugs(directory)
   }

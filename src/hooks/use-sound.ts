@@ -12,6 +12,7 @@ const audioCache = new Map<string, CacheEntry | null>()
 /** A single shared Web Audio API context used across the entire application to prevent hitting browser hardware limits. */
 let sharedAudioContext: AudioContext | null = null
 
+/** Lazily creates (and then reuses) the shared AudioContext, with a webkit fallback for older Safari. */
 function getAudioContext(): AudioContext | null {
   if (typeof window === 'undefined') return null
   if (sharedAudioContext) return sharedAudioContext
@@ -27,6 +28,7 @@ function getAudioContext(): AudioContext | null {
   return sharedAudioContext
 }
 
+/** Fetches and decodes an audio file, deduplicating concurrent requests via the shared cache. */
 function loadAudio(url: string, audioCtx: AudioContext): Promise<AudioBuffer> {
   const cached = audioCache.get(url)
   /** If the audio is already fully decoded and cached, return it instantly */
@@ -53,6 +55,7 @@ function loadAudio(url: string, audioCtx: AudioContext): Promise<AudioBuffer> {
   return loadingPromise
 }
 
+/** Plays a decoded buffer once through a gain node at the given volume. */
 function playAudioBuffer(buffer: AudioBuffer, audioCtx: AudioContext, volume: number = 1) {
   const source = audioCtx.createBufferSource()
   const gainNode = audioCtx.createGain()

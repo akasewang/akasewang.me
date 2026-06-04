@@ -5,6 +5,7 @@ import { useViews } from '@/components/providers/views-context'
 import { viewsContent } from '@/data/content/views-content'
 import { Icons } from '@/components/ui/icons'
 
+/** Props for {@link ViewCounter}. */
 type ViewCounterProps = {
   slug?: string
   readOnly?: boolean

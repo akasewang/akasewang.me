@@ -82,10 +82,10 @@ export const TimelineItem = memo(function TimelineItem({
         aria-expanded={hasContent ? isExpanded : undefined}
         onClick={hasContent ? handleToggle : undefined}
         onKeyDown={hasContent ? handleKeyDown : undefined}
+        data-highlight-item={hasContent ? '' : undefined}
         className={cn(
-          'group/card relative -mx-2 -my-1.5 flex flex-col gap-3 rounded-xl ring-1 ring-transparent retina:ring-[0.5px] px-2 py-1.5 transition-[background-color,box-shadow,transform,scale] duration-300 ease-out sm:-mx-3 sm:-my-2 sm:flex-row sm:items-start sm:justify-between sm:px-3 sm:py-2',
-          hasContent &&
-            'hover:bg-accent hover:ring-accent-border hover:shadow-md active:scale-[0.99] active:duration-200',
+          'group/card relative z-10 -mx-2 -my-1.5 flex flex-col gap-3 rounded-xl px-2 py-1.5 transition-[transform,scale] duration-300 ease-out sm:-mx-3 sm:-my-2 sm:flex-row sm:items-start sm:justify-between sm:px-3 sm:py-2',
+          hasContent && 'active:scale-[0.99] active:duration-200',
         )}
       >
         <div className="flex-1 pr-8 sm:pr-0">

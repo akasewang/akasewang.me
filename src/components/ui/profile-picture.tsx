@@ -6,6 +6,7 @@ import { m, useInView } from 'framer-motion'
 import { useFluidBlob } from '@/hooks/use-fluid-blob'
 import { cn } from '@/utils/utils'
 
+/** Props for {@link ProfilePicture}. */
 interface ProfilePictureProps {
   src: string
   alt: string

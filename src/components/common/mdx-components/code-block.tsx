@@ -4,6 +4,7 @@ import { isValidElement, useMemo, type HTMLAttributes, type ReactNode } from 're
 import { cn } from '@/utils/utils'
 import { CopyButton } from '@/components/ui/copy-button'
 
+/** Props for {@link Pre}. */
 interface PreProps extends HTMLAttributes<HTMLPreElement> {
   copyable?: boolean
   raw?: boolean
@@ -23,8 +24,8 @@ const extractCode = (node: ReactNode): string => {
 }
 
 /**
- * Custom `<pre>` element renderer for MDX content.
- * content to power the integrated copy-to-clipboard functionality.
+ * Custom `<pre>` renderer for MDX code blocks. Extracts the code text to power a floating
+ * hover copy-to-clipboard button.
  *
  * @param copyable - Whether to display the copy button hover action. Defaults to true.
  * @param raw - If true, bypasses the styled wrapper and renders a standard HTML pre tag.

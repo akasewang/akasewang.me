@@ -9,12 +9,14 @@ export type RegistryItemType =
   | 'registry:hook'
   | 'registry:lib'
 
+/** A single file shipped by a registry item, with its install type and optional target path. */
 export interface RegistryFile {
   path: string
   type: RegistryItemType
   target?: string
 }
 
+/** A full registry component entry: identity, files, dependencies, and theming config. */
 export interface RegistryItem {
   slug: string
   name: string

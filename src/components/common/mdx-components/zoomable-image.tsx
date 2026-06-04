@@ -21,7 +21,6 @@ import type { Photo } from '@/types/photos'
  *
  * @param props - Standard HTMLImageElement attributes.
  */
-
 export function ZoomableImage({
   src,
   alt,

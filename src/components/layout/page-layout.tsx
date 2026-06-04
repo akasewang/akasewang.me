@@ -3,6 +3,7 @@ import { PageHeader } from './page-header'
 import { PageFooter } from './page-footer'
 import { cn } from '@/utils/utils'
 
+/** Props for {@link PageLayout}. */
 interface PageLayoutProps {
   children?: ReactNode
   title?: string

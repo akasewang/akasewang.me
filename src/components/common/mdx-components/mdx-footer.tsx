@@ -5,6 +5,7 @@ import { BackButton } from '@/components/ui/back-button'
 import { SMOOTH_SPRING_TRANSITION } from '@/constants/ui'
 import { cn } from '@/utils/utils'
 
+/** Props for {@link MdxFooter}. */
 interface MdxFooterProps {
   url: string
   title: string

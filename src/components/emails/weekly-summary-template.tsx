@@ -13,6 +13,7 @@ import {
 } from '@react-email/components'
 import { SITE_URL, FULL_NAME, USERNAME } from '@/constants/constants'
 
+/** Props for the weekly admin subscriber-summary email. */
 interface WeeklySummaryTemplateProps {
   subscriberCount: number
   newEmails?: string[]
@@ -139,6 +140,7 @@ const defaultEmails = [
   'elara.vance@design.co',
 ]
 
+/** Admin digest email summarizing the subscribers gained over the past week. */
 export const WeeklySummaryTemplate = ({
   subscriberCount = 12,
   newEmails = defaultEmails,

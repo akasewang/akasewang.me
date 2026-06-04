@@ -1,6 +1,7 @@
 import { cn } from '@/utils/utils'
 import { SectionTitle } from './section-title'
 
+/** Props for {@link PageHeader}. */
 interface PageHeaderProps {
   title: string
   subtitle?: string

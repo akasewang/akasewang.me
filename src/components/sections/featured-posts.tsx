@@ -1,9 +1,10 @@
 'use client'
 
-import { useMemo, useEffect } from 'react'
+import { useRef, useMemo, useEffect } from 'react'
 import { usePathname } from 'next/navigation'
 import { m, AnimatePresence } from 'framer-motion'
 import { ViewAll } from '@/components/ui/view-all'
+import { HoverHighlight } from '@/components/ui/hover-highlight'
 import { BlogPostCard } from '@/components/blogs/blog-post-card'
 import { useViews } from '@/components/providers/views-context'
 import { landingPageContent } from '@/data/content/landing-content'
@@ -12,6 +13,7 @@ import { EmptyState } from '@/components/common/empty-state'
 import { SPRING_TRANSITION } from '@/constants/ui'
 import type { BlogPost, BlogCategory } from '@/types/blog'
 
+/** Props for {@link FeaturedPosts}. */
 interface FeaturedPostsProps {
   filterType?: BlogCategory
   searchQuery?: string
@@ -29,6 +31,7 @@ export function FeaturedPosts({ filterType, searchQuery, posts }: FeaturedPostsP
   const pathname = usePathname()
   const isHomePage = pathname === '/'
   const { prefetchViews } = useViews()
+  const listRef = useRef<HTMLDivElement>(null)
 
   const displayed = useMemo(() => {
     let filtered = posts
@@ -62,7 +65,8 @@ export function FeaturedPosts({ filterType, searchQuery, posts }: FeaturedPostsP
 
       <AnimatePresence mode="popLayout">
         {displayed.length > 0 ? (
-          <m.div key="post-list" layout className="space-y-4">
+          <m.div key="post-list" ref={listRef} layout className="relative space-y-4">
+            <HoverHighlight parentRef={listRef} />
             {displayed.map((post) => (
               <m.div
                 key={post.slug}

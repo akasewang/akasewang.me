@@ -5,6 +5,7 @@ import { m } from 'framer-motion'
 import { cn } from '@/utils/utils'
 import { SPRING_TRANSITION, SMOOTH_SPRING_TRANSITION } from '@/constants/ui'
 
+/** Props for {@link CategoryFilter}. */
 interface CategoryFilterProps<T extends string> {
   categories: readonly { value: T; label: string }[]
   value: T
@@ -12,7 +13,8 @@ interface CategoryFilterProps<T extends string> {
 }
 
 /**
- * Used for filtering content by distinct categories (e.g., Blog topics, Component types).
+ * A horizontal row of category buttons with an animated active-pill indicator, used to filter
+ * content by distinct categories (e.g. blog topics, component types).
  *
  * @param categories - Array of category objects containing a strictly typed `value` and display `label`.
  * @param value - The currently active category value.

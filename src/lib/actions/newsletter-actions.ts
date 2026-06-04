@@ -15,6 +15,7 @@ import type { ActionResult } from '@/types/actions'
 
 let resendInstance: Resend | null = null
 
+/** Lazily instantiates a singleton Resend client, throwing if the API key is not configured. */
 function getResend() {
   if (!resendInstance) {
     if (!process.env.RESEND_API_KEY) throw new Error('Missing RESEND_API_KEY')
@@ -23,6 +24,7 @@ function getResend() {
   return resendInstance
 }
 
+/** From-address for outgoing mail, falling back to Resend's onboarding sender. */
 const SENDER_EMAIL = process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev'
 
 /**
@@ -91,8 +93,8 @@ export async function broadcastNewsletter(
     )
 
     /**
-     * Map over every active subscriber and inject their unique unsubscribe token
-     * Injects data directly into the pre-compiled HTML string for maximum speed.
+     * Map over every active subscriber and inject their unique unsubscribe token directly
+     * into the pre-compiled HTML string, which is much faster than re-rendering per recipient.
      */
     const payloads = activeSubscribers.map((s) => ({
       from: `${FULL_NAME} <${SENDER_EMAIL}>`,

@@ -2,8 +2,8 @@ import type { RegistryItemType } from '@/types/registry'
 
 /**
  * Defines the structure of the MDX frontmatter for component documentation.
- * This interface acts as the single source of truth for both the documentation UI
- * Also defines the Shadcn CLI installation schema.
+ * Acts as the single source of truth for both the documentation UI and the
+ * Shadcn CLI installation schema.
  */
 export interface ComponentPost {
   title: string

@@ -8,6 +8,7 @@ import { ZOOM_EASE } from '@/constants/ui'
 import type { Photo } from '@/types/photos'
 import { useScrollLock } from '@/hooks/use-scroll-lock'
 
+/** Props for {@link PhotoOverlay}; `photo` is `null` when nothing is zoomed. */
 interface PhotoOverlayProps {
   photo: Photo | null
   isOpen: boolean
@@ -16,8 +17,9 @@ interface PhotoOverlayProps {
 
 /**
  * A fullscreen portal overlay that displays a high-resolution version of a photo.
- * Locks the body scroll and traps focus/escape keys while open.
- * Uses Framer Motion's 'm' component to inherit the LazyMotion engine from the parent.
+ * Locks body scroll while open and closes on Escape or a backdrop/image click.
+ * Uses Framer Motion's `m` component to inherit the LazyMotion engine from the parent, with a
+ * shared `layoutId` so the grid thumbnail morphs into the overlay.
  */
 export function PhotoOverlay({ photo, isOpen, onClose }: PhotoOverlayProps) {
   useScrollLock(isOpen)

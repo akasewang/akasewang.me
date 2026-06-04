@@ -5,6 +5,7 @@ import Image from 'next/image'
 import { m, AnimatePresence } from 'framer-motion'
 import { Icons } from '@/components/ui/icons'
 
+/** Props for {@link ProjectDemo}. */
 interface ProjectDemoProps {
   image?: string
   video?: string
@@ -12,8 +13,8 @@ interface ProjectDemoProps {
 }
 
 /**
- * Supports both video playback with custom controls (play/pause, seek, buffering state)
- * and static image fallbacks.
+ * A project media viewer: plays a looping video with custom controls (play/pause, seek,
+ * buffering state) or shows a static image fallback.
  *
  * @param image - Optional URL to a static fallback image or video poster.
  * @param video - Optional URL to the video file to be played.

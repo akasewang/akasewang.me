@@ -6,6 +6,7 @@ import { parseTocFromContent } from './utils/parse-toc'
 import { useActiveHeading, scrollToHeading } from './hooks/use-active-heading'
 import { Icons } from '@/components/ui/icons'
 
+/** Props for {@link AsideTOC}. */
 interface AsideTOCProps {
   content?: string
   className?: string

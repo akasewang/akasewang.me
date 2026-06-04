@@ -7,12 +7,16 @@ import { SeparatorBullet } from '@/components/ui/separator-bullet'
 import { formatDateString, isNew, cn } from '@/utils/utils'
 import type { BlogPost } from '@/types/blog'
 
+/** Props for {@link BlogPostCard}. */
 interface BlogPostCardProps {
   post: BlogPost
   className?: string
 }
 
-/** Blog Post Card Component. */
+/**
+ * A list row linking to a blog post, showing its title (with a "new" tag for recent posts),
+ * date, view count, and a two-line excerpt. Used in the featured/listing post lists.
+ */
 export function BlogPostCard({
   post: { title, slug, date, excerpt },
   className,
@@ -21,8 +25,9 @@ export function BlogPostCard({
     <Link
       href={`/blogs/${slug}`}
       prefetch={false}
+      data-highlight-item
       className={cn(
-        'group relative -mx-2 -my-1.5 flex flex-col rounded-xl ring-1 ring-transparent retina:ring-[0.5px] px-2 py-1.5 transition-[background-color,box-shadow,transform,scale] duration-300 ease-out hover:bg-accent hover:ring-accent-border hover:shadow-md active:scale-[0.99] active:duration-200 sm:-mx-3 sm:-my-2 sm:px-3 sm:py-2',
+        'group relative z-10 -mx-2 -my-1.5 flex flex-col rounded-xl px-2 py-1.5 transition-[transform,scale] duration-300 ease-out active:scale-[0.99] active:duration-200 sm:-mx-3 sm:-my-2 sm:px-3 sm:py-2',
         className,
       )}
     >

@@ -14,6 +14,7 @@ import {
 } from '@react-email/components'
 import { SITE_URL, FULL_NAME, USERNAME, SITE } from '@/constants/constants'
 
+/** Props for the subscriber welcome email. */
 interface WelcomeTemplateProps {
   unsubscribeToken: string
   isResubscribe?: boolean
@@ -124,6 +125,7 @@ const styles = {
   footerLinkDim: { color: theme.link, textDecoration: 'none' },
 }
 
+/** Welcome email sent on a new or returning subscription, with a one-click unsubscribe link. */
 export const WelcomeTemplate = ({
   unsubscribeToken,
   isResubscribe = false,

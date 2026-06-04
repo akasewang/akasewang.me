@@ -3,6 +3,7 @@
 import React, { useMemo } from 'react'
 import { Tabs, Tab } from '@/components/common/mdx-components/tabs'
 
+/** Props for {@link ComponentPreviewClient}. */
 interface ComponentPreviewProps {
   slug: string
   codeNode: React.ReactNode
@@ -15,7 +16,6 @@ interface ComponentPreviewProps {
  * @param slug - The unique identifier of the component in the registry.
  * @param codeNode - The pre-compiled MDX syntax-highlighted source code node.
  */
-
 export function ComponentPreviewClient({ slug, codeNode }: ComponentPreviewProps) {
   const Preview = useMemo(() => {
     const Component = React.lazy(() =>

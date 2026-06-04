@@ -10,6 +10,7 @@ import type { RegistryItem } from '@/types/registry'
 
 type ComponentCategory = (typeof COMPONENT_CATEGORIES)[number]['value']
 
+/** Props for {@link ComponentTabs}. */
 interface ComponentTabsProps {
   allComponents: RegistryItem[]
 }

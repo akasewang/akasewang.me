@@ -10,13 +10,15 @@ import { NewTag } from '@/components/ui/new-tag'
 import { formatDateString, isNew } from '@/utils/utils'
 import type { ProjectPostData } from '@/types/project'
 
+/** Props for {@link ProjectCard}. */
 interface ProjectCardProps {
   project: ProjectPostData
 }
 
 /**
- * Project Card Component.
- * automatically play/pause background video demonstrations based on scroll intersection, saving battery and bandwidth.
+ * Project card for the projects grid. Shows a video or image preview with a hover-revealed
+ * title, date, and view count, and automatically plays/pauses the background video based on
+ * scroll intersection to save battery and bandwidth.
  */
 export const ProjectCard = memo(function ProjectCard({ project }: ProjectCardProps) {
   const { title, slug, video, image, date, period } = project

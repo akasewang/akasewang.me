@@ -4,6 +4,7 @@ import { useEffect, useRef } from 'react'
 import { useViews } from '@/components/providers/views-context'
 import { cn } from '@/utils/utils'
 
+/** Props for {@link DownloadCounter}. */
 interface DownloadCounterProps {
   slug: string
 }

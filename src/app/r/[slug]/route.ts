@@ -6,9 +6,9 @@ import { incrementInstallAction } from '@/lib/actions/views'
 /**
  * Shadcn UI Registry API Route.
  * This route is pinged by the shadcn CLI (`npx shadcn add <slug>`) to fetch component code.
- * It dynamically resolves the CLI schema from MDX frontmatter and reads the local file system
- * Serves the raw source code of components. It also applies path transformations to ensure
- * registry-internal imports are mapped correctly for the end user.
+ * It dynamically resolves the CLI schema from MDX frontmatter and reads the raw component
+ * source from the local file system, applying path transformations so registry-internal
+ * imports map correctly for the end user.
  *
  * Includes an integrated telemetry tracker that filters by User-Agent to prevent bot inflation.
  * Utilizes an ephemeral in-memory cache to deduplicate CI/CD burst installs by IP.

@@ -1,10 +1,10 @@
 import { useEffect } from 'react'
 
 /**
- * Utility hook that prevents body scrolling when a modal or overlay is open.
- * Sets the document body overflow to hidden. Layout shifts are natively prevented
+ * Locks body scrolling while `isOpen` is true (e.g. for a modal or overlay) by setting
+ * `overflow: hidden` on the document body, and restores the previous overflow on cleanup.
  *
- * @param isOpen - Boolean indicating whether the scroll lock should be currently active.
+ * @param isOpen - Whether the scroll lock should currently be active.
  */
 export function useScrollLock(isOpen: boolean) {
   useEffect(() => {

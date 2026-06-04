@@ -12,6 +12,7 @@ import { SectionTitle } from '@/components/layout/section-title'
 import { SPRING_TRANSITION } from '@/constants/ui'
 import type { ProjectPostData, ProjectCategory } from '@/types/project'
 
+/** Props for {@link FeaturedProjects}. */
 interface FeaturedProjectsProps {
   filterType?: ProjectCategory
   projects: ProjectPostData[]

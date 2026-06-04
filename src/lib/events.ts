@@ -1,3 +1,4 @@
+/** The set of user interactions tracked in analytics. */
 type EventName =
   | 'copy_npm_command'
   | 'copy_code_block'
@@ -5,6 +6,7 @@ type EventName =
   | 'play_name_pronunciation'
   | 'open_command_menu'
 
+/** An analytics event: a predefined name plus optional scalar properties. */
 interface Event {
   name: EventName
   properties?: Record<string, string | number | boolean | null>

@@ -5,6 +5,7 @@ import { Icons } from '@/components/ui/icons'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { cn } from '@/utils/utils'
 
+/** Props for {@link CarouselButton}. */
 interface CarouselButtonProps {
   href: string
   label: string
@@ -14,7 +15,8 @@ interface CarouselButtonProps {
 }
 
 /**
- * Wrapped in a Tooltip to provide accessible context to the user.
+ * A floating link button (e.g. to a full directory page) shown beside a carousel,
+ * wrapped in a tooltip that surfaces its label and optional keyboard shortcut.
  *
  * @param href - The destination URL for the link.
  * @param label - The accessible label and tooltip text.

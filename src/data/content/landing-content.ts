@@ -4,9 +4,8 @@ import type { SharedContent } from '@/types/site'
 
 /**
  * Landing Page Content Model.
- * Centralized static text definitions for the main home page.
- * Allows easy modification of the hero section bio, section titles, and action labels
- * Allows content updates without modifying React component logic directly.
+ * Centralized text for the home page — hero bio, section titles, and action labels —
+ * so content can be updated without touching React component logic.
  */
 export const landingPageContent: LandingPageContent = {
   hero: {
@@ -50,6 +49,7 @@ export const landingPageContent: LandingPageContent = {
   },
 }
 
+/** Shared "show more / show less" toggle labels reused across expandable lists. */
 export const sharedContent: SharedContent = {
   more: 'show more',
   less: 'show less',

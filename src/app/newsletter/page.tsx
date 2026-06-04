@@ -20,7 +20,8 @@ export async function generateMetadata(): Promise<Metadata> {
 
 /**
  * Public Newsletter Subscription Route.
- * Renders a dedicated page for subscribing to the newsletter. Connects to the database and Resend API.
+ * Renders a dedicated page for subscribing to the newsletter; the actual signup is handled
+ * by the `NewsletterSubscription` form's server action.
  */
 export default async function NewsletterPage() {
   const breadcrumbJsonLd = getBreadcrumbSchema([

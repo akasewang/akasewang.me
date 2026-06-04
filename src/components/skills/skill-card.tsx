@@ -5,6 +5,7 @@ import { SpotlightCard } from '@/components/ui/spotlight'
 import { cn } from '@/utils/utils'
 import type { Skill } from '@/types/home'
 
+/** Props for {@link SkillCard}. */
 interface SkillCardProps {
   skill: Skill
   className?: string
@@ -15,7 +16,10 @@ const SKILL_CARD_BASE_CLASSES =
 
 const SKILL_NAME_BASE_CLASSES = 'whitespace-nowrap font-mono text-xs font-medium leading-none'
 
-/** Skill Card Component. */
+/**
+ * A compact skill chip showing the technology's icon and name, with a velocity-reactive
+ * spotlight on hover. Renders as an external link when the skill has a `url`, else a static chip.
+ */
 export function SkillCard({ skill: { url, icon, name }, className }: SkillCardProps) {
   const isLink = !!url
 

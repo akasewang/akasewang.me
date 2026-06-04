@@ -6,6 +6,7 @@ import { BackButton } from '@/components/ui/back-button'
 import { cn } from '@/utils/utils'
 import { SMOOTH_SPRING_TRANSITION } from '@/constants/ui'
 
+/** Props for {@link PageFooter}. */
 interface PageFooterProps {
   text?: ReactNode
   backButtonHref?: string

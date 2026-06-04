@@ -3,6 +3,7 @@
 import { type ReactNode } from 'react'
 import { cn } from '@/utils/utils'
 
+/** Props for {@link EmptyState}. */
 interface EmptyStateProps {
   title?: string
   message: string

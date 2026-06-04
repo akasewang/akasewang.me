@@ -2,7 +2,7 @@ import { forwardRef, type ComponentProps } from 'react'
 import { cn } from '@/utils/utils'
 
 /**
- * Supports standard HTML textarea attributes and forwards its ref.
+ * A styled multi-line textarea that forwards its ref and accepts native textarea attributes.
  * Pre-configured with a minimum height and `resize-none` for layout stability.
  *
  * @param className - Optional CSS classes for custom styling.

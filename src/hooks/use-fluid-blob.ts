@@ -3,14 +3,17 @@
 import { useEffect, useRef } from 'react'
 import { useMotionValue, animate, useReducedMotion, type MotionValue } from 'framer-motion'
 
+/** Motion values produced by {@link useFluidBlob}, bound directly to a blob element's CSS. */
 export interface FluidBlobState {
   borderRadius: MotionValue<string>
   rotate: MotionValue<number>
   scale: MotionValue<number>
 }
 
+/** Random float in the `[min, max)` range. */
 const rand = (min: number, max: number) => Math.random() * (max - min) + min
 
+/** Generates a random asymmetric `border-radius` string for the organic blob shape. */
 function randomBorderRadius() {
   const r = () => Math.round(rand(25, 75))
   return `${r()}% ${r()}% ${r()}% ${r()}% / ${r()}% ${r()}% ${r()}% ${r()}%`

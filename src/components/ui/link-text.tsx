@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { AnimatedArrow } from '@/components/ui/animated-arrow'
 import { cn } from '@/utils/utils'
 
+/** Props for {@link LinkText}. */
 interface LinkTextProps {
   href: string
   children: ReactNode
@@ -14,7 +15,8 @@ interface LinkTextProps {
 }
 
 /**
- * Automatically handles external link routing attributes (`target="_blank"`, `rel="noopener noreferrer"`).
+ * An inline text link with an animated underline and an optional trailing arrow. Automatically
+ * applies external-link attributes (`target="_blank"`, `rel="noopener noreferrer"`) for `http` URLs.
  *
  * @param href - The destination URL for the link.
  * @param children - The text content of the link.

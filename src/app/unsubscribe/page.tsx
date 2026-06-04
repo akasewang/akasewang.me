@@ -4,6 +4,7 @@ import { eq } from 'drizzle-orm'
 import { unsubscribeContent } from '@/data/content/unsubscribe-content'
 import { PageLayout } from '@/components/layout/page-layout'
 
+/** Props for the unsubscribe route; the `token` is read from `searchParams`. */
 type Props = {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }

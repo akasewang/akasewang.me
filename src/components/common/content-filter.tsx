@@ -11,8 +11,10 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 
+/** Sort options for content listings: by date or view count, ascending or descending. */
 export type SortOption = 'date-desc' | 'date-asc' | 'views-desc' | 'views-asc'
 
+/** Props for {@link ContentFilter}. */
 interface ContentFilterProps<T extends string> {
   searchQuery: string
   onSearchChange: (value: string) => void

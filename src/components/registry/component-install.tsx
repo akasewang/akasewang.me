@@ -13,6 +13,7 @@ const PREFIX_MAP: Record<(typeof PACKAGE_MANAGERS)[number], string> = {
   bun: 'bunx --bun',
 }
 
+/** Props for {@link ComponentInstall}. */
 interface ComponentInstallProps {
   slug: string
 }
@@ -24,7 +25,6 @@ interface ComponentInstallProps {
  *
  * @param slug - The unique identifier of the component in the registry.
  */
-
 export function ComponentInstall({ slug }: ComponentInstallProps) {
   return (
     <div className="my-8 w-full not-prose">

@@ -3,6 +3,7 @@
 import { cn } from '@/utils/utils'
 import { useSpotlight } from '@/hooks/use-spotlight'
 
+/** Props for {@link Spotlight}. */
 interface SpotlightProps {
   isHovering: boolean
   outerSize?: number
@@ -15,13 +16,14 @@ interface SpotlightProps {
 }
 
 /**
- * Typically injected by the `useSpotlight` hook.
+ * Renders a cursor-following spotlight from layered radial gradients positioned by the
+ * `--mx` / `--my` / `--spotlight-intensity` CSS variables (typically set by `useSpotlight`),
+ * fading in while `isHovering`. Optionally reveals masked `children` under the light.
  *
- * @param isHovering - Determines whether the spotlight layers are currently visible.
- * @param outerSize - The base pixel size for the spotlight's radius.
- * @param children - Optional content that will be masked to only reveal directly under the cursor.
+ * @param isHovering - Whether the spotlight layers are currently visible.
+ * @param outerSize - Base pixel radius for the spotlight gradients. Defaults to 140.
+ * @param children - Optional content masked to reveal only directly under the cursor.
  */
-
 export function Spotlight({
   isHovering,
   outerSize = 140,
@@ -82,6 +84,7 @@ export function Spotlight({
   )
 }
 
+/** Props for {@link SpotlightCard}; `as` selects the rendered element type. */
 export interface SpotlightCardProps<T extends React.ElementType = 'div'> {
   as?: T
   outerSize?: number
@@ -97,7 +100,6 @@ export interface SpotlightCardProps<T extends React.ElementType = 'div'> {
  * Use `as` to render as a different semantic element (e.g., `as="a"`).
  * Use `revealLayer` to supply completely custom content for the spotlight mask.
  */
-
 export function SpotlightCard<T extends React.ElementType = 'div'>({
   as,
   children,

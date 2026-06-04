@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import { cn } from '@/utils/utils'
 
+/** Props for {@link SectionTitle}. */
 interface SectionTitleProps {
   children: ReactNode
   className?: string

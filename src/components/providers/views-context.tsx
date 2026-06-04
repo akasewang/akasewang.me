@@ -12,6 +12,7 @@ import {
 } from 'react'
 import { incrementViewAction, getViewsBatchAction } from '@/lib/actions/views'
 
+/** Shape of the views/installs snapshot persisted to localStorage. */
 type ViewsCache = {
   views: Record<string, number>
   installs: Record<string, number>
@@ -30,9 +31,12 @@ type ViewsContextType = {
 const ViewsContext = createContext<ViewsContextType | null>(null)
 
 const CACHE_KEY = 'views-cache-all'
+/** How long a persisted cache stays valid (5 minutes). */
 const CACHE_DURATION = 5 * 60 * 1000
+/** Window for coalescing prefetch requests into a single batched API call (ms). */
 const BATCH_DELAY = 50
 
+/** Persists the current view/install counts to localStorage, stripping unresolved (null) entries. */
 function syncCache(views: Record<string, number | null>, installs: Record<string, number | null>) {
   if (typeof window === 'undefined') return
   try {

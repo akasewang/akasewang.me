@@ -4,11 +4,14 @@ import { m } from 'framer-motion'
 import { cn } from '@/utils/utils'
 import { SPRING_TRANSITION } from '@/constants/ui'
 
+/** Props for {@link NewTag}. */
 interface NewTagProps {
   className?: string
 }
 
 /**
+ * An animated "New" badge (shimmer sweep + spring entrance) for recently-added items.
+ *
  * @param className - Optional CSS classes for custom sizing or positioning.
  */
 export function NewTag({ className }: NewTagProps) {

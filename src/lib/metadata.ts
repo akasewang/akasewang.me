@@ -1,6 +1,7 @@
 import { Metadata } from 'next'
 import { SITE_URL, SITE_NAME, USERNAME, FULL_NAME } from '@/constants/constants'
 
+/** Page-specific inputs for {@link constructMetadata}. */
 interface MetadataProps {
   title: string
   description: string
@@ -28,11 +29,11 @@ export function getOgImageUrl(title?: string, type?: string): string {
 }
 
 /**
- * Generates standardized Next.js Metadata objects (SEO tags, OpenGraph, Twitter Cards) for any page.
- * Ensures that canonical URLs, dynamic OG images, and basic SEO tags are consistently applied
- * Standardizes metadata across the entire application without duplicating boilerplate.
+ * Generates a standardized Next.js Metadata object (SEO tags, Open Graph, Twitter cards) for any page.
+ * Applies canonical URLs, a dynamic OG image, and base SEO tags consistently, so pages don't repeat
+ * this boilerplate.
  *
- * @param props - An object containing page-specific SEO metadata like title, description, and path.
+ * @param props - Page-specific SEO metadata such as title, description, and path.
  * @returns A Next.js `Metadata` object ready to be exported from a page.
  */
 export function constructMetadata({

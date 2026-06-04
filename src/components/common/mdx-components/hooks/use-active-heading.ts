@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import type { TocItem } from '../utils/parse-toc'
 
-/* React hook that monitors window scroll position to determine and highlight the currently active Table of Contents (TOC) heading */
+/** Tracks window scroll position to report which Table-of-Contents heading is currently active. */
 export function useActiveHeading(items: TocItem[], offset = 120): string {
   const [activeId, setActiveId] = useState('')
 
@@ -50,7 +50,7 @@ export function useActiveHeading(items: TocItem[], offset = 120): string {
   return activeId
 }
 
-/* Utility function to smoothly scroll the page to a specific DOM element by ID, applying a configurable Y-offset to account for fixed headers */
+/** Smoothly scrolls to a heading element by id, applying a Y-offset to clear fixed headers. */
 export function scrollToHeading(id: string, yOffset = -100): void {
   const element = document.getElementById(id)
   if (element)

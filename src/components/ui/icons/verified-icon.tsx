@@ -1,6 +1,7 @@
 ﻿import { forwardRef, type ComponentProps } from 'react'
 import { cn } from '@/utils/utils'
 
+/** Badge-style verified checkmark icon (scalloped seal), rendered as an SVG. */
 export const VerifiedIcon = forwardRef<SVGSVGElement, ComponentProps<'svg'>>(
   ({ className, ...props }, ref) => (
     <svg

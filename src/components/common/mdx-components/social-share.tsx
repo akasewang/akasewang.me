@@ -14,18 +14,21 @@ import {
   DropdownMenuItem,
 } from '@/components/ui/dropdown-menu'
 
+/** Props for {@link SocialShare}. */
 interface SocialShareProps {
   url: string
   title: string
   className?: string
 }
 
+/** A shareable network entry: its name, icon, and optional action verb ("share via"). */
 type ShareOption = {
   name: string
   icon: typeof Icons.x
   actionText?: string
 }
 
+/** Networks offered in the share menu, in display order. */
 const SHARE_NETWORKS: ShareOption[] = [
   { name: 'X', icon: Icons.x },
   { name: 'LinkedIn', icon: Icons.linkedin },
@@ -36,6 +39,7 @@ const SHARE_NETWORKS: ShareOption[] = [
   { name: 'Email', icon: Icons.mail, actionText: 'share via' },
 ]
 
+/** Builds the share intent URL for a given network, page URL, and title. */
 const getShareUrl = (network: string, url: string, title: string) => {
   const encodedUrl = encodeURIComponent(url)
   const encodedTitle = encodeURIComponent(title)
@@ -61,8 +65,8 @@ const getShareUrl = (network: string, url: string, title: string) => {
 }
 
 /**
- * Includes a native "Copy Link" fallback with clipboard support, and direct integration
- * with multiple social networks.
+ * A share button that opens a dropdown with a copy-link action and direct share links to
+ * several social networks.
  *
  * @param url - The absolute URL of the page to be shared.
  * @param title - The title of the page to be included in social previews.

@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import { cn } from '@/utils/utils'
 
+/** Props for {@link Steps}. */
 interface StepsProps {
   children: ReactNode
   className?: string
@@ -15,14 +16,15 @@ export const Steps = ({ children, className }: StepsProps) => {
   return <div className={cn('my-8 ml-4 [counter-reset:step]', className)}>{children}</div>
 }
 
+/** Props for {@link Step}. */
 interface StepProps {
   title?: string
   children: ReactNode
 }
 
 /**
- * Individual step item within a `<Steps>` container.
- * dashed line between steps.
+ * Individual step within a `<Steps>` container; renders an auto-incrementing number marker
+ * and a dashed line connecting it to the next step.
  *
  * @param title - Optional heading for the step.
  */

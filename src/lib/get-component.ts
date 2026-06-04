@@ -1,16 +1,16 @@
 import fs from 'node:fs'
 import path from 'node:path'
 
-/** Cache the Current Working Directory to avoid recalculating on every file read */
+/** Cache the current working directory to avoid recalculating on every file read. */
 const CWD = process.cwd()
 
 /**
  * Reads a component's source code directly from the file system.
- * Used during build time (or SSR) to display the source in the component preview tab
- * Serves the raw string via the JSON payload for the shadcn CLI.
+ * Used at build time (or during SSR) to show the source in the component preview tab and
+ * to serve the raw string in the JSON payload for the shadcn CLI.
  *
- * @param filePath - The relative path to the file from the project root.
- * @returns The raw string contents of the file, or an error fallback string.
+ * @param filePath - The path to the file, relative to the project root.
+ * @returns The raw file contents, or a fallback string if the read fails.
  */
 export function getComponentSource(filePath: string): string {
   try {

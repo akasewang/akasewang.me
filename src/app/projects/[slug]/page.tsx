@@ -24,6 +24,7 @@ export async function generateStaticParams() {
   return getProjectSlugs()
 }
 
+/** Resolved dynamic route params for a single project. */
 export type paramsType = Promise<{ slug: string }>
 
 /** Dynamically resolves Open Graph and SEO metadata based on the requested project's MDX frontmatter. */

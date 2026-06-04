@@ -1,10 +1,7 @@
 import type { SocialLink } from '@/types/site'
 import { USERNAME } from '@/constants/constants'
 
-/**
- * Active Socials Data Dictionary.
- * Centralized static configuration and text definitions.
- */
+/** Social profiles currently shown in the UI (links + display handles). */
 export const activeSocials: SocialLink[] = [
   {
     href: `https://github.com/${USERNAME}`,
@@ -38,6 +35,7 @@ export const activeSocials: SocialLink[] = [
   },
 ]
 
+/** Social profiles kept on record but not currently surfaced in the UI. */
 export const inactiveSocials: SocialLink[] = [
   {
     href: `https://bsky.app/profile/${USERNAME}.me`,

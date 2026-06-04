@@ -14,6 +14,7 @@ import {
 } from '@react-email/components'
 import { SITE_URL, FULL_NAME, USERNAME } from '@/constants/constants'
 
+/** Props for the new-post broadcast email. */
 interface NewsletterTemplateProps {
   unsubscribeToken: string
   blogTitle?: string
@@ -171,6 +172,7 @@ const defaultPosts = [
   },
 ]
 
+/** Broadcast email announcing a new blog post, with recent posts and a one-click unsubscribe link. */
 export const NewsletterTemplate = ({
   blogTitle = `A new post from ${FULL_NAME}`,
   blogUrl = SITE_URL,

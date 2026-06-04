@@ -3,6 +3,7 @@
 import { cn } from '@/utils/utils'
 import { useSpotlight } from '@/registry/hooks/use-spotlight'
 
+/** Props for {@link Spotlight}. */
 interface SpotlightProps {
   isHovering: boolean
   outerSize?: number
@@ -15,13 +16,15 @@ interface SpotlightProps {
 }
 
 /**
- * Specifically engineered to be installed via the shadcn registry.
+ * Renders a cursor-following spotlight from layered radial gradients positioned by the
+ * `--mx` / `--my` / `--spotlight-intensity` CSS variables (set by `useSpotlight`), fading
+ * in while `isHovering`. Optionally reveals masked `children` under the light. Designed to
+ * be installed via the shadcn registry.
  *
- * @param isHovering - Determines if the spotlight is currently visible.
- * @param outerSize - The base radius (in pixels) for the spotlight calculations. Defaults to 140.
- * @param children - Optional content to be revealed specifically under the spotlight mask.
+ * @param isHovering - Whether the spotlight is currently visible.
+ * @param outerSize - Base radius (in pixels) for the spotlight gradients. Defaults to 140.
+ * @param children - Optional content revealed under the spotlight mask.
  */
-
 export function Spotlight({
   isHovering,
   outerSize = 140,
@@ -82,16 +85,16 @@ export function Spotlight({
   )
 }
 
+/** Props for {@link SpotlightCard}; any extra `div` attributes are forwarded to the container. */
 export interface SpotlightCardProps extends React.HTMLAttributes<HTMLDivElement> {
   outerSize?: number
   withBaseReveal?: boolean
 }
 
 /**
- * A highly-optimized container that automatically tracks cursor velocity and applies the Spotlight effect.
- * Completely abstracts away the boilerplate of hooks and refs for the developer.
+ * A container that automatically tracks cursor velocity and applies the {@link Spotlight}
+ * effect, abstracting away the `useSpotlight` hook and ref wiring for the developer.
  */
-
 export function SpotlightCard({
   children,
   className,

@@ -3,11 +3,14 @@ import { LinkText } from '@/components/ui/link-text'
 import { LINK_REGEX } from '@/constants/constants'
 
 /**
- * Useful for rendering user-provided text descriptions (like timeline items or bios) where full MDX
- * Used when full compilation is overkill but basic link interactivity is needed.
+ * Renders a plain string into a ReactNode, converting inline markdown links
+ * (`[label](url)`) into interactive `LinkText` elements.
  *
- * @param text - The raw text string containing markdown links (e.g., `[label](url)`).
- * @returns A ReactNode array with parsed text segments and interactive links, or the original string if no links exist.
+ * Useful for user-provided text such as timeline items or bios, where full MDX
+ * compilation is overkill but basic link interactivity is still needed.
+ *
+ * @param text - The raw text string, optionally containing markdown links.
+ * @returns A ReactNode array of text segments and links, or the original string if it contains no links.
  */
 export function renderWithLinks(text: string): ReactNode {
   if (!text) return text

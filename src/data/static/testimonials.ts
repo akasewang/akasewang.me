@@ -8,6 +8,7 @@ import type { TestimonialRows } from '@/types/home'
  * image: string (e.g., '/testimonial-avatar/example.jpg')
  */
 
+/** Testimonials shown on the testimonials wall, split into two scrolling marquee rows. */
 export const testimonials: TestimonialRows = {
   topRow: [
     {

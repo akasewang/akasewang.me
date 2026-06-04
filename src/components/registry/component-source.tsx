@@ -3,20 +3,20 @@ import { getComponentSource } from '@/lib/get-component'
 import { MDXRemote } from 'next-mdx-remote/rsc'
 import { MDX_OPTIONS, MDX_COMPONENTS } from '@/components/common/mdx-components/mdx-config'
 
+/** Props for {@link ComponentSource}. */
 interface ComponentSourceProps {
   slug: string
   className?: string
 }
 
 /**
- * Server Component to render the syntax-highlighted source code of a registry component.
- * It resolves the component metadata via the MDX-driven registry sync, dynamically reads
- * Reads the raw file contents from the local filesystem and applies path transformations for clean UI viewing.
+ * Server Component that renders the syntax-highlighted source of a registry component.
+ * Resolves the component via the MDX-driven registry sync, reads the raw file from the local
+ * filesystem, and rewrites registry-internal import paths to their public equivalents for display.
  *
  * @param slug - The unique identifier of the component in the registry.
  * @param className - Optional CSS classes for custom container styling.
  */
-
 export async function ComponentSource({ slug, className }: ComponentSourceProps) {
   const components = await getRegistryComponents()
   const item = components.find((c) => c.slug === slug)

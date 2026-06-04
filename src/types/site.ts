@@ -1,7 +1,9 @@
 /**
  * Global Layout & Navigation
- * Top-level structure for navbars, footers, and general page layouts
+ * Top-level structure for navbars, footers, and general page layouts.
  */
+
+/** Navbar link labels for the primary routes. */
 export interface NavbarContent {
   home: string
   blogs: string
@@ -10,22 +12,26 @@ export interface NavbarContent {
   photos: string
 }
 
+/** Footer attribution and optional license link. */
 export interface FooterContent {
   ownerName: string
   license?: string
   licenseHref?: string
 }
 
+/** Shared UI labels reused across pages (name pronunciation, back-to-top). */
 export interface CommonContent {
   pronounceName: string
   backToTop: string
 }
 
+/** Generic page header copy (title + subtitle). */
 export interface PageContent {
   title: string
   subtitle: string
 }
 
+/** A section header with a "view all" link to its full listing. */
 export interface LinkableSectionContent {
   title: string
   viewAll: string
@@ -33,8 +39,10 @@ export interface LinkableSectionContent {
 
 /**
  * SEO & Social Sharing
- * Types for metadata, open graph, and social links
+ * Types for metadata, open graph, and social links.
  */
+
+/** Page metadata used to build `<head>` tags and open-graph cards. */
 export interface SeoContent {
   title: string
   description: string
@@ -42,12 +50,14 @@ export interface SeoContent {
   ogTitle: string
 }
 
+/** A social profile link: destination, accessible label, and display text. */
 export interface SocialLink {
   href: string
   label: string
   display: string
 }
 
+/** Shared "show more / show less" toggle labels. */
 export interface SharedContent {
   more: string
   less: string
@@ -55,8 +65,10 @@ export interface SharedContent {
 
 /**
  * Metrics & View Counters
- * Content types for the views counter UI component
+ * Content types for the views counter UI component.
  */
+
+/** Labels for the view/visitor counter, including its offline state. */
 export interface ViewsContent {
   offline: string
   visitors: string
@@ -66,8 +78,10 @@ export interface ViewsContent {
 
 /**
  * Toast Notifications
- * Centralized dictionary of status messages and errors for the app
+ * Centralized dictionary of status messages and errors for the app.
  */
+
+/** Toast copy grouped by feature (newsletter, message board, subscribe). */
 export interface ToastMessages {
   newsletter: {
     success: string
@@ -107,8 +121,10 @@ export interface ToastMessages {
 
 /**
  * Chronological Data & Timelines
- * Reusable type definitions for representing any chronological event across the application
+ * Reusable type definitions for representing any chronological event across the application.
  */
+
+/** A labelled link with optional surrounding text, used in timeline entries. */
 export interface LinkItem {
   text: string
   url: string
@@ -116,6 +132,7 @@ export interface LinkItem {
   suffix?: string
 }
 
+/** Props for a single timeline entry (experience, education, etc.) and its expandable body. */
 export interface TimelineItemProps {
   id: string
   title: string

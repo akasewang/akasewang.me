@@ -9,6 +9,7 @@ import { toastContent } from '@/data/content/toast-content'
 import { MESSAGES_PER_PAGE } from '@/constants/constants'
 import type { ActionResult } from '@/types/actions'
 
+/** Verifies an admin secret against the configured password (false if none is set). */
 const isAdmin = (secret: string) =>
   process.env.ADMIN_PASSWORD && secret === process.env.ADMIN_PASSWORD
 

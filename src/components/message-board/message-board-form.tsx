@@ -12,7 +12,9 @@ import { Input } from '@/components/ui/input'
 import { TextArea } from '@/components/ui/text-area'
 import { toast } from 'sonner'
 
+/** Secret message that, when posted, logs the admin out instead of submitting. */
 const ADMIN_LOGOUT_COMMAND = process.env.NEXT_PUBLIC_ADMIN_LOGOUT_COMMAND || '/logout'
+/** Secret prefix (`/admin <password>`) that authenticates an admin instead of posting. */
 const ADMIN_LOGIN_PREFIX = process.env.NEXT_PUBLIC_ADMIN_LOGIN_PREFIX || '/admin '
 const mbToast = toastContent.messageBoard
 

@@ -1,14 +1,14 @@
 import type { NewsletterPageContent, NewsletterSectionContent } from '@/types/newsletter'
 
-/**
- * Newsletter Page Content Data Dictionary.
- * Centralized static configuration and text definitions.
- */
+/** Copy for the newsletter feature: the standalone page header and the inline subscription section. */
+
+/** Header copy for the dedicated `/newsletter` page. */
 export const newsletterPageContent: NewsletterPageContent = {
   title: 'newsletter.',
   subtitle: 'Fresh code, hot takes and zero spam. Pinky promise.',
 }
 
+/** Copy for the inline newsletter subscription section (description, form, button states). */
 export const newsletterContent: NewsletterSectionContent = {
   title: 'stay updated.',
   descriptionPrefix: "It's ",

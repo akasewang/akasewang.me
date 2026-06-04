@@ -7,6 +7,7 @@ import { SeparatorBullet } from '@/components/ui/separator-bullet'
 import { formatDateString, isNew, cn } from '@/utils/utils'
 import type { RegistryItem } from '@/types/registry'
 
+/** Props for {@link ComponentCard}. */
 interface ComponentCardProps {
   item: RegistryItem
   className?: string
@@ -22,7 +23,7 @@ interface ComponentCardProps {
 
 /** from needlessly re-parsing these massive string literals on every single re-render of the list. */
 const CARD_BASE_CLASSES =
-  'group relative -mx-2 -my-1.5 flex flex-col rounded-xl px-2 py-1.5 ring-1 ring-transparent transition-[background-color,box-shadow,transform,scale] duration-300 ease-out hover:bg-accent hover:shadow-md hover:ring-accent-border active:scale-[0.99] active:duration-200 sm:-mx-3 sm:-my-2 sm:px-3 sm:py-2 retina:ring-[0.5px]'
+  'group relative z-10 -mx-2 -my-1.5 flex flex-col rounded-xl px-2 py-1.5 transition-[transform,scale] duration-300 ease-out active:scale-[0.99] active:duration-200 sm:-mx-3 sm:-my-2 sm:px-3 sm:py-2'
 
 export function ComponentCard({
   item: { name, slug, description, date },
@@ -37,6 +38,7 @@ export function ComponentCard({
     <Link
       href={`/components/${slug}`}
       prefetch={false}
+      data-highlight-item
       className={className ? cn(CARD_BASE_CLASSES, className) : CARD_BASE_CLASSES}
     >
       <article className="flex flex-col">

@@ -14,6 +14,7 @@ import { m } from 'framer-motion'
 import { cn } from '@/utils/utils'
 import { SPRING_TRANSITION, SMOOTH_SPRING_TRANSITION } from '@/constants/ui'
 
+/** Props for {@link Tabs}. */
 interface TabsProps {
   items?: string[]
   defaultIndex?: number
@@ -21,6 +22,7 @@ interface TabsProps {
   children: ReactNode
 }
 
+/** Props for {@link Tab}. */
 interface TabProps {
   title?: string
   children: ReactNode
@@ -28,7 +30,8 @@ interface TabProps {
 }
 
 /**
- * Maps child `<Tab>` components dynamically.
+ * A tabbed container that turns each child `<Tab>` into a tab (labelled from `items` or the
+ * tab's `title`), with an animated active-tab indicator.
  *
  * @param items - Optional array of strings to use as tab labels, overriding child `title` props.
  * @param defaultIndex - The index of the tab to activate by default.

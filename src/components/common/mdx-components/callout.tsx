@@ -4,10 +4,10 @@ import { useId, type CSSProperties, type ReactNode } from 'react'
 import { Icons } from '@/components/ui/icons'
 import { cn } from '@/utils/utils'
 
-/* Defines the available visual variants for the Callout component */
+/** The available visual variants for a callout. */
 type CalloutType = 'info' | 'tip' | 'warn' | 'error' | 'success'
 
-/* Props for the Callout component, allowing custom title and type */
+/** Props for {@link Callout}. */
 interface CalloutProps {
   type?: CalloutType
   title?: ReactNode
@@ -15,7 +15,7 @@ interface CalloutProps {
   className?: string
 }
 
-/* Configuration mapping for each callout type, including its icon, label, text accent color, and base hue */
+/** Per-variant config: icon, label, text accent color, and base hue. */
 const VARIANTS: Record<
   CalloutType,
   { icon: keyof typeof Icons; label: string; accent: string; hue: string }
@@ -53,6 +53,9 @@ const VARIANTS: Record<
 }
 
 /**
+ * A styled MDX admonition box (note, tip, warning, error, success) with an icon, label,
+ * and a variant-tinted background.
+ *
  * @param type - The semantic variant of the callout (info, tip, warn, error, success).
  * @param title - Optional custom title to display instead of the default type label.
  * @param className - Optional CSS classes for custom container styling.

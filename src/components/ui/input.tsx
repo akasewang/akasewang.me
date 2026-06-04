@@ -2,7 +2,7 @@ import { forwardRef, type ComponentProps } from 'react'
 import { cn } from '@/utils/utils'
 
 /**
- * Supports standard HTML input attributes and forwards its ref.
+ * A styled text input that forwards its ref and accepts all native input attributes.
  *
  * @param className - Optional CSS classes for custom styling.
  * @param type - The HTML input type (defaults to 'text').

@@ -5,8 +5,8 @@ import { SITE_URL } from '@/constants/constants'
 
 /**
  * Generates an XML Sitemap for search engine crawlers (Googlebot, Bingbot, etc.).
- * Dynamically aggregates all static routes, blog posts, and projects to ensure
- * Ensures accurate and up-to-date indexing of the site's content.
+ * Dynamically aggregates all static routes, blog posts, and projects so the site's
+ * content stays accurately and freshly indexed.
  *
  * @returns An XML Response containing the full URL set.
  */

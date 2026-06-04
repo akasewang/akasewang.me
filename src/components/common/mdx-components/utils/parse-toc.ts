@@ -1,9 +1,11 @@
+/** A single table-of-contents entry parsed from a heading (with its nesting level). */
 export interface TocItem {
   id: string
   text: string
   level: number
 }
 
+/** Slugifies heading text into a URL-safe anchor id. */
 export const generateId = (text: string): string =>
   text
     .toLowerCase()
@@ -11,6 +13,11 @@ export const generateId = (text: string): string =>
     .replace(/[\s-]+/g, '-')
     .replace(/^-+|-+$/g, '')
 
+/**
+ * Builds a table of contents from MDX/markdown content. Prefers existing `<h2>`–`<h4>` tags
+ * with `id` attributes, and otherwise falls back to parsing `##`–`####` markdown headings
+ * (ignoring fenced code blocks), generating ids via {@link generateId}.
+ */
 export function parseTocFromContent(content: string): TocItem[] {
   const items: TocItem[] = []
   const htmlMatches = Array.from(

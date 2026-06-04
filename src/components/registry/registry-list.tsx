@@ -1,11 +1,14 @@
 'use client'
 
+import { useRef } from 'react'
 import { m, AnimatePresence } from 'framer-motion'
 import { ComponentCard } from './component-card'
+import { HoverHighlight } from '@/components/ui/hover-highlight'
 import type { RegistryItem } from '@/types/registry'
 import { SPRING_TRANSITION } from '@/constants/ui'
 import { EmptyState } from '@/components/common/empty-state'
 
+/** Props for {@link RegistryList}. */
 interface RegistryListProps {
   components: RegistryItem[]
 }
@@ -19,9 +22,12 @@ interface RegistryListProps {
  * @param components - Array of registry items to be rendered as cards.
  */
 export function RegistryList({ components }: RegistryListProps) {
+  const listRef = useRef<HTMLDivElement>(null)
+
   return (
     <>
-      <div className="flex flex-col gap-2">
+      <div ref={listRef} className="relative flex flex-col gap-2">
+        <HoverHighlight parentRef={listRef} />
         <AnimatePresence mode="popLayout">
           {components.length > 0 ? (
             components.map((item, index) => (

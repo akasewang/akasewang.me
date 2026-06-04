@@ -6,7 +6,7 @@ import { USERNAME, SITE } from '@/constants/constants'
 const CACHE_KEY = 'github_stars_cache'
 const CACHE_TTL = 15 * 60 * 1000
 
-/* Module-level variable to deduplicate simultaneous in-flight requests across components */
+/** Module-level variable to deduplicate simultaneous in-flight requests across components. */
 let sharedFetchPromise: Promise<number | null> | null = null
 
 /**
@@ -22,7 +22,7 @@ export function useGithubStars() {
     let isMounted = true
 
     const fetchStars = async () => {
-      /* 1. Attempt to read from cache first to avoid hitting GitHub API rate limits */
+      /** 1. Attempt to read from cache first to avoid hitting GitHub API rate limits. */
       try {
         const cached = localStorage.getItem(CACHE_KEY)
         if (cached) {
@@ -33,11 +33,11 @@ export function useGithubStars() {
           }
         }
       } catch {
-        /* Silently ignore storage errors (e.g., Safari private mode, strict ad blockers) */
+        /** Silently ignore storage errors (e.g., Safari private mode, strict ad blockers). */
       }
 
       try {
-        /* 2. If another component is already fetching, piggyback on that promise */
+        /** 2. If another component is already fetching, piggyback on that promise. */
         if (!sharedFetchPromise) {
           sharedFetchPromise = fetch(`https://api.github.com/repos/${USERNAME}/${SITE}`)
             .then((res) => {
@@ -48,10 +48,10 @@ export function useGithubStars() {
               const count = data.stargazers_count
               if (typeof count === 'number') {
                 try {
-                  /* 3. Cache the result for future visits across all tabs */
+                  /** 3. Cache the result for future visits across all tabs. */
                   localStorage.setItem(CACHE_KEY, JSON.stringify({ count, timestamp: Date.now() }))
                 } catch {
-                  /* Silently ignore storage errors */
+                  /** Silently ignore storage errors. */
                 }
 
                 return count
@@ -73,13 +73,13 @@ export function useGithubStars() {
 
     fetchStars()
 
-    /* Cleanup function to prevent setting state if the component unmounts before the promise resolves */
+    /** Cleanup function to prevent setting state if the component unmounts before the promise resolves. */
     return () => {
       isMounted = false
     }
   }, [])
 
-  /* Pre-format string variants so the UI components can remain strictly presentational */
+  /** Pre-format string variants so the UI components can remain strictly presentational. */
   const shortCount =
     stars !== null
       ? new Intl.NumberFormat('en-US', { notation: 'compact', maximumFractionDigits: 1 })

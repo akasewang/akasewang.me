@@ -7,6 +7,7 @@ import { SpotlightCard } from '@/components/ui/spotlight'
 import { cn } from '@/utils/utils'
 import type { Testimonial } from '@/types/home'
 
+/** Props for {@link TestimonialCard}. */
 interface TestimonialCardProps {
   testimonial: Testimonial
   className?: string

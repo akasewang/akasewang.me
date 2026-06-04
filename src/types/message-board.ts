@@ -1,4 +1,6 @@
-/** Types for the guestbook feature, including DB entries and UI content */
+/** Types for the guestbook feature, including DB entries and UI content. */
+
+/** Static copy for the message board UI, including admin-only action labels. */
 export interface MessageBoardContent {
   title: string
   subtitle: string
@@ -25,6 +27,7 @@ export interface MessageBoardContent {
   }
 }
 
+/** A single message board entry as stored/returned by the database. */
 export interface MessageBoardEntry {
   id: number
   name: string

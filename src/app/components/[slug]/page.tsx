@@ -18,6 +18,7 @@ import { getReadingTime, formatDateString } from '@/utils/utils'
 import { SITE_URL, FULL_NAME } from '@/constants/constants'
 import { constructMetadata, getOgImageUrl } from '@/lib/metadata'
 
+/** Props for the component documentation route, carrying the dynamic `slug` param. */
 interface ComponentPageProps {
   params: Promise<{
     slug: string
@@ -33,7 +34,6 @@ export async function generateStaticParams() {
 }
 
 /** Dynamically resolves Open Graph and SEO metadata based on the requested component's MDX frontmatter. */
-
 export async function generateMetadata({ params }: ComponentPageProps): Promise<Metadata> {
   const { slug } = await params
   const doc = await getComponentDoc(slug)

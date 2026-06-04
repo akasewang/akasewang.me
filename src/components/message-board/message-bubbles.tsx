@@ -13,6 +13,7 @@ const contentWidthClass = 'max-w-[85%] sm:max-w-[70%]'
 const bubbleBaseClass = 'min-w-[150px] px-4 py-3 rounded-2xl ring-1 ring-inset'
 const actionBtnClass = 'text-[11px] font-medium transition-colors duration-300 active:duration-200'
 
+/** Props for {@link MessageBubbles}: one entry, its date, and admin action callbacks. */
 type MessageBubblesProps = {
   msg: MessageBoardEntry
   msgDate: Date

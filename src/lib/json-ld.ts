@@ -9,6 +9,7 @@ import {
 import { getOgImageUrl } from '@/lib/metadata'
 import { activeSocials } from '@/data/static/social'
 
+/** Shared JSON-LD `Person` node for the site owner, reused across the other schemas. */
 const PERSON_SCHEMA = {
   '@type': 'Person',
   name: FULL_NAME,

@@ -4,10 +4,12 @@ import { cn } from '@/utils/utils'
 export * from './verified-icon'
 export * from './volume'
 
+/** Shared props for the inline SVG icons, adding an optional `size` shorthand. */
 export interface IconProps extends React.SVGProps<SVGSVGElement> {
   size?: string | number
 }
 
+/** Central registry of inline SVG icon components used throughout the app. */
 export const Icons = {
   /** CUSTOM & BRAND ICONS */
 

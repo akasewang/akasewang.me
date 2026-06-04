@@ -15,6 +15,8 @@ import {
 } from '../constants/constants'
 
 /**
+ * Merges class names with `clsx` and resolves conflicting Tailwind utilities via `tailwind-merge`.
+ *
  * @param inputs - An array of class values, objects, or strings.
  * @returns A single unified class string.
  */

@@ -12,9 +12,11 @@ import React from 'react'
 import { FULL_NAME } from '@/constants/constants'
 import type { ActionResult } from '@/types/actions'
 
+/** Basic email-shape validation for subscription input. */
 const EMAIL_REGEX = /^[\w.-]+@[a-zA-Z\d.-]+\.[a-zA-Z]{2,}$/
 
 let resendInstance: Resend | null = null
+/** Lazily instantiates a singleton Resend client, throwing if the API key is not configured. */
 function getResend() {
   if (!resendInstance) {
     if (!process.env.RESEND_API_KEY) {
@@ -25,6 +27,7 @@ function getResend() {
   return resendInstance
 }
 
+/** From-address for outgoing mail, falling back to Resend's onboarding sender. */
 const SENDER_EMAIL = process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev'
 
 /**

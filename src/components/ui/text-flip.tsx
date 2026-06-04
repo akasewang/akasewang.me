@@ -11,6 +11,7 @@ const defaultVariants: Variants = {
   exit: { y: -20, opacity: 0, filter: 'blur(4px)' },
 }
 
+/** Props for {@link TextFlip}. */
 interface TextFlipProps {
   as?: ElementType
   className?: string
@@ -21,6 +22,9 @@ interface TextFlipProps {
 }
 
 /**
+ * Cycles through its children one at a time on a timer, animating each out and the next in
+ * (e.g. the rotating role titles in the hero).
+ *
  * @param as - The HTML element or Framer Motion component to render as (defaults to `m.span`).
  * @param interval - Time in seconds between each flip.
  * @param transition - Custom Framer Motion transition config.
