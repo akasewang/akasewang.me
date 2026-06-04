@@ -20,7 +20,8 @@ import { newsletterContent } from '@/data/content/newsletter-content'
 export function NewsletterSubscription({ hideHeader = false }: { hideHeader?: boolean }) {
   const [email, setEmail] = useState('')
   const [loading, setLoading] = useState(false)
-  const { success, countdown, startCountdown, showError, resetStatus } = useStatusTimer('newsletter-sub')
+  const { success, countdown, startCountdown, showError, resetStatus } =
+    useStatusTimer('newsletter-sub')
 
   async function handleSubmit(e: React.SyntheticEvent) {
     e.preventDefault()

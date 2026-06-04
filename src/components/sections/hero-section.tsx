@@ -1,17 +1,17 @@
-"use client";
+'use client'
 
-import Image from "next/image";
-import { LinkText } from "@/components/ui/link-text";
-import { Icons, VerifiedIcon } from "@/components/ui/icons";
-import { useRouter } from "next/navigation";
-import { PronounceMyName } from "@/components/common/pronounce-my-name";
-import { renderWithLinks } from "@/utils/content-utils";
-import { landingPageContent } from "@/data/content/landing-content";
-import { activeSocials, inactiveSocials } from "@/data/static/social";
-import { FULL_NAME, EMAIL } from "@/constants/constants";
-import { TextFlip } from "@/components/ui/text-flip";
-import { Button } from "@/components/ui/button";
-import { SectionTitle } from "@/components/layout/section-title";
+import Image from 'next/image'
+import { LinkText } from '@/components/ui/link-text'
+import { Icons, VerifiedIcon } from '@/components/ui/icons'
+import { useRouter } from 'next/navigation'
+import { PronounceMyName } from '@/components/common/pronounce-my-name'
+import { renderWithLinks } from '@/utils/content-utils'
+import { landingPageContent } from '@/data/content/landing-content'
+import { activeSocials, inactiveSocials } from '@/data/static/social'
+import { FULL_NAME, EMAIL } from '@/constants/constants'
+import { TextFlip } from '@/components/ui/text-flip'
+import { Button } from '@/components/ui/button'
+import { SectionTitle } from '@/components/layout/section-title'
 
 /**
  * Hero Section Component.
@@ -20,8 +20,8 @@ import { SectionTitle } from "@/components/layout/section-title";
  * Includes the PronounceMyName audio trigger and integrates content from static data models.
  */
 export function HeroSection() {
-  const { hero } = landingPageContent;
-  const router = useRouter();
+  const { hero } = landingPageContent
+  const router = useRouter()
 
   return (
     <section id="hero" className="animate-page-simple space-y-8">
@@ -33,6 +33,7 @@ export function HeroSection() {
             width={64}
             height={64}
             priority
+            unoptimized
             className="profile-slime-image"
           />
         </div>
@@ -104,16 +105,16 @@ export function HeroSection() {
           <Button
             defaultText={hero.scheduleMeet}
             defaultIcon={Icons.calendar}
-            onClick={() => window.open(hero.scheduleMeetUrl, "_blank")}
+            onClick={() => window.open(hero.scheduleMeetUrl, '_blank')}
           />
           <Button
             variant="minimal"
             defaultText={hero.messageBoard}
             defaultIcon={Icons.messageBoard}
-            onClick={() => router.push("/message-board")}
+            onClick={() => router.push('/message-board')}
           />
         </div>
       </div>
     </section>
-  );
+  )
 }

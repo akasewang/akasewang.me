@@ -5,14 +5,8 @@ import { useSearchParams, useRouter } from 'next/navigation'
 import { ContentFilter, type SortOption } from '@/components/common/content-filter'
 import { RegistryList } from '@/components/registry/registry-list'
 import { useViews } from '@/components/providers/views-context'
+import { COMPONENT_CATEGORIES } from '@/constants/categories'
 import type { RegistryItem } from '@/types/registry'
-
-const COMPONENT_CATEGORIES = [
-  { value: 'all', label: 'all' },
-  { value: 'registry:component', label: 'components' },
-  { value: 'registry:hook', label: 'hooks' },
-  { value: 'registry:block', label: 'blocks' },
-] as const
 
 type ComponentCategory = (typeof COMPONENT_CATEGORIES)[number]['value']
 
@@ -98,7 +92,8 @@ export function ComponentTabs({ allComponents }: ComponentTabsProps) {
     return allComponents
       .filter(
         (item) =>
-          (category === 'all' || item.type === category) &&
+          item.type === 'registry:component' &&
+          (category === 'all' || item.category === category) &&
           (item.name.toLowerCase().includes(query) ||
             item.description.toLowerCase().includes(query)),
       )

@@ -16,6 +16,6 @@ export const SMOOTH_SPRING_TRANSITION: Transition = {
 
 export const ZOOM_EASE: Transition = {
   type: 'tween',
-  ease: [0.22, 1, 0.36, 1],
-  duration: 0.4,
+  ease: 'easeOut',
+  duration: 0.25,
 }

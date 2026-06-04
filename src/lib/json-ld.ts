@@ -5,12 +5,12 @@ import {
   ROLES,
   CORE_TECHS,
   SECONDARY_TECHS,
-} from "@/constants/constants";
-import { getOgImageUrl } from "@/lib/metadata";
-import { activeSocials } from "@/data/static/social";
+} from '@/constants/constants'
+import { getOgImageUrl } from '@/lib/metadata'
+import { activeSocials } from '@/data/static/social'
 
 const PERSON_SCHEMA = {
-  "@type": "Person",
+  '@type': 'Person',
   name: FULL_NAME,
   url: SITE_URL,
   jobTitle: ROLES[0],
@@ -18,7 +18,7 @@ const PERSON_SCHEMA = {
   image: `${SITE_URL}/profpic.png`,
   knowsAbout: [...CORE_TECHS, ...SECONDARY_TECHS],
   sameAs: activeSocials.map((social) => social.href),
-};
+}
 
 /**
  * Returns the standard Person schema for the portfolio owner.
@@ -27,7 +27,7 @@ const PERSON_SCHEMA = {
  * @returns A JSON-LD compliant `Person` schema object.
  */
 export function getPersonSchema() {
-  return PERSON_SCHEMA;
+  return PERSON_SCHEMA
 }
 
 /**
@@ -38,22 +38,22 @@ export function getPersonSchema() {
  */
 export function getWebsiteSchema() {
   return {
-    "@context": "https://schema.org",
-    "@type": "WebSite",
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
     name: FULL_NAME,
     url: SITE_URL,
     description: SITE_DESCRIPTION,
     author: PERSON_SCHEMA,
     about: PERSON_SCHEMA,
     potentialAction: {
-      "@type": "SearchAction",
+      '@type': 'SearchAction',
       target: {
-        "@type": "EntryPoint",
+        '@type': 'EntryPoint',
         urlTemplate: `${SITE_URL}/blogs?q={search_term_string}`,
       },
-      "query-input": "required name=search_term_string",
+      'query-input': 'required name=search_term_string',
     },
-  };
+  }
 }
 
 /**
@@ -69,22 +69,22 @@ export function getBlogPostingSchema({
   slug,
   image,
 }: {
-  title: string;
-  excerpt: string;
-  date: string;
-  slug: string;
-  image?: string;
+  title: string
+  excerpt: string
+  date: string
+  slug: string
+  image?: string
 }) {
   return {
-    "@context": "https://schema.org",
-    "@type": "BlogPosting",
+    '@context': 'https://schema.org',
+    '@type': 'BlogPosting',
     headline: title,
     description: excerpt,
     datePublished: date,
     author: PERSON_SCHEMA,
     url: `${SITE_URL}/blogs/${slug}`,
-    image: image ?? getOgImageUrl(title, "Blog"),
-  };
+    image: image ?? getOgImageUrl(title, 'Blog'),
+  }
 }
 
 /**
@@ -95,26 +95,26 @@ export function getBlogPostingSchema({
  */
 export function getProfilePageSchema() {
   return {
-    "@context": "https://schema.org",
-    "@type": "ProfilePage",
+    '@context': 'https://schema.org',
+    '@type': 'ProfilePage',
     mainEntity: PERSON_SCHEMA,
-    dateCreated: "2024-01-01",
-    dateModified: new Date().toISOString().split("T")[0],
+    dateCreated: '2024-01-01',
+    dateModified: new Date().toISOString().split('T')[0],
     name: `${FULL_NAME} - ${ROLES[0]}`,
     description: SITE_DESCRIPTION,
     url: SITE_URL,
     breadcrumb: {
-      "@type": "BreadcrumbList",
+      '@type': 'BreadcrumbList',
       itemListElement: [
         {
-          "@type": "ListItem",
+          '@type': 'ListItem',
           position: 1,
-          name: "Home",
+          name: 'Home',
           item: SITE_URL,
         },
       ],
     },
-  };
+  }
 }
 
 /**
@@ -126,13 +126,13 @@ export function getProfilePageSchema() {
  */
 export function getBreadcrumbSchema(items: { name: string; url: string }[]) {
   return {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
     itemListElement: items.map((item, index) => ({
-      "@type": "ListItem",
+      '@type': 'ListItem',
       position: index + 1,
       name: item.name,
       item: item.url,
     })),
-  };
+  }
 }

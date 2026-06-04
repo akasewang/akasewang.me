@@ -30,7 +30,7 @@ export function useStatusTimer(storageKey?: string) {
           }
         } catch (e) {}
       }
-      
+
       setExpiresAt(null)
       setSuccess(false)
       setError(null)
@@ -73,29 +73,41 @@ export function useStatusTimer(storageKey?: string) {
     return () => clearInterval(interval)
   }, [expiresAt, storageKey])
 
-  const persistState = useCallback((sec: number, isSuccess: boolean, errMsg: string | null) => {
-    const expires = Date.now() + sec * 1000
-    setExpiresAt(expires)
-    if (storageKey && sec > 0) {
-      localStorage.setItem(`status-timer-${storageKey}`, JSON.stringify({
-        expiresAt: expires,
-        success: isSuccess,
-        error: errMsg
-      }))
-    }
-  }, [storageKey])
+  const persistState = useCallback(
+    (sec: number, isSuccess: boolean, errMsg: string | null) => {
+      const expires = Date.now() + sec * 1000
+      setExpiresAt(expires)
+      if (storageKey && sec > 0) {
+        localStorage.setItem(
+          `status-timer-${storageKey}`,
+          JSON.stringify({
+            expiresAt: expires,
+            success: isSuccess,
+            error: errMsg,
+          }),
+        )
+      }
+    },
+    [storageKey],
+  )
 
-  const startCountdown = useCallback((seconds: number) => {
-    setSuccess(true)
-    setError(null)
-    persistState(seconds, true, null)
-  }, [persistState])
+  const startCountdown = useCallback(
+    (seconds: number) => {
+      setSuccess(true)
+      setError(null)
+      persistState(seconds, true, null)
+    },
+    [persistState],
+  )
 
-  const showError = useCallback((message: string, cooldownSeconds: number = 0) => {
-    setSuccess(false)
-    setError(message)
-    persistState(cooldownSeconds, false, message)
-  }, [persistState])
+  const showError = useCallback(
+    (message: string, cooldownSeconds: number = 0) => {
+      setSuccess(false)
+      setError(message)
+      persistState(cooldownSeconds, false, message)
+    },
+    [persistState],
+  )
 
   const resetStatus = useCallback(() => {
     setSuccess(false)

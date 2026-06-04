@@ -14,6 +14,7 @@ import { PageLayout } from '@/components/layout/page-layout'
 import { PHOTO_CATEGORIES } from '@/constants/categories'
 import type { Category } from '@/types/photos'
 import { PhotoOverlay } from './photo-overlay'
+
 /**
  * and a dynamic layout toggle (aspect ratio vs strict square cropping).
  * Connects directly with the PhotoOverlay component for image lightboxing.
@@ -24,6 +25,7 @@ export function PhotosContent() {
 
   const [view, setView] = useState<'cover' | 'contain'>('cover')
   const [zoomedPhotoId, setZoomedPhotoId] = useState<string | null>(null)
+  const [isToggling, setIsToggling] = useState(false)
 
   const categoryParam = searchParams.get('category')
   const activeCategory = useMemo(() => {
@@ -42,6 +44,16 @@ export function PhotosContent() {
     router.replace(`/photos?${params.toString()}`, { scroll: false })
   }
 
+  const handleToggleView = () => {
+    setIsToggling(true)
+    setView((v) => (v === 'cover' ? 'contain' : 'cover'))
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        setIsToggling(false)
+      })
+    })
+  }
+
   const zoomedPhoto = useMemo(() => photos.find((p) => p.id === zoomedPhotoId), [zoomedPhotoId])
 
   const filteredPhotos = useMemo(
@@ -58,7 +70,7 @@ export function PhotosContent() {
       >
         <div className="z-50 mb-6 md:fixed md:left-8 md:top-24 md:mb-0 animate-page-simple">
           <button
-            onClick={() => setView((v) => (v === 'cover' ? 'contain' : 'cover'))}
+            onClick={handleToggleView}
             className="relative flex h-8 shrink-0 items-center justify-center text-sm font-medium text-muted-foreground transition-colors duration-300 hover:text-primary"
             aria-label="Toggle layout mode"
             title="Toggle layout mode"
@@ -83,13 +95,11 @@ export function PhotosContent() {
             {filteredPhotos.length > 0 ? (
               <motion.div
                 key="photo-grid"
-                layout
                 className="columns-1 gap-4 space-y-4 sm:columns-2 lg:columns-3 xl:columns-4"
               >
                 {filteredPhotos.map((photo, idx) => (
                   <motion.div
                     key={photo.id ?? idx}
-                    layout
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
@@ -112,8 +122,8 @@ export function PhotosContent() {
 
                       <motion.div
                         layoutId={`photo-${photo.id}`}
-                        className="relative h-full w-full"
-                        transition={ZOOM_EASE}
+                        transition={isToggling ? { duration: 0 } : ZOOM_EASE}
+                        className="relative h-full w-full overflow-hidden"
                       >
                         <Image
                           src={photo.url}

@@ -25,7 +25,8 @@ const mbToast = toastContent.messageBoard
  */
 export function MessageBoardForm() {
   const [isPending, setIsPending] = useState(false)
-  const { success, countdown, startCountdown, showError, resetStatus } = useStatusTimer('message-board')
+  const { success, countdown, startCountdown, showError, resetStatus } =
+    useStatusTimer('message-board')
   const { loginAdmin, logoutAdmin } = useAdmin()
   const formRef = useRef<HTMLFormElement>(null)
 

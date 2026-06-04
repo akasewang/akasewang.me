@@ -46,7 +46,7 @@ const iconVariants: Variants = {
  */
 export function BackToTop() {
   const { scrollYProgress, scrollY } = useScroll()
-  const dashoffset = useTransform(scrollYProgress, [0, 0.90], [BACK_TO_TOP_CIRCUMFERENCE, 0])
+  const dashoffset = useTransform(scrollYProgress, [0, 0.9], [BACK_TO_TOP_CIRCUMFERENCE, 0])
 
   const [isVisible, setIsVisible] = useState(false)
   const [mode, setMode] = useState<'down' | 'up'>('down')
@@ -70,7 +70,7 @@ export function BackToTop() {
 
   useEffect(() => {
     measureDOM()
-    
+
     let timeoutId: number
     const handleResize = () => {
       window.clearTimeout(timeoutId)
@@ -101,7 +101,7 @@ export function BackToTop() {
 
     const isNearBottom = scrollY.get() + windowHeight >= document.documentElement.scrollHeight - 150
 
-    setMode(latest > 0.90 || isNearBottom || isAtLastSection ? 'up' : 'down')
+    setMode(latest > 0.9 || isNearBottom || isAtLastSection ? 'up' : 'down')
   })
 
   const handleAction = useCallback(() => {

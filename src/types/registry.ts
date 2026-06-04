@@ -19,6 +19,11 @@ export interface RegistryItem {
   slug: string
   name: string
   description: string
+  /**
+   * Optional category for the component registry browser UI.
+   * Note: This is an extension of the standard Shadcn CLI schema, used purely for our UI filtering.
+   */
+  category?: string
   type: RegistryItemType
   date: string
   files: RegistryFile[]

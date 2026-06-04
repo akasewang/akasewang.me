@@ -34,7 +34,17 @@ export function RegistryList({ components }: RegistryListProps) {
               </m.div>
             ))
           ) : (
-            <EmptyState key="no-components" message="no components found matching your criteria." />
+            <m.div
+              key="no-components"
+              layout
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -12 }}
+              transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+              className="w-full"
+            >
+              <EmptyState message="no components found matching your criteria." />
+            </m.div>
           )}
         </AnimatePresence>
       </div>

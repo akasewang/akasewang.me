@@ -1,7 +1,6 @@
 'use client'
 
 import { type ReactNode } from 'react'
-import { motion } from 'framer-motion'
 import { cn } from '@/utils/utils'
 
 interface EmptyStateProps {
@@ -11,14 +10,10 @@ interface EmptyStateProps {
   className?: string
 }
 
-const animationVariants = {
-  initial: { opacity: 0, y: 12 },
-  animate: { opacity: 1, y: 0 },
-  exit: { opacity: 0, y: -12 },
-}
-
 /**
- * A standard UI component used to display a visually appealing message when no data is available
+ * A standard UI component used to display a visually appealing message when no data is available.
+ * Note: This component is intentionally purely functional (no framer-motion) so that parent
+ * components (like RegistryList) can cleanly handle `AnimatePresence` and `layout` shifts.
  *
  * @param title - Optional heading to display above the message.
  * @param message - The primary text explaining the empty state.
@@ -27,12 +22,7 @@ const animationVariants = {
  */
 export function EmptyState({ title, message, children, className }: EmptyStateProps) {
   return (
-    <motion.div
-      variants={animationVariants}
-      initial="initial"
-      animate="animate"
-      exit="exit"
-      transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+    <div
       className={cn(
         'relative flex flex-col items-center justify-center overflow-hidden rounded-3xl px-4 py-20 text-center select-none',
         className,
@@ -51,6 +41,6 @@ export function EmptyState({ title, message, children, className }: EmptyStatePr
       {children && (
         <div className="mt-10 flex flex-wrap items-center justify-center gap-3">{children}</div>
       )}
-    </motion.div>
+    </div>
   )
 }

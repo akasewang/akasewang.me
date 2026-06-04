@@ -1,31 +1,21 @@
-import type { Metadata } from "next";
-import { SpeedInsights } from "@vercel/speed-insights/next";
-import { Analytics } from "@vercel/analytics/react";
+import type { Metadata } from 'next'
+import { SpeedInsights } from '@vercel/speed-insights/next'
+import { Analytics } from '@vercel/analytics/react'
 
-import { Navbar } from "@/components/layout/navbar";
-import { Footer } from "@/components/layout/footer";
-import { ViewsProvider } from "@/components/providers/views-context";
-import { Toaster } from "@/components/ui/sonner";
-import { BackToTop } from "@/components/common/back-to-top";
-import { TooltipProvider } from "@/components/ui/tooltip";
+import { Navbar } from '@/components/layout/navbar'
+import { Footer } from '@/components/layout/footer'
+import { ViewsProvider } from '@/components/providers/views-context'
+import { Toaster } from '@/components/ui/sonner'
+import { BackToTop } from '@/components/common/back-to-top'
+import { TooltipProvider } from '@/components/ui/tooltip'
 
-import { fontSans, fontSerif, fontMono } from "@/lib/fonts";
-import {
-  getPersonSchema,
-  getWebsiteSchema,
-  getProfilePageSchema,
-} from "@/lib/json-ld";
-import {
-  FULL_NAME,
-  SITE_NAME,
-  USERNAME,
-  SITE_URL,
-  ALL_KEYWORDS,
-} from "@/constants/constants";
-import { getOgImageUrl } from "@/lib/metadata";
-import { homeSeoContent } from "@/data/content/seo-content";
+import { fontSans, fontSerif, fontMono } from '@/lib/fonts'
+import { getPersonSchema, getWebsiteSchema, getProfilePageSchema } from '@/lib/json-ld'
+import { FULL_NAME, SITE_NAME, USERNAME, SITE_URL, ALL_KEYWORDS } from '@/constants/constants'
+import { getOgImageUrl } from '@/lib/metadata'
+import { homeSeoContent } from '@/data/content/seo-content'
 
-import "./globals.css";
+import './globals.css'
 
 /**
  * Generates the SEO metadata for the application.
@@ -39,19 +29,19 @@ export async function generateMetadata(): Promise<Metadata> {
     authors: [{ name: FULL_NAME }],
     creator: FULL_NAME,
     metadataBase: new URL(SITE_URL),
-    manifest: "/manifest.json",
+    manifest: '/manifest.json',
     icons: {
-      apple: "/profpic.png",
+      apple: '/profpic.png',
     },
     alternates: {
       canonical: SITE_URL,
       types: {
-        "application/rss+xml": `${SITE_URL}/feed.xml`,
+        'application/rss+xml': `${SITE_URL}/feed.xml`,
       },
     },
     openGraph: {
-      type: "website",
-      locale: "en_US",
+      type: 'website',
+      locale: 'en_US',
       url: SITE_URL,
       siteName: SITE_NAME,
       images: [
@@ -63,10 +53,10 @@ export async function generateMetadata(): Promise<Metadata> {
       ],
     },
     twitter: {
-      card: "summary_large_image",
+      card: 'summary_large_image',
       creator: `@${USERNAME}`,
     },
-  };
+  }
 }
 
 /**
@@ -74,20 +64,16 @@ export async function generateMetadata(): Promise<Metadata> {
  * Instantiates the Person, Website, and ProfilePage schemas based on schema.org standards.
  */
 const jsonLd = [
-  { "@context": "https://schema.org", ...getPersonSchema() },
+  { '@context': 'https://schema.org', ...getPersonSchema() },
   getWebsiteSchema(),
   getProfilePageSchema(),
-];
+]
 
 /**
  * Main application layout that wraps all pages.
  * Wraps the DOM tree in global context providers (Tooltips, View tracking, Toasters).
  */
-export default async function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html
       lang="en"
@@ -118,5 +104,5 @@ export default async function RootLayout({
         </TooltipProvider>
       </body>
     </html>
-  );
+  )
 }

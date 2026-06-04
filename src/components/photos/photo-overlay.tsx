@@ -36,22 +36,31 @@ export function PhotoOverlay({ photo, isOpen, onClose }: PhotoOverlayProps) {
     <Portal>
       <AnimatePresence>
         {isOpen && photo && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
-            onClick={onClose}
-            className="fixed inset-0 z-[100] flex cursor-zoom-out items-center justify-center bg-background/60 backdrop-blur-md"
-          >
+          <div className="fixed inset-0 z-[100] flex cursor-zoom-out items-center justify-center">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              onClick={onClose}
+              className="absolute inset-0 bg-background/80 backdrop-blur-md"
+            />
             <motion.div
               layoutId={`photo-${photo.id}`}
               transition={ZOOM_EASE}
-              className="relative h-[90vh] w-[90vw]"
+              className="relative z-10 flex overflow-hidden shadow-2xl bg-muted/20"
+              onClick={onClose}
             >
-              <Image src={photo.url} alt={photo.alt} fill className="object-contain" priority />
+              <Image
+                src={photo.url}
+                alt={photo.alt}
+                width={photo.width}
+                height={photo.height}
+                className="max-h-[90vh] max-w-[90vw] w-auto h-auto object-cover"
+                priority
+              />
             </motion.div>
-          </motion.div>
+          </div>
         )}
       </AnimatePresence>
     </Portal>

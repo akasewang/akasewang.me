@@ -1,3 +1,5 @@
+import type { RegistryItemType } from '@/types/registry'
+
 /**
  * Defines the structure of the MDX frontmatter for component documentation.
  * This interface acts as the single source of truth for both the documentation UI
@@ -8,6 +10,17 @@ export interface ComponentPost {
   date: string
   excerpt: string
   slug: string
+  /**
+   * Optional: UI classification category (e.g., 'layout', 'effects', 'inputs').
+   * Used to filter components in the registry browser tabs.
+   */
+  category?: string
+
+  /**
+   * Optional: The Shadcn CLI installation type (e.g., 'registry:component', 'registry:hook').
+   * Used by the CLI to determine where to install the core component file.
+   */
+  type?: RegistryItemType
   tech?: string[]
 
   /**

@@ -6,7 +6,6 @@ export const PROJECT_CATEGORIES = [
   { value: 'all', label: 'All' },
   { value: 'web', label: 'Web Application' },
   { value: 'ml', label: 'Machine Learning' },
-  { value: 'oss', label: 'Open Source' },
 ] as const
 
 export const SKILL_CATEGORIES = [
@@ -39,4 +38,12 @@ export const BLOG_CATEGORIES = [
   { value: 'all', label: 'All' },
   { value: 'technical', label: 'Technical' },
   { value: 'personal', label: 'Personal' },
+] as const
+
+export const COMPONENT_CATEGORIES = [
+  { value: 'all', label: 'All' },
+  { value: 'effects', label: 'Effects' },
+  { value: 'ui-elements', label: 'UI Elements' },
+  { value: 'navigation', label: 'Navigation' },
+  { value: 'layout', label: 'Layout' },
 ] as const
