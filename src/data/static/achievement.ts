@@ -13,7 +13,6 @@ export const achievements: TimelineItemProps[] = [
       'Secured 1st Place (MongoDB Track) and 4th Place (Diamante Blockchain Track) out of 50+ competing teams.',
       'Built Pramanit, a decentralized app using Diamante Blockchain and MongoDB for secure certificate issuance, eliminating counterfeits and streamlining verification.',
     ],
-    defaultExpanded: true,
     tech: ['React', 'Node.js', 'MongoDB', 'Diamante'],
     links: [
       { text: 'HTS', url: 'https://hackthespace.co/', prefix: 'by' },
@@ -32,7 +31,6 @@ export const achievements: TimelineItemProps[] = [
     description: [
       'Awarded to select SAIL wards for outstanding academic excellence in the Senior Secondary Examination (Class XII).',
     ],
-    defaultExpanded: false,
     tech: ['Physics', 'Chemistry', 'Mathematics', 'English', 'Computer Science'],
     links: [{ text: 'SAIL', url: 'https://sail.co.in/en', prefix: 'by' }],
   },

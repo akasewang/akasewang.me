@@ -16,7 +16,6 @@ export const education: TimelineItemProps[] = [
       '- Computer Science: Data Structures and Algorithms, Object Oriented Programming, Operating Systems, Database Management Systems, Computer Networks, Computer Architecture, Design and Analysis of Algorithms.',
       '- Mathematics: Linear Algebra, Probability and Statistics, Calculus, Complex Analysis, Differential Equations, Numerical Methods, Discrete Mathematics, Graph Theory, Matrix Theory.',
     ],
-    defaultExpanded: false,
     tech: [
       'Machine Learning',
       'Software Engineering',
@@ -40,7 +39,6 @@ export const education: TimelineItemProps[] = [
       'Class XII (PCM with Computer Science): 93%',
       'Class X (Third Language: Sanskrit): 87.6%',
     ],
-    defaultExpanded: false,
     tech: ['English', 'Hindi', 'Maths', 'Physics', 'Chemistry', 'Computer Science'],
     links: [
       {

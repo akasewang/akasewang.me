@@ -10,7 +10,7 @@ import {
   type ReactNode,
 } from 'react'
 import * as RadixTabs from '@radix-ui/react-tabs'
-import { m } from 'framer-motion'
+import { m, AnimatePresence } from 'framer-motion'
 import { cn } from '@/utils/utils'
 import { SPRING_TRANSITION, SMOOTH_SPRING_TRANSITION } from '@/constants/ui'
 
@@ -88,15 +88,32 @@ export const Tabs = ({ items, defaultIndex = 0, className, children }: TabsProps
           )
         })}
       </RadixTabs.List>
-      {tabs.map(({ value, node }) => (
-        <RadixTabs.Content
-          key={value}
-          value={value}
-          className="p-1 focus:outline-none flex flex-col gap-3 [&>*]:!my-0 [&>[role=paragraph]]:px-2 [&>p]:px-2 [&>ul]:px-2 [&>ol]:px-2 [&>h1]:px-2 [&>h2]:px-2 [&>h3]:px-2"
-        >
-          {node}
-        </RadixTabs.Content>
-      ))}
+      <div className="relative mt-2">
+        <AnimatePresence mode="wait">
+          {tabs.map(({ value, node }) => {
+            if (activeTab !== value) return null
+
+            return (
+              <RadixTabs.Content
+                key={value}
+                value={value}
+                forceMount
+                asChild
+              >
+                <m.div
+                  initial={{ opacity: 0, filter: 'blur(4px)', y: 4 }}
+                  animate={{ opacity: 1, filter: 'blur(0px)', y: 0 }}
+                  exit={{ opacity: 0, filter: 'blur(4px)', y: 4 }}
+                  transition={{ duration: 0.2, ease: 'easeOut' }}
+                  className="p-1 focus:outline-none flex flex-col gap-3 [&>*]:!my-0 [&>[role=paragraph]]:px-2 [&>p]:px-2 [&>ul]:px-2 [&>ol]:px-2 [&>h1]:px-2 [&>h2]:px-2 [&>h3]:px-2"
+                >
+                  {node}
+                </m.div>
+              </RadixTabs.Content>
+            )
+          })}
+        </AnimatePresence>
+      </div>
     </RadixTabs.Root>
   )
 }
