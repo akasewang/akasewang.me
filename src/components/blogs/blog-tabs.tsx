@@ -72,9 +72,10 @@ export function BlogTabs({ allPosts }: { allPosts: BlogPost[] }) {
       const query = params.toString()
       const newUrl = query ? `${pathname}?${query}` : pathname
 
-      router.replace(newUrl, { scroll: false })
+      /** Shallow URL update that syncs with `useSearchParams` without triggering a navigation. */
+      window.history.replaceState(null, '', newUrl)
     },
-    [searchParams, router, pathname],
+    [searchParams, pathname],
   )
 
   const handleCategoryChange = (val: BlogCategoryType) => {

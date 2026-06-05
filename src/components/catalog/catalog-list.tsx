@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback, useMemo } from 'react'
-import { useSearchParams, useRouter, usePathname } from 'next/navigation'
+import { useSearchParams, usePathname } from 'next/navigation'
 import { m, AnimatePresence } from 'framer-motion'
 import { CategoryFilter } from '@/components/common/category-filter'
 import { EmptyState } from '@/components/common/empty-state'
@@ -17,7 +17,6 @@ import type { FilterCategory } from '@/types/catalog'
  */
 export function CatalogList() {
   const searchParams = useSearchParams()
-  const router = useRouter()
   const pathname = usePathname()
 
   const categoryParam = searchParams.get('category')
@@ -39,9 +38,10 @@ export function CatalogList() {
       const query = params.toString()
       const newUrl = query ? `${pathname}?${query}` : pathname
 
-      router.replace(newUrl, { scroll: false })
+      /** Shallow URL update that syncs with `useSearchParams` without triggering a navigation. */
+      window.history.replaceState(null, '', newUrl)
     },
-    [searchParams, router, pathname],
+    [searchParams, pathname],
   )
 
   const filteredItems = useMemo(

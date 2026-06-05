@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useMemo, useEffect, useCallback, useDeferredValue, useRef } from 'react'
-import { useSearchParams, useRouter, usePathname } from 'next/navigation'
+import { useSearchParams, usePathname } from 'next/navigation'
 import { ContentFilter, type SortOption } from '@/components/common/content-filter'
 import { RegistryList } from '@/components/registry/registry-list'
 import { useViews } from '@/components/providers/views-context'
@@ -26,7 +26,6 @@ const VALID_SORTS = new Set<SortOption>(['date-desc', 'date-asc', 'views-desc', 
  */
 export function ComponentTabs({ allComponents }: ComponentTabsProps) {
   const searchParams = useSearchParams()
-  const router = useRouter()
   const pathname = usePathname()
   const { getViews } = useViews()
 
@@ -77,9 +76,10 @@ export function ComponentTabs({ allComponents }: ComponentTabsProps) {
       const query = params.toString()
       const newUrl = query ? `${pathname}?${query}` : pathname
 
-      router.replace(newUrl, { scroll: false })
+      /** Shallow URL update that syncs with `useSearchParams` without triggering a navigation. */
+      window.history.replaceState(null, '', newUrl)
     },
-    [searchParams, router, pathname],
+    [searchParams, pathname],
   )
 
   const debouncedUpdateParams = useCallback(

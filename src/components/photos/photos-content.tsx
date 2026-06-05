@@ -2,7 +2,7 @@
 
 import { useMemo, useState, useCallback, memo } from 'react'
 import Image from 'next/image'
-import { useSearchParams, useRouter, usePathname } from 'next/navigation'
+import { useSearchParams, usePathname } from 'next/navigation'
 import { m } from 'framer-motion'
 import { cn } from '@/utils/utils'
 import { Icons } from '@/components/ui/icons'
@@ -30,7 +30,6 @@ const PHOTO_BY_ID = new Map(photos.map((p) => [p.id, p]))
  */
 export function PhotosContent() {
   const searchParams = useSearchParams()
-  const router = useRouter()
   const pathname = usePathname()
 
   const [view, setView] = useState<'cover' | 'contain'>('cover')
@@ -62,9 +61,10 @@ export function PhotosContent() {
       const query = params.toString()
       const newUrl = query ? `${pathname}?${query}` : pathname
 
-      router.replace(newUrl, { scroll: false })
+      /** Shallow URL update that syncs with `useSearchParams` without triggering a navigation. */
+      window.history.replaceState(null, '', newUrl)
     },
-    [searchParams, router, pathname],
+    [searchParams, pathname],
   )
 
   const handleToggleView = useCallback(() => {
