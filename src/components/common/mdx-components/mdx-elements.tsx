@@ -4,6 +4,14 @@ import { cn } from '@/utils/utils'
 import { Pre } from './code-block'
 import { ZoomableImage } from './zoomable-image'
 import { generateId } from './utils/parse-toc'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
 
 const HEADING_SIZES = {
   1: 'mb-4 mt-8 font-serif text-2xl font-medium italic leading-snug text-primary',
@@ -116,4 +124,10 @@ export const mdxElements = {
     </blockquote>
   ),
   img: ZoomableImage,
+  table: Table,
+  tr: TableRow,
+  th: TableHead,
+  td: TableCell,
+  thead: TableHeader,
+  tbody: TableBody,
 }

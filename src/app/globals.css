@@ -295,31 +295,6 @@
       margin: 2rem 0;
       opacity: 0.6;
     }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      text-align: left;
-      font-size: 0.875rem;
-      margin: 1.5rem 0;
-    }
-    th {
-      font-weight: 400;
-      padding: 0.75rem 1rem;
-      border-bottom: 2px solid var(--border);
-      color: var(--primary);
-      text-wrap: pretty;
-      line-height: 1.5;
-    }
-    td {
-      padding: 0.75rem 1rem;
-      border-bottom: 1px solid color-mix(in oklab, var(--border) 60%, transparent);
-      color: var(--foreground);
-      text-wrap: pretty;
-      line-height: 1.5;
-    }
-    tr:hover td {
-      background-color: color-mix(in oklab, var(--primary) 2%, transparent);
-    }
   }
 
   /**

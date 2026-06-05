@@ -6,13 +6,19 @@ import {
   useId,
   useMemo,
   useState,
+  useCallback,
   type ReactElement,
   type ReactNode,
 } from 'react'
 import * as RadixTabs from '@radix-ui/react-tabs'
 import { m, AnimatePresence } from 'framer-motion'
 import { cn } from '@/utils/utils'
-import { SPRING_TRANSITION, SMOOTH_SPRING_TRANSITION } from '@/constants/ui'
+import {
+  SPRING_TRANSITION,
+  SMOOTH_SPRING_TRANSITION,
+  SWIPE_TRANSITION,
+  SWIPE_VARIANTS,
+} from '@/constants/ui'
 
 /** Props for {@link Tabs}. */
 interface TabsProps {
@@ -39,31 +45,40 @@ interface TabProps {
  */
 export const Tabs = ({ items, defaultIndex = 0, className, children }: TabsProps) => {
   const id = useId()
-  const tabs = useMemo(
-    () =>
-      (Children.toArray(children).filter(isValidElement) as ReactElement<TabProps>[]).map(
-        (child, i) => ({
-          label: items?.[i] ?? child.props.title ?? `Tab ${i + 1}`,
-          value: `${id}-${i}`,
-          node: child,
-        }),
-      ),
-    [children, items, id],
+  const [activeIndex, setActiveIndex] = useState(defaultIndex)
+  const [direction, setDirection] = useState(1)
+
+  const validChildren = useMemo(
+    () => Children.toArray(children).filter(isValidElement) as ReactElement<TabProps>[],
+    [children],
   )
-  const [activeTab, setActiveTab] = useState(tabs[defaultIndex]?.value ?? tabs[0]?.value)
+
+  const handleValueChange = useCallback((val: string) => {
+    const newIndex = parseInt(val, 10)
+    setActiveIndex((prev) => {
+      setDirection(newIndex > prev ? 1 : -1)
+      return newIndex
+    })
+  }, [])
+
+  const safeIndex = activeIndex < validChildren.length ? activeIndex : 0
+  const activeNode = validChildren[safeIndex]
 
   return (
     <RadixTabs.Root
-      value={activeTab}
-      onValueChange={setActiveTab}
+      value={safeIndex.toString()}
+      onValueChange={handleValueChange}
       className={cn('relative isolate my-6 not-prose rounded-xl bg-code-tab', className)}
     >
       <RadixTabs.List
         aria-label="Tabs"
         className="flex items-center gap-1 overflow-x-auto px-1 pt-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       >
-        {tabs.map(({ value, label }) => {
-          const isActive = activeTab === value
+        {validChildren.map((child, i) => {
+          const value = i.toString()
+          const isActive = safeIndex === i
+          const label = items?.[i] ?? child.props.title ?? `Tab ${i + 1}`
+
           return (
             <RadixTabs.Trigger key={value} value={value} asChild>
               <m.button
@@ -88,30 +103,24 @@ export const Tabs = ({ items, defaultIndex = 0, className, children }: TabsProps
           )
         })}
       </RadixTabs.List>
-      <div className="relative mt-2">
-        <AnimatePresence mode="wait">
-          {tabs.map(({ value, node }) => {
-            if (activeTab !== value) return null
-
-            return (
-              <RadixTabs.Content
-                key={value}
-                value={value}
-                forceMount
-                asChild
-              >
-                <m.div
-                  initial={{ opacity: 0, filter: 'blur(4px)', y: 4 }}
-                  animate={{ opacity: 1, filter: 'blur(0px)', y: 0 }}
-                  exit={{ opacity: 0, filter: 'blur(4px)', y: 4 }}
-                  transition={{ duration: 0.2, ease: 'easeOut' }}
-                  className="p-1 focus:outline-none flex flex-col gap-3 [&>*]:!my-0 [&>[role=paragraph]]:px-2 [&>p]:px-2 [&>ul]:px-2 [&>ol]:px-2 [&>h1]:px-2 [&>h2]:px-2 [&>h3]:px-2"
-                >
-                  {node}
-                </m.div>
-              </RadixTabs.Content>
-            )
-          })}
+      <div className="relative overflow-hidden">
+        <AnimatePresence mode="popLayout" initial={false} custom={direction}>
+          <RadixTabs.Content key={safeIndex} value={safeIndex.toString()} asChild forceMount>
+            <m.div
+              custom={direction}
+              variants={SWIPE_VARIANTS}
+              initial="enter"
+              animate="center"
+              exit="exit"
+              transition={SWIPE_TRANSITION}
+              className={cn(
+                'w-full p-1 focus:outline-none flex flex-col gap-3 [&>*]:!my-0 [&>[role=paragraph]]:px-2 [&>p]:px-2 [&>ul]:px-2 [&>ol]:px-2 [&>h1]:px-2 [&>h2]:px-2 [&>h3]:px-2',
+                activeNode?.props.className,
+              )}
+            >
+              {activeNode}
+            </m.div>
+          </RadixTabs.Content>
         </AnimatePresence>
       </div>
     </RadixTabs.Root>
@@ -124,5 +133,6 @@ export const Tabs = ({ items, defaultIndex = 0, className, children }: TabsProps
  * is handled by the parent `<Tabs>` component mapping over its children.
  *
  * @param title - The label to display on the tab trigger button.
+ * @param className - Optional CSS classes passed down to the animated tab panel container.
  */
 export const Tab = ({ children }: TabProps) => <>{children}</>
