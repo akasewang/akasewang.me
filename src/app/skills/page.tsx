@@ -37,7 +37,7 @@ export default function SkillsPage() {
       footerText="That's the stack. No more, no less (well, maybe a little more)."
       breadcrumb={breadcrumbJsonLd}
     >
-      <Suspense fallback={<div className="bg-muted/20 h-96 w-full animate-pulse rounded-lg" />}>
+      <Suspense fallback={null}>
         <SkillsGrid />
       </Suspense>
     </PageLayout>

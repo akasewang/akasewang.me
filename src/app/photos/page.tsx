@@ -21,7 +21,7 @@ export async function generateMetadata(): Promise<Metadata> {
  */
 export default function PhotosPage() {
   return (
-    <Suspense>
+    <Suspense fallback={null}>
       <PhotosContent />
     </Suspense>
   )

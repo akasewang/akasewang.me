@@ -3,7 +3,7 @@
 import { useMemo, useState, useCallback, memo } from 'react'
 import Image from 'next/image'
 import { useSearchParams, useRouter, usePathname } from 'next/navigation'
-import { m, AnimatePresence } from 'framer-motion'
+import { m } from 'framer-motion'
 import { cn } from '@/utils/utils'
 import { Icons } from '@/components/ui/icons'
 import { photos } from '@/data/static/photos'
@@ -110,27 +110,25 @@ export function PhotosContent() {
               onChange={handleCategoryChange}
             />
           </div>
-          <AnimatePresence mode="popLayout">
-            {filteredPhotos.length > 0 ? (
-              <m.div
-                key="photo-grid"
-                className="columns-1 gap-4 space-y-4 sm:columns-2 lg:columns-3 xl:columns-4"
-              >
-                {filteredPhotos.map((photo) => (
-                  <PhotoCard
-                    key={photo.id}
-                    photo={photo}
-                    view={view}
-                    isToggling={isToggling}
-                    onZoom={setZoomedPhotoId}
-                    onPreload={preloadPhoto}
-                  />
-                ))}
-              </m.div>
-            ) : (
-              <EmptyState key="no-photos" message="no photos found in this category." />
-            )}
-          </AnimatePresence>
+          {filteredPhotos.length > 0 ? (
+            <div
+              key="photo-grid"
+              className="columns-1 gap-4 space-y-4 sm:columns-2 lg:columns-3 xl:columns-4"
+            >
+              {filteredPhotos.map((photo) => (
+                <PhotoCard
+                  key={photo.id}
+                  photo={photo}
+                  view={view}
+                  isToggling={isToggling}
+                  onZoom={setZoomedPhotoId}
+                  onPreload={preloadPhoto}
+                />
+              ))}
+            </div>
+          ) : (
+            <EmptyState key="no-photos" message="no photos found in this category." />
+          )}
         </div>
       </PageLayout>
 
