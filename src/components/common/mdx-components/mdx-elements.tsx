@@ -11,7 +11,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table'
+} from './table'
 
 const HEADING_SIZES = {
   1: 'mb-4 mt-8 font-serif text-2xl font-medium italic leading-snug text-primary',
