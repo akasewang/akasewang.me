@@ -47,42 +47,44 @@ export function useFluidBlob(
   useEffect(() => {
     if (!shouldAnimate) return
 
-    let timer: ReturnType<typeof setTimeout>
     let currentRotate = rotate.get()
+    let morphTimer: ReturnType<typeof setTimeout>
+    let spinTimer: ReturnType<typeof setTimeout>
+    let radiusControls: { stop: () => void } | undefined
+    let scaleControls: { stop: () => void } | undefined
+    let rotateControls: { stop: () => void } | undefined
 
-    let radiusControls: { stop: () => void }
-    let rotateControls: { stop: () => void }
-    let scaleControls: { stop: () => void }
-
-    const tick = () => {
+    /** Drives the fluid shape morph — fastest cadence so the blob feels alive. */
+    const morph = () => {
       hasStartedRef.current = true
-      const nextDuration = (intervalMs * rand(0.65, 1.4)) / 1000
-      currentRotate += rand(40, 160) * (Math.random() < 0.25 ? -1 : 1)
+      const duration = (intervalMs * rand(0.5, 0.9)) / 1000
+      radiusControls = animate(borderRadius, randomBorderRadius(), { duration, ease: 'easeInOut' })
+      scaleControls = animate(scale, rand(0.95, 1.07), { duration, ease: 'easeInOut' })
+      morphTimer = setTimeout(morph, duration * 1000)
+    }
 
-      radiusControls = animate(borderRadius, randomBorderRadius(), {
-        duration: nextDuration,
-        ease: 'easeInOut',
-      })
-      rotateControls = animate(rotate, currentRotate, { duration: nextDuration, ease: 'easeInOut' })
-      scaleControls = animate(scale, rand(0.96, 1.06), {
-        duration: nextDuration,
-        ease: 'easeInOut',
-      })
-
-      timer = setTimeout(tick, nextDuration * 1000)
+    /** Drives rotation on a slower cadence so spin doesn't overpower the morph. */
+    const spin = () => {
+      const duration = (intervalMs * rand(1.6, 2.4)) / 1000
+      currentRotate += rand(25, 90) * (Math.random() < 0.25 ? -1 : 1)
+      rotateControls = animate(rotate, currentRotate, { duration, ease: 'easeInOut' })
+      spinTimer = setTimeout(spin, duration * 1000)
     }
 
     if (randomStart || hasStartedRef.current) {
-      tick()
+      morph()
+      spin()
     } else {
-      timer = setTimeout(tick, 2000)
+      morphTimer = setTimeout(morph, 2000)
+      spinTimer = setTimeout(spin, 2000)
     }
 
     return () => {
-      clearTimeout(timer)
+      clearTimeout(morphTimer)
+      clearTimeout(spinTimer)
       radiusControls?.stop()
-      rotateControls?.stop()
       scaleControls?.stop()
+      rotateControls?.stop()
     }
   }, [intervalMs, randomStart, shouldAnimate, borderRadius, rotate, scale])
 

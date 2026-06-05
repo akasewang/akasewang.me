@@ -22,9 +22,9 @@ export function ProfilePicture({ src, alt, className }: ProfilePictureProps) {
 
   const isInView = useInView(containerRef, { margin: '200px' })
 
-  const thread1 = useFluidBlob(3200, true, isInView)
-  const thread2 = useFluidBlob(3800, true, isInView)
-  const thread3 = useFluidBlob(4400, true, isInView)
+  const thread1 = useFluidBlob(1600, true, isInView)
+  const thread2 = useFluidBlob(1900, true, isInView)
+  const thread3 = useFluidBlob(2200, true, isInView)
 
   const innerBlob = useFluidBlob(2700, false, isInView)
 
@@ -40,7 +40,7 @@ export function ProfilePicture({ src, alt, className }: ProfilePictureProps) {
           rotate: thread1.rotate,
           scale: thread1.scale,
         }}
-        className="absolute -inset-1 -z-10 border-[1.5px] border-primary opacity-60"
+        className="absolute -inset-[3px] -z-10 border border-primary opacity-70"
       />
       <m.div
         suppressHydrationWarning
@@ -49,7 +49,7 @@ export function ProfilePicture({ src, alt, className }: ProfilePictureProps) {
           rotate: thread2.rotate,
           scale: thread2.scale,
         }}
-        className="absolute -inset-1 -z-10 border-[1.5px] border-primary opacity-50"
+        className="absolute -inset-[4px] -z-10 border border-primary opacity-50"
       />
       <m.div
         suppressHydrationWarning
@@ -58,7 +58,7 @@ export function ProfilePicture({ src, alt, className }: ProfilePictureProps) {
           rotate: thread3.rotate,
           scale: thread3.scale,
         }}
-        className="absolute -inset-1 -z-10 border-[1.5px] border-primary opacity-40"
+        className="absolute -inset-[5px] -z-10 border border-primary opacity-30"
       />
       <m.div
         suppressHydrationWarning
