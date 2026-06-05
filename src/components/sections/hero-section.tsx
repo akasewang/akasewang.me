@@ -61,33 +61,43 @@ export function HeroSection() {
       </div>
 
       <div className="space-y-2">
-        <p className="text-sm text-foreground">{hero.findMeOn}</p>
-        <div className="flex flex-wrap gap-2">
-          {activeSocials.map((link) => (
-            <LinkText key={link.label} href={link.href}>
-              {link.label}
-            </LinkText>
-          ))}
-        </div>
-        <p className="mt-4 text-sm text-foreground">
+        {activeSocials.length > 0 && (
+          <>
+            <p className="text-sm text-foreground">{hero.findMeOn}</p>
+            <div className="flex flex-wrap gap-2">
+              {activeSocials.map((link) => (
+                <LinkText key={link.label} href={link.href}>
+                  {link.label}
+                </LinkText>
+              ))}
+            </div>
+          </>
+        )}
+        <p
+          className={
+            activeSocials.length > 0 ? 'mt-4 text-sm text-foreground' : 'text-sm text-foreground'
+          }
+        >
           {hero.mailMeAt} <LinkText href={`mailto:${EMAIL}`}>{EMAIL}</LinkText>
         </p>
       </div>
 
-      <div className="space-y-2">
-        <p className="text-sm text-muted-foreground">{hero.inactivePrefix}</p>
-        <div className="flex flex-wrap gap-x-4 gap-y-2">
-          {inactiveSocials.map((link) => (
-            <LinkText
-              key={link.label}
-              href={link.href}
-              className="text-muted-foreground hover:text-muted-foreground"
-            >
-              {link.label}
-            </LinkText>
-          ))}
+      {inactiveSocials.length > 0 && (
+        <div className="space-y-2">
+          <p className="text-sm text-muted-foreground">{hero.inactivePrefix}</p>
+          <div className="flex flex-wrap gap-x-4 gap-y-2">
+            {inactiveSocials.map((link) => (
+              <LinkText
+                key={link.label}
+                href={link.href}
+                className="text-muted-foreground hover:text-muted-foreground"
+              >
+                {link.label}
+              </LinkText>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
       <div className="space-y-4">
         <p className="text-sm text-foreground">{hero.connectText}</p>

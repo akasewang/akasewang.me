@@ -83,48 +83,48 @@ export function PhotosContent() {
   return (
     <>
       <div className="z-50 mb-6 animate-page-simple md:fixed md:left-8 md:top-24 md:mb-0">
-          <button
-            onClick={handleToggleView}
-            className="relative flex h-8 shrink-0 items-center justify-center text-sm font-medium text-muted-foreground transition-colors duration-300 hover:text-primary"
-            aria-label="Toggle layout mode"
-            title="Toggle layout mode"
-          >
-            {view === 'cover' ? (
-              <Icons.layoutGrid className="size-4.5" />
-            ) : (
-              <Icons.layoutPanel className="size-4.5" />
-            )}
-          </button>
-        </div>
-
-        <div className="mx-auto max-w-7xl animate-page-simple">
-          <div className="mb-8">
-            <CategoryFilter
-              categories={PHOTO_CATEGORIES}
-              value={activeCategory}
-              onChange={handleCategoryChange}
-            />
-          </div>
-          {filteredPhotos.length > 0 ? (
-            <div
-              key="photo-grid"
-              className="columns-1 gap-4 space-y-4 sm:columns-2 lg:columns-3 xl:columns-4"
-            >
-              {filteredPhotos.map((photo) => (
-                <PhotoCard
-                  key={photo.id}
-                  photo={photo}
-                  view={view}
-                  isToggling={isToggling}
-                  onZoom={setZoomedPhotoId}
-                  onPreload={preloadPhoto}
-                />
-              ))}
-            </div>
+        <button
+          onClick={handleToggleView}
+          className="relative flex h-8 shrink-0 items-center justify-center text-sm font-medium text-muted-foreground transition-colors duration-300 hover:text-primary"
+          aria-label="Toggle layout mode"
+          title="Toggle layout mode"
+        >
+          {view === 'cover' ? (
+            <Icons.layoutGrid className="size-4.5" />
           ) : (
-            <EmptyState key="no-photos" message="no photos found in this category." />
+            <Icons.layoutPanel className="size-4.5" />
           )}
+        </button>
+      </div>
+
+      <div className="mx-auto max-w-7xl animate-page-simple">
+        <div className="mb-8">
+          <CategoryFilter
+            categories={PHOTO_CATEGORIES}
+            value={activeCategory}
+            onChange={handleCategoryChange}
+          />
         </div>
+        {filteredPhotos.length > 0 ? (
+          <div
+            key="photo-grid"
+            className="columns-1 gap-4 space-y-4 sm:columns-2 lg:columns-3 xl:columns-4"
+          >
+            {filteredPhotos.map((photo) => (
+              <PhotoCard
+                key={photo.id}
+                photo={photo}
+                view={view}
+                isToggling={isToggling}
+                onZoom={setZoomedPhotoId}
+                onPreload={preloadPhoto}
+              />
+            ))}
+          </div>
+        ) : (
+          <EmptyState key="no-photos" message="no photos found in this category." />
+        )}
+      </div>
 
       <PreloadRenderer ids={preloadIds} />
 

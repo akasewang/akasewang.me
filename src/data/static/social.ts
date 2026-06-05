@@ -33,10 +33,6 @@ export const activeSocials: SocialLink[] = [
     label: 'Instagram',
     display: `@${USERNAME}`,
   },
-]
-
-/** Social profiles kept on record but not currently surfaced in the UI. */
-export const inactiveSocials: SocialLink[] = [
   {
     href: `https://bsky.app/profile/${USERNAME}.me`,
     label: 'Bluesky',
@@ -49,7 +45,10 @@ export const inactiveSocials: SocialLink[] = [
   },
   {
     href: `https://mastodon.social/@${USERNAME}`,
-    label: 'Mastodon',
+    label: 'Mastodon [Social]',
     display: `@${USERNAME}`,
   },
 ]
+
+/** Social profiles kept on record but not currently surfaced in the UI. */
+export const inactiveSocials: SocialLink[] = []

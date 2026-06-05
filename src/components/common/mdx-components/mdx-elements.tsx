@@ -4,14 +4,7 @@ import { cn } from '@/utils/utils'
 import { Pre } from './code-block'
 import { ZoomableImage } from './zoomable-image'
 import { generateId } from './utils/parse-toc'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from './table'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './table'
 
 const HEADING_SIZES = {
   1: 'mb-4 mt-8 font-serif text-2xl font-medium italic leading-snug text-primary',
