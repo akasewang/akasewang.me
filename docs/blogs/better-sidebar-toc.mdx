@@ -70,8 +70,9 @@ Let's check the core React hook that handles this logic:
 
 ```ts
 import { useEffect, useState } from 'react'
+import type { TocItem } from '../utils/parse-toc'
 
-export function useActiveHeading(items: { id: string }[], offset = 120): string {
+export function useActiveHeading(items: TocItem[], offset = 120): string {
   const [activeId, setActiveId] = useState('')
 
   useEffect(() => {
@@ -135,13 +136,11 @@ To solve this, we implement a custom, smooth scrolling helper that scrolls to th
 ```ts
 export function scrollToHeading(id: string, yOffset = -100): void {
   const element = document.getElementById(id)
-
-  if (element) {
+  if (element)
     window.scrollTo({
       top: element.getBoundingClientRect().top + window.scrollY + yOffset,
       behavior: 'smooth',
     })
-  }
 }
 ```
 
@@ -162,6 +161,7 @@ import { parseTocFromContent } from './utils/parse-toc'
 import { useActiveHeading, scrollToHeading } from './hooks/use-active-heading'
 import { Icons } from '@/components/ui/icons'
 
+/** Props for {@link AsideTOC}. */
 interface AsideTOCProps {
   content?: string
   className?: string
@@ -171,6 +171,9 @@ interface AsideTOCProps {
  * Sidebar navigation component that dynamically generates and displays a Table of Contents (TOC).
  * Uses a scroll-spying hook to highlight the currently active heading as the user scrolls.
  * Only visible on large screens (xl breakpoint).
+ *
+ * @param content - The raw Markdown/MDX string content to parse for headings.
+ * @param className - Optional CSS classes for custom container styling.
  */
 export const AsideTOC = ({ content, className }: AsideTOCProps) => {
   const items = useMemo(() => (content ? parseTocFromContent(content) : []), [content])
@@ -186,10 +189,7 @@ export const AsideTOC = ({ content, className }: AsideTOCProps) => {
       )}
     >
       <div className="flex flex-col gap-4">
-        {/* Visual indicator icon */}
         <Icons.menu className="size-[18px] text-muted-foreground transition-colors duration-300 hover:text-primary group-hover/blog:text-primary" />
-        
-        {/* Reveal TOC on hover for a cleaner reading experience */}
         <div className="flex flex-col gap-2.5 opacity-0 transition-opacity duration-300 ease-in-out hover:opacity-100 group-hover/blog:opacity-100">
           {items.map(({ id, level, text }) => (
             <button

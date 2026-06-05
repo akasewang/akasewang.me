@@ -18,7 +18,33 @@ But if you implement this naively, you'll hit a set of frustrating visual bugs:
 
 Here is a look at how to build a highly polished, rate limited [CopyButton](https://github.com/akasewang/akasewang.me/blob/main/src/components/ui/copy-button.tsx) component using Framer Motion spring dynamics that solves all of these problems in under 70 lines of code.
 
-## 1. Preventing Layout Jitter with PopLayout
+## 1. Prerequisite: Lazy Motion Setup
+
+Because we want to keep our initial page load lightning fast, we use Framer Motion's `m` component (instead of `motion`) to lazily load the animation engine. 
+
+To make this work, wrap your application (or component tree) in a `LazyMotion` provider:
+
+```tsx
+'use client'
+
+import { LazyMotion, domMax } from 'framer-motion'
+import { ReactNode } from 'react'
+
+/**
+ * Global provider for Framer Motion's LazyMotion feature.
+ * Injects the `domMax` animation engine into the app at the root level, allowing all child
+ * components to use the lightweight `m` component (e.g. `m.div`) instead of `motion.div`.
+ */
+export function MotionProvider({ children }: { children: ReactNode }) {
+  return (
+    <LazyMotion features={domMax} strict>
+      {children}
+    </LazyMotion>
+  )
+}
+```
+
+## 2. Preventing Layout Jitter with PopLayout
 
 When you swap React components inside a layout, the outgoing element is unmounted and the incoming element is mounted. For a brief split second, both elements can coexist in the DOM, pushing each other out of place.
 
@@ -47,7 +73,7 @@ This allows the incoming icon to slide into the exact same spatial coordinate wi
     return (
       <span className="relative" style={{ width: iconSize, height: iconSize }}>
         <AnimatePresence initial={false} mode="popLayout">
-          <motion.span
+          <m.span
             key={copied ? 'check' : 'copy'}
             initial={{ scale: 0.5, opacity: 0, rotate: -45 }}
             animate={{ scale: 1, opacity: 1, rotate: 0 }}
@@ -55,7 +81,7 @@ This allows the incoming icon to slide into the exact same spatial coordinate wi
             className="absolute inset-0 flex items-center justify-center"
           >
             <ActiveIcon size={iconSize} />
-          </motion.span>
+          </m.span>
         </AnimatePresence>
       </span>
     )
@@ -63,7 +89,7 @@ This allows the incoming icon to slide into the exact same spatial coordinate wi
   </Tab>
 </Tabs>
 
-## 2. Preventing Double Trigger Glitches (Rate Limiting)
+## 3. Preventing Double Trigger Glitches (Rate Limiting)
 
 The most annoying bug in naively coded copy buttons is the **"double click timer trap."**
 
@@ -76,8 +102,8 @@ Let's examine how the [CopyButton](https://github.com/akasewang/akasewang.me/blo
 
 ```tsx
 /**
- * A highly interactive clipboard copy button that swaps its icon with an animated checkmark upon success.
- * Can be used in a controlled or uncontrolled state.
+ * A button that copies `value` to the clipboard, swapping the copy icon for a check on success.
+ * Works uncontrolled (manages its own brief "copied" state) or controlled (via the `copied` prop).
  *
  * @param value - The text string to copy to the clipboard.
  * @param iconSize - The pixel size of the rendered icon.
@@ -118,7 +144,7 @@ export function CopyButton({
 
 By adding the guard `if (isCopied) return`, we lock the button during its active display period. Click spamming has zero effect on the timers, keeping the visual experience completely predictable.
 
-## 3. Creating Tactile Spring Physics
+## 4. Creating Tactile Spring Physics
 
 Flat, immediate state transitions make buttons feel rigid. To make our copy button feel organic, we add two layers of micro animations:
 
@@ -126,13 +152,13 @@ Flat, immediate state transitions make buttons feel rigid. To make our copy butt
 When the user presses down, the button physically squeezes in slightly (`scale: 0.94`), using a high stiffness spring animation. This mimics the mechanical feedback of a physical keyboard switch:
 
 ```tsx
-<motion.button
+<m.button
   whileTap={{ scale: 0.94 }}
   transition={{ type: 'spring', stiffness: 500, damping: 30 }}
   onClick={handleCopy}
 >
   ...
-</motion.button>
+</m.button>
 ```
 
 ### Layer B: The Rotational Snap
@@ -141,7 +167,7 @@ As the copy icon exits, it rotates `45 degrees` and fades out. Simultaneously, t
 Because we specify an custom ease curve `[0.23, 1, 0.32, 1]` (a dramatic cubic bezier), the transition feels snappy and incredibly premium.
 
 ```tsx
-<motion.span
+<m.span
   key={isCopied ? 'check' : 'copy'}
   initial={{ scale: 0.5, opacity: 0, rotate: -45 }}
   animate={{ scale: 1, opacity: 1, rotate: 0 }}
@@ -149,10 +175,10 @@ Because we specify an custom ease curve `[0.23, 1, 0.32, 1]` (a dramatic cubic b
   transition={{ duration: 0.2, ease: [0.23, 1, 0.32, 1] }}
 >
   <ActiveIcon />
-</motion.span>
+</m.span>
 ```
 
-## 4. Controlled vs. Uncontrolled Flexibility
+## 5. Controlled vs. Uncontrolled Flexibility
 
 Sometimes you want the copy button to manage its own state (e.g., inside an MDX code block where the component is self contained). Other times, a parent component needs to control the state (e.g., in a complex signup flow where copying a key triggers the next step in the UI).
 

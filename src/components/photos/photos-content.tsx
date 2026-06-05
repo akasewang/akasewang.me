@@ -10,7 +10,6 @@ import { photos } from '@/data/static/photos'
 import { CategoryFilter } from '@/components/common/category-filter'
 import { EmptyState } from '@/components/common/empty-state'
 import { ZOOM_EASE } from '@/constants/ui'
-import { PageLayout } from '@/components/layout/page-layout'
 import { PHOTO_CATEGORIES } from '@/constants/categories'
 import type { Photo, Category } from '@/types/photos'
 import { PhotoOverlay } from './photo-overlay'
@@ -44,6 +43,7 @@ export function PhotosContent() {
   }, [])
 
   const categoryParam = searchParams.get('category')
+
   const activeCategory = useMemo(() => {
     return categoryParam && PHOTO_CATEGORIES.some((c) => c.value === categoryParam)
       ? (categoryParam as Category)
@@ -82,12 +82,7 @@ export function PhotosContent() {
 
   return (
     <>
-      <PageLayout
-        animate={false}
-        footerText="Taking photos so I don't have to remember things."
-        className="relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] min-h-screen w-screen overflow-hidden px-8 pb-12 pt-2 md:px-28 md:pt-12"
-      >
-        <div className="z-50 mb-6 animate-page-simple md:fixed md:left-8 md:top-24 md:mb-0">
+      <div className="z-50 mb-6 animate-page-simple md:fixed md:left-8 md:top-24 md:mb-0">
           <button
             onClick={handleToggleView}
             className="relative flex h-8 shrink-0 items-center justify-center text-sm font-medium text-muted-foreground transition-colors duration-300 hover:text-primary"
@@ -130,7 +125,6 @@ export function PhotosContent() {
             <EmptyState key="no-photos" message="no photos found in this category." />
           )}
         </div>
-      </PageLayout>
 
       <PreloadRenderer ids={preloadIds} />
 
