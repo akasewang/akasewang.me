@@ -1,12 +1,15 @@
-﻿# State & Hooks
+# State & Hooks
 
-We avoid heavy state managers like Redux. Most state is handled by React hooks or the URL.
+We avoid heavy state managers like Redux. Most state lives in React hooks or directly in the URL.
 
 ## URL State
-For pages with filters or sorting (like the blogs or component lists), the current state is stored right in the URL search parameters (e.g., ?category=react&sort=newest).
-- If you copy the link and send it to someone, they see exactly what you see.
-- Because it's in the URL, the server can read it on the first load and render the correct data immediately.
+
+For pages with filtering or sorting (blogs, component lists), the current state is stored in the URL's search params (e.g. `?category=react&sort=newest`).
+
+- Copy the link, send it to someone, and they see exactly what you see.
+- Because the state is in the URL, the server can read it on first load and render the correct data immediately — no flicker.
 
 ## Custom Hooks
-- **useInfiniteScroll**: Infinite scroll can cause issues if the scroll callback uses old data. We use a useRef trick to make sure the scroll event always uses the newest version of your data without restarting the scroll listener.
-- **useAdmin**: This hook manages whether you are logged in as an admin. It listens to browser storage events, so if you log out in one tab, you instantly get logged out in all your other open tabs.
+
+- **useInfiniteScroll**: A scroll callback can capture stale data in its closure. We use a `useRef` to always read the latest data inside the scroll handler, without tearing down and re-attaching the listener.
+- **useAdmin**: Tracks whether you're logged in as an admin. It listens for browser `storage` events, so logging out in one tab instantly logs you out in every other open tab.

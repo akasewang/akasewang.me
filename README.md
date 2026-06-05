@@ -42,7 +42,7 @@ This portfolio is built to be fast, secure, and easy to maintain.
 
 ### Content & Components
 
-- **Markdown (MDX)**: All blogs and projects are written in Markdown. We read these files locally and swap out standard HTML for our custom React components.
+- **Markdown (MDX)**: All blogs and projects are written in Markdown. We read these files locally and swap standard HTML for custom React components — styled links, tables, callouts, steps, tabs, and zoomable images all render through our own components.
 - **Shadcn Registry**: Developers can use the Shadcn CLI to download components directly from this site using `npx shadcn add <component>`.
 - **Weekly Emails**: An automated cron job sends the site admin a weekly summary of new newsletter subscribers.
 

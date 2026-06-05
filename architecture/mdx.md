@@ -1,18 +1,20 @@
-﻿# MDX & Content Parsing
+# MDX & Content Parsing
 
-All blogs, projects, and component docs are written in MDX (Markdown with React components).
+All blogs, projects, and component docs are authored in MDX (Markdown with embedded React components). Files live under `docs/`, grouped by type (`docs/blogs`, `docs/projects`, `docs/components`).
 
-## Parsing Content
-- We use mdx-manager.ts to read the .mdx files directly from the file system. 
-- We use s.readFileSync because reading local files is fast enough that asynchronous reading doesn't add any real benefit for this specific use case.
-- The frontmatter (title, date, etc.) is validated to make sure there are no typos or missing fields.
+## Reading Content
+
+- `mdx-manager.ts` exposes a `createMdxManager` factory that builds a strongly-typed manager for each content type, so blogs, projects, and components all reuse the same read, parse, and sort logic.
+- Files are read asynchronously with `fs.readFile`, and each read is wrapped in React's `cache()`. If several components request the same post during a single server render, the disk is only touched once.
+- Frontmatter (title, date, etc.) is validated on read so typos and missing fields fail fast instead of rendering a broken page.
 
 ## React in Markdown
-- We use 
-ext-mdx-remote to turn Markdown text into HTML.
-- In mdx-config.tsx, we swap out standard HTML tags for our custom Tailwind components (e.g., swapping <a> for our custom <LinkText>).
-- This also lets us drop complex React components directly into a .mdx file.
+
+- We use `next-mdx-remote` to compile Markdown into React elements, with `remark-gfm` for GitHub Flavored Markdown and `rehype-highlight` for server-side syntax highlighting.
+- In `mdx-config.tsx`, standard HTML tags are swapped for custom Tailwind components — for example `<a>` renders as our `LinkText`, and Markdown tables (`<table>`, `<thead>`, `<tr>`, `<th>`, `<td>`) render through our own `Table` components.
+- The same mapping lets us drop richer components — `Callout`, `Steps`, `Tabs`, `ZoomableImage`, and code blocks — directly into a `.mdx` file.
 
 ## Table of Contents
-- When parsing MDX, we automatically find all headings (<h1> to <h6>) and give them clickable anchor links.
-- The sidebar component reads these headings and highlights whichever section you are currently looking at on the screen.
+
+- While parsing, every heading (`<h1>` through `<h6>`) is given a generated id and a clickable anchor link.
+- The sidebar reads those headings and highlights whichever section is currently in view as you scroll.
