@@ -31,7 +31,7 @@ export function AnnouncementBanner() {
           initial={false}
           animate={{ y: 0 }}
           exit={{ y: '-100%' }}
-          transition={{ type: 'spring', stiffness: 320, damping: 34 }}
+          transition={{ duration: 0.3, ease: 'easeOut' }}
           className="bg-gradient-to-r from-verified to-verified-deep fixed inset-x-0 top-0 z-[60] flex h-10 items-center justify-center overflow-hidden border-b border-white/10 px-12 shadow-md"
         >
           <span
