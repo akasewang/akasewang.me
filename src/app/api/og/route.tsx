@@ -1,7 +1,7 @@
 import { ImageResponse } from 'next/og'
 import { SITE_URL } from '@/constants/constants'
 
-/** Force the route to use the Edge runtime to ensure ultra-low latency globally */
+/** Force the route to use the Edge runtime to ensure ultra low latency globally */
 export const runtime = 'edge'
 
 /**

@@ -18,7 +18,7 @@ function getResend() {
   return resendInstance
 }
 
-/** From-address for outgoing mail, falling back to Resend's onboarding sender. */
+/** From address for outgoing mail, falling back to Resend's onboarding sender. */
 const SENDER_EMAIL = process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev'
 /** Recipient for the weekly summary (the site admin); the route 500s if it's unset. */
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL
@@ -57,7 +57,7 @@ export async function GET(request: Request) {
 
     const count = recentSubscribers.length
 
-    /** Short-circuit and exit early if there are no new subscribers to report */
+    /** Short circuit and exit early if there are no new subscribers to report */
     if (count === 0) {
       return NextResponse.json({
         success: true,

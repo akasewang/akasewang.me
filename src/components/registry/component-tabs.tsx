@@ -19,7 +19,7 @@ const VALID_SORTS = new Set<SortOption>(['date-desc', 'date-asc', 'views-desc', 
 
 /**
  * Main container for the component registry browser.
- * Handles URL-based state synchronization for searching and filtering by category.
+ * Handles URL based state synchronization for searching and filtering by category.
  * and sorting registry items (by date or views).
  *
  * @param allComponents - The full array of registry items to be filtered and displayed.

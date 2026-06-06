@@ -6,7 +6,7 @@ const STORAGE_KEY = 'adminKey'
 const TOGGLE_EVENT = 'adminModeToggled'
 
 /**
- * Hook for managing client-side admin authentication state via `localStorage`.
+ * Hook for managing client side admin authentication state via `localStorage`.
  * Synchronizes the admin state across multiple browser tabs using `storage` events.
  * Synchronizes state within the same tab using custom `adminModeToggled` events.
  *

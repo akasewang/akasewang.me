@@ -17,7 +17,7 @@ export function getComponentSource(filePath: string): string {
     /**
      * Perform a synchronous file read.
      * This is acceptable and often preferred in Next.js Server Components / SSR
-     * Synchronous execution is used where reading local files asynchronously does not yield meaningful event-loop benefits.
+     * Synchronous execution is used where reading local files asynchronously does not yield meaningful event loop benefits.
      */
     return fs.readFileSync(path.join(CWD, filePath), 'utf8')
   } catch (error) {

@@ -52,7 +52,7 @@ SelectTrigger.displayName = Trigger.displayName
 
 /**
  * Renders the select menu panel.
- * Automatically injects the `MenuHighlight` background for zero-lag fluid hover effects.
+ * Automatically injects the `MenuHighlight` background for zero lag fluid hover effects.
  */
 const SelectContent = forwardRef<
   ComponentRef<typeof Content>,

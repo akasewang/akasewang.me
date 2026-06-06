@@ -21,7 +21,7 @@ interface SocialShareProps {
   className?: string
 }
 
-/** A shareable network entry: its name, icon, and optional action verb ("share via"). */
+/** A shareable network entry: its name, icon and optional action verb ("share via"). */
 type ShareOption = {
   name: string
   icon: typeof Icons.x
@@ -39,7 +39,7 @@ const SHARE_NETWORKS: ShareOption[] = [
   { name: 'Email', icon: Icons.mail, actionText: 'share via' },
 ]
 
-/** Builds the share intent URL for a given network, page URL, and title. */
+/** Builds the share intent URL for a given network, page URL and title. */
 const getShareUrl = (network: string, url: string, title: string) => {
   const encodedUrl = encodeURIComponent(url)
   const encodedTitle = encodeURIComponent(title)
@@ -65,7 +65,7 @@ const getShareUrl = (network: string, url: string, title: string) => {
 }
 
 /**
- * A share button that opens a dropdown with a copy-link action and direct share links to
+ * A share button that opens a dropdown with a copy link action and direct share links to
  * several social networks.
  *
  * @param url - The absolute URL of the page to be shared.

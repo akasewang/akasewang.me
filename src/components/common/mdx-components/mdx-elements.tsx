@@ -18,7 +18,7 @@ const HEADING_SIZES = {
 const ICON_SIZES = { 1: 22, 2: 18, 3: 16, 4: 14, 5: 12, 6: 10 } as const
 
 /**
- * Higher-order function that generates a customized heading component.
+ * Higher order function that generates a customized heading component.
  * Automatically injects an anchor link and a hashtag icon to support the TOC.
  *
  * @param level - The heading level (1-6) to generate.

@@ -12,7 +12,7 @@ import { formatDateString, cn } from '@/utils/utils'
 import type { TimelineItemProps } from '@/types/site'
 
 /**
- * Supports rendering markdown-style links, lists, and technological tags.
+ * Supports rendering markdown style links, lists and technological tags.
  *
  * @param id - A unique identifier for the timeline item, used for anchor scrolling.
  * @param title - The primary heading (e.g., job title or degree).

@@ -37,7 +37,7 @@ export interface ComponentPost {
 
   /**
    * Optional: Other registry components this component depends on (e.g., 'button', 'badge').
-   * Used by the CLI to automatically install sub-components.
+   * Used by the CLI to automatically install subcomponents.
    */
   registryDependencies?: string[]
 

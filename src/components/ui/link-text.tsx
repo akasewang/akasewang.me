@@ -16,7 +16,7 @@ interface LinkTextProps {
 
 /**
  * An inline text link with an animated underline and an optional trailing arrow. Automatically
- * applies external-link attributes (`target="_blank"`, `rel="noopener noreferrer"`) for `http` URLs.
+ * applies external link attributes (`target="_blank"`, `rel="noopener noreferrer"`) for `http` URLs.
  *
  * @param href - The destination URL for the link.
  * @param children - The text content of the link.

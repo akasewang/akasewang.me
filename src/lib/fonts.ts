@@ -1,7 +1,7 @@
 import { Inter, Geist_Mono, PT_Serif } from 'next/font/google'
 
 /**
- * Next.js-optimized Google Fonts configuration.
+ * Next.js optimized Google Fonts configuration.
  * Each font is instantiated here and exposed to CSS via a custom property (`--font-*`).
  */
 
@@ -12,7 +12,7 @@ export const fontSans = Inter({
   display: 'swap',
 })
 
-/** Monospace typeface for code, counters, and tabular numerals. */
+/** Monospace typeface for code, counters and tabular numerals. */
 export const fontMono = Geist_Mono({
   subsets: ['latin'],
   variable: '--font-mono',

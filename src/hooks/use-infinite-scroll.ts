@@ -5,7 +5,7 @@ import { useEffect, useRef } from 'react'
  *
  * @param onIntersect - Callback function executed when the target element enters the viewport.
  * @param enabled - Boolean to enable or disable the observer. Defaults to `true`.
- * @param rootMargin - The intersection observer's root margin. Defaults to `'400px'` to pre-fetch before the element becomes visible.
+ * @param rootMargin - The intersection observer's root margin. Defaults to `'400px'` to prefetch before the element becomes visible.
  * @returns {React.RefObject<T>} targetRef - Attach this ref to the DOM element acting as the infinite scroll trigger.
  */
 export function useInfiniteScroll<T extends HTMLElement>(
@@ -18,7 +18,7 @@ export function useInfiniteScroll<T extends HTMLElement>(
    * A persistent ref to store the latest `onIntersect` callback.
    * This is a crucial React pattern: it guarantees the IntersectionObserver always
    * calls the most recent closure version of the callback without needing to be
-   * re-instantiated every time the callback's dependencies change.
+   * reinstantiated every time the callback's dependencies change.
    */
   const onIntersectRef = useRef(onIntersect)
 

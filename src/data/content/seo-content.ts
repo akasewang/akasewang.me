@@ -3,7 +3,7 @@ import type { SeoContent } from '@/types/site'
 
 /**
  * SEO Content Dictionary.
- * Provides the localized metadata, titles, and descriptions used across different site routes.
+ * Provides the localized metadata, titles and descriptions used across different site routes.
  * Injected into the generic layout SEO configuration to construct dynamic meta tags and Open Graph data.
  */
 export const homeSeoContent: SeoContent = {
@@ -16,7 +16,7 @@ export const homeSeoContent: SeoContent = {
 export const projectsSeoContent: SeoContent = {
   title: `Projects | ${FULL_NAME}`,
   description:
-    "A showcase of my recent work, including web apps, open-source tools, and weekend experiments that I haven't abandoned yet.",
+    "A showcase of my recent work, including web apps, open source tools and weekend experiments that I haven't abandoned yet.",
   imageAlt: `Projects - ${FULL_NAME}`,
   ogTitle: 'Selected projects and open source works.',
 }
@@ -40,15 +40,15 @@ export const messageBoardSeoContent: SeoContent = {
 export const blogsSeoContent: SeoContent = {
   title: `Blogs | ${FULL_NAME}`,
   description:
-    'A collection of my writing. Spanning software engineering, design, and personal essays on life.',
+    'A collection of my writing. Spanning software engineering, design and personal essays on life.',
   imageAlt: `Blogs - ${FULL_NAME}`,
-  ogTitle: 'Writing on software, design, and personal reflections.',
+  ogTitle: 'Writing on software, design and personal reflections.',
 }
 
 export const skillsSeoContent: SeoContent = {
   title: `Skills & Tech Stack | ${FULL_NAME}`,
   description:
-    'The programming languages, frameworks, and tools I use to build things (and occasionally break things) on a daily basis.',
+    'The programming languages, frameworks and tools I use to build things (and occasionally break things) on a daily basis.',
   imageAlt: `Skills - ${FULL_NAME}`,
   ogTitle: 'The tech stack I use to build things.',
 }
@@ -80,7 +80,7 @@ export const photosSeoContent: SeoContent = {
 export const componentsSeoContent: SeoContent = {
   title: `Components | ${FULL_NAME}`,
   description:
-    'A registry of reusable UI components and micro-interactions I have built for my projects.',
+    'A registry of reusable UI components and micro interactions I have built for my projects.',
   imageAlt: `Components - ${FULL_NAME}`,
   ogTitle: 'Reusable UI components and interactions.',
 }

@@ -16,8 +16,8 @@ interface ProjectCardProps {
 }
 
 /**
- * Project card for the projects grid. Shows a video or image preview with a hover-revealed
- * title, date, and view count, and automatically plays/pauses the background video based on
+ * Project card for the projects grid. Shows a video or image preview with a hover revealed
+ * title, date and view count and automatically plays/pauses the background video based on
  * scroll intersection to save battery and bandwidth.
  */
 export const ProjectCard = memo(function ProjectCard({ project }: ProjectCardProps) {

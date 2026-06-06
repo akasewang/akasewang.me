@@ -23,7 +23,7 @@ interface StepProps {
 }
 
 /**
- * Individual step within a `<Steps>` container; renders an auto-incrementing number marker
+ * Individual step within a `<Steps>` container; renders an auto incrementing number marker
  * and a dashed line connecting it to the next step.
  *
  * @param title - Optional heading for the step.

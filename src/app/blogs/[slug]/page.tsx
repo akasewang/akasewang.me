@@ -17,7 +17,7 @@ import { constructMetadata, getOgImageUrl } from '@/lib/metadata'
 
 /**
  * Next.js static generation hook.
- * Pre-computes all possible blog post paths at build time for ultra-fast static delivery.
+ * Precomputes all possible blog post paths at build time for ultra fast static delivery.
  */
 export async function generateStaticParams() {
   return getBlogSlugs()
@@ -46,7 +46,7 @@ export async function generateMetadata({ params }: { params: paramsType }): Prom
 
 /**
  * Server Component responsible for rendering an individual blog post.
- * Hydrates the MDX content, calculates next/prev navigation, and injects SEO schemas.
+ * Hydrates the MDX content, calculates next/prev navigation and injects SEO schemas.
  */
 export default async function BlogPost({ params }: { params: paramsType }) {
   const { slug } = await params

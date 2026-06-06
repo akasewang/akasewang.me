@@ -28,7 +28,7 @@ export function useKeyboardShortcut(
     /**
      * Storing the action in a ref ensures the keydown listener always executes the most
      * current version of the callback or route string, avoiding stale closures while
-     * preventing the `useEffect` from unnecessarily re-attaching the listener on every render.
+     * preventing the `useEffect` from unnecessarily reattaching the listener on every render.
      */
     actionRef.current = action
   }, [action])
@@ -39,7 +39,7 @@ export function useKeyboardShortcut(
     const handleKeyDown = (e: KeyboardEvent) => {
       const target = e.target as HTMLElement
 
-      /** Silently ignore keyboard shortcuts if the user is typing inside an input, textarea, or content-editable field */
+      /** Silently ignore keyboard shortcuts if the user is typing inside an input, textarea, or content editable field */
       if (['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName) || target.isContentEditable) {
         return
       }

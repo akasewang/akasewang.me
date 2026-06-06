@@ -57,7 +57,7 @@ DropdownMenuSubContent.displayName = DropdownMenuPrimitive.SubContent.displayNam
 
 /**
  * Renders the dropdown menu panel.
- * Automatically injects the `MenuHighlight` background for zero-lag fluid hover effects.
+ * Automatically injects the `MenuHighlight` background for zero lag fluid hover effects.
  */
 const DropdownMenuContent = React.forwardRef<
   React.ComponentRef<typeof DropdownMenuPrimitive.Content>,

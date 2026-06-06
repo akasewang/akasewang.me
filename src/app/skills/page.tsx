@@ -22,7 +22,7 @@ export async function generateMetadata(): Promise<Metadata> {
 /**
  * Main Skills Route.
  * Renders an interactive grid of technologies and skills, utilizing Suspense to
- * lazy-load the grid while preserving a static skeleton layout during initial paint.
+ * lazy load the grid while preserving a static skeleton layout during initial paint.
  */
 export default function SkillsPage() {
   const breadcrumbJsonLd = getBreadcrumbSchema([

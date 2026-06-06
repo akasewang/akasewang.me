@@ -14,4 +14,4 @@ When someone runs `npx shadcn add [component]`, the CLI requests the code from o
 ## Abuse Prevention
 
 - We check the `User-Agent` to confirm a real CLI tool is making the request, not a random bot.
-- Requests are cached in memory by IP address, so a CI/CD pipeline asking for the same component 50 times a minute only triggers the file-reading work once.
+- Requests are cached in memory by IP address, so a CI/CD pipeline asking for the same component 50 times a minute only triggers the file reading work once.

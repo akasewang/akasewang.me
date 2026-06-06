@@ -15,7 +15,7 @@ interface BlogPostCardProps {
 
 /**
  * A list row linking to a blog post, showing its title (with a "new" tag for recent posts),
- * date, view count, and a two-line excerpt. Used in the featured/listing post lists.
+ * date, view count and a two line excerpt. Used in the featured/listing post lists.
  */
 export function BlogPostCard({
   post: { title, slug, date, excerpt },

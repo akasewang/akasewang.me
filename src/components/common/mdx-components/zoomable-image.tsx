@@ -9,7 +9,7 @@ import type { Photo } from '@/types/photos'
 
 /**
  * Automatically wraps standard Markdown images (`![alt](url)`) and provides a clickable overlay.
- * Re-uses the global `<PhotoOverlay>` component for the zoomed state.
+ * Reuses the global `<PhotoOverlay>` component for the zoomed state.
  *
  * @example
  * // Default size (Markdown syntax)

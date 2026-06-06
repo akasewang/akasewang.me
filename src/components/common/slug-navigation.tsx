@@ -35,7 +35,7 @@ const BUTTON_DISABLED_STYLES = 'cursor-not-allowed opacity-20'
 
 /**
  * A combined navigation and utility toolbar displayed on detailed content pages (like individual blog posts).
- * Features previous/next content navigation, a "copy raw content" button, and a social sharing dropdown.
+ * Features previous/next content navigation, a "copy raw content" button and a social sharing dropdown.
  * Includes global keyboard shortcuts (Left/Right arrows for nav, 'C' for copy).
  *
  * @param prev - Navigation item data for the preceding content.

@@ -3,7 +3,7 @@ import { forwardRef, type ComponentProps } from 'react'
 import { cn } from '@/utils/utils'
 
 /**
- * Creates a styled, ref-forwarding wrapper around a native HTML element.
+ * Creates a styled, ref forwarding wrapper around a native HTML element.
  * Reduces the repeated forwardRef + className merge boilerplate to a single call.
  */
 function styled<T extends keyof HTMLElementTagNameMap>(Tag: T, base: string, name: string) {

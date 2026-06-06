@@ -18,7 +18,7 @@ import { constructMetadata, getOgImageUrl } from '@/lib/metadata'
 
 /**
  * Next.js static generation hook.
- * Pre-computes all possible project showcase paths at build time for instant delivery.
+ * Precomputes all possible project showcase paths at build time for instant delivery.
  */
 export async function generateStaticParams() {
   return getProjectSlugs()
@@ -47,13 +47,13 @@ export async function generateMetadata({ params }: { params: paramsType }): Prom
 
 /**
  * Server Component responsible for rendering an individual project case study.
- * Hydrates the MDX content, calculates navigation, and renders demo visuals (video/image).
+ * Hydrates the MDX content, calculates navigation and renders demo visuals (video/image).
  */
 export default async function ProjectPost({ params }: { params: paramsType }) {
   const { slug } = await params
   const post = await getProject(slug)
 
-  /** Trigger a Next.js 404 boundary if the user requests a non-existent project */
+  /** Trigger a Next.js 404 boundary if the user requests a nonexistent project */
   if (!post) notFound()
 
   const { content, data } = post

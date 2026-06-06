@@ -22,7 +22,7 @@ const { featuredComponents } = landingPageContent.sections
 
 /**
  * Featured Components Section.
- * A dual-purpose component that renders a subset of registry components on the home page.
+ * A dual purpose component that renders a subset of registry components on the home page.
  * or acts as the full list on the main `/components` route.
  */
 export function FeaturedComponents({ components }: FeaturedComponentsProps) {

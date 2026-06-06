@@ -21,7 +21,7 @@ import './globals.css'
 
 /**
  * Generates the SEO metadata for the application.
- * Uses global constants and localized content blocks to dynamically inject OpenGraph, Twitter Cards, and canonical URLs.
+ * Uses global constants and localized content blocks to dynamically inject OpenGraph, Twitter Cards and canonical URLs.
  */
 export async function generateMetadata(): Promise<Metadata> {
   return {
@@ -63,7 +63,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 /**
  * JSON-LD structured data for rich search results.
- * Instantiates the Person, Website, and ProfilePage schemas based on schema.org standards.
+ * Instantiates the Person, Website and ProfilePage schemas based on schema.org standards.
  */
 const jsonLd = [
   { '@context': 'https://schema.org', ...getPersonSchema() },
@@ -72,7 +72,7 @@ const jsonLd = [
 ]
 
 /**
- * Pre-paint script that reserves the announcement banner's height via `--banner-offset`
+ * Prepaint script that reserves the announcement banner's height via `--banner-offset`
  * before hydration, preventing a layout shift when the banner mounts.
  */
 const bannerOffsetScript = `document.documentElement.style.setProperty('--banner-offset','2.5rem')`

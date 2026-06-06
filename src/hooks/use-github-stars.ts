@@ -6,13 +6,13 @@ import { USERNAME, SITE } from '@/constants/constants'
 const CACHE_KEY = 'github_stars_cache'
 const CACHE_TTL = 15 * 60 * 1000
 
-/** Module-level variable to deduplicate simultaneous in-flight requests across components. */
+/** Module level variable to deduplicate simultaneous in flight requests across components. */
 let sharedFetchPromise: Promise<number | null> | null = null
 
 /**
  * React hook to fetch and cache GitHub stars for the site's repository.
  * Utilizes a shared promise to prevent network spam if used in multiple components,
- * and localStorage to prevent rate-limiting across tabs and page navigations.
+ * and localStorage to prevent rate limiting across tabs and page navigations.
  * Includes strict Error Boundaries for incognito/privacy mode storage blocks.
  */
 export function useGithubStars() {
@@ -79,7 +79,7 @@ export function useGithubStars() {
     }
   }, [])
 
-  /** Pre-format string variants so the UI components can remain strictly presentational. */
+  /** Preformat string variants so the UI components can remain strictly presentational. */
   const shortCount =
     stars !== null
       ? new Intl.NumberFormat('en-US', { notation: 'compact', maximumFractionDigits: 1 })

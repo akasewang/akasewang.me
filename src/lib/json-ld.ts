@@ -23,7 +23,7 @@ const PERSON_SCHEMA = {
 
 /**
  * Returns the standard Person schema for the portfolio owner.
- * Includes bio, skills, and social links to build a unified identity graph for search engines.
+ * Includes bio, skills and social links to build a unified identity graph for search engines.
  *
  * @returns A JSON-LD compliant `Person` schema object.
  */
@@ -60,7 +60,7 @@ export function getWebsiteSchema() {
 /**
  * Creates a BlogPosting schema for individual blog articles to improve SEO and content discoverability.
  *
- * @param props - An object containing the blog post's title, excerpt, date, slug, and optional image.
+ * @param props - An object containing the blog post's title, excerpt, date, slug and optional image.
  * @returns A JSON-LD compliant `BlogPosting` schema object.
  */
 export function getBlogPostingSchema({

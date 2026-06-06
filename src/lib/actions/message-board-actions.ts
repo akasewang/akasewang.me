@@ -17,8 +17,8 @@ const isAdmin = (secret: string) =>
  * Server action to submit a new message to the public message board.
  * Includes rate limiting (based on IP) and basic honeypot bot protection.
  *
- * @param formData - The submitted form data containing `name`, `message`, and the hidden `honey` field.
- * @returns An ActionResult indicating success or specific validation/rate-limit errors.
+ * @param formData - The submitted form data containing `name`, `message` and the hidden `honey` field.
+ * @returns An ActionResult indicating success or specific validation/rate limit errors.
  */
 export async function submitMessageBoardMessage(formData: FormData): Promise<ActionResult> {
   const { messageBoard: toasts } = toastContent

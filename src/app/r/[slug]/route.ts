@@ -7,11 +7,11 @@ import { incrementInstallAction } from '@/lib/actions/views'
  * Shadcn UI Registry API Route.
  * This route is pinged by the shadcn CLI (`npx shadcn add <slug>`) to fetch component code.
  * It dynamically resolves the CLI schema from MDX frontmatter and reads the raw component
- * source from the local file system, applying path transformations so registry-internal
+ * source from the local file system, applying path transformations so registry internal
  * imports map correctly for the end user.
  *
  * Includes an integrated telemetry tracker that filters by User-Agent to prevent bot inflation.
- * Utilizes an ephemeral in-memory cache to deduplicate CI/CD burst installs by IP.
+ * Utilizes an ephemeral in memory cache to deduplicate CI/CD burst installs by IP.
  *
  * @param request - The incoming HTTP request.
  * @param params - The dynamic route parameters containing the component slug.
@@ -19,7 +19,7 @@ import { incrementInstallAction } from '@/lib/actions/views'
  */
 export const dynamic = 'force-dynamic'
 
-/** In-memory cache to deduplicate CI/CD burst installs by IP */
+/** In memory cache to deduplicate CI/CD burst installs by IP */
 const installRateLimitMap = new Map<string, number>()
 /** 1 minute window for rate limiting */
 const RATE_LIMIT_WINDOW_MS = 60000
@@ -55,7 +55,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ slug
 
     const files = componentData.files.map((file) => ({
       path: file.path.slice(file.path.lastIndexOf('/') + 1),
-      /** Perform a single-pass regex replacement instead of multiple string traversals */
+      /** Perform a single pass regex replacement instead of multiple string traversals */
       content: getComponentSource(file.path).replace(
         REPLACEMENT_REGEX,
         (match) => PATH_REPLACEMENTS[match],
@@ -78,7 +78,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ slug
       /** Throttle CI/CD burst installs */
       if (!lastSeen || now - lastSeen > RATE_LIMIT_WINDOW_MS) {
         installRateLimitMap.set(cacheKey, now)
-        /** Fire-and-forget: do not await this, so the user's download isn't blocked by database latency */
+        /** Fire and forget: do not await this, so the user's download isn't blocked by database latency */
         incrementInstallAction(cleanSlug).catch(console.error)
       }
 

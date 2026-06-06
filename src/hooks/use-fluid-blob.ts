@@ -20,8 +20,8 @@ function randomBorderRadius() {
 }
 
 /**
- * Custom hook that generates a non-repeating, hardware-accelerated fluid morph animation.
- * Uses Framer Motion's imperative `animate()` API to completely bypass React re-renders.
+ * Custom hook that generates a nonrepeating, hardware accelerated fluid morph animation.
+ * Uses Framer Motion's imperative `animate()` API to completely bypass React rerenders.
  *
  * @param intervalMs - Base interval for morph cadence.
  * @param randomStart - If true, initializes with random state. If false, starts stable.

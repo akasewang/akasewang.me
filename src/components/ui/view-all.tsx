@@ -10,7 +10,7 @@ interface ViewAllProps {
 }
 
 /**
- * A "view all" link with an underline-on-hover label and a forward arrow, linking to a full listing.
+ * A "view all" link with an underline on hover label and a forward arrow, linking to a full listing.
  *
  * @param href - The destination URL for the link.
  * @param label - The text to display.

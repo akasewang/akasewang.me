@@ -1,11 +1,11 @@
 import { useState, useEffect, useCallback } from 'react'
 
 /**
- * Custom hook for managing time-based status states (success/error) with automatic cooldown and countdown timers.
- * Useful for handling temporary UI states like "Copied to clipboard" or rate-limiting error messages.
+ * Custom hook for managing time based status states (success/error) with automatic cooldown and countdown timers.
+ * Useful for handling temporary UI states like "Copied to clipboard" or rate limiting error messages.
  *
  * @param {string} [storageKey] - Optional key to persist the countdown in localStorage across navigations.
- * @returns {object} An object containing success/error states, the current countdown value, and methods to trigger them.
+ * @returns {object} An object containing success/error states, the current countdown value and methods to trigger them.
  */
 export function useStatusTimer(storageKey?: string) {
   const [success, setSuccess] = useState(false)

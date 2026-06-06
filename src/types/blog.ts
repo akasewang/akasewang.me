@@ -1,6 +1,6 @@
 import { BLOG_CATEGORIES } from '@/constants/categories'
 
-/** Type definitions for blog posts, their frontmatter, and UI listings. */
+/** Type definitions for blog posts, their frontmatter and UI listings. */
 
 /** A blog post category/type filter value (technical, personal…). */
 export type BlogCategory = (typeof BLOG_CATEGORIES)[number]['value']
@@ -22,7 +22,7 @@ export interface BlogPost {
   tags?: string[]
 }
 
-/** Static copy for the blogs listing page (headings and empty-state messages). */
+/** Static copy for the blogs listing page (headings and empty state messages). */
 export interface BlogsListingContent {
   title: string
   subtitle: string

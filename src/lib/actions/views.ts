@@ -59,7 +59,7 @@ export async function getViewsBatchAction(slugs: string[]) {
       .from(views)
       .where(inArray(views.slug, slugs))
 
-    /** Pre-fill maps with 0 for all requested slugs to handle missing database rows gracefully */
+    /** Prefill maps with 0 for all requested slugs to handle missing database rows gracefully */
     const viewsMap: Record<string, number> = Object.fromEntries(slugs.map((slug) => [slug, 0]))
     const installsMap: Record<string, number> = Object.fromEntries(slugs.map((slug) => [slug, 0]))
 

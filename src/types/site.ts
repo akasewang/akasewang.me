@@ -1,6 +1,6 @@
 /**
  * Global Layout & Navigation
- * Top-level structure for navbars, footers, and general page layouts.
+ * Top level structure for navbars, footers and general page layouts.
  */
 
 /** Navbar link labels for the primary routes. */
@@ -19,7 +19,7 @@ export interface FooterContent {
   licenseHref?: string
 }
 
-/** Shared UI labels reused across pages (name pronunciation, back-to-top). */
+/** Shared UI labels reused across pages (name pronunciation, back to top). */
 export interface CommonContent {
   pronounceName: string
   backToTop: string
@@ -46,10 +46,10 @@ export interface LinkableSectionContent {
 
 /**
  * SEO & Social Sharing
- * Types for metadata, open graph, and social links.
+ * Types for metadata, open graph and social links.
  */
 
-/** Page metadata used to build `<head>` tags and open-graph cards. */
+/** Page metadata used to build `<head>` tags and open graph cards. */
 export interface SeoContent {
   title: string
   description: string
@@ -57,7 +57,7 @@ export interface SeoContent {
   ogTitle: string
 }
 
-/** A social profile link: destination, accessible label, and display text. */
+/** A social profile link: destination, accessible label and display text. */
 export interface SocialLink {
   href: string
   label: string

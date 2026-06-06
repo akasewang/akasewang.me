@@ -10,13 +10,13 @@ interface SpotlightProps {
   children?: React.ReactNode
   /**
    * If true, automatically renders a faintly visible background layer of the children.
-   * Perfect for text-reveal effects where the text should remain barely visible when not hovered.
+   * Perfect for text reveal effects where the text should remain barely visible when not hovered.
    */
   withBaseReveal?: boolean
 }
 
 /**
- * Renders a cursor-following spotlight from layered radial gradients positioned by the
+ * Renders a cursor following spotlight from layered radial gradients positioned by the
  * `--mx` / `--my` / `--spotlight-intensity` CSS variables (typically set by `useSpotlight`),
  * fading in while `isHovering`. Optionally reveals masked `children` under the light.
  *
@@ -95,7 +95,7 @@ export interface SpotlightCardProps<T extends React.ElementType = 'div'> {
 }
 
 /**
- * A highly-optimized container that automatically tracks cursor velocity and applies the Spotlight effect.
+ * A highly optimized container that automatically tracks cursor velocity and applies the Spotlight effect.
  * Completely abstracts away the boilerplate of hooks and refs for the developer.
  * Use `as` to render as a different semantic element (e.g., `as="a"`).
  * Use `revealLayer` to supply completely custom content for the spotlight mask.

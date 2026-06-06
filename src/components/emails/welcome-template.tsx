@@ -125,7 +125,7 @@ const styles = {
   footerLinkDim: { color: theme.link, textDecoration: 'none' },
 }
 
-/** Welcome email sent on a new or returning subscription, with a one-click unsubscribe link. */
+/** Welcome email sent on a new or returning subscription, with a one click unsubscribe link. */
 export const WelcomeTemplate = ({
   unsubscribeToken,
   isResubscribe = false,

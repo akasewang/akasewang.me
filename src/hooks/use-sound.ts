@@ -70,9 +70,9 @@ function playAudioBuffer(buffer: AudioBuffer, audioCtx: AudioContext, volume: nu
 
 /**
  * Hook for lazily loading audio only when needed (or via explicit preload), returning playback controls and loading states.
- * Uses a global `AudioContext` and an in-memory cache to prevent duplicate fetching/decoding across identical URLs.
+ * Uses a global `AudioContext` and an in memory cache to prevent duplicate fetching/decoding across identical URLs.
  * @param url - The URL path to the audio file.
- * @returns {object} An object containing playback and preloading methods, and loading state booleans.
+ * @returns {object} An object containing playback and preloading methods and loading state booleans.
  */
 export function useSoundLazy(url: string) {
   const bufferRef = useRef<AudioBuffer | null>(null)

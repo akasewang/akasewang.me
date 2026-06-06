@@ -16,7 +16,7 @@ interface PronounceMyNameProps {
 }
 
 /**
- * A button (and `P` keyboard shortcut) that plays a name-pronunciation audio clip and
+ * A button (and `P` keyboard shortcut) that plays a name pronunciation audio clip and
  * animates the speaker icon while it plays. Preloads the audio on hover.
  *
  * @param className - Optional CSS classes for custom container styling.

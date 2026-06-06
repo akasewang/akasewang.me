@@ -6,7 +6,7 @@ import { LINK_REGEX } from '@/constants/constants'
  * Renders a plain string into a ReactNode, converting inline markdown links
  * (`[label](url)`) into interactive `LinkText` elements.
  *
- * Useful for user-provided text such as timeline items or bios, where full MDX
+ * Useful for user provided text such as timeline items or bios, where full MDX
  * compilation is overkill but basic link interactivity is still needed.
  *
  * @param text - The raw text string, optionally containing markdown links.

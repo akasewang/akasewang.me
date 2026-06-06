@@ -8,12 +8,12 @@ import { InfiniteCarousel } from '@/components/ui/infinite-carousel'
 
 /**
  * Dismissible Announcement Banner.
- * A fixed, full-width bar pinned to the top of the screen featuring a seamlessly
+ * A fixed, full width bar pinned to the top of the screen featuring a seamlessly
  * looping text carousel and a grain overlay. Links out to external content and
  * can be temporarily closed via the trailing icon.
  *
  * Drives the global `--banner-offset` CSS variable so the navbar and page content
- * shift down while the banner is visible. The pre-paint reservation is handled by an
+ * shift down while the banner is visible. The prepaint reservation is handled by an
  * inline script in the root layout to avoid layout shift before hydration.
  */
 export function AnnouncementBanner() {

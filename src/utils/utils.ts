@@ -26,7 +26,7 @@ export function cn(...inputs: ClassValue[]) {
 
 /**
  * Calculates the estimated reading time in minutes for a given text block.
- * Based on a constant words-per-minute reading speed.
+ * Based on a constant words per minute reading speed.
  *
  * @param content - The raw text content to analyze.
  * @returns The estimated time in minutes (rounded up).
@@ -122,7 +122,7 @@ export function formatDayLabel(date: Date): string {
  * Handles exact matching for the 'Present' constant.
  *
  * @param dateStr - The date string or object to display.
- * @returns A UI-ready formatted date string.
+ * @returns A UI ready formatted date string.
  */
 export function formatDateString(dateStr?: string | Date): string {
   if (!dateStr) return ''
@@ -161,7 +161,7 @@ export function formatDateString(dateStr?: string | Date): string {
  * Creates consistent visuals for users without avatars by hashing their name.
  *
  * @param name - The seed string (e.g., username) to hash.
- * @returns An object containing the generated `backgroundImage`, `colors` array, and `angle`.
+ * @returns An object containing the generated `backgroundImage`, `colors` array and `angle`.
  */
 export function generateGradientFromName(name: string) {
   /** Calculate a deterministic integer hash from the string characters */
@@ -171,7 +171,7 @@ export function generateGradientFromName(name: string) {
   }
   hash = Math.abs(hash)
 
-  /** Pseudo-random number generator seeded by the hash */
+  /** Pseudorandom number generator seeded by the hash */
   const random = (seedOffset: number) => {
     const x = Math.sin(hash + seedOffset) * 10000
     return x - Math.floor(x)
@@ -184,7 +184,7 @@ export function generateGradientFromName(name: string) {
   const c2 = getColor(20)
   const c3 = getColor(30)
 
-  /** Use the seed to randomly pick a gradient style, angle, and focal point */
+  /** Use the seed to randomly pick a gradient style, angle and focal point */
   const patternType = random(40)
   const angle = Math.floor(random(50) * 360)
   const posX = Math.floor(random(60) * 100)

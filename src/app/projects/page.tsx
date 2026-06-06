@@ -22,8 +22,8 @@ export async function generateMetadata(): Promise<Metadata> {
 
 /**
  * Main Projects Listing Route.
- * Fetches all MDX project portfolios server-side and wraps the rendering logic in a Suspense
- * boundary so that client-side search parameters don't block the initial HTML response.
+ * Fetches all MDX project portfolios server side and wraps the rendering logic in a Suspense
+ * boundary so that client side search parameters don't block the initial HTML response.
  */
 export default async function ProjectsPage() {
   const projects = await getAllProjects()

@@ -10,9 +10,9 @@ import type { ProjectPostData, ProjectCategory } from '@/types/project'
 
 /**
  * Project Tabs/Filter Controller Component.
- * Acts as the client-side state manager for the main projects listing page.
- * Synchronizes search queries, category filters, and sorting methods with the URL search parameters
- * to ensure deep-linkable and shareable filter states.
+ * Acts as the client side state manager for the main projects listing page.
+ * Synchronizes search queries, category filters and sorting methods with the URL search parameters
+ * to ensure deep linkable and shareable filter states.
  */
 export function ProjectTabs({ projects }: { projects: ProjectPostData[] }) {
   const searchParams = useSearchParams()

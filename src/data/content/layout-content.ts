@@ -7,8 +7,8 @@ import type {
 } from '@/types/site'
 
 /**
- * Global layout copy: navigation labels, footer attribution, and shared UI strings
- * used across the navbar, footer, and common page chrome.
+ * Global layout copy: navigation labels, footer attribution and shared UI strings
+ * used across the navbar, footer and common page chrome.
  */
 
 /** Primary navigation link labels. */
@@ -27,7 +27,7 @@ export const footerContent: FooterContent = {
   licenseHref: 'https://creativecommons.org/licenses/by-nc-sa/4.0/',
 }
 
-/** Shared chrome labels reused across pages (name pronunciation, back-to-top). */
+/** Shared chrome labels reused across pages (name pronunciation, back to top). */
 export const commonContent: CommonContent = {
   pronounceName: 'Pronounce my name',
   backToTop: 'Back to Top',
@@ -37,7 +37,7 @@ export const commonContent: CommonContent = {
  * Top announcement banner content.
  */
 export const announcementBanner: AnnouncementBannerContent = {
-  message: "click here to see my designs (my mom says they're very nice)",
+  message: "Building something? Click here if you want seamless design and development",
   href: 'https://noddy.studio/',
   dismissLabel: 'Dismiss banner',
 }

@@ -8,8 +8,8 @@ interface ComponentPreviewProps {
 }
 
 /**
- * Server Component that resolves a component slug against the MDX-driven registry sync and
- * pre-generates the syntax-highlighted source node, handing both off to the client preview wrapper.
+ * Server Component that resolves a component slug against the MDX driven registry sync and
+ * pregenerates the syntax highlighted source node, handing both off to the client preview wrapper.
  *
  * @param slug - The unique identifier of the component in the registry.
  */

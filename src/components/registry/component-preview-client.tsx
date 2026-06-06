@@ -14,7 +14,7 @@ interface ComponentPreviewProps {
  * and provides a tabbed interface to toggle between the live preview and the raw source code.
  *
  * @param slug - The unique identifier of the component in the registry.
- * @param codeNode - The pre-compiled MDX syntax-highlighted source code node.
+ * @param codeNode - The precompiled MDX syntax highlighted source code node.
  */
 export function ComponentPreviewClient({ slug, codeNode }: ComponentPreviewProps) {
   const Preview = useMemo(() => {

@@ -37,7 +37,7 @@ interface TabProps {
 
 /**
  * A tabbed container that turns each child `<Tab>` into a tab (labelled from `items` or the
- * tab's `title`), with an animated active-tab indicator.
+ * tab's `title`), with an animated active tab indicator.
  *
  * @param items - Optional array of strings to use as tab labels, overriding child `title` props.
  * @param defaultIndex - The index of the tab to activate by default.

@@ -14,7 +14,7 @@ const renderVolunteer = (vol: TimelineItemProps) => (
 
 /**
  * Volunteer Section.
- * Renders a timeline of community service and open-source contributions using the `ExpandableList` component.
+ * Renders a timeline of community service and open source contributions using the `ExpandableList` component.
  * Automatically injects the "Present" constant for ongoing roles.
  */
 export function Volunteer() {

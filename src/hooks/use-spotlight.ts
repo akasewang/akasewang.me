@@ -1,7 +1,7 @@
 import { useRef, useState, useEffect } from 'react'
 
 /**
- * Drives a velocity-reactive spotlight effect. Tracks the cursor inside the container and
+ * Drives a velocity reactive spotlight effect. Tracks the cursor inside the container and
  * writes its position (`--mx`/`--my`) and an ease-out-cubic intensity (`--spotlight-intensity`)
  * as CSS custom properties, flaring brighter on faster movement and settling as it slows.
  * Updates are batched into `requestAnimationFrame` to avoid layout thrashing.

@@ -11,7 +11,7 @@ interface BackButtonProps {
 }
 
 /**
- * A back-navigation link styled as a terminal `cd ..` command; reveals the destination
+ * A back navigation link styled as a terminal `cd ..` command; reveals the destination
  * label on hover.
  *
  * @param href - The target URL to navigate to (defaults to '/').

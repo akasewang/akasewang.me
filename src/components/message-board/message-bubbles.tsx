@@ -13,7 +13,7 @@ const contentWidthClass = 'max-w-[85%] sm:max-w-[70%]'
 const bubbleBaseClass = 'min-w-[150px] px-4 py-3 rounded-2xl ring-1 ring-inset'
 const actionBtnClass = 'text-[11px] font-medium transition-colors duration-300 active:duration-200'
 
-/** Props for {@link MessageBubbles}: one entry, its date, and admin action callbacks. */
+/** Props for {@link MessageBubbles}: one entry, its date and admin action callbacks. */
 type MessageBubblesProps = {
   msg: MessageBoardEntry
   msgDate: Date
@@ -25,7 +25,7 @@ type MessageBubblesProps = {
 
 /**
  * Renders individual message bubbles (both user message and admin reply).
- * Memoized to prevent re-renders when the parent list updates during infinite scroll.
+ * Memoized to prevent rerenders when the parent list updates during infinite scroll.
  * Handles the inline reply editing UI when an admin is authenticated.
  */
 export const MessageBubbles = memo(

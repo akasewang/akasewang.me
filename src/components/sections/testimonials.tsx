@@ -22,7 +22,7 @@ const SHARED_CAROUSEL_PROPS = {
 }
 
 /**
- * Renders a dual-row infinite scrolling carousel of client/peer testimonials.
+ * Renders a dual row infinite scrolling carousel of client/peer testimonials.
  * Includes a global keyboard shortcut ('T') to navigate to the full testimonials directory.
  */
 export function Testimonials() {

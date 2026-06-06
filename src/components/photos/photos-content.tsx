@@ -19,14 +19,14 @@ const PHOTO_BY_ID = new Map(photos.map((p) => [p.id, p]))
 
 /**
  * Main container for the Photos gallery page.
- * Manages URL-based category filtering, 'cover' vs 'contain' view modes, and fullscreen zooming.
+ * Manages URL based category filtering, 'cover' vs 'contain' view modes and fullscreen zooming.
  *
  * Performance features:
  * - Uses `new URLSearchParams(searchParams.toString())` to safely update URL state without trailing `?`.
  * - Hoists the static `PHOTO_BY_ID` map to prevent O(N) lookups on every render when zooming.
  * - Suppresses layout morphing animations during view mode toggling via `isToggling`.
  * - Dispatches image preloading to an isolated renderer so hovering over images doesn't trigger
- *   costly root-level React re-renders.
+ *   costly root level React rerenders.
  */
 export function PhotosContent() {
   const searchParams = useSearchParams()
@@ -200,9 +200,9 @@ const PhotoCard = memo(function PhotoCard({
 })
 
 /**
- * An invisible component that forces the browser to begin downloading high-res images
+ * An invisible component that forces the browser to begin downloading high res images
  * before the user actually clicks on them. Rendered in a separate isolated component tree
- * to prevent the main `PhotosContent` from re-rendering whenever a new ID is added.
+ * to prevent the main `PhotosContent` from rerendering whenever a new ID is added.
  *
  * @param ids - Set of photo IDs that the user has hovered over.
  */

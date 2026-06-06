@@ -15,7 +15,7 @@ interface ProfilePictureProps {
 
 /**
  * Renders a profile picture with an organic, constantly morphing fluid mask.
- * Background threads animate independently for a multi-layered effect.
+ * Background threads animate independently for a multilayered effect.
  */
 export function ProfilePicture({ src, alt, className }: ProfilePictureProps) {
   const containerRef = useRef<HTMLDivElement>(null)

@@ -23,7 +23,7 @@ const SHARED_CAROUSEL_PROPS = {
 }
 
 /**
- * Renders a dual-row infinite scrolling carousel of tech stack icons.
+ * Renders a dual row infinite scrolling carousel of tech stack icons.
  * Includes a global keyboard shortcut ('S') to navigate to the full skills directory.
  */
 export function Skills() {

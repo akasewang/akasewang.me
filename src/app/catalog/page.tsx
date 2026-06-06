@@ -18,7 +18,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 /**
  * Main Catalog Route.
- * Renders the reading list and bookmarks using a client-side Suspense boundary
+ * Renders the reading list and bookmarks using a client side Suspense boundary
  * to enable dynamic filtering via URL parameters without blocking the initial paint.
  */
 export default function CatalogPage() {

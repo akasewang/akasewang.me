@@ -16,7 +16,7 @@ interface PhotoOverlayProps {
 }
 
 /**
- * A fullscreen portal overlay that displays a high-resolution version of a photo.
+ * A fullscreen portal overlay that displays a high resolution version of a photo.
  * Locks body scroll while open and closes on Escape or a backdrop/image click.
  * Uses Framer Motion's `m` component to inherit the LazyMotion engine from the parent, with a
  * shared `layoutId` so the grid thumbnail morphs into the overlay.

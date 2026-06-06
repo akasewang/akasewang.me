@@ -24,7 +24,7 @@ function getResend() {
   return resendInstance
 }
 
-/** From-address for outgoing mail, falling back to Resend's onboarding sender. */
+/** From address for outgoing mail, falling back to Resend's onboarding sender. */
 const SENDER_EMAIL = process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev'
 
 /**
@@ -94,7 +94,7 @@ export async function broadcastNewsletter(
 
     /**
      * Map over every active subscriber and inject their unique unsubscribe token directly
-     * into the pre-compiled HTML string, which is much faster than re-rendering per recipient.
+     * into the precompiled HTML string, which is much faster than rerendering per recipient.
      */
     const payloads = activeSubscribers.map((s) => ({
       from: `${FULL_NAME} <${SENDER_EMAIL}>`,

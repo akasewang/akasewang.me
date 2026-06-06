@@ -10,9 +10,9 @@ interface ComponentSourceProps {
 }
 
 /**
- * Server Component that renders the syntax-highlighted source of a registry component.
- * Resolves the component via the MDX-driven registry sync, reads the raw file from the local
- * filesystem, and rewrites registry-internal import paths to their public equivalents for display.
+ * Server Component that renders the syntax highlighted source of a registry component.
+ * Resolves the component via the MDX driven registry sync, reads the raw file from the local
+ * filesystem and rewrites registry internal import paths to their public equivalents for display.
  *
  * @param slug - The unique identifier of the component in the registry.
  * @param className - Optional CSS classes for custom container styling.

@@ -22,7 +22,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 /**
  * Main Blog Listing Route.
- * Fetches all MDX posts server-side and passes them to a client-side Suspense boundary
+ * Fetches all MDX posts server side and passes them to a client side Suspense boundary
  * to handle category filtering and URL search parameters without blocking the initial render.
  */
 export default async function BlogPage() {

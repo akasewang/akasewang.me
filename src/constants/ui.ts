@@ -12,7 +12,7 @@ export const SPRING_TRANSITION: Transition = {
   damping: 30,
 }
 
-/** Softer, lower-stiffness spring for fluid gliding motion (e.g. the hover highlight). */
+/** Softer, lower stiffness spring for fluid gliding motion (e.g. the hover highlight). */
 export const SMOOTH_SPRING_TRANSITION: Transition = {
   type: 'spring',
   stiffness: 260,
@@ -28,7 +28,7 @@ export const ZOOM_EASE: Transition = {
 }
 
 /**
- * Horizontal cross-slide for the active panel. The incoming panel enters from the side the
+ * Horizontal cross slide for the active panel. The incoming panel enters from the side the
  * user moved towards while the outgoing one leaves the opposite way, giving a swipe feel.
  * Distances are percentages so the motion scales with the panel width.
  */

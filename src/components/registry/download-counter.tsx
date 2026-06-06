@@ -10,7 +10,7 @@ interface DownloadCounterProps {
 }
 
 /**
- * Renders a digital-clock-style install counter.
+ * Renders a digital clock style install counter.
  * Displayed as a centered horizontal block, typically used at the end of component documentation pages.
  * @param slug - The unique component identifier used to fetch install statistics.
  */

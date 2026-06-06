@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 
 /**
  * Locks body scrolling while `isOpen` is true (e.g. for a modal or overlay) by setting
- * `overflow: hidden` on the document body, and restores the previous overflow on cleanup.
+ * `overflow: hidden` on the document body and restores the previous overflow on cleanup.
  *
  * @param isOpen - Whether the scroll lock should currently be active.
  */

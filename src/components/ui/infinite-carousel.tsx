@@ -24,7 +24,7 @@ interface InfiniteCarouselProps<T> {
 }
 
 /**
- * An auto-scrolling, infinitely-looping carousel (Embla + auto-scroll plugin). Duplicates
+ * An auto scrolling, infinitely looping carousel (Embla + auto-scroll plugin). Duplicates
  * `items` enough times to fill wide screens and pauses while hovered.
  *
  * @param items - The generic array of data items to map over.

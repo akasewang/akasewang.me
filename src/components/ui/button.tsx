@@ -36,7 +36,7 @@ const SUCCESS_STYLES =
   'ring-1 ring-inset ring-success/30 retina:ring-[0.5px] bg-success/10 text-success shadow-[0_2px_4px_oklch(0%_0_0/0.2),inset_0_1px_1px_oklch(100%_0_0/0.1)]'
 
 /**
- * A versatile Button component with built-in handling for pending and success states commonly used in forms.
+ * A versatile Button component with built in handling for pending and success states commonly used in forms.
  *
  * @param isPending - If true, displays the `loadingText` and a spinner in the right box.
  * @param isSuccess - If true (and `countdown > 0`), displays the success state styling.
@@ -46,7 +46,7 @@ const SUCCESS_STYLES =
  * @param successIcon - The icon component to display in the success state.
  * @param defaultText - The primary text label for the button.
  * @param defaultIcon - The primary icon component to display next to the default text.
- * @param showArrow - If true, renders a right-side box with an animated hover arrow.
+ * @param showArrow - If true, renders a right side box with an animated hover arrow.
  * @param variant - Visual style variant (`primary`, `secondary`, or `minimal`).
  */
 export function Button({

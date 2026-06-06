@@ -11,7 +11,7 @@ type Props = {
 
 /**
  * Unsubscribe Route.
- * Server-side rendered route that handles one-click unsubscribe links from the newsletter.
+ * Server side rendered route that handles one click unsubscribe links from the newsletter.
  * Extracts the secret `token` from the URL search parameters and deactivates the corresponding user in the database.
  */
 export default async function UnsubscribePage({ searchParams }: Props) {

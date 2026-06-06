@@ -23,7 +23,7 @@ const { featuredProjects } = landingPageContent.sections
 
 /**
  * Featured Projects Section.
- * A dual-purpose component that renders a subset of projects on the home page
+ * A dual purpose component that renders a subset of projects on the home page
  * or acts as the fully searchable/filterable grid on the main `/projects` listing.
  * Animates using the lightweight `m` component injected from the root `MotionProvider`.
  */

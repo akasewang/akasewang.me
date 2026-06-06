@@ -13,7 +13,7 @@ interface Event {
 }
 
 /**
- * Safely records strongly-typed user interaction events into Google Analytics (gtag).
+ * Safely records strongly typed user interaction events into Google Analytics (gtag).
  * Ensures tracking only occurs if the gtag script has successfully loaded on the window object.
  *
  * @param event - The event object containing a predefined `name` and optional string/number `properties`.

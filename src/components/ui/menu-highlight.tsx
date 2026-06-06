@@ -7,7 +7,7 @@ import { SMOOTH_SPRING_TRANSITION } from '@/constants/ui'
 /**
  * A floating highlight that tracks the currently `data-highlighted` item within
  * `parentRef`. Driven by Framer Motion values and the imperative `animate()` API
- * so following the cursor/keyboard across items never triggers a React re-render.
+ * so following the cursor/keyboard across items never triggers a React rerender.
  */
 export function MenuHighlight({ parentRef }: { parentRef: React.RefObject<HTMLElement | null> }) {
   const x = useMotionValue(0)

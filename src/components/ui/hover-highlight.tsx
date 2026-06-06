@@ -4,18 +4,18 @@ import { useEffect } from 'react'
 import { m, useMotionValue, animate, type Transition } from 'framer-motion'
 import { SMOOTH_SPRING_TRANSITION } from '@/constants/ui'
 
-/** Short opacity-only fade so the highlight eases in softly without its box animating. */
+/** Short opacity only fade so the highlight eases in softly without its box animating. */
 const FADE_IN: Transition = { type: 'tween', duration: 0.18, ease: 'easeOut' }
 
 /**
  * A floating highlight that tracks the `data-highlight-item` element the pointer is over
- * within `parentRef` — the hover-driven counterpart to {@link MenuHighlight}, which instead
+ * within `parentRef` — the hover driven counterpart to {@link MenuHighlight}, which instead
  * follows Radix's `data-highlighted` attribute.
  *
  * On the first hover it appears instantly at the item's full box (fading only its opacity
  * in, so it never visibly grows or shrinks into shape), then glides between items as the
  * cursor moves. All motion runs through Framer Motion values and the imperative `animate()`
- * API, so following the cursor never triggers a React re-render. A `prefers-reduced-motion`
+ * API, so following the cursor never triggers a React rerender. A `prefers-reduced-motion`
  * preference disables the glide and fade, snapping instead.
  *
  * Inert by design: a container with no `data-highlight-item` children never shows a
@@ -53,7 +53,7 @@ export function HoverHighlight({ parentRef }: { parentRef: React.RefObject<HTMLE
      */
     let active: HTMLElement | null = null
     /**
-     * Honour the user's reduced-motion preference (live, so it tracks OS changes mid-
+     * Honour the user's reduced motion preference (live, so it tracks OS changes mid-
      * session): snap everything instead of gliding/fading, matching globals.css.
      */
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)')
@@ -65,7 +65,7 @@ export function HoverHighlight({ parentRef }: { parentRef: React.RefObject<HTMLE
       const top = rect.top - parentRect.top
 
       /**
-       * `jump` (not `set`) so an in-flight spring is cancelled rather than resuming next
+       * `jump` (not `set`) so an in flight spring is cancelled rather than resuming next
        * frame; used for the first appearance and for every move under reduced motion.
        */
       if (visible && !reduceMotion.matches) {

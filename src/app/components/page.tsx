@@ -19,7 +19,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 /**
  * Server Component for the component registry catalog.
- * Fetches the entire registry schema and passes it to the client-side filtering tabs.
+ * Fetches the entire registry schema and passes it to the client side filtering tabs.
  */
 export default async function ComponentsPage() {
   /** Await the dynamic registry sync to ensure we have the latest MDX definitions */

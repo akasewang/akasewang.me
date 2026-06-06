@@ -6,5 +6,5 @@ import type { PageContent } from '@/types/site'
  */
 export const componentsPageContent: PageContent = {
   title: 'components.',
-  subtitle: 'A collection of reusable UI components and micro-interactions.',
+  subtitle: 'A collection of reusable UI components and micro interactions.',
 }

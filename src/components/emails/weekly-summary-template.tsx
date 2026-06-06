@@ -13,7 +13,7 @@ import {
 } from '@react-email/components'
 import { SITE_URL, FULL_NAME, USERNAME } from '@/constants/constants'
 
-/** Props for the weekly admin subscriber-summary email. */
+/** Props for the weekly admin subscriber summary email. */
 interface WeeklySummaryTemplateProps {
   subscriberCount: number
   newEmails?: string[]

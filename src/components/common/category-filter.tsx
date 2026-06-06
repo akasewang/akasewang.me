@@ -13,7 +13,7 @@ interface CategoryFilterProps<T extends string> {
 }
 
 /**
- * A horizontal row of category buttons with an animated active-pill indicator, used to filter
+ * A horizontal row of category buttons with an animated active pill indicator, used to filter
  * content by distinct categories (e.g. blog topics, component types).
  *
  * @param categories - Array of category objects containing a strictly typed `value` and display `label`.

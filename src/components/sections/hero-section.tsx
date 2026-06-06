@@ -16,7 +16,7 @@ import { ProfilePicture } from '@/components/ui/profile-picture'
 /**
  * Hero Section Component.
  * The primary introduction area on the landing page. Renders the user's avatar, name,
- * rotating roles (via TextFlip), and active/inactive social links.
+ * rotating roles (via TextFlip) and active/inactive social links.
  * Includes the PronounceMyName audio trigger and integrates content from static data models.
  */
 export function HeroSection() {

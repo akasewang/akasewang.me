@@ -119,7 +119,7 @@
 
   /**
    * Base Element Overrides
-   * Global typography, selection styling, and form element resets.
+   * Global typography, selection styling and form element resets.
    */
   ::selection {
     background: var(--primary);
@@ -327,7 +327,7 @@
 
   /**
    * UI Component Animations
-   * Smooth entrance/exit transitions for popovers, tooltips, and dropdowns.
+   * Smooth entrance/exit transitions for popovers, tooltips and dropdowns.
    */
   :is(.tooltip-elegant, .select-content-elegant) {
     will-change: opacity, transform;

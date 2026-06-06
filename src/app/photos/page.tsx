@@ -18,7 +18,7 @@ export async function generateMetadata(): Promise<Metadata> {
 /**
  * Main Photos Route.
  * Renders the photo gallery inside a Suspense boundary so image fetching and the
- * client-side gallery can stream in without blocking the initial paint.
+ * client side gallery can stream in without blocking the initial paint.
  */
 export default function PhotosPage() {
   return (

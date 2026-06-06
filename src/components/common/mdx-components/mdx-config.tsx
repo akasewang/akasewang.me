@@ -17,10 +17,10 @@ import { DownloadCounter } from '@/components/registry/download-counter'
 /**
  * Global MDX configuration and component mapping.
  * Serves as the central registry linking raw Markdown elements and custom React components
- * to the `next-mdx-remote` parser used across blogs, projects, and component documentation.
+ * to the `next-mdx-remote` parser used across blogs, projects and component documentation.
  */
 
-/** Configure server-side syntax highlighting (rehypeHighlight) and GitHub Flavored Markdown (remarkGfm) */
+/** Configure server side syntax highlighting (rehypeHighlight) and GitHub Flavored Markdown (remarkGfm) */
 export const MDX_OPTIONS = {
   mdxOptions: {
     rehypePlugins: [rehypeHighlight as any],

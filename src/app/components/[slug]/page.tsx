@@ -27,7 +27,7 @@ interface ComponentPageProps {
 
 /**
  * Next.js static generation hook.
- * Pre-computes all possible component paths at build time to ensure ultra-fast static delivery.
+ * Precomputes all possible component paths at build time to ensure ultra fast static delivery.
  */
 export async function generateStaticParams() {
   return getComponentSlugs()
@@ -53,13 +53,13 @@ export async function generateMetadata({ params }: ComponentPageProps): Promise<
 
 /**
  * Server Component responsible for rendering an individual component's documentation page.
- * Hydrates the MDX content, calculates navigation (prev/next), and injects structured JSON-LD data.
+ * Hydrates the MDX content, calculates navigation (prev/next) and injects structured JSON-LD data.
  */
 export default async function ComponentPage({ params }: ComponentPageProps) {
   const { slug } = await params
   const doc = await getComponentDoc(slug)
 
-  /** Trigger a Next.js 404 boundary if the user requests a non-existent slug */
+  /** Trigger a Next.js 404 boundary if the user requests a nonexistent slug */
   if (!doc) notFound()
 
   const {

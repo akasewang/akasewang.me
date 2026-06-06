@@ -40,7 +40,7 @@ export const testimonials: TestimonialRows = {
     {
       id: 'bottomrow-testimonial-2',
       quote:
-        'His ability to translate complex requirements into elegant and high-performing web solutions is outstanding. A reliable and brilliant tech partner.',
+        'His ability to translate complex requirements into elegant and high performing web solutions is outstanding. A reliable and brilliant tech partner.',
       role: 'Senior Engineering Manager, CloudScale',
       url: 'https://www.linkedin.com/in/vikram-patel-example',
       author: 'Vikram Patel',

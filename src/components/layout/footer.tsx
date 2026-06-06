@@ -11,7 +11,7 @@ const currentYear = new Date().getFullYear()
 
 /**
  * Global site footer.
- * Displays licensing, copyright, and global site visitor metrics.
+ * Displays licensing, copyright and global site visitor metrics.
  */
 export function Footer() {
   useKeyboardShortcut('l', () => {

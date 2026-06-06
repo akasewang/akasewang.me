@@ -10,12 +10,12 @@ import {
 } from '@/utils/mdx-utils'
 
 /**
- * Factory function that creates strongly-typed content managers (for blogs, projects, components).
- * Abstracts away the boilerplate of reading MDX files, parsing frontmatter, and sorting by date.
+ * Factory function that creates strongly typed content managers (for blogs, projects, components).
+ * Abstracts away the boilerplate of reading MDX files, parsing frontmatter and sorting by date.
  *
  * @param subDirectory - The directory name inside the `docs/` folder (e.g., 'blogs', 'components').
  * @param entityName - The singular name of the entity for error logging (e.g., 'blog', 'component').
- * @returns An object with `getSlugs`, `getPost`, and `getAll` methods.
+ * @returns An object with `getSlugs`, `getPost` and `getAll` methods.
  */
 export function createMdxManager<T extends { date: string }>(
   subDirectory: string,
@@ -52,7 +52,7 @@ export function createMdxManager<T extends { date: string }>(
   })
 
   /**
-   * Retrieves all MDX documents in the directory, parses their frontmatter, and sorts them chronologically.
+   * Retrieves all MDX documents in the directory, parses their frontmatter and sorts them chronologically.
    * Wrapped in React `cache()` to optimize aggressive parallel data fetching (e.g., in `Promise.all` on the Home page).
    */
   const getAll = cache(async (): Promise<T[]> => {

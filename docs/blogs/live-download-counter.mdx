@@ -1,6 +1,6 @@
 ---
 title: 'Building a Live Download Counter'
-excerpt: 'How to build a live telemetry tracker using decoupled React components, atomic PostgreSQL upserts, and non-blocking Next.js API routes to prevent CLI race conditions.'
+excerpt: 'How to build a live telemetry tracker using decoupled React components, atomic PostgreSQL upserts and nonblocking Next.js API routes to prevent CLI race conditions.'
 date: '2026-05-31'
 slug: live-download-counter
 type: technical
@@ -9,20 +9,20 @@ tags: ['react', 'nextjs', 'drizzle-orm', 'database']
 
 When building the component registry for this portfolio, I wanted a way to track how many times a component was installed via the CLI (`npx shadcn add`). 
 
-While standard web applications often just render a raw metric string (e.g., `10,420`), I wanted something that felt more tactile and hardware-inspired. By segmenting the digits into distinct monospaced blocks, we create a highly legible, aesthetic counter that feels right at home on an engineering dashboard.
+While standard web applications often just render a raw metric string (e.g., `10,420`), I wanted something that felt more tactile and hardware inspired. By segmenting the digits into distinct monospaced blocks, we create a highly legible, aesthetic counter that feels right at home on an engineering dashboard.
 
 But building a live counter isn't just about CSS. We have to solve a few structural problems:
 1. **Separation of Concerns**: The UI component itself must remain pure and stateless so it can be easily distributed.
 2. **Concurrency**: If a popular component drops, hundreds of developers might run the CLI command simultaneously. We need to prevent database race conditions.
 3. **Performance**: Tracking telemetry shouldn't slow down the actual CLI download speed for the end user.
 
-Here is how I engineered the full stack architecture using **React**, **Next.js Server Actions**, and **Drizzle ORM**.
+Here is how I engineered the full stack architecture using **React**, **Next.js Server Actions** and **Drizzle ORM**.
 
 ## 1. The Pure UI Component
 
 Following the Shadcn philosophy, we start by building a completely isolated, stateless UI component. It doesn't know anything about databases or server fetching. 
 
-It simply accepts a `value` prop, pads it with leading zeros to maintain a consistent width (e.g., `00420`), and maps over each digit to render it inside a dedicated tile.
+It simply accepts a `value` prop, pads it with leading zeros to maintain a consistent width (e.g., `00420`) and maps over each digit to render it inside a dedicated tile.
 
 ```tsx
 // src/components/ui/download-counter.tsx
@@ -84,9 +84,9 @@ export const component_metrics = pgTable('component_metrics', {
 
 ## 3. Atomic Server Actions
 
-Next, we need a secure way to interface with the database. We write two Next.js Server Actions: one to fetch the data for the UI, and one to increment the data when a CLI installation occurs.
+Next, we need a secure way to interface with the database. We write two Next.js Server Actions: one to fetch the data for the UI and one to increment the data when a CLI installation occurs.
 
-The increment action is where things get interesting. If we run a standard `SELECT` followed by an `UPDATE count + 1`, we run the risk of a race condition. If two users install the component at the exact same millisecond, they might both read `10`, and both write `11`, effectively losing a metric.
+The increment action is where things get interesting. If we run a standard `SELECT` followed by an `UPDATE count + 1`, we run the risk of a race condition. If two users install the component at the exact same millisecond, they might both read `10` and both write `11`, effectively losing a metric.
 
 To solve this, we rely on Drizzle's `onConflictDoUpdate` to perform an **Atomic Upsert**. We push the math down to the PostgreSQL engine itself, ensuring the increment is perfectly transactional.
 
@@ -133,7 +133,7 @@ export async function incrementInstallAction(slug: string) {
 
 ## 4. Hydration & The Frontend Wrapper
 
-Now we need to bridge the server and the client. We build a React client component that mounts, fires off the `getInstallsAction`, and handles the loading state.
+Now we need to bridge the server and the client. We build a React client component that mounts, fires off the `getInstallsAction` and handles the loading state.
 
 While waiting for the network response, we return a smooth `animate-pulse` skeleton. Once the database integer arrives, we pass it into our pure `DownloadCounter` UI.
 
@@ -162,11 +162,11 @@ export function LiveCounter({ slug }: { slug: string }) {
 }
 ```
 
-## 5. Non-Blocking API Triggers
+## 5. Nonblocking API Triggers
 
 Finally, we need to actually trigger the `incrementInstallAction` whenever someone uses the CLI. 
 
-In our Next.js API route that serves the component JSON payload, we invoke the server action, but we **do not await it**. By using `.catch()` instead of `await`, we create a "fire-and-forget" telemetry ping. The CLI payload is returned to the user instantly, while the database upsert happens silently in the background.
+In our Next.js API route that serves the component JSON payload, we invoke the server action, but we **do not await it**. By using `.catch()` instead of `await`, we create a "fire and forget" telemetry ping. The CLI payload is returned to the user instantly, while the database upsert happens silently in the background.
 
 ```typescript
 // src/app/r/[slug]/route.ts
@@ -185,4 +185,4 @@ export async function GET(
 }
 ```
 
-By decoupling the UI from the database logic, utilizing atomic upserts to prevent race conditions, and leveraging non-blocking API triggers, we've built an extremely robust, edge-ready metrics system that scales effortlessly.
+By decoupling the UI from the database logic, utilizing atomic upserts to prevent race conditions and leveraging nonblocking API triggers, we've built an extremely robust, edge ready metrics system that scales effortlessly.

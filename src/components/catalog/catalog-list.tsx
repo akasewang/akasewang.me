@@ -13,7 +13,7 @@ import type { FilterCategory } from '@/types/catalog'
 /**
  * Catalog List Component.
  * The primary interface for the bookmarks/reading list page.
- * Manages category state via URL search parameters, allowing deep-linking to specific filters.
+ * Manages category state via URL search parameters, allowing deep linking to specific filters.
  */
 export function CatalogList() {
   const searchParams = useSearchParams()

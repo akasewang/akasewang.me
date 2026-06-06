@@ -10,13 +10,13 @@ interface SpotlightProps {
   children?: React.ReactNode
   /**
    * If true, automatically renders a faintly visible background layer of the children.
-   * Perfect for text-reveal effects where the text should remain barely visible when not hovered.
+   * Perfect for text reveal effects where the text should remain barely visible when not hovered.
    */
   withBaseReveal?: boolean
 }
 
 /**
- * Renders a cursor-following spotlight from layered radial gradients positioned by the
+ * Renders a cursor following spotlight from layered radial gradients positioned by the
  * `--mx` / `--my` / `--spotlight-intensity` CSS variables (set by `useSpotlight`), fading
  * in while `isHovering`. Optionally reveals masked `children` under the light. Designed to
  * be installed via the shadcn registry.

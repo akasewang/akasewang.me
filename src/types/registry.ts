@@ -16,7 +16,7 @@ export interface RegistryFile {
   target?: string
 }
 
-/** A full registry component entry: identity, files, dependencies, and theming config. */
+/** A full registry component entry: identity, files, dependencies and theming config. */
 export interface RegistryItem {
   slug: string
   name: string

@@ -1,6 +1,6 @@
 # akasewang.me
 
-Source code for the personal portfolio, blog, and digital footprint of Akash Dewangan. Built with a strict focus on performance, type safety, and minimal latency.
+Source code for the personal portfolio, blog and digital footprint of Akash Dewangan. Built with a strict focus on performance, type safety and minimal latency.
 
 [![Next.js](https://img.shields.io/badge/Next.js_16-000000?style=for-the-badge&logo=nextdotjs&logoColor=white)](#)
 [![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)](#)
@@ -15,18 +15,18 @@ Source code for the personal portfolio, blog, and digital footprint of Akash Dew
 
 For a simple breakdown of how the systems in this portfolio work, check out the documentation:
 
-- [**System Overview**](./architecture/overview.md) - Hosting, database, and SEO.
+- [**System Overview**](./architecture/overview.md) - Hosting, database and SEO.
 - [**Component Registry API**](./architecture/registry.md) - How the `/r/[slug]` API serves components to the Shadcn CLI.
 - [**MDX & Content Parsing**](./architecture/mdx.md) - Reading local markdown files and swapping HTML for React.
-- [**State & Hooks**](./architecture/state.md) - URL-based filtering and custom React hooks.
-- [**UI & Animations**](./architecture/ui.md) - Tailwind v4, custom cursors, and Framer Motion effects.
-- [**Message Board**](./architecture/message-board.md) - Spam protection, rate limiting, and admin commands.
+- [**State & Hooks**](./architecture/state.md) - URL based filtering and custom React hooks.
+- [**UI & Animations**](./architecture/ui.md) - Tailwind v4, custom cursors and Framer Motion effects.
+- [**Message Board**](./architecture/message-board.md) - Spam protection, rate limiting and admin commands.
 
 ---
 
 ## Features & How It Works
 
-This portfolio is built to be fast, secure, and easy to maintain.
+This portfolio is built to be fast, secure and easy to maintain.
 
 ### Hosting & SEO
 
@@ -38,19 +38,19 @@ This portfolio is built to be fast, secure, and easy to maintain.
 
 - **Serverless Database**: Powered by Neon Postgres and queried safely using Drizzle ORM.
 - **View Counter**: We track page views in batches. This keeps the site running fast because we don't hit the database for every single click.
-- **Message Board**: A public guestbook with built-in spam protection and rate limiting to block bots.
+- **Message Board**: A public guestbook with built in spam protection and rate limiting to block bots.
 
 ### Content & Components
 
-- **Markdown (MDX)**: All blogs and projects are written in Markdown. We read these files locally and swap standard HTML for custom React components — styled links, tables, callouts, steps, tabs, and zoomable images all render through our own components.
+- **Markdown (MDX)**: All blogs and projects are written in Markdown. We read these files locally and swap standard HTML for custom React components — styled links, tables, callouts, steps, tabs and zoomable images all render through our own components.
 - **Shadcn Registry**: Developers can use the Shadcn CLI to download components directly from this site using `npx shadcn add <component>`.
 - **Weekly Emails**: An automated cron job sends the site admin a weekly summary of new newsletter subscribers.
 
 ### Styling & Standards
 
-- **Fast Animations**: We use Framer Motion for smooth physics-based animations, and load the animation code lazily so the page doesn't feel heavy.
+- **Fast Animations**: We use Framer Motion for smooth physics based animations and load the animation code lazily so the page doesn't feel heavy.
 - **Tailwind v4**: The design system uses Tailwind CSS v4 and native CSS variables, including a custom mouse cursor that runs purely on fast CSS.
-- **Clean Code Docs**: Our internal code comments strictly explain _how_ things work, and never mention styling or colors. This keeps the documentation relevant even if the design changes later.
+- **Clean Code Docs**: Our internal code comments strictly explain _how_ things work and never mention styling or colors. This keeps the documentation relevant even if the design changes later.
 - **Formatter**: We use Biome instead of Prettier/ESLint because it is incredibly fast.
 
 ---
@@ -94,4 +94,4 @@ Requirements: Node.js >= 20, npm.
 
 ## License
 
-This project is licensed under the CC-BY-NC-SA-4.0 License. You are free to explore and learn from this source code, but commercial use is prohibited, and you must heavily modify the branding, content, and personal assets before deploying your own iteration.
+This project is licensed under the CC-BY-NC-SA-4.0 License. You are free to explore and learn from this source code, but commercial use is prohibited and you must heavily modify the branding, content and personal assets before deploying your own iteration.

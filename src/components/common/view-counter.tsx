@@ -28,8 +28,8 @@ export function ViewCounter({ slug, readOnly = false, type = 'views' }: ViewCoun
 
   /**
    * A persistent ref is used to track exactly which slug was processed during the current mount cycle.
-   * This guarantees that React StrictMode's double-invocation in development will NEVER artificially
-   * inflate database metrics by double-counting views.
+   * This guarantees that React StrictMode's double invocation in development will NEVER artificially
+   * inflate database metrics by double counting views.
    */
   const processedSlug = useRef<string | null>(null)
 
@@ -37,10 +37,10 @@ export function ViewCounter({ slug, readOnly = false, type = 'views' }: ViewCoun
     if (!effectiveSlug || processedSlug.current === effectiveSlug) return
 
     if (readOnly) {
-      /** Trigger a non-mutating database fetch via the global ViewsContext */
+      /** Trigger a nonmutating database fetch via the global ViewsContext */
       requestView(effectiveSlug)
     } else {
-      /** Fire-and-forget a database increment while optimistically updating the UI */
+      /** Fire and forget a database increment while optimistically updating the UI */
       incrementViews(effectiveSlug)
     }
 

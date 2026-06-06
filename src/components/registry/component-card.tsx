@@ -14,14 +14,14 @@ interface ComponentCardProps {
 }
 
 /**
- * Displays metadata such as the component's name, description, release date, and view count.
+ * Displays metadata such as the component's name, description, release date and view count.
  * Acts as a prefetching navigation link to the component's detailed documentation page.
  *
- * @param item - The registry item data containing slug, name, description, and date.
+ * @param item - The registry item data containing slug, name, description and date.
  * @param className - Optional CSS classes for custom container styling.
  */
 
-/** from needlessly re-parsing these massive string literals on every single re-render of the list. */
+/** from needlessly reparsing these massive string literals on every single rerender of the list. */
 const CARD_BASE_CLASSES =
   'group relative z-10 -mx-2 -my-1.5 flex flex-col rounded-xl px-2 py-1.5 transition-[transform,scale] duration-300 ease-out active:scale-[0.99] active:duration-200 sm:-mx-3 sm:-my-2 sm:px-3 sm:py-2'
 

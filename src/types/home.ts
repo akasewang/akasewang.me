@@ -43,7 +43,7 @@ export interface TestimonialRows {
  */
 export type SkillCategory = (typeof SKILL_CATEGORIES)[number]['value']
 
-/** A single tech-stack skill: its name, icon, optional link, and category. */
+/** A single tech stack skill: its name, icon, optional link and category. */
 export interface Skill {
   id: string
   name: string
@@ -60,7 +60,7 @@ export interface SkillRows {
 
 /**
  * Landing Page Layout
- * High-level configuration tying all home sections together.
+ * High level configuration tying all home sections together.
  */
 export interface LandingPageContent {
   hero: HeroContent

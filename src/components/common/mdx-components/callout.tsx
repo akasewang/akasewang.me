@@ -15,7 +15,7 @@ interface CalloutProps {
   className?: string
 }
 
-/** Per-variant config: icon, label, text accent color, and base hue. */
+/** Per variant config: icon, label, text accent color and base hue. */
 const VARIANTS: Record<
   CalloutType,
   { icon: keyof typeof Icons; label: string; accent: string; hue: string }
@@ -54,7 +54,7 @@ const VARIANTS: Record<
 
 /**
  * A styled MDX admonition box (note, tip, warning, error, success) with an icon, label,
- * and a variant-tinted background.
+ * and a variant tinted background.
  *
  * @param type - The semantic variant of the callout (info, tip, warn, error, success).
  * @param title - Optional custom title to display instead of the default type label.

@@ -24,7 +24,7 @@ const { featuredPosts } = landingPageContent.sections
 
 /**
  * Featured Posts Section.
- * A dual-purpose component that renders a subset of blog posts on the home page.
+ * A dual purpose component that renders a subset of blog posts on the home page.
  * or acts as the fully searchable/filterable list on the main `/blogs` listing.
  */
 export function FeaturedPosts({ filterType, searchQuery, posts }: FeaturedPostsProps) {

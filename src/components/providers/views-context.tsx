@@ -221,7 +221,7 @@ export function ViewsProvider({ children }: { children: ReactNode }) {
 
 /**
  * Hook to access the views context.
- * Provides methods for fetching, incrementing, and batching view count updates.
+ * Provides methods for fetching, incrementing and batching view count updates.
  * Must be used within a `<ViewsProvider>`.
  *
  * @returns The context containing view management methods.

@@ -10,7 +10,7 @@ interface NewTagProps {
 }
 
 /**
- * An animated "New" badge (shimmer sweep + spring entrance) for recently-added items.
+ * An animated "New" badge (shimmer sweep + spring entrance) for recently added items.
  *
  * @param className - Optional CSS classes for custom sizing or positioning.
  */

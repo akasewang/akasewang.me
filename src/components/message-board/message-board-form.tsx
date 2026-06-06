@@ -19,8 +19,8 @@ const ADMIN_LOGIN_PREFIX = process.env.NEXT_PUBLIC_ADMIN_LOGIN_PREFIX || '/admin
 const mbToast = toastContent.messageBoard
 
 /**
- * A client-side form component for submitting messages to the message board.
- * Includes built-in honeypot spam protection, rate limiting countdowns,
+ * A client side form component for submitting messages to the message board.
+ * Includes built in honeypot spam protection, rate limiting countdowns,
  * and secret admin command parsing (`/admin password`, `/logout`).
  *
  * @returns A fully interactive form with animated submission states.
