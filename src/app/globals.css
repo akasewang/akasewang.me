@@ -68,6 +68,9 @@
     /* blue-500 */
     --verified: oklch(0.623 0.214 259.815);
 
+    /* blue-600 */
+    --verified-deep: oklch(0.546 0.245 262.881);
+
     /* green-500 */
     --success: oklch(0.696 0.170 162.000);
 
@@ -109,6 +112,9 @@
 
     /* spacing */
     --spacing: 0.25rem;
+
+    /* announcement banner height; toggled to 0 once dismissed */
+    --banner-offset: 0px;
   }
 
   /**
@@ -208,6 +214,7 @@
   --color-border: var(--border);
   --color-ring: var(--ring);
   --color-verified: var(--verified);
+  --color-verified-deep: var(--verified-deep);
   --color-success: var(--success);
   --color-warning: var(--warning);
 
@@ -431,6 +438,12 @@
   100% { opacity: 1; transform: translateY(0); }
 }
 
+/** Diagonal light sweep used by the "New" badge and Announcement Banner. */
+@keyframes shimmer {
+  0% { transform: translateX(-100%) skewX(-20deg); }
+  100% { transform: translateX(300%) skewX(-20deg); }
+}
+
 /** Page entry sliding fade-in entrance animation utility. */
 .animate-page-simple {
     animation: page-simple-in 0.6s ease-out both;
@@ -442,6 +455,8 @@
  */
 @media (prefers-reduced-motion: reduce) {
   .animate-page-simple { animation: none !important; }
+  .animate-\[shimmer_5s_linear_infinite\] { animation: none !important; }
+  .animate-\[shimmer_2s_linear_infinite\] { animation: none !important; }
   .initials-path { animation: none !important; stroke-dasharray: unset !important; opacity: 1 !important; }
   :is(.tooltip-elegant, .select-content-elegant, .dropdown-elegant)[data-state], .select-check-elegant, .tooltip-elegant, .dropdown-elegant { animation: none !important; transition: opacity 120ms linear; }
 }

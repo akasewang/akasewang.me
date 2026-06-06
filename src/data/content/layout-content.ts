@@ -1,5 +1,10 @@
 import { FULL_NAME } from '@/constants/constants'
-import type { NavbarContent, FooterContent, CommonContent } from '@/types/site'
+import type {
+  NavbarContent,
+  FooterContent,
+  CommonContent,
+  AnnouncementBannerContent,
+} from '@/types/site'
 
 /**
  * Global layout copy: navigation labels, footer attribution, and shared UI strings
@@ -26,4 +31,13 @@ export const footerContent: FooterContent = {
 export const commonContent: CommonContent = {
   pronounceName: 'Pronounce my name',
   backToTop: 'Back to Top',
+}
+
+/**
+ * Top announcement banner content.
+ */
+export const announcementBanner: AnnouncementBannerContent = {
+  message: "click here to see my designs (my mom says they're very nice)",
+  href: 'https://noddy.studio/',
+  dismissLabel: 'Dismiss banner',
 }

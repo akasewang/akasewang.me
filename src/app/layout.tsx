@@ -4,6 +4,7 @@ import { Analytics } from '@vercel/analytics/react'
 
 import { Navbar } from '@/components/layout/navbar'
 import { Footer } from '@/components/layout/footer'
+import { AnnouncementBanner } from '@/components/layout/announcement-banner'
 import { ViewsProvider } from '@/components/providers/views-context'
 import { Toaster } from '@/components/ui/sonner'
 import { BackToTop } from '@/components/common/back-to-top'
@@ -71,6 +72,12 @@ const jsonLd = [
 ]
 
 /**
+ * Pre-paint script that reserves the announcement banner's height via `--banner-offset`
+ * before hydration, preventing a layout shift when the banner mounts.
+ */
+const bannerOffsetScript = `document.documentElement.style.setProperty('--banner-offset','2.5rem')`
+
+/**
  * Main application layout that wraps all pages.
  * Wraps the DOM tree in global context providers (Tooltips, View tracking, Toasters).
  */
@@ -80,6 +87,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       lang="en"
       className={`${fontSans.variable} ${fontSerif.variable} ${fontMono.variable} scroll-smooth`}
       data-scroll-behavior="smooth"
+      suppressHydrationWarning
     >
       <head>
         <link rel="preload" href="/profpic.png" as="image" />
@@ -87,12 +95,14 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
+        <script dangerouslySetInnerHTML={{ __html: bannerOffsetScript }} />
       </head>
       <body className="bg-background font-sans text-foreground antialiased">
         <MotionProvider>
           <TooltipProvider delayDuration={0}>
             <ViewsProvider>
-              <div className="mx-auto flex min-h-screen max-w-[800px] flex-col pb-20 pt-12 md:pb-12">
+              <AnnouncementBanner />
+              <div className="mx-auto flex min-h-screen max-w-[800px] flex-col pb-20 pt-[calc(3rem_+_var(--banner-offset,0px))] transition-[padding] duration-300 ease-out md:pb-12">
                 <Navbar />
                 <main className="flex-grow px-8 py-12">{children}</main>
                 <Footer />

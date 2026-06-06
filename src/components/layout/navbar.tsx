@@ -43,13 +43,13 @@ export function Navbar() {
   })
 
   return (
-    <nav className="absolute inset-x-0 top-0 z-50">
+    <nav className="absolute inset-x-0 top-[var(--banner-offset,0px)] z-50 transition-[top] duration-300 ease-out">
       <div className="mx-auto px-8 py-6">
         <div className="flex items-center justify-between md:justify-end">
           <Link
             href="/"
             aria-label={navbarContent.home}
-            className="relative flex h-8 shrink-0 items-center justify-center text-primary transition-colors duration-300 md:fixed md:left-8 md:top-6"
+            className="relative flex h-8 shrink-0 items-center justify-center text-primary transition-[color,top] duration-300 md:fixed md:left-8 md:top-[calc(1.5rem_+_var(--banner-offset,0px))]"
           >
             <Icons.initials className="size-9" />
           </Link>

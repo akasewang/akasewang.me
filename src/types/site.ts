@@ -25,6 +25,13 @@ export interface CommonContent {
   backToTop: string
 }
 
+/** Copy and destination for the top announcement banner. */
+export interface AnnouncementBannerContent {
+  message: string
+  href: string
+  dismissLabel: string
+}
+
 /** Generic page header copy (title + subtitle). */
 export interface PageContent {
   title: string
