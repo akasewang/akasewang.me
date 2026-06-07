@@ -123,11 +123,7 @@ export function SocialShare({ url, title, className }: SocialShareProps) {
           </TooltipContent>
         </Tooltip>
 
-        <DropdownMenuContent
-          align="center"
-          sideOffset={6}
-          onCloseAutoFocus={(e) => e.preventDefault()}
-        >
+        <DropdownMenuContent align="center" sideOffset={6}>
           <div className="flex flex-col gap-0.5">
             <DropdownMenuItem
               onSelect={(e) => {

@@ -19,8 +19,30 @@ export const TooltipProvider = ({
 
 /** Tooltip root; wraps a trigger and content pair. */
 export const Tooltip = Root
-/** Element that opens the tooltip on hover/focus. */
-export const TooltipTrigger = Trigger
+
+/**
+ * Element that opens the tooltip on hover or keyboard focus.
+ *
+ * Only keyboard focus (`:focus-visible`) opens the tooltip; pointer clicks and programmatic
+ * focus restoration (such as a dropdown, dialog or sonner toast returning focus to the trigger
+ * on close) are ignored, so the tooltip never reappears without a hover. Those focus events are
+ * suppressed with `preventDefault()`, which Radix treats as a signal to skip its internal open
+ * handler. Hover opens the tooltip through a separate code path and is unaffected.
+ */
+export const TooltipTrigger = forwardRef<
+  ComponentRef<typeof Trigger>,
+  ComponentPropsWithoutRef<typeof Trigger>
+>(({ onFocus, ...props }, ref) => (
+  <Trigger
+    ref={ref}
+    {...props}
+    onFocus={(event) => {
+      onFocus?.(event)
+      if (!event.currentTarget.matches(':focus-visible')) event.preventDefault()
+    }}
+  />
+))
+TooltipTrigger.displayName = Trigger.displayName
 
 /**
  * Renders inside a React Portal to avoid z-index and overflow clipping issues.
