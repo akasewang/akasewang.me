@@ -2,7 +2,7 @@
  * Personal & Site Identity
  * Core configuration for the user portfolio.
  */
-export const SITE_URL = 'https://akasewang.me'
+export const SITE_URL = 'https://www.akasewang.me'
 export const FIRST_NAME = 'Akash'
 export const LAST_NAME = 'Dewangan'
 export const FULL_NAME = `${FIRST_NAME} ${LAST_NAME}`

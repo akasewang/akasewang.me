@@ -45,7 +45,6 @@ next-env.d.ts
 
 # Ignore generated output logs
 *_output*
-*.txt
 
 # Editor directories and files
 .vscode/*

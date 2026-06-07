@@ -25,7 +25,7 @@ export const Tooltip = Root
  *
  * Only keyboard focus (`:focus-visible`) opens the tooltip; pointer clicks and programmatic
  * focus restoration (such as a dropdown, dialog or sonner toast returning focus to the trigger
- * on close) are ignored, so the tooltip never reappears without a hover. Those focus events are
+ * on close) are ignored so the tooltip never reappears without a hover. Those focus events are
  * suppressed with `preventDefault()`, which Radix treats as a signal to skip its internal open
  * handler. Hover opens the tooltip through a separate code path and is unaffected.
  */

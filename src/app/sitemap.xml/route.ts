@@ -1,19 +1,38 @@
 import { getAllBlogPosts } from '@/lib/managers/blog-manager'
 import { getAllProjects } from '@/lib/managers/project-manager'
+import { getAllComponentDocs } from '@/lib/managers/component-manager'
+import { photos } from '@/data/static/photos'
 import { parseDate } from '@/utils/utils'
 import { SITE_URL } from '@/constants/constants'
 
+/** A single sitemap URL entry that may carry image children for Google Images. */
+interface SitemapUrl {
+  url: string
+  lastModified: string
+  priority: string
+  changefreq: string
+  images?: string[]
+}
+
 /**
  * Generates an XML Sitemap for search engine crawlers (Googlebot, Bingbot, etc.).
- * Dynamically aggregates all static routes, blog posts and projects so the site's
- * content stays accurately and freshly indexed.
+ * Dynamically aggregates all static routes, blog posts, projects and component docs so the
+ * site's content stays accurately and freshly indexed. The photos page also lists its gallery
+ * images via the image sitemap extension so they can surface in Google Images.
  *
  * @returns An XML Response containing the full URL set.
  */
 export async function GET(): Promise<Response> {
-  const [blogPosts, projectPosts] = await Promise.all([getAllBlogPosts(), getAllProjects()])
+  const [blogPosts, projectPosts, componentDocs] = await Promise.all([
+    getAllBlogPosts(),
+    getAllProjects(),
+    getAllComponentDocs(),
+  ])
 
   const currentDate = new Date().toISOString()
+
+  /** Absolute URLs of every gallery image surfaced on the `/photos` entry. */
+  const photoImages = photos.map((photo) => `${SITE_URL}${photo.url}`)
 
   const staticPages = [
     { path: '', priority: '1.0', changefreq: 'weekly' },
@@ -28,12 +47,13 @@ export async function GET(): Promise<Response> {
     { path: '/testimonials', priority: '0.7', changefreq: 'monthly' },
   ]
 
-  const urls = [
+  const urls: SitemapUrl[] = [
     ...staticPages.map(({ path, priority, changefreq }) => ({
       url: `${SITE_URL}${path}`,
       lastModified: currentDate,
       priority,
       changefreq,
+      ...(path === '/photos' && photoImages.length > 0 && { images: photoImages }),
     })),
     ...blogPosts.map((post) => ({
       url: `${SITE_URL}/blogs/${post.slug}`,
@@ -47,17 +67,25 @@ export async function GET(): Promise<Response> {
       priority: '0.8',
       changefreq: 'weekly',
     })),
+    ...componentDocs.map((doc) => ({
+      url: `${SITE_URL}/components/${doc.slug}`,
+      lastModified: parseDate(doc.date),
+      priority: '0.7',
+      changefreq: 'weekly',
+    })),
   ]
 
   const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
 ${urls
   .map(
     (page) => `  <url>
     <loc>${page.url}</loc>
     <lastmod>${page.lastModified}</lastmod>
     <priority>${page.priority}</priority>
-    <changefreq>${page.changefreq}</changefreq>
+    <changefreq>${page.changefreq}</changefreq>${(page.images ?? [])
+      .map((image) => `\n    <image:image>\n      <image:loc>${image}</image:loc>\n    </image:image>`)
+      .join('')}
   </url>`,
   )
   .join('\n')}

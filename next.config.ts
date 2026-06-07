@@ -22,9 +22,10 @@ const nextConfig: NextConfig = withMDX({
   pageExtensions: ['ts', 'tsx', 'js', 'jsx', 'md', 'mdx'],
   experimental: {
     /**
-     * The site is served live on several domains (canonical: akasewang.me). Listing every
-     * host here lets Server Actions (newsletter, message board) pass their CSRF/origin check
-     * regardless of which domain the form was submitted from.
+     * Origins permitted to invoke Server Actions. The site serves the same app from several
+     * domains (canonical: www.akasewang.me) and a Server Action rejects any request whose origin
+     * doesn't match an allowed host so each domain must be present for the newsletter and message
+     * board forms to work on it.
      */
     serverActions: {
       allowedOrigins: [
