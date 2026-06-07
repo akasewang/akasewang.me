@@ -72,7 +72,7 @@ export const Tabs = ({ items, defaultIndex = 0, className, children }: TabsProps
     >
       <RadixTabs.List
         aria-label="Tabs"
-        className="flex items-center gap-1 overflow-x-auto px-1 pt-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        className="flex items-center gap-1 overflow-x-auto px-2 pt-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       >
         {validChildren.map((child, i) => {
           const value = i.toString()
@@ -114,7 +114,7 @@ export const Tabs = ({ items, defaultIndex = 0, className, children }: TabsProps
               exit="exit"
               transition={SWIPE_TRANSITION}
               className={cn(
-                'w-full p-1 focus:outline-none flex flex-col gap-3 [&>*]:!my-0 [&>[role=paragraph]]:px-2 [&>p]:px-2 [&>ul]:px-2 [&>ol]:px-2 [&>h1]:px-2 [&>h2]:px-2 [&>h3]:px-2',
+                'w-full p-2 focus:outline-none flex flex-col gap-1.5 [&>*]:!my-0 [&>[role=paragraph]]:px-2 [&>p]:px-2 [&>ul]:px-2 [&>ol]:px-2 [&>h1]:px-2 [&>h2]:px-2 [&>h3]:px-2',
                 activeNode?.props.className,
               )}
             >

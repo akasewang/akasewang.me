@@ -23,16 +23,18 @@ Consider the HTTP headers when setting a session cookie on the root domain versu
 
 <Tabs items={["Root Domain Issue", "Subdomain Isolation"]}>
   <Tab title="Root Domain Issue">
+    This directive tells the browser to include the cookie for `akasewang.me` and all subdomains. A request for a simple image at `cdn.akasewang.me/image.png` will now carry the session payload.
+
     ```http
     Set-Cookie: session_id=xyz123; Domain=akasewang.me; Path=/; HttpOnly; Secure
     ```
-    This directive tells the browser to include the cookie for `akasewang.me` and all subdomains. A request for a simple image at `cdn.akasewang.me/image.png` will now carry the session payload.
   </Tab>
   <Tab title="Subdomain Isolation">
+    This restricts the cookie strictly to `www.akasewang.me` protecting your static assets and APIs from unnecessary payload overhead.
+
     ```http
     Set-Cookie: session_id=xyz123; Domain=www.akasewang.me; Path=/; HttpOnly; Secure
     ```
-    This restricts the cookie strictly to `www.akasewang.me` protecting your static assets and APIs from unnecessary payload overhead.
   </Tab>
 </Tabs>
 
@@ -54,20 +56,22 @@ Because your root domain must hold your `SOA`, `NS` and usually `MX` or `TXT` re
 
 <Tabs items={["Invalid Apex Config", "Valid WWW Config"]}>
   <Tab title="Invalid Apex Config">
+    DNS parsers will reject this zone file. You cannot alias the root node while it holds mandatory infrastructure records.
+
     ```text
     @   IN  SOA   ns1.provider.com. admin.provider.com.
     @   IN  MX    10 mail.provider.com.
     @   IN  CNAME loadbalancer.cloudprovider.com.  ; ILLEGAL - Conflicts with SOA/MX
     ```
-    DNS parsers will reject this zone file. You cannot alias the root node while it holds mandatory infrastructure records.
   </Tab>
   <Tab title="Valid WWW Config">
+    The `www` subdomain is free of root level conflicts allowing seamless load balancer aliasing.
+
     ```text
     @   IN  SOA   ns1.provider.com. admin.provider.com.
     @   IN  MX    10 mail.provider.com.
     www IN  CNAME loadbalancer.cloudprovider.com.  ; PERFECTLY VALID
     ```
-    The `www` subdomain is free of root level conflicts allowing seamless load balancer aliasing.
   </Tab>
 </Tabs>
 

@@ -82,7 +82,7 @@ export function PhotosContent() {
 
   return (
     <>
-      <div className="z-50 mb-6 animate-page-simple md:fixed md:left-8 md:top-24 md:mb-0">
+      <div className="z-50 mb-6 animate-page-simple md:fixed md:left-8 md:top-[calc(6rem_+_var(--banner-offset,0px))] md:mb-0 md:transition-[top] md:duration-300 md:ease-out">
         <button
           onClick={handleToggleView}
           className="relative flex h-8 shrink-0 items-center justify-center text-sm font-medium text-muted-foreground transition-colors duration-300 hover:text-primary"

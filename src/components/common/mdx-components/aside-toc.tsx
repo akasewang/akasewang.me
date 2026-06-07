@@ -29,7 +29,7 @@ export const AsideTOC = ({ content, className }: AsideTOCProps) => {
   return (
     <nav
       className={cn(
-        'not-prose hidden xl:block fixed left-0 top-24 z-50 h-[calc(100vh-6rem)] w-64 pt-4 pl-8',
+        'not-prose hidden xl:block fixed left-0 top-[calc(6rem_+_var(--banner-offset,0px))] z-50 h-[calc(100vh-6rem)] w-64 pt-4 pl-8 transition-[top] duration-300 ease-out',
         className,
       )}
     >
