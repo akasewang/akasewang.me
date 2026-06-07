@@ -20,6 +20,23 @@ const nextConfig: NextConfig = withMDX({
   },
 })({
   pageExtensions: ['ts', 'tsx', 'js', 'jsx', 'md', 'mdx'],
+  experimental: {
+    /**
+     * The site is served live on several domains (canonical: akasewang.me). Listing every
+     * host here lets Server Actions (newsletter, message board) pass their CSRF/origin check
+     * regardless of which domain the form was submitted from.
+     */
+    serverActions: {
+      allowedOrigins: [
+        'akasewang.me',
+        'www.akasewang.me',
+        'akasewang.com',
+        'www.akasewang.com',
+        'akashdewangan.com',
+        'www.akashdewangan.com',
+      ],
+    },
+  },
   images: {
     formats: ['image/webp', 'image/avif'],
     minimumCacheTTL: 60 * 60 * 24 * 30,

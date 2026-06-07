@@ -13,12 +13,7 @@
       "type": "image/x-icon"
     },
     {
-      "src": "/initials.svg",
-      "sizes": "any",
-      "type": "image/svg+xml"
-    },
-    {
-      "src": "/initials-bg.svg",
+      "src": "/icon.svg",
       "sizes": "any",
       "type": "image/svg+xml"
     }
