@@ -1,0 +1,60 @@
+---
+title: Why I Use WWW as my Canonical URL
+excerpt: The World Wide Web prefix is often viewed as a relic of the 90s but there are solid engineering and infrastructure reasons why keeping the www subdomain is the safest choice for a growing project.
+date: '2026-06-07'
+slug: why-i-use-www
+type: technical
+tags: ['dns', 'infrastructure', 'web development', 'architecture']
+---
+
+If you look at the URL bar right now you will notice something that many modern web developers try to avoid: the `www` prefix. 
+
+In recent years the trend has heavily skewed toward naked or apex domains. After all `domain.com` looks significantly cleaner and shorter than `www.domain.com`. It fits nicely on business cards, social media bios and gives off a modern minimalist aesthetic. The `www` prefix is often dismissed as a relic of the 1990s originally used to differentiate web traffic from FTP or mail servers.
+
+Despite the aesthetic appeal of the naked domain I intentionally chose to use `www` as the canonical URL for my site. Here is a breakdown of the technical and architectural reasons behind that decision.
+
+## 1. The Cookie Leakage Problem
+
+One of the most compelling reasons to use a subdomain like `www` involves how browsers handle cookies.
+
+When you set a cookie on a naked domain (`akasewang.me`) the browser automatically sends that cookie to all subdomains. If I were to spin up an API at `api.akasewang.me` or a static asset CDN at `cdn.akasewang.me` every single request to those subdomains would needlessly carry the cookies from my main website.
+
+This causes a few significant problems:
+
+- **Performance:** Appending unneeded cookies to every request wastes bandwidth especially for static assets like images and fonts.
+- **Security:** If your main site stores sensitive session data leaking those cookies to third party subdomains or microservices increases your attack surface.
+- **Caching:** CDNs often bypass cache entirely if they see a `Cookie` header on an incoming request. 
+
+By using `www.akasewang.me` as the primary site any cookies set there stay strictly locked to the `www` subdomain. My other subdomains remain perfectly isolated and stateless.
+
+## 2. DNS Flexibility and the CNAME Limitation
+
+At the DNS level the apex domain (`akasewang.me`) comes with a strict limitation defined by the DNS protocol: you cannot assign a CNAME record to the root domain.
+
+A `CNAME` (Canonical Name) record allows you to alias one name to another name. This is critical for modern cloud infrastructure where load balancers (like AWS ELB or Heroku routers) give you a dynamic hostname rather than a static IP address.
+
+Because you cannot put a CNAME on the root domain you are forced to use an `A Record` which points to a hardcoded static IP address. If that server goes down or changes IPs your site breaks until the DNS propagates.
+
+With a `www` subdomain you can freely use a CNAME. You can point `www.akasewang.me` directly to your cloud provider load balancer hostname allowing them to dynamically route traffic, cycle IP addresses and handle DDoS mitigation without you ever touching your DNS settings.
+
+<Callout type="info" title="What about CNAME Flattening?">
+  Modern DNS providers like Cloudflare, Vercel and Netlify solve this issue using a technique called CNAME Flattening or ALIAS records which simulate a CNAME at the root level. While this is a great workaround it locks you into using specific DNS providers that support this non standard feature. Sticking with `www` means your DNS works flawlessly everywhere.
+</Callout>
+
+## 3. Strict Separation of Concerns
+
+Using a naked domain conflates the concept of the organization with the website. 
+
+From an infrastructure perspective `akasewang.me` is my root entity. It owns my email routing (MX records), text verification (TXT records) and all my infrastructure routing. My website is simply one service hosted under that entity. 
+
+By explicitly placing the website at `www.akasewang.me` I establish a clean logical separation of concerns. The website has its own dedicated namespace just like a blog, a dashboard or an API would.
+
+## Conclusion
+
+Choosing between a naked domain and a `www` domain usually boils down to a tradeoff between aesthetics and technical flexibility. 
+
+For a simple personal portfolio you can absolutely get away with a naked domain especially since modern providers like Vercel handle the heavy lifting of DNS routing. However as an engineer I prefer setting up architecture that is robust, scalable and adheres to fundamental networking principles.
+
+By keeping the `www` I ensure strict cookie isolation, maintain total freedom in my choice of DNS and hosting providers and leave the door wide open for future scaling without having to migrate my entire canonical URL structure.
+
+A few extra characters in the URL bar is a small price to pay for technical peace of mind.
