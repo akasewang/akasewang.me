@@ -18,7 +18,7 @@ export const SITE_DESCRIPTION =
  * Constants used for formatting content timestamps and reading times.
  */
 export const READING_SPEED = 200
-export const THIRTY_DAYS_MS = 2592000000
+export const TWO_WEEKS_MS = 1209600000
 export const PRESENT = 'Present'
 export const DATE_DISPLAY_FORMAT = 'dd.MM.yyyy'
 export const DATE_PARSING_PATTERNS = [

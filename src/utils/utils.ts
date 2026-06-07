@@ -10,7 +10,7 @@ import {
   FULL_DATE_REGEX,
   TEXT_MONTH_YEAR_REGEX,
   CAPITALIZE_REGEX,
-  THIRTY_DAYS_MS,
+  TWO_WEEKS_MS,
   PRESENT,
 } from '../constants/constants'
 
@@ -225,5 +225,5 @@ export function isNew(dateStr?: string | Date): boolean {
   if (!date) return false
 
   const diff = Date.now() - date.getTime()
-  return diff >= -86400000 && diff <= THIRTY_DAYS_MS
+  return diff >= -86400000 && diff <= TWO_WEEKS_MS
 }
