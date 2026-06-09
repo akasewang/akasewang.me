@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Icons, VolumeOffIcon, VolumeOnIcon } from '@/components/ui/icons'
+import { Icons } from '@/components/ui/icons'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { SITE, USERNAME } from '@/constants/constants'
 import { navbarContent } from '@/data/content/layout-content'
@@ -51,7 +51,7 @@ export function Navbar() {
     setAudioEnabled(false)
   }
 
-  useKeyboardShortcut('a', handleAudioToggle)
+  useKeyboardShortcut('F1', handleAudioToggle)
 
   useKeyboardShortcut('g', () => {
     navigateSound()
@@ -63,7 +63,7 @@ export function Navbar() {
     window.open('/feed.xml', '_blank', 'noopener,noreferrer')
   })
 
-  const AudioIcon = isAudioEnabled ? VolumeOnIcon : VolumeOffIcon
+  const AudioIcon = isAudioEnabled ? Icons.volumeUp : Icons.volumeMute
 
   return (
     <nav className="absolute inset-x-0 top-[var(--banner-offset,0px)] z-50 transition-[top] duration-300 ease-out">
@@ -101,9 +101,9 @@ export function Navbar() {
               <TooltipTrigger asChild>
                 <button
                   type="button"
-                  aria-label={isAudioEnabled ? 'Turn audio off' : 'Turn audio on'}
+                  aria-label={isAudioEnabled ? 'Turn sound effects off' : 'Turn sound effects on'}
                   aria-pressed={isAudioEnabled}
-                  aria-keyshortcuts="A"
+                  aria-keyshortcuts="F1"
                   onMouseEnter={hoverLink}
                   onClick={handleAudioToggle}
                   className={cn(ICON_BUTTON_STYLES, '-ml-[7px]')}
@@ -111,8 +111,8 @@ export function Navbar() {
                   <AudioIcon className="size-4.5" />
                 </button>
               </TooltipTrigger>
-              <TooltipContent side="bottom" shortcut="A">
-                {isAudioEnabled ? 'Audio On' : 'Audio Off'}
+              <TooltipContent side="bottom" shortcut="F1">
+                {isAudioEnabled ? 'Sound Effects On' : 'Sound Effects Off'}
               </TooltipContent>
             </Tooltip>
 

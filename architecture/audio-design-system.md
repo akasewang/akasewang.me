@@ -10,8 +10,8 @@ To ensure a consistent, premium tactile experience across the portfolio, all int
 
 ---
 
-## Global Audio Preference
-The navbar audio toggle is the single global mute control. It defaults to enabled on first load, persists via `useAudioPreference`, exposes the `A` keyboard shortcut, and all procedural UI sounds plus real audio playback from `useSoundLazy` must check that preference before playing.
+## Global Sound Effects Preference
+The navbar sound effects toggle is the single global mute control. It defaults to disabled on each page load, stays enabled only in memory for the current page session, exposes the `F1` keyboard shortcut, and all procedural UI sounds plus real audio playback from `useSoundLazy` must check that preference before playing.
 
 When turning audio off, the control may play one final falling `toggle(false)` chime before muting. When turning audio on, it re-enables first and then plays `toggle(true)`.
 
