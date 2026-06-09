@@ -60,7 +60,7 @@ export const TimelineItem = memo(function TimelineItem({
               <Bullet className="mt-[9px]" />
             </div>
           ) : (
-            <span className="mt-0.5 w-5 shrink-0 select-none font-mono text-xs font-medium text-muted-foreground">
+            <span className="mt-[3px] sm:mt-[2px] w-5 shrink-0 select-none font-mono text-xs font-medium text-muted-foreground">
               {(i + 1).toString().padStart(2, '0')}
             </span>
           )}
