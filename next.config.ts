@@ -1,5 +1,5 @@
-import type { NextConfig } from 'next'
 import withMDX from '@next/mdx'
+import type { NextConfig } from 'next'
 
 const securityHeaders = [
   { key: 'X-Content-Type-Options', value: 'nosniff' },
@@ -20,6 +20,11 @@ const nextConfig: NextConfig = withMDX({
   },
 })({
   pageExtensions: ['ts', 'tsx', 'js', 'jsx', 'md', 'mdx'],
+  outputFileTracingIncludes: {
+    '/feed.xml': ['./docs/blogs/**/*'],
+    '/r/*': ['./src/registry/**/*'],
+    '/sitemap.xml': ['./docs/blogs/**/*', './docs/components/**/*', './docs/projects/**/*'],
+  },
   experimental: {
     /**
      * Origins permitted to invoke Server Actions. The site serves the same app from several

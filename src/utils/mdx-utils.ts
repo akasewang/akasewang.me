@@ -1,6 +1,6 @@
 import 'server-only'
-import fs from 'fs/promises'
-import path from 'path'
+import fs from 'node:fs/promises'
+import path from 'node:path'
 import matter from 'gray-matter'
 import { parseAnyDate } from '@/utils/utils'
 
@@ -14,9 +14,9 @@ import { parseAnyDate } from '@/utils/utils'
  */
 export async function resolveMdxFilePath(baseDir: string, slug: string): Promise<string | null> {
   for (const ext of ['.mdx', '.md']) {
-    const p = path.join(baseDir, `${slug}${ext}`)
+    const p = path.join(/* turbopackIgnore: true */ baseDir, `${slug}${ext}`)
     try {
-      await fs.access(p)
+      await fs.access(/* turbopackIgnore: true */ p)
       return p
     } catch {}
   }
@@ -33,7 +33,7 @@ export async function resolveMdxFilePath(baseDir: string, slug: string): Promise
  */
 export async function getMdxSlugs(baseDir: string) {
   try {
-    const entries = await fs.readdir(baseDir, { withFileTypes: true })
+    const entries = await fs.readdir(/* turbopackIgnore: true */ baseDir, { withFileTypes: true })
 
     return entries
       .filter(
@@ -53,7 +53,7 @@ export async function getMdxSlugs(baseDir: string) {
  * @returns An object containing the raw `content` string and parsed `data` object.
  */
 export async function readMdxFile(filePath: string) {
-  const fileContent = await fs.readFile(filePath, 'utf8')
+  const fileContent = await fs.readFile(/* turbopackIgnore: true */ filePath, 'utf8')
   const { content, data } = matter(fileContent)
 
   return {

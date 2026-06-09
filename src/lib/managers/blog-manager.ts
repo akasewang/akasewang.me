@@ -1,7 +1,11 @@
-import { createMdxManager } from './mdx-manager'
+import path from 'node:path'
 import type { BlogPost } from '@/types/blog'
+import { createMdxManager } from './mdx-manager'
 
-const manager = createMdxManager<BlogPost>('blogs', 'blog')
+const manager = createMdxManager<BlogPost>(
+  path.join(/* turbopackIgnore: true */ process.cwd(), 'docs', 'blogs'),
+  'blog',
+)
 
 /**
  * Blog Manager

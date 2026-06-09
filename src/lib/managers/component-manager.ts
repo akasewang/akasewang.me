@@ -1,8 +1,12 @@
-import { createMdxManager } from './mdx-manager'
+import path from 'node:path'
 import type { ComponentPost } from '@/types/component'
+import { createMdxManager } from './mdx-manager'
 
 /** Instantiate a highly optimized, cached MDX parser specifically tuned for the 'components' directory */
-const manager = createMdxManager<ComponentPost>('components', 'component')
+const manager = createMdxManager<ComponentPost>(
+  path.join(/* turbopackIgnore: true */ process.cwd(), 'docs', 'components'),
+  'component',
+)
 
 /**
  * Component Manager

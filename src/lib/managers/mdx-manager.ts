@@ -1,11 +1,10 @@
 import 'server-only'
-import path from 'path'
 import { cache } from 'react'
 import {
-  getMdxSlugs,
-  resolveMdxFilePath,
-  readMdxFile,
   getMdxFrontmatter,
+  getMdxSlugs,
+  readMdxFile,
+  resolveMdxFilePath,
   sortMdxByDate,
 } from '@/utils/mdx-utils'
 
@@ -13,16 +12,14 @@ import {
  * Factory function that creates strongly typed content managers (for blogs, projects, components).
  * Abstracts away the boilerplate of reading MDX files, parsing frontmatter and sorting by date.
  *
- * @param subDirectory - The directory name inside the `docs/` folder (e.g., 'blogs', 'components').
+ * @param directory - The absolute, statically scoped directory containing the MDX files.
  * @param entityName - The singular name of the entity for error logging (e.g., 'blog', 'component').
  * @returns An object with `getSlugs`, `getPost` and `getAll` methods.
  */
 export function createMdxManager<T extends { date: string }>(
-  subDirectory: string,
+  directory: string,
   entityName: string,
 ) {
-  const directory = path.join(process.cwd(), 'docs', subDirectory)
-
   /** Lists the slugs of every MDX document in the directory (for static params). */
   const getSlugs = async () => {
     return getMdxSlugs(directory)
@@ -43,8 +40,13 @@ export function createMdxManager<T extends { date: string }>(
         content,
         data: { ...data, slug } as unknown as T,
       }
-    } catch (error: any) {
-      if (error.code !== 'ENOENT') {
+    } catch (error) {
+      const code =
+        typeof error === 'object' && error !== null && 'code' in error
+          ? (error as { code?: unknown }).code
+          : undefined
+
+      if (code !== 'ENOENT') {
         console.error(`Error fetching ${entityName} [${slug}]:`, error)
       }
       return null
