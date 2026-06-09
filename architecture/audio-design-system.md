@@ -11,7 +11,7 @@ To ensure a consistent, premium tactile experience across the portfolio, all int
 ---
 
 ## Global Audio Preference
-The navbar audio toggle is the single global mute control. It persists via `useAudioPreference`, exposes the `A` keyboard shortcut, and all procedural UI sounds plus real audio playback from `useSoundLazy` must check that preference before playing.
+The navbar audio toggle is the single global mute control. It defaults to enabled on first load, persists via `useAudioPreference`, exposes the `A` keyboard shortcut, and all procedural UI sounds plus real audio playback from `useSoundLazy` must check that preference before playing.
 
 When turning audio off, the control may play one final falling `toggle(false)` chime before muting. When turning audio on, it re-enables first and then plays `toggle(true)`.
 
@@ -76,7 +76,7 @@ Every interactive element still makes a sound on hover (consistency), but the *t
 ## 5. Select & Filter (`select`)
 **Trigger:** Choosing an option without full navigation.
 **Do use on:** Category filters, MDX Tabs, Select/Dropdown menu items (including Social Share network links and the dropdown "copy link" entry), Table-of-Contents heading clicks.
-**Implementation:** `DropdownMenuItem` / `SelectItem` play `select` automatically on selection. Do **not** add a second click sound to their children — that doubles the blip. The menu-item `select` is canonical for anything inside a menu.
+**Implementation:** `DropdownMenuItem` / `SelectItem` play `select` automatically on selection and suppress the menu's automatic close chime for that selection-close cycle. Do **not** add a second click sound to their children — that doubles the blip. The menu-item `select` is canonical for anything inside a menu.
 
 ## 6. Utility (`tap`)
 **Trigger:** A minor, neutral utility action that is neither success, navigation, nor a toggle.

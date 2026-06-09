@@ -2,7 +2,8 @@
 
 import { useCallback, useEffect, useState } from 'react'
 
-const AUDIO_ENABLED_STORAGE_KEY = 'audio-enabled'
+const AUDIO_ENABLED_STORAGE_KEY = 'audio-enabled-v2'
+const LEGACY_AUDIO_ENABLED_STORAGE_KEY = 'audio-enabled'
 
 let audioEnabled = true
 let hasHydratedPreference = false
@@ -18,7 +19,13 @@ function hydrateAudioPreference() {
   if (hasHydratedPreference || typeof window === 'undefined') return
 
   const storedPreference = window.localStorage.getItem(AUDIO_ENABLED_STORAGE_KEY)
-  if (storedPreference !== null) audioEnabled = storedPreference === 'true'
+  if (storedPreference !== null) {
+    audioEnabled = storedPreference === 'true'
+  } else {
+    audioEnabled = true
+    window.localStorage.setItem(AUDIO_ENABLED_STORAGE_KEY, 'true')
+    window.localStorage.removeItem(LEGACY_AUDIO_ENABLED_STORAGE_KEY)
+  }
 
   hasHydratedPreference = true
 }

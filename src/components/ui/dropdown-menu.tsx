@@ -7,19 +7,39 @@ import { MenuHighlight } from '@/components/ui/menu-highlight'
 import { useSoundEffects } from '@/hooks/use-sound-effects'
 import { cn } from '@/utils/utils'
 
+type DropdownSoundContextValue = {
+  markSelectionClose: () => void
+}
+
+const DropdownSoundContext = React.createContext<DropdownSoundContextValue | null>(null)
+
 const DropdownMenu: React.FC<React.ComponentProps<typeof DropdownMenuPrimitive.Root>> = ({
   onOpenChange,
   ...props
 }) => {
   const { toggle } = useSoundEffects()
+  const skipNextCloseSoundRef = React.useRef(false)
+  const markSelectionClose = React.useCallback(() => {
+    skipNextCloseSoundRef.current = true
+  }, [])
+
   return (
-    <DropdownMenuPrimitive.Root
-      onOpenChange={(open) => {
-        toggle(open)
-        onOpenChange?.(open)
-      }}
-      {...props}
-    />
+    <DropdownSoundContext.Provider value={{ markSelectionClose }}>
+      <DropdownMenuPrimitive.Root
+        onOpenChange={(open) => {
+          if (open) {
+            toggle(true)
+          } else if (skipNextCloseSoundRef.current) {
+            skipNextCloseSoundRef.current = false
+          } else {
+            toggle(false)
+          }
+
+          onOpenChange?.(open)
+        }}
+        {...props}
+      />
+    </DropdownSoundContext.Provider>
   )
 }
 
@@ -126,6 +146,8 @@ const DropdownMenuItem = React.forwardRef<
   }
 >(({ className, inset, children, ...props }, ref) => {
   const { select, hoverTick } = useSoundEffects()
+  const soundContext = React.useContext(DropdownSoundContext)
+
   return (
     <DropdownMenuPrimitive.Item
       ref={ref}
@@ -136,6 +158,7 @@ const DropdownMenuItem = React.forwardRef<
       }}
       onSelect={(e) => {
         select()
+        soundContext?.markSelectionClose()
         props.onSelect?.(e)
       }}
       className={cn(
@@ -156,6 +179,8 @@ const DropdownMenuCheckboxItem = React.forwardRef<
   React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.CheckboxItem>
 >(({ className, children, checked, ...props }, ref) => {
   const { select, hoverTick } = useSoundEffects()
+  const soundContext = React.useContext(DropdownSoundContext)
+
   return (
     <DropdownMenuPrimitive.CheckboxItem
       ref={ref}
@@ -167,6 +192,7 @@ const DropdownMenuCheckboxItem = React.forwardRef<
       }}
       onSelect={(e) => {
         select()
+        soundContext?.markSelectionClose()
         props.onSelect?.(e)
       }}
       className={cn(
@@ -190,6 +216,8 @@ const DropdownMenuRadioItem = React.forwardRef<
   React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.RadioItem>
 >(({ className, children, ...props }, ref) => {
   const { select, hoverTick } = useSoundEffects()
+  const soundContext = React.useContext(DropdownSoundContext)
+
   return (
     <DropdownMenuPrimitive.RadioItem
       ref={ref}
@@ -200,6 +228,7 @@ const DropdownMenuRadioItem = React.forwardRef<
       }}
       onSelect={(e) => {
         select()
+        soundContext?.markSelectionClose()
         props.onSelect?.(e)
       }}
       className={cn(

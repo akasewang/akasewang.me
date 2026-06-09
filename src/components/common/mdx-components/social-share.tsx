@@ -74,7 +74,7 @@ const getShareUrl = (network: string, url: string, title: string) => {
  * @param className - Optional CSS classes for custom container styling.
  */
 export function SocialShare({ url, title, className }: SocialShareProps) {
-  const { hoverTick, toggle, error: errorSound } = useSoundEffects()
+  const { hoverTick, error: errorSound } = useSoundEffects()
   const [isOpen, setIsOpen] = useState(false)
   const [copied, setCopied] = useState(false)
 
@@ -91,13 +91,11 @@ export function SocialShare({ url, title, className }: SocialShareProps) {
       toast.success('Link copied to clipboard')
       setTimeout(() => {
         setCopied(false)
-        toggle(false)
         setIsOpen(false)
       }, 1000)
     } catch {
       errorSound()
       toast.error('Failed to copy link')
-      toggle(false)
       setIsOpen(false)
     }
   }

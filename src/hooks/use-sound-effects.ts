@@ -466,8 +466,6 @@ function playMedia(ctx: AudioContext, playing: boolean) {
   })
 }
 
-/** Hook */
-
 /**
  * Provides procedurally generated UI sound effects for interactive elements.
  * Sounds are synthesised in real-time using the Web Audio API. Most cues are short

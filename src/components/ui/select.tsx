@@ -30,14 +30,24 @@ const Select: React.FC<React.ComponentProps<typeof Root>> = ({
   ...props
 }) => {
   const { toggle, select } = useSoundEffects()
+  const skipNextCloseSoundRef = useRef(false)
+
   return (
     <Root
       {...props}
       onOpenChange={(open) => {
-        toggle(open)
+        if (open) {
+          toggle(true)
+        } else if (skipNextCloseSoundRef.current) {
+          skipNextCloseSoundRef.current = false
+        } else {
+          toggle(false)
+        }
+
         onOpenChange?.(open)
       }}
       onValueChange={(value) => {
+        skipNextCloseSoundRef.current = true
         select()
         onValueChange?.(value)
       }}
