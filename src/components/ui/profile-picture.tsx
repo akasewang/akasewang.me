@@ -26,7 +26,7 @@ export function ProfilePicture({ src, alt, className }: ProfilePictureProps) {
   const thread2 = useFluidBlob(1900, true, isInView)
   const thread3 = useFluidBlob(2200, true, isInView)
 
-  const innerBlob = useFluidBlob(2700, false, isInView)
+  const innerBlob = useFluidBlob(1900, true, isInView)
 
   return (
     <div
@@ -40,7 +40,7 @@ export function ProfilePicture({ src, alt, className }: ProfilePictureProps) {
           rotate: thread1.rotate,
           scale: thread1.scale,
         }}
-        className="absolute -inset-[3px] -z-10 border border-primary opacity-70"
+        className="absolute -inset-[3px] -z-10 border border-primary/80 opacity-70"
       />
       <m.div
         suppressHydrationWarning
@@ -49,7 +49,7 @@ export function ProfilePicture({ src, alt, className }: ProfilePictureProps) {
           rotate: thread2.rotate,
           scale: thread2.scale,
         }}
-        className="absolute -inset-[4px] -z-10 border border-primary opacity-50"
+        className="absolute -inset-[3px] -z-10 border border-primary/60 opacity-45"
       />
       <m.div
         suppressHydrationWarning
@@ -58,15 +58,14 @@ export function ProfilePicture({ src, alt, className }: ProfilePictureProps) {
           rotate: thread3.rotate,
           scale: thread3.scale,
         }}
-        className="absolute -inset-[5px] -z-10 border border-primary opacity-30"
+        className="absolute -inset-[3px] -z-10 border border-primary/40 opacity-25"
       />
       <m.div
         suppressHydrationWarning
         style={{
           borderRadius: innerBlob.borderRadius,
-          scale: innerBlob.scale,
         }}
-        className="relative size-full overflow-hidden shadow-[inset_0_0_0_1px_rgba(255,255,255,0.1)]"
+        className="relative size-full overflow-hidden shadow-[inset_0_0_0_1px_rgba(255,255,255,0.12)]"
       >
         <Image
           src={src}
