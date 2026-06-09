@@ -1,14 +1,15 @@
 'use client'
 
-import { useRef, useEffect, memo } from 'react'
+import { m, useInView } from 'framer-motion'
 import Image from 'next/image'
 import Link from 'next/link'
-import { m, useInView } from 'framer-motion'
-import { SPRING_TRANSITION } from '@/constants/ui'
+import { memo, useEffect, useRef } from 'react'
 import { ViewCounter } from '@/components/common/view-counter'
 import { NewTag } from '@/components/ui/new-tag'
-import { formatDateString, isNew } from '@/utils/utils'
+import { SPRING_TRANSITION } from '@/constants/ui'
+import { useSoundEffects } from '@/hooks/use-sound-effects'
 import type { ProjectPostData } from '@/types/project'
+import { formatDateString, isNew } from '@/utils/utils'
 
 /** Props for {@link ProjectCard}. */
 interface ProjectCardProps {
@@ -22,6 +23,7 @@ interface ProjectCardProps {
  */
 export const ProjectCard = memo(function ProjectCard({ project }: ProjectCardProps) {
   const { title, slug, video, image, date, period } = project
+  const { hoverCard, navigate: navigateSound } = useSoundEffects()
   const videoRef = useRef<HTMLVideoElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
 
@@ -49,7 +51,13 @@ export const ProjectCard = memo(function ProjectCard({ project }: ProjectCardPro
       exit={{ opacity: 0, scale: 0.96 }}
       transition={SPRING_TRANSITION}
     >
-      <Link href={`/projects/${slug}`} prefetch={false} className="group block w-full rounded-xl">
+      <Link
+        href={`/projects/${slug}`}
+        prefetch={false}
+        onMouseEnter={hoverCard}
+        onClick={navigateSound}
+        className="group block w-full rounded-xl"
+      >
         <div
           ref={containerRef}
           className="relative aspect-[16/10] w-full overflow-hidden rounded-xl bg-card ring-1 ring-inset ring-ring/80 retina:ring-[0.5px] transition-[box-shadow,transform,scale] duration-300 ease-out md:group-hover:ring-ring md:group-hover:shadow-2xl md:active:scale-[0.98] md:active:duration-200 md:active:shadow-none"

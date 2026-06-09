@@ -1,10 +1,12 @@
 'use client'
 
-import { testimonials } from '@/data/static/testimonials'
-import { InfiniteCarousel } from '@/components/ui/infinite-carousel'
-import { CarouselButton } from '@/components/ui/carousel-button'
+import { useRouter } from 'next/navigation'
 import { TestimonialCard } from '@/components/testimonials/testimonial-card'
+import { CarouselButton } from '@/components/ui/carousel-button'
+import { InfiniteCarousel } from '@/components/ui/infinite-carousel'
+import { testimonials } from '@/data/static/testimonials'
 import { useKeyboardShortcut } from '@/hooks/use-keyboard-shortcut'
+import { useSoundEffects } from '@/hooks/use-sound-effects'
 import type { Testimonial } from '@/types/home'
 
 const CAROUSEL_OPTIONS = {
@@ -26,7 +28,13 @@ const SHARED_CAROUSEL_PROPS = {
  * Includes a global keyboard shortcut ('T') to navigate to the full testimonials directory.
  */
 export function Testimonials() {
-  useKeyboardShortcut('T', '/testimonials')
+  const router = useRouter()
+  const { navigate: navigateSound } = useSoundEffects()
+
+  useKeyboardShortcut('T', () => {
+    navigateSound()
+    router.push('/testimonials')
+  })
 
   return (
     <section id="testimonials" className="animate-page-simple">

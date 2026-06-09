@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { isAudioEnabled } from '@/hooks/use-audio-preference'
 
 type CacheEntry = { buffer: AudioBuffer; loading: Promise<AudioBuffer> }
 
@@ -106,7 +107,9 @@ export function useSoundLazy(url: string) {
   }, [load])
 
   const play = useCallback(
-    (volume: number = 1) => {
+    (volume: number = 1, forcePlay: boolean = false) => {
+      if (!forcePlay && !isAudioEnabled()) return
+
       const audioCtx = getAudioContext()
       if (!audioCtx) return
 

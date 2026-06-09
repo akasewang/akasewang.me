@@ -1,16 +1,17 @@
 'use client'
 
-import { useState, useRef } from 'react'
-import { useStatusTimer } from '@/hooks/use-status-timer'
-import { useAdmin } from '@/hooks/use-admin'
-import { submitMessageBoardMessage } from '@/lib/actions/message-board-actions'
-import { messageBoardContent as mbContent } from '@/data/content/message-board-content'
-import { toastContent } from '@/data/content/toast-content'
-import { Icons } from '@/components/ui/icons'
+import { useRef, useState } from 'react'
+import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
+import { Icons } from '@/components/ui/icons'
 import { Input } from '@/components/ui/input'
 import { TextArea } from '@/components/ui/text-area'
-import { toast } from 'sonner'
+import { messageBoardContent as mbContent } from '@/data/content/message-board-content'
+import { toastContent } from '@/data/content/toast-content'
+import { useAdmin } from '@/hooks/use-admin'
+import { useSoundEffects } from '@/hooks/use-sound-effects'
+import { useStatusTimer } from '@/hooks/use-status-timer'
+import { submitMessageBoardMessage } from '@/lib/actions/message-board-actions'
 
 /** Secret message that, when posted, logs the admin out instead of submitting. */
 const ADMIN_LOGOUT_COMMAND = process.env.NEXT_PUBLIC_ADMIN_LOGOUT_COMMAND || '/logout'
@@ -29,13 +30,15 @@ export function MessageBoardForm() {
   const [isPending, setIsPending] = useState(false)
   const { success, countdown, startCountdown, showError, resetStatus } =
     useStatusTimer('message-board')
+  const { error: errorSound, success: successSound, destructive } = useSoundEffects()
   const { loginAdmin, logoutAdmin } = useAdmin()
   const formRef = useRef<HTMLFormElement>(null)
 
   const isDisabled = isPending || countdown > 0
 
-  const handleAdminCommand = (message: string) => {
+  const handleAdminCommand = (message: string, playSound: () => void) => {
     formRef.current?.reset()
+    playSound()
     toast.success(message)
   }
 
@@ -49,7 +52,7 @@ export function MessageBoardForm() {
      */
     if (trimmedMessage === ADMIN_LOGOUT_COMMAND) {
       logoutAdmin()
-      return handleAdminCommand(mbToast.adminLogout)
+      return handleAdminCommand(mbToast.adminLogout, destructive)
     }
 
     /**
@@ -60,7 +63,7 @@ export function MessageBoardForm() {
       const password = trimmedMessage.slice(ADMIN_LOGIN_PREFIX.length).trim()
       if (password) {
         loginAdmin(password)
-        return handleAdminCommand(mbToast.adminLogin)
+        return handleAdminCommand(mbToast.adminLogin, successSound)
       }
     }
 
@@ -72,6 +75,7 @@ export function MessageBoardForm() {
 
       if (!result.success) {
         showError(result.error, result.error === mbToast.rateLimit ? 300 : undefined)
+        errorSound()
         toast.error(result.error)
       } else {
         formRef.current?.reset()
@@ -79,6 +83,7 @@ export function MessageBoardForm() {
         toast.success(mbToast.success)
       }
     } catch {
+      errorSound()
       toast.error(mbToast.connectionError)
     } finally {
       setIsPending(false)
@@ -87,10 +92,7 @@ export function MessageBoardForm() {
 
   return (
     <form ref={formRef} action={action} className="flex flex-col gap-4">
-      {/*
-       * Honeypot field: Invisible to legitimate users but filled out by automated spam bots.
-       * If the server detects a value in this field, it silently rejects the request.
-       */}
+      {/** Honeypot field that automated spam bots fill out and the server silently rejects. */}
       <input type="text" name="honey" className="hidden" tabIndex={-1} autoComplete="off" />
 
       <Input

@@ -1,24 +1,25 @@
 'use client'
 
+import * as RadixTabs from '@radix-ui/react-tabs'
+import { AnimatePresence, m } from 'framer-motion'
 import {
   Children,
   isValidElement,
+  type ReactElement,
+  type ReactNode,
+  useCallback,
   useId,
   useMemo,
   useState,
-  useCallback,
-  type ReactElement,
-  type ReactNode,
 } from 'react'
-import * as RadixTabs from '@radix-ui/react-tabs'
-import { m, AnimatePresence } from 'framer-motion'
-import { cn } from '@/utils/utils'
 import {
-  SPRING_TRANSITION,
   SMOOTH_SPRING_TRANSITION,
+  SPRING_TRANSITION,
   SWIPE_TRANSITION,
   SWIPE_VARIANTS,
 } from '@/constants/ui'
+import { useSoundEffects } from '@/hooks/use-sound-effects'
+import { cn } from '@/utils/utils'
 
 /** Props for {@link Tabs}. */
 interface TabsProps {
@@ -44,6 +45,7 @@ interface TabProps {
  * @param className - Optional CSS classes for custom container styling.
  */
 export const Tabs = ({ items, defaultIndex = 0, className, children }: TabsProps) => {
+  const { select, hoverTick } = useSoundEffects()
   const id = useId()
   const [activeIndex, setActiveIndex] = useState(defaultIndex)
   const [direction, setDirection] = useState(1)
@@ -53,13 +55,17 @@ export const Tabs = ({ items, defaultIndex = 0, className, children }: TabsProps
     [children],
   )
 
-  const handleValueChange = useCallback((val: string) => {
-    const newIndex = parseInt(val, 10)
-    setActiveIndex((prev) => {
-      setDirection(newIndex > prev ? 1 : -1)
-      return newIndex
-    })
-  }, [])
+  const handleValueChange = useCallback(
+    (val: string) => {
+      select()
+      const newIndex = parseInt(val, 10)
+      setActiveIndex((prev) => {
+        setDirection(newIndex > prev ? 1 : -1)
+        return newIndex
+      })
+    },
+    [select],
+  )
 
   const safeIndex = activeIndex < validChildren.length ? activeIndex : 0
   const activeNode = validChildren[safeIndex]
@@ -85,6 +91,7 @@ export const Tabs = ({ items, defaultIndex = 0, className, children }: TabsProps
                 type="button"
                 whileTap={{ scale: 0.97 }}
                 transition={SPRING_TRANSITION}
+                onMouseEnter={hoverTick}
                 className={cn(
                   'group relative flex min-w-16 items-center justify-center rounded-lg px-3 py-1 font-mono text-xs font-medium lowercase transition-colors duration-300',
                   isActive ? 'text-foreground' : 'text-muted-foreground hover:text-foreground/80',

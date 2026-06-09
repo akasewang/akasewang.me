@@ -1,15 +1,16 @@
 'use client'
 
 import { useState } from 'react'
+import { toast } from 'sonner'
 import { Icons } from '@/components/ui/icons'
+import { newsletterContent } from '@/data/content/newsletter-content'
+import { toastContent } from '@/data/content/toast-content'
+import { useSoundEffects } from '@/hooks/use-sound-effects'
 import { useStatusTimer } from '@/hooks/use-status-timer'
+import { subscribeAction } from '@/lib/actions/subscribe'
+import { SectionTitle } from '../layout/section-title'
 import { Button } from '../ui/button'
 import { Input } from '../ui/input'
-import { subscribeAction } from '@/lib/actions/subscribe'
-import { toast } from 'sonner'
-import { toastContent } from '@/data/content/toast-content'
-import { SectionTitle } from '../layout/section-title'
-import { newsletterContent } from '@/data/content/newsletter-content'
 
 /**
  * A form for subscribing to the newsletter, with a postsubmit cooldown (via `useStatusTimer`)
@@ -22,6 +23,7 @@ export function NewsletterSubscription({ hideHeader = false }: { hideHeader?: bo
   const [loading, setLoading] = useState(false)
   const { success, countdown, startCountdown, showError, resetStatus } =
     useStatusTimer('newsletter-sub')
+  const { error: errorSound } = useSoundEffects()
 
   async function handleSubmit(e: React.SyntheticEvent) {
     e.preventDefault()
@@ -45,6 +47,7 @@ export function NewsletterSubscription({ hideHeader = false }: { hideHeader?: bo
       toast.success(successMessage)
     } catch (err) {
       const message = err instanceof Error ? err.message : newsletterContent.errorFallback
+      errorSound()
       toast.error(message)
       showError(message)
     } finally {

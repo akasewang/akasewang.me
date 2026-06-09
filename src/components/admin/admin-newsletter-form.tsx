@@ -1,12 +1,11 @@
 'use client'
 
-import React, { useState } from 'react'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { broadcastNewsletter } from '@/lib/actions/newsletter-actions'
-import type { BlogPost } from '@/types/blog'
-import { Icons } from '@/components/ui/icons'
+import type React from 'react'
+import { useState } from 'react'
 import { toast } from 'sonner'
+import { Button } from '@/components/ui/button'
+import { Icons } from '@/components/ui/icons'
+import { Input } from '@/components/ui/input'
 import {
   Select,
   SelectContent,
@@ -16,7 +15,10 @@ import {
 } from '@/components/ui/select'
 import { adminNewsletterContent } from '@/data/content/admin-content'
 import { toastContent } from '@/data/content/toast-content'
+import { useSoundEffects } from '@/hooks/use-sound-effects'
 import { useStatusTimer } from '@/hooks/use-status-timer'
+import { broadcastNewsletter } from '@/lib/actions/newsletter-actions'
+import type { BlogPost } from '@/types/blog'
 
 /**
  * Admin only form to broadcast a selected blog post to all subscribers.
@@ -28,6 +30,7 @@ export function AdminNewsletterForm({ blogs }: { blogs: BlogPost[] }) {
   const [selectedBlogSlug, setSelectedBlogSlug] = useState(blogs[0]?.slug || '')
   const [loading, setLoading] = useState(false)
   const { success, countdown, startCountdown, resetStatus } = useStatusTimer('admin-newsletter')
+  const { error: errorSound } = useSoundEffects()
 
   async function handleSubmit(e: React.SyntheticEvent) {
     e.preventDefault()
@@ -35,6 +38,7 @@ export function AdminNewsletterForm({ blogs }: { blogs: BlogPost[] }) {
     resetStatus()
 
     if (!adminSecret) {
+      errorSound()
       toast.error(toastContent.newsletter.passwordRequired)
       setLoading(false)
       return
@@ -44,6 +48,7 @@ export function AdminNewsletterForm({ blogs }: { blogs: BlogPost[] }) {
       const response = await broadcastNewsletter(selectedBlogSlug, adminSecret)
 
       if (!response.success) {
+        errorSound()
         toast.error(response.error)
       } else {
         toast.success(toastContent.newsletter.broadcastSuccess(response.data.count))
@@ -51,6 +56,7 @@ export function AdminNewsletterForm({ blogs }: { blogs: BlogPost[] }) {
         startCountdown(3)
       }
     } catch {
+      errorSound()
       toast.error(toastContent.newsletter.unexpectedError)
     } finally {
       setLoading(false)

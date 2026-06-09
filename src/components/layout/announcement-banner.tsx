@@ -1,10 +1,11 @@
 'use client'
 
-import { useState } from 'react'
 import { AnimatePresence, m } from 'framer-motion'
+import { useState } from 'react'
 import { Icons } from '@/components/ui/icons'
-import { announcementBanner } from '@/data/content/layout-content'
 import { InfiniteCarousel } from '@/components/ui/infinite-carousel'
+import { announcementBanner } from '@/data/content/layout-content'
+import { useSoundEffects } from '@/hooks/use-sound-effects'
 
 /**
  * Dismissible Announcement Banner.
@@ -17,9 +18,11 @@ import { InfiniteCarousel } from '@/components/ui/infinite-carousel'
  * inline script in the root layout to avoid layout shift before hydration.
  */
 export function AnnouncementBanner() {
+  const { tap, clickPop, hoverLink, hoverTick } = useSoundEffects()
   const [visible, setVisible] = useState(true)
 
   const dismiss = () => {
+    tap()
     setVisible(false)
     document.documentElement.style.setProperty('--banner-offset', '0px')
   }
@@ -43,6 +46,8 @@ export function AnnouncementBanner() {
             href={announcementBanner.href}
             target="_blank"
             rel="noopener noreferrer"
+            onMouseEnter={hoverLink}
+            onClick={clickPop}
             className="group relative z-10 flex w-full max-w-[calc(100%-3rem)] overflow-hidden text-sm font-medium text-white/70 transition-colors hover:text-white [mask-image:linear-gradient(to_right,transparent,black_5%,black_95%,transparent)]"
           >
             <InfiniteCarousel
@@ -62,6 +67,7 @@ export function AnnouncementBanner() {
           <button
             type="button"
             onClick={dismiss}
+            onMouseEnter={hoverTick}
             aria-label={announcementBanner.dismissLabel}
             className="absolute right-3 top-1/2 z-10 flex size-6 -translate-y-1/2 items-center justify-center rounded-md text-white/70 transition-colors duration-300 hover:bg-white/10 hover:text-white"
           >

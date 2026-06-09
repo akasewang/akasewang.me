@@ -1,15 +1,16 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
-import { Icons } from '@/components/ui/icons'
-import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip'
-import { CopyButton } from '@/components/ui/copy-button'
 import { SocialShare } from '@/components/common/mdx-components/social-share'
-import { cn } from '@/utils/utils'
+import { CopyButton } from '@/components/ui/copy-button'
+import { Icons } from '@/components/ui/icons'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { useKeyboardShortcut } from '@/hooks/use-keyboard-shortcut'
+import { useSoundEffects } from '@/hooks/use-sound-effects'
+import { cn } from '@/utils/utils'
 
 /** A single prev/next navigation target (slug + title). */
 interface NavItem {
@@ -46,6 +47,12 @@ const BUTTON_DISABLED_STYLES = 'cursor-not-allowed opacity-20'
  * @param title - The title of the current page, passed to the SocialShare component.
  */
 export function SlugNavigation({ prev, next, basePath, content, url, title }: SlugNavigationProps) {
+  const {
+    navigate: navigateSound,
+    hoverTick,
+    success: successSound,
+    error: errorSound,
+  } = useSoundEffects()
   const router = useRouter()
   const [copied, setCopied] = useState(false)
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -56,17 +63,26 @@ export function SlugNavigation({ prev, next, basePath, content, url, title }: Sl
     }
   }, [])
 
-  const handleCopy = () => {
-    navigator.clipboard.writeText(content)
-    setCopied(true)
-    toast.success('MDX content copied to clipboard')
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(content)
+      successSound()
+      setCopied(true)
+      toast.success('MDX content copied to clipboard')
 
-    if (timeoutRef.current) clearTimeout(timeoutRef.current)
-    timeoutRef.current = setTimeout(() => setCopied(false), 1500)
+      if (timeoutRef.current) clearTimeout(timeoutRef.current)
+      timeoutRef.current = setTimeout(() => setCopied(false), 1500)
+    } catch {
+      errorSound()
+      toast.error('Failed to copy MDX content')
+    }
   }
 
   const navigateTo = (item?: NavItem) => {
-    if (item) router.push(`${basePath}/${item.slug}`)
+    if (item) {
+      navigateSound()
+      router.push(`${basePath}/${item.slug}`)
+    }
   }
 
   useKeyboardShortcut('C', handleCopy)
@@ -82,7 +98,11 @@ export function SlugNavigation({ prev, next, basePath, content, url, title }: Sl
           <Link
             href={item ? `${basePath}/${item.slug}` : ''}
             className={cn(BUTTON_BASE_STYLES, item ? BUTTON_ACTIVE_STYLES : BUTTON_DISABLED_STYLES)}
-            onClick={(e) => !item && e.preventDefault()}
+            onClick={(e) => {
+              if (!item) e.preventDefault()
+              else navigateSound()
+            }}
+            onMouseEnter={item ? hoverTick : undefined}
             aria-disabled={!item}
           >
             <Icon size={18} />

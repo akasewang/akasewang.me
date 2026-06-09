@@ -1,15 +1,16 @@
 'use client'
 
-import { useState, useMemo, memo } from 'react'
-import { LinkText } from '@/components/ui/link-text'
-import { Tag } from '@/components/ui/tag'
-import { ExpandToggle } from '@/components/ui/expand-toggle'
+import { memo, useMemo, useState } from 'react'
 import { Bullet } from '@/components/ui/bullet'
+import { ExpandToggle } from '@/components/ui/expand-toggle'
+import { LinkText } from '@/components/ui/link-text'
 import { SeparatorDate } from '@/components/ui/separator-date'
 import { SeparatorSlash } from '@/components/ui/separator-slash'
-import { renderWithLinks } from '@/utils/content-utils'
-import { formatDateString, cn } from '@/utils/utils'
+import { Tag } from '@/components/ui/tag'
+import { useSoundEffects } from '@/hooks/use-sound-effects'
 import type { TimelineItemProps } from '@/types/site'
+import { renderWithLinks } from '@/utils/content-utils'
+import { cn, formatDateString } from '@/utils/utils'
 
 /**
  * Supports rendering markdown style links, lists and technological tags.
@@ -35,6 +36,7 @@ export const TimelineItem = memo(function TimelineItem({
 }: TimelineItemProps) {
   const [isExpanded, setIsExpanded] = useState(defaultExpanded)
   const hasContent = !!description?.length
+  const { toggle, hoverCard } = useSoundEffects()
 
   const parsedLines = useMemo(() => {
     if (!hasContent) return null
@@ -42,12 +44,17 @@ export const TimelineItem = memo(function TimelineItem({
     const validLines = description.map((line) => line.trim()).filter(Boolean)
     if (!validLines.length) return null
 
+    const lineKeyCounts = new Map<string, number>()
+
     return validLines.map((trimmed, i) => {
       const isBullet = trimmed.startsWith('-')
       const content = isBullet ? trimmed.slice(1).trim() : trimmed
+      const keyCount = lineKeyCounts.get(trimmed) ?? 0
+      const lineKey = keyCount ? `${trimmed}-${keyCount}` : trimmed
+      lineKeyCounts.set(trimmed, keyCount + 1)
 
       return (
-        <div key={i} className="flex items-start gap-3">
+        <div key={lineKey} className="flex items-start gap-3">
           {isBullet ? (
             <div className="flex w-5 shrink-0 justify-center">
               <Bullet className="mt-[9px]" />
@@ -63,73 +70,96 @@ export const TimelineItem = memo(function TimelineItem({
     })
   }, [description, hasContent])
 
-  const handleToggle = () => setIsExpanded((prev) => !prev)
+  const isNestedInteractiveTarget = (e: React.SyntheticEvent<HTMLElement>) =>
+    e.target instanceof Element &&
+    e.target !== e.currentTarget &&
+    e.target.closest('a, button, input, select, textarea, [role="button"]') !== e.currentTarget
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
+  const handleToggle = () => {
+    toggle(!isExpanded)
+    setIsExpanded((prev) => !prev)
+  }
+
+  const handleCardClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (isNestedInteractiveTarget(e)) return
+    handleToggle()
+  }
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (isNestedInteractiveTarget(e)) return
+
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault()
       handleToggle()
     }
   }
 
-  const stopPropagation = (e: React.SyntheticEvent) => e.stopPropagation()
+  const itemSummary = (
+    <>
+      <div className="flex-1 pr-8 sm:pr-0">
+        <h3 className="text-balance font-normal text-primary">{title}</h3>
+
+        {!!links?.length && (
+          <div className="relative z-10 mt-0.5 flex w-fit flex-wrap items-center gap-y-1 text-sm text-muted-foreground">
+            {links.map((link, i) => (
+              <div key={`${link.url}-${link.text}`} className="flex items-center">
+                {i > 0 && <SeparatorSlash />}
+                <div className="flex items-center gap-1.5">
+                  {link.prefix && <span className="whitespace-nowrap">{link.prefix}</span>}
+                  <LinkText href={link.url}>{link.text}</LinkText>
+                  {link.suffix && <span className="whitespace-nowrap">{link.suffix}</span>}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <div className="flex items-center justify-between sm:mt-0.5 sm:flex-col sm:items-end sm:gap-2">
+        <div className="whitespace-nowrap font-mono text-[13px] text-muted-foreground">
+          {formatDateString(startDate)}
+          {endDate && (
+            <>
+              <SeparatorDate />
+              {formatDateString(endDate)}
+            </>
+          )}
+        </div>
+
+        {hasContent && (
+          <ExpandToggle
+            isExpanded={isExpanded}
+            className="absolute right-2 top-2.5 text-muted-foreground transition-colors duration-300 group-hover/card:text-primary sm:static sm:-mr-1"
+          />
+        )}
+      </div>
+    </>
+  )
+
+  const itemSummaryClassName = cn(
+    'group/card relative z-10 -mx-2 -my-1.5 flex flex-col gap-3 rounded-xl px-2 py-1.5 transition-[transform,scale] duration-300 ease-out sm:-mx-3 sm:-my-2 sm:flex-row sm:items-start sm:justify-between sm:px-3 sm:py-2',
+    hasContent && 'active:scale-[0.99] active:duration-200',
+  )
 
   return (
     <div id={id} className="scroll-mt-24">
-      <div
-        role={hasContent ? 'button' : undefined}
-        tabIndex={hasContent ? 0 : undefined}
-        aria-expanded={hasContent ? isExpanded : undefined}
-        onClick={hasContent ? handleToggle : undefined}
-        onKeyDown={hasContent ? handleKeyDown : undefined}
-        data-highlight-item={hasContent ? '' : undefined}
-        className={cn(
-          'group/card relative z-10 -mx-2 -my-1.5 flex flex-col gap-3 rounded-xl px-2 py-1.5 transition-[transform,scale] duration-300 ease-out sm:-mx-3 sm:-my-2 sm:flex-row sm:items-start sm:justify-between sm:px-3 sm:py-2',
-          hasContent && 'active:scale-[0.99] active:duration-200',
-        )}
-      >
-        <div className="flex-1 pr-8 sm:pr-0">
-          <h3 className="text-balance font-normal text-primary">{title}</h3>
-
-          {!!links?.length && (
-            <div
-              className="relative z-10 mt-0.5 flex w-fit flex-wrap items-center gap-y-1 text-sm text-muted-foreground"
-              onClick={stopPropagation}
-              onPointerDown={stopPropagation}
-            >
-              {links.map((link, i) => (
-                <div key={`${link.url}-${i}`} className="flex items-center">
-                  {i > 0 && <SeparatorSlash />}
-                  <div className="flex items-center gap-1.5">
-                    {link.prefix && <span className="whitespace-nowrap">{link.prefix}</span>}
-                    <LinkText href={link.url}>{link.text}</LinkText>
-                    {link.suffix && <span className="whitespace-nowrap">{link.suffix}</span>}
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
+      {hasContent ? (
+        /** biome-ignore lint/a11y/useSemanticElements: This expandable summary contains links, so a real button would nest interactive controls. */
+        <div
+          role="button"
+          tabIndex={0}
+          aria-expanded={isExpanded}
+          onClick={handleCardClick}
+          onKeyDown={handleKeyDown}
+          onMouseEnter={hoverCard}
+          data-highlight-item
+          className={itemSummaryClassName}
+        >
+          {itemSummary}
         </div>
-
-        <div className="flex items-center justify-between sm:mt-0.5 sm:flex-col sm:items-end sm:gap-2">
-          <div className="whitespace-nowrap font-mono text-[13px] text-muted-foreground">
-            {formatDateString(startDate)}
-            {endDate && (
-              <>
-                <SeparatorDate />
-                {formatDateString(endDate)}
-              </>
-            )}
-          </div>
-
-          {hasContent && (
-            <ExpandToggle
-              isExpanded={isExpanded}
-              className="absolute right-2 top-2.5 text-muted-foreground transition-colors duration-300 group-hover/card:text-primary sm:static sm:-mr-1"
-            />
-          )}
-        </div>
-      </div>
+      ) : (
+        <div className={itemSummaryClassName}>{itemSummary}</div>
+      )}
 
       {parsedLines && (
         <div

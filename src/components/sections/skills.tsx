@@ -1,10 +1,12 @@
 'use client'
 
-import { skillRows } from '@/data/static/skills'
-import { InfiniteCarousel } from '@/components/ui/infinite-carousel'
-import { CarouselButton } from '@/components/ui/carousel-button'
+import { useRouter } from 'next/navigation'
 import { SkillCard } from '@/components/skills/skill-card'
+import { CarouselButton } from '@/components/ui/carousel-button'
+import { InfiniteCarousel } from '@/components/ui/infinite-carousel'
+import { skillRows } from '@/data/static/skills'
 import { useKeyboardShortcut } from '@/hooks/use-keyboard-shortcut'
+import { useSoundEffects } from '@/hooks/use-sound-effects'
 import type { Skill } from '@/types/home'
 
 const CAROUSEL_OPTIONS = {
@@ -27,7 +29,13 @@ const SHARED_CAROUSEL_PROPS = {
  * Includes a global keyboard shortcut ('S') to navigate to the full skills directory.
  */
 export function Skills() {
-  useKeyboardShortcut('S', '/skills')
+  const router = useRouter()
+  const { navigate: navigateSound } = useSoundEffects()
+
+  useKeyboardShortcut('S', () => {
+    navigateSound()
+    router.push('/skills')
+  })
 
   return (
     <section id="skills" className="animate-page-simple">

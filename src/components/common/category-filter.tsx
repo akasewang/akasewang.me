@@ -1,9 +1,10 @@
 'use client'
 
-import { useId } from 'react'
 import { m } from 'framer-motion'
+import { useId } from 'react'
+import { SMOOTH_SPRING_TRANSITION, SPRING_TRANSITION } from '@/constants/ui'
+import { useSoundEffects } from '@/hooks/use-sound-effects'
 import { cn } from '@/utils/utils'
-import { SPRING_TRANSITION, SMOOTH_SPRING_TRANSITION } from '@/constants/ui'
 
 /** Props for {@link CategoryFilter}. */
 interface CategoryFilterProps<T extends string> {
@@ -25,6 +26,7 @@ export function CategoryFilter<T extends string>({
   value,
   onChange,
 }: CategoryFilterProps<T>) {
+  const { select, hoverTick } = useSoundEffects()
   const id = useId()
 
   return (
@@ -38,7 +40,12 @@ export function CategoryFilter<T extends string>({
             type="button"
             whileTap={{ scale: 0.97 }}
             transition={SPRING_TRANSITION}
-            onClick={() => onChange(catValue)}
+            onClick={() => {
+              if (isActive) return
+              select()
+              onChange(catValue)
+            }}
+            onMouseEnter={hoverTick}
             className={cn(
               'relative flex min-w-12 items-center justify-center rounded-none px-3 py-1 font-mono text-[13px] font-medium lowercase transition-colors duration-300',
               isActive ? 'text-primary-foreground' : 'text-secondary hover:text-primary',

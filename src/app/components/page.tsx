@@ -31,7 +31,7 @@ export default async function ComponentsPage() {
       subtitle={componentsPageContent.subtitle}
       footerText="Feel free to copy and use these in your own projects."
     >
-      {/* Suspend the Tabs component to allow Next.js to stream the page shell instantly while client hooks (like useSearchParams) initialize */}
+      {/** Suspend the Tabs component to allow Next.js to stream the page shell instantly while client hooks initialize. */}
       <Suspense fallback={null}>
         <ComponentTabs allComponents={components} />
       </Suspense>

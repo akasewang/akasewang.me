@@ -1,13 +1,14 @@
 'use client'
 
-import { type ElementType } from 'react'
-import { m, type HTMLMotionProps } from 'framer-motion'
-import { Icons } from '@/components/ui/icons'
-import { AnimatedArrow } from '@/components/ui/animated-arrow'
-import { cn } from '@/utils/utils'
+import { type HTMLMotionProps, m } from 'framer-motion'
+import { type ElementType, useEffect, useRef } from 'react'
 import { toast } from 'sonner'
-import { toastContent } from '@/data/content/toast-content'
+import { AnimatedArrow } from '@/components/ui/animated-arrow'
+import { Icons } from '@/components/ui/icons'
 import { SPRING_TRANSITION } from '@/constants/ui'
+import { toastContent } from '@/data/content/toast-content'
+import { useSoundEffects } from '@/hooks/use-sound-effects'
+import { cn } from '@/utils/utils'
 
 /** Props for {@link Button}. */
 interface ButtonProps extends HTMLMotionProps<'button'> {
@@ -65,18 +66,27 @@ export function Button({
   onClick,
   ...props
 }: ButtonProps) {
+  const { clickPop, hoverTick, error, success: successSound } = useSoundEffects()
   const isSuccessState = isSuccess && countdown > 0
   const isActionActive = isPending || countdown > 0
   const hasRightBox = showArrow || isActionActive
   const isDisabled = disabled || isPending || (countdown > 0 && !isSuccess)
+  const wasSuccessRef = useRef(isSuccessState)
+
+  useEffect(() => {
+    if (isSuccessState && !wasSuccessRef.current) successSound()
+    wasSuccessRef.current = isSuccessState
+  }, [isSuccessState, successSound])
 
   const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     if (countdown > 0) {
+      error()
       e.preventDefault()
       e.stopPropagation()
       toast.error(toastContent.subscribe.wait)
       return
     }
+    clickPop()
     onClick?.(e)
   }
 
@@ -125,6 +135,10 @@ export function Button({
     <m.button
       {...props}
       onClick={handleClick}
+      onMouseEnter={(e) => {
+        if (!isDisabled) hoverTick()
+        props.onMouseEnter?.(e)
+      }}
       disabled={isDisabled}
       whileTap={isDisabled ? undefined : { scale: 0.99 }}
       transition={SPRING_TRANSITION}

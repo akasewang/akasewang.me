@@ -1,12 +1,13 @@
 'use client'
 
 import { memo, useState } from 'react'
-import type { MessageBoardEntry } from '@/types/message-board'
 import { GradientAvatar } from '@/components/ui/gradient-avatar'
-import { FULL_NAME } from '@/constants/constants'
-import { capitalizeName, formatTime, formatDayLabel, cn } from '@/utils/utils'
-import { messageBoardContent } from '@/data/content/message-board-content'
 import { TextArea } from '@/components/ui/text-area'
+import { FULL_NAME } from '@/constants/constants'
+import { messageBoardContent } from '@/data/content/message-board-content'
+import { useSoundEffects } from '@/hooks/use-sound-effects'
+import type { MessageBoardEntry } from '@/types/message-board'
+import { capitalizeName, cn, formatDayLabel, formatTime } from '@/utils/utils'
 
 const t = messageBoardContent.admin
 const contentWidthClass = 'max-w-[85%] sm:max-w-[70%]'
@@ -30,6 +31,7 @@ type MessageBubblesProps = {
  */
 export const MessageBubbles = memo(
   ({ msg, msgDate, showDayHeader, adminKey, onDelete, onReply }: MessageBubblesProps) => {
+    const { tap, clickPop, hoverTick } = useSoundEffects()
     const [isReplying, setIsReplying] = useState(false)
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [replyText, setReplyText] = useState(msg.adminReply || '')
@@ -86,14 +88,23 @@ export const MessageBubbles = memo(
             {adminKey && (
               <div className="ml-2 mt-1.5 flex items-center gap-3">
                 <button
-                  onClick={() => onDelete(msg.id)}
+                  type="button"
+                  onClick={() => {
+                    onDelete(msg.id)
+                  }}
+                  onMouseEnter={hoverTick}
                   className={cn(actionBtnClass, 'text-destructive hover:text-destructive/80')}
                 >
                   {t.delete}
                 </button>
                 {!msg.adminReply && !isReplying && (
                   <button
-                    onClick={() => toggleReply(true)}
+                    type="button"
+                    onClick={() => {
+                      tap()
+                      toggleReply(true)
+                    }}
+                    onMouseEnter={hoverTick}
                     className={cn(actionBtnClass, 'text-foreground hover:text-foreground/80')}
                   >
                     {t.reply}
@@ -121,7 +132,12 @@ export const MessageBubbles = memo(
               </div>
               {adminKey && !isReplying && (
                 <button
-                  onClick={() => toggleReply(true)}
+                  type="button"
+                  onClick={() => {
+                    tap()
+                    toggleReply(true)
+                  }}
+                  onMouseEnter={hoverTick}
                   className={cn(
                     actionBtnClass,
                     'mr-2 mt-1.5 text-foreground hover:text-foreground/80',
@@ -148,14 +164,24 @@ export const MessageBubbles = memo(
               />
               <div className="flex gap-2">
                 <button
-                  onClick={() => toggleReply(false)}
+                  type="button"
+                  onClick={() => {
+                    tap()
+                    toggleReply(false)
+                  }}
+                  onMouseEnter={hoverTick}
                   disabled={isSubmitting}
                   className="rounded-md bg-muted/20 ring-1 ring-inset ring-ring/80 retina:ring-[0.5px] px-4 py-1.5 text-xs font-medium text-muted-foreground transition-[color,background-color,box-shadow,transform,scale] duration-300 hover:bg-muted/50 hover:ring-ring active:scale-[0.98] active:duration-200 disabled:pointer-events-none disabled:opacity-50"
                 >
                   {t.cancel}
                 </button>
                 <button
-                  onClick={handleReplySubmit}
+                  type="button"
+                  onClick={() => {
+                    clickPop()
+                    handleReplySubmit()
+                  }}
+                  onMouseEnter={hoverTick}
                   disabled={!isReplyValid || isSubmitting}
                   className="flex items-center gap-2 rounded-md bg-primary px-4 py-1.5 text-xs font-medium text-primary-foreground transition-[opacity,transform,scale] duration-300 hover:opacity-90 active:scale-[0.98] active:duration-200 disabled:pointer-events-none disabled:opacity-50"
                 >

@@ -1,18 +1,19 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useMemo, useState } from 'react'
 
 import { toast } from 'sonner'
-import { Icons } from '@/components/ui/icons'
-import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip'
-import { cn } from '@/utils/utils'
-import { USERNAME } from '@/constants/constants'
 import {
   DropdownMenu,
-  DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { Icons } from '@/components/ui/icons'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
+import { USERNAME } from '@/constants/constants'
+import { useSoundEffects } from '@/hooks/use-sound-effects'
+import { cn } from '@/utils/utils'
 
 /** Props for {@link SocialShare}. */
 interface SocialShareProps {
@@ -73,6 +74,7 @@ const getShareUrl = (network: string, url: string, title: string) => {
  * @param className - Optional CSS classes for custom container styling.
  */
 export function SocialShare({ url, title, className }: SocialShareProps) {
+  const { hoverTick, toggle, error: errorSound } = useSoundEffects()
   const [isOpen, setIsOpen] = useState(false)
   const [copied, setCopied] = useState(false)
 
@@ -89,17 +91,21 @@ export function SocialShare({ url, title, className }: SocialShareProps) {
       toast.success('Link copied to clipboard')
       setTimeout(() => {
         setCopied(false)
+        toggle(false)
         setIsOpen(false)
       }, 1000)
     } catch {
+      errorSound()
       toast.error('Failed to copy link')
+      toggle(false)
       setIsOpen(false)
     }
   }
 
   const triggerButton = (
     <button
-      onClick={() => setIsOpen((prev) => !prev)}
+      type="button"
+      onMouseEnter={hoverTick}
       className={cn(
         'relative flex size-8 items-center justify-center rounded-lg bg-transparent text-secondary ring-1 ring-transparent retina:ring-[0.5px] transition-[color,background-color,transform,scale,box-shadow] duration-300 ease-in-out hover:bg-accent hover:ring-accent-border hover:text-primary active:scale-[0.95] active:duration-200',
         isOpen && 'bg-accent ring-accent-border text-primary scale-[0.95]',
@@ -142,12 +148,7 @@ export function SocialShare({ url, title, className }: SocialShareProps) {
 
               return (
                 <DropdownMenuItem key={option.name} asChild>
-                  <a
-                    href={option.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={() => setIsOpen(false)}
-                  >
+                  <a href={option.href} target="_blank" rel="noopener noreferrer">
                     <Icon />
                     <span>
                       {actionText} {option.name.toLowerCase()}

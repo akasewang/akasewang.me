@@ -1,9 +1,17 @@
 'use client'
 
-import { useState, useRef, useEffect, type MouseEvent } from 'react'
+import { AnimatePresence, m } from 'framer-motion'
 import Image from 'next/image'
-import { m, AnimatePresence } from 'framer-motion'
+import {
+  type KeyboardEvent,
+  type MouseEvent,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from 'react'
 import { Icons } from '@/components/ui/icons'
+import { useSoundEffects } from '@/hooks/use-sound-effects'
 
 /** Props for {@link ProjectDemo}. */
 interface ProjectDemoProps {
@@ -21,6 +29,7 @@ interface ProjectDemoProps {
  * @param title - Accessibility title for the media content.
  */
 export function ProjectDemo({ image, video, title }: ProjectDemoProps) {
+  const { hoverCard, media } = useSoundEffects()
   const [state, setState] = useState({
     isPlaying: true,
     isBuffering: true,
@@ -34,23 +43,40 @@ export function ProjectDemo({ image, video, title }: ProjectDemoProps) {
   const hideTimerRef = useRef<NodeJS.Timeout | null>(null)
   const fallbackImage = image || '/default-image-project.webp'
 
-  const updateState = (updates: Partial<typeof state>) =>
+  const updateState = useCallback((updates: Partial<typeof state>) => {
     setState((prev) => ({ ...prev, ...updates }))
+  }, [])
 
-  const resetHideTimer = () => {
-    if (hideTimerRef.current) clearTimeout(hideTimerRef.current)
-    updateState({ showControls: true })
-    if (!state.isPlaying)
-      hideTimerRef.current = setTimeout(() => updateState({ showControls: false }), 5000)
-  }
+  const resetHideTimer = useCallback(
+    (isPlayingOverride = state.isPlaying) => {
+      if (hideTimerRef.current) clearTimeout(hideTimerRef.current)
+      updateState({ showControls: true })
+      if (!isPlayingOverride)
+        hideTimerRef.current = setTimeout(() => updateState({ showControls: false }), 5000)
+    },
+    [state.isPlaying, updateState],
+  )
 
-  const togglePlay = (e: MouseEvent) => {
-    e.stopPropagation()
+  const togglePlay = () => {
     if (!videoRef.current) return
     const isPlaying = !state.isPlaying
+    media(isPlaying)
     isPlaying ? videoRef.current.play() : videoRef.current.pause()
     updateState({ isPlaying })
-    resetHideTimer()
+    resetHideTimer(isPlaying)
+  }
+
+  const handleToggleClick = (e: MouseEvent) => {
+    e.stopPropagation()
+    togglePlay()
+  }
+
+  const handleToggleKeyDown = (e: KeyboardEvent<HTMLElement>) => {
+    if (e.key !== 'Enter' && e.key !== ' ') return
+
+    e.preventDefault()
+    e.stopPropagation()
+    togglePlay()
   }
 
   const handleSeek = (e: MouseEvent) => {
@@ -70,26 +96,30 @@ export function ProjectDemo({ image, video, title }: ProjectDemoProps) {
     }
     document.addEventListener('mousedown', handleClickOutside)
     return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [])
+  }, [updateState])
 
   useEffect(() => {
     resetHideTimer()
     return () => {
       if (hideTimerRef.current) clearTimeout(hideTimerRef.current)
     }
-  }, [state.isPlaying])
+  }, [resetHideTimer])
 
   return (
     <div className="my-8 w-full not-prose" ref={containerRef}>
       <figure
         className="group/demo relative isolate m-0 select-none overflow-hidden rounded-xl bg-muted/40 motion-safe:animate-in motion-safe:fade-in-0 motion-safe:duration-500"
         onMouseEnter={() => {
+          if (video) hoverCard()
           updateState({ isHovered: true })
           resetHideTimer()
         }}
         onMouseLeave={() => updateState({ isHovered: false })}
-        onMouseMove={resetHideTimer}
-        onClick={togglePlay}
+        onMouseMove={() => resetHideTimer()}
+        onClick={video ? handleToggleClick : undefined}
+        onKeyDown={video ? handleToggleKeyDown : undefined}
+        role={video ? 'button' : undefined}
+        tabIndex={video ? 0 : undefined}
       >
         <div className="relative aspect-video w-full">
           {video ? (
@@ -101,13 +131,15 @@ export function ProjectDemo({ image, video, title }: ProjectDemoProps) {
                 muted
                 loop
                 playsInline
-                onTimeUpdate={() =>
-                  videoRef.current &&
-                  setTime((prev) => ({
-                    ...prev,
-                    current: videoRef.current!.currentTime,
-                  }))
-                }
+                onTimeUpdate={() => {
+                  const videoEl = videoRef.current
+                  if (videoEl) {
+                    setTime((prev) => ({
+                      ...prev,
+                      current: videoEl.currentTime,
+                    }))
+                  }
+                }}
                 onLoadedMetadata={() =>
                   videoRef.current && setTime({ current: 0, duration: videoRef.current.duration })
                 }

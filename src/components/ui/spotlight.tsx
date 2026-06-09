@@ -1,7 +1,8 @@
 'use client'
 
-import { cn } from '@/utils/utils'
+import type { SpotlightMoveState } from '@/hooks/use-spotlight'
 import { useSpotlight } from '@/hooks/use-spotlight'
+import { cn } from '@/utils/utils'
 
 /** Props for {@link Spotlight}. */
 interface SpotlightProps {
@@ -90,6 +91,7 @@ export interface SpotlightCardProps<T extends React.ElementType = 'div'> {
   outerSize?: number
   withBaseReveal?: boolean
   revealLayer?: React.ReactNode
+  onSpotlightMove?: (state: SpotlightMoveState) => void
   className?: string
   children?: React.ReactNode
 }
@@ -107,13 +109,15 @@ export function SpotlightCard<T extends React.ElementType = 'div'>({
   outerSize = 140,
   withBaseReveal = false,
   revealLayer,
+  onSpotlightMove,
   ...props
 }: SpotlightCardProps<T> & Omit<React.ComponentPropsWithoutRef<T>, keyof SpotlightCardProps<T>>) {
-  const { ref, isHovering } = useSpotlight<HTMLElement>()
+  const { ref, isHovering } = useSpotlight<HTMLElement>({ onMove: onSpotlightMove })
   const Comp = as || 'div'
+  const spotlightRef = ref as React.ComponentPropsWithRef<T>['ref']
 
   return (
-    <Comp ref={ref as any} className={cn('relative overflow-hidden', className)} {...props}>
+    <Comp ref={spotlightRef} className={cn('relative overflow-hidden', className)} {...props}>
       <Spotlight
         isHovering={isHovering}
         outerSize={outerSize}

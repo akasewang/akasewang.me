@@ -1,17 +1,18 @@
 'use client'
 
-import { useMemo, useState, useCallback, memo } from 'react'
-import Image from 'next/image'
-import { useSearchParams, usePathname } from 'next/navigation'
 import { m } from 'framer-motion'
-import { cn } from '@/utils/utils'
-import { Icons } from '@/components/ui/icons'
-import { photos } from '@/data/static/photos'
+import Image from 'next/image'
+import { usePathname, useSearchParams } from 'next/navigation'
+import { memo, useCallback, useMemo, useState } from 'react'
 import { CategoryFilter } from '@/components/common/category-filter'
 import { EmptyState } from '@/components/common/empty-state'
-import { ZOOM_EASE } from '@/constants/ui'
+import { Icons } from '@/components/ui/icons'
 import { PHOTO_CATEGORIES } from '@/constants/categories'
-import type { Photo, Category } from '@/types/photos'
+import { ZOOM_EASE } from '@/constants/ui'
+import { photos } from '@/data/static/photos'
+import { useSoundEffects } from '@/hooks/use-sound-effects'
+import type { Category, Photo } from '@/types/photos'
+import { cn } from '@/utils/utils'
 import { PhotoOverlay } from './photo-overlay'
 
 /** Static id→photo lookup, hoisted so zoom/preload don't do O(N) scans on every render. */
@@ -29,6 +30,7 @@ const PHOTO_BY_ID = new Map(photos.map((p) => [p.id, p]))
  *   costly root level React rerenders.
  */
 export function PhotosContent() {
+  const { toggle, hoverTick } = useSoundEffects()
   const searchParams = useSearchParams()
   const pathname = usePathname()
 
@@ -68,10 +70,13 @@ export function PhotosContent() {
   )
 
   const handleToggleView = useCallback(() => {
+    const nextView = view === 'cover' ? 'contain' : 'cover'
+
+    toggle(nextView === 'contain')
     setIsToggling(true)
-    setView((v) => (v === 'cover' ? 'contain' : 'cover'))
+    setView(nextView)
     setTimeout(() => setIsToggling(false), 50)
-  }, [])
+  }, [toggle, view])
 
   const zoomedPhoto = zoomedPhotoId ? PHOTO_BY_ID.get(zoomedPhotoId) : undefined
 
@@ -84,7 +89,9 @@ export function PhotosContent() {
     <>
       <div className="z-50 mb-6 animate-page-simple md:fixed md:left-8 md:top-[calc(6rem_+_var(--banner-offset,0px))] md:mb-0 md:transition-[top] md:duration-300 md:ease-out">
         <button
+          type="button"
           onClick={handleToggleView}
+          onMouseEnter={hoverTick}
           className="relative flex h-8 shrink-0 items-center justify-center text-sm font-medium text-muted-foreground transition-colors duration-300 hover:text-primary"
           aria-label="Toggle layout mode"
           title="Toggle layout mode"
@@ -160,6 +167,7 @@ const PhotoCard = memo(function PhotoCard({
   onZoom: (id: string) => void
   onPreload: (id: string) => void
 }) {
+  const { hoverCard, zoom } = useSoundEffects()
   return (
     <m.div
       initial={{ opacity: 0 }}
@@ -168,14 +176,22 @@ const PhotoCard = memo(function PhotoCard({
       transition={ZOOM_EASE}
       className="break-inside-avoid"
     >
-      <div
-        onClick={() => onZoom(photo.id)}
-        onPointerEnter={() => onPreload(photo.id)}
+      <button
+        type="button"
+        onClick={() => {
+          zoom(true)
+          onZoom(photo.id)
+        }}
+        onPointerEnter={() => {
+          hoverCard()
+          onPreload(photo.id)
+        }}
         onPointerDown={() => onPreload(photo.id)}
         style={view === 'contain' ? { aspectRatio: `${photo.width} / ${photo.height}` } : undefined}
         className={cn(
           'group relative w-full cursor-zoom-in overflow-hidden bg-muted/20',
           view === 'cover' && 'aspect-square',
+          'block border-0 p-0 text-left',
         )}
       >
         <div className="absolute inset-0 z-10 bg-muted/10 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
@@ -194,7 +210,7 @@ const PhotoCard = memo(function PhotoCard({
             className="size-full object-cover"
           />
         </m.div>
-      </div>
+      </button>
     </m.div>
   )
 })

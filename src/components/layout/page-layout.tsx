@@ -1,7 +1,10 @@
-import { ReactNode } from 'react'
-import { PageHeader } from './page-header'
-import { PageFooter } from './page-footer'
+import type { ReactNode } from 'react'
 import { cn } from '@/utils/utils'
+import { PageFooter } from './page-footer'
+import { PageHeader } from './page-header'
+
+/** JSON-serializable value accepted for inline JSON-LD schema payloads. */
+type JsonLdValue = string | number | boolean | null | JsonLdValue[] | { [key: string]: JsonLdValue }
 
 /** Props for {@link PageLayout}. */
 interface PageLayoutProps {
@@ -10,7 +13,7 @@ interface PageLayoutProps {
   subtitle?: string
   footerText?: string
   backButtonHref?: string
-  breadcrumb?: any
+  breadcrumb?: JsonLdValue
   className?: string
   animate?: boolean
 }
@@ -26,18 +29,12 @@ export function PageLayout({
   className,
   animate = true,
 }: PageLayoutProps) {
+  const breadcrumbJson = breadcrumb ? JSON.stringify(breadcrumb).replace(/</g, '\\u003c') : null
+
   return (
     <main className={cn('space-y-8', animate && 'animate-page-simple', className)}>
-      {/*
-       * Automatically inject Breadcrumb JSON-LD schema into the document head
-       * for rich SEO results in search engines.
-       */}
-      {breadcrumb && (
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }}
-        />
-      )}
+      {/** Automatically inject Breadcrumb JSON-LD schema into the document head for rich SEO results in search engines. */}
+      {breadcrumbJson && <script type="application/ld+json">{breadcrumbJson}</script>}
 
       {(title || subtitle) && <PageHeader title={title || ''} subtitle={subtitle} />}
 

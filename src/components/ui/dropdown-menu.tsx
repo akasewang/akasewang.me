@@ -1,13 +1,27 @@
 'use client'
 
-import * as React from 'react'
 import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu'
+import * as React from 'react'
 import { Icons } from '@/components/ui/icons'
 import { MenuHighlight } from '@/components/ui/menu-highlight'
-
+import { useSoundEffects } from '@/hooks/use-sound-effects'
 import { cn } from '@/utils/utils'
 
-const DropdownMenu = DropdownMenuPrimitive.Root
+const DropdownMenu: React.FC<React.ComponentProps<typeof DropdownMenuPrimitive.Root>> = ({
+  onOpenChange,
+  ...props
+}) => {
+  const { toggle } = useSoundEffects()
+  return (
+    <DropdownMenuPrimitive.Root
+      onOpenChange={(open) => {
+        toggle(open)
+        onOpenChange?.(open)
+      }}
+      {...props}
+    />
+  )
+}
 
 const DropdownMenuTrigger = DropdownMenuPrimitive.Trigger
 
@@ -24,20 +38,31 @@ const DropdownMenuSubTrigger = React.forwardRef<
   React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.SubTrigger> & {
     inset?: boolean
   }
->(({ className, inset, children, ...props }, ref) => (
-  <DropdownMenuPrimitive.SubTrigger
-    ref={ref}
-    className={cn(
-      'flex cursor-default select-none items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none focus:bg-accent data-[state=open]:bg-accent [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0',
-      inset && 'pl-8',
-      className,
-    )}
-    {...props}
-  >
-    {children}
-    <Icons.chevronRight className="ml-auto" />
-  </DropdownMenuPrimitive.SubTrigger>
-))
+>(({ className, inset, children, ...props }, ref) => {
+  const { toggle, hoverTick } = useSoundEffects()
+  return (
+    <DropdownMenuPrimitive.SubTrigger
+      ref={ref}
+      {...props}
+      onMouseEnter={(e) => {
+        hoverTick()
+        props.onMouseEnter?.(e)
+      }}
+      onClick={(e) => {
+        toggle(true)
+        props.onClick?.(e)
+      }}
+      className={cn(
+        'flex cursor-default select-none items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none focus:bg-accent data-[state=open]:bg-accent [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0',
+        inset && 'pl-8',
+        className,
+      )}
+    >
+      {children}
+      <Icons.chevronRight className="ml-auto" />
+    </DropdownMenuPrimitive.SubTrigger>
+  )
+})
 DropdownMenuSubTrigger.displayName = DropdownMenuPrimitive.SubTrigger.displayName
 
 const DropdownMenuSubContent = React.forwardRef<
@@ -99,65 +124,98 @@ const DropdownMenuItem = React.forwardRef<
   React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Item> & {
     inset?: boolean
   }
->(({ className, inset, children, ...props }, ref) => (
-  <DropdownMenuPrimitive.Item
-    ref={ref}
-    className={cn(
-      'group relative z-10 flex w-full cursor-default select-none items-center gap-2.5 rounded-lg px-2.5 py-1 text-left text-xs tracking-tight outline-none transition-colors [&>svg]:size-4 [&>svg]:shrink-0 data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
-      'data-[highlighted]:z-10 data-[highlighted]:text-primary text-secondary',
-      inset && 'pl-8',
-      className,
-    )}
-    {...props}
-  >
-    {children}
-  </DropdownMenuPrimitive.Item>
-))
+>(({ className, inset, children, ...props }, ref) => {
+  const { select, hoverTick } = useSoundEffects()
+  return (
+    <DropdownMenuPrimitive.Item
+      ref={ref}
+      {...props}
+      onMouseEnter={(e) => {
+        hoverTick()
+        props.onMouseEnter?.(e)
+      }}
+      onSelect={(e) => {
+        select()
+        props.onSelect?.(e)
+      }}
+      className={cn(
+        'group relative z-10 flex w-full cursor-default select-none items-center gap-2.5 rounded-lg px-2.5 py-1 text-left text-xs tracking-tight outline-none transition-colors [&>svg]:size-4 [&>svg]:shrink-0 data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
+        'data-[highlighted]:z-10 data-[highlighted]:text-primary text-secondary',
+        inset && 'pl-8',
+        className,
+      )}
+    >
+      {children}
+    </DropdownMenuPrimitive.Item>
+  )
+})
 DropdownMenuItem.displayName = DropdownMenuPrimitive.Item.displayName
 
 const DropdownMenuCheckboxItem = React.forwardRef<
   React.ComponentRef<typeof DropdownMenuPrimitive.CheckboxItem>,
   React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.CheckboxItem>
->(({ className, children, checked, ...props }, ref) => (
-  <DropdownMenuPrimitive.CheckboxItem
-    ref={ref}
-    className={cn(
-      'relative flex cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
-      className,
-    )}
-    checked={checked}
-    {...props}
-  >
-    <span className="absolute left-2 flex h-3.5 w-3.5 items-center justify-center">
-      <DropdownMenuPrimitive.ItemIndicator>
-        <Icons.check className="h-4 w-4" />
-      </DropdownMenuPrimitive.ItemIndicator>
-    </span>
-    {children}
-  </DropdownMenuPrimitive.CheckboxItem>
-))
+>(({ className, children, checked, ...props }, ref) => {
+  const { select, hoverTick } = useSoundEffects()
+  return (
+    <DropdownMenuPrimitive.CheckboxItem
+      ref={ref}
+      checked={checked}
+      {...props}
+      onMouseEnter={(e) => {
+        hoverTick()
+        props.onMouseEnter?.(e)
+      }}
+      onSelect={(e) => {
+        select()
+        props.onSelect?.(e)
+      }}
+      className={cn(
+        'relative flex cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
+        className,
+      )}
+    >
+      <span className="absolute left-2 flex h-3.5 w-3.5 items-center justify-center">
+        <DropdownMenuPrimitive.ItemIndicator>
+          <Icons.check className="h-4 w-4" />
+        </DropdownMenuPrimitive.ItemIndicator>
+      </span>
+      {children}
+    </DropdownMenuPrimitive.CheckboxItem>
+  )
+})
 DropdownMenuCheckboxItem.displayName = DropdownMenuPrimitive.CheckboxItem.displayName
 
 const DropdownMenuRadioItem = React.forwardRef<
   React.ComponentRef<typeof DropdownMenuPrimitive.RadioItem>,
   React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.RadioItem>
->(({ className, children, ...props }, ref) => (
-  <DropdownMenuPrimitive.RadioItem
-    ref={ref}
-    className={cn(
-      'relative flex cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
-      className,
-    )}
-    {...props}
-  >
-    <span className="absolute left-2 flex h-3.5 w-3.5 items-center justify-center">
-      <DropdownMenuPrimitive.ItemIndicator>
-        <Icons.circle className="size-2 fill-current" />
-      </DropdownMenuPrimitive.ItemIndicator>
-    </span>
-    {children}
-  </DropdownMenuPrimitive.RadioItem>
-))
+>(({ className, children, ...props }, ref) => {
+  const { select, hoverTick } = useSoundEffects()
+  return (
+    <DropdownMenuPrimitive.RadioItem
+      ref={ref}
+      {...props}
+      onMouseEnter={(e) => {
+        hoverTick()
+        props.onMouseEnter?.(e)
+      }}
+      onSelect={(e) => {
+        select()
+        props.onSelect?.(e)
+      }}
+      className={cn(
+        'relative flex cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
+        className,
+      )}
+    >
+      <span className="absolute left-2 flex h-3.5 w-3.5 items-center justify-center">
+        <DropdownMenuPrimitive.ItemIndicator>
+          <Icons.circle className="size-2 fill-current" />
+        </DropdownMenuPrimitive.ItemIndicator>
+      </span>
+      {children}
+    </DropdownMenuPrimitive.RadioItem>
+  )
+})
 DropdownMenuRadioItem.displayName = DropdownMenuPrimitive.RadioItem.displayName
 
 const DropdownMenuLabel = React.forwardRef<
@@ -193,18 +251,18 @@ DropdownMenuShortcut.displayName = 'DropdownMenuShortcut'
 
 export {
   DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
   DropdownMenuCheckboxItem,
-  DropdownMenuRadioItem,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
   DropdownMenuLabel,
+  DropdownMenuPortal,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
   DropdownMenuSeparator,
   DropdownMenuShortcut,
-  DropdownMenuGroup,
-  DropdownMenuPortal,
   DropdownMenuSub,
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
-  DropdownMenuRadioGroup,
+  DropdownMenuTrigger,
 }

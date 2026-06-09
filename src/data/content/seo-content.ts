@@ -1,4 +1,4 @@
-import { FULL_NAME, SITE_NAME, SITE_DESCRIPTION } from '@/constants/constants'
+import { FULL_NAME, SITE_DESCRIPTION, SITE_NAME } from '@/constants/constants'
 import type { SeoContent } from '@/types/site'
 
 /**
@@ -13,6 +13,7 @@ export const homeSeoContent: SeoContent = {
   ogTitle: 'Software engineer who designs on the side.',
 }
 
+/** SEO metadata for the projects listing page. */
 export const projectsSeoContent: SeoContent = {
   title: `Projects | ${FULL_NAME}`,
   description:
@@ -21,6 +22,7 @@ export const projectsSeoContent: SeoContent = {
   ogTitle: 'Selected projects and open source works.',
 }
 
+/** SEO metadata for the newsletter signup page. */
 export const newsletterSeoContent: SeoContent = {
   title: `Newsletter | ${FULL_NAME}`,
   description:
@@ -29,6 +31,7 @@ export const newsletterSeoContent: SeoContent = {
   ogTitle: 'Join my weekly newsletter.',
 }
 
+/** SEO metadata for the public message board page. */
 export const messageBoardSeoContent: SeoContent = {
   title: `Message Board | ${FULL_NAME}`,
   description:
@@ -37,6 +40,7 @@ export const messageBoardSeoContent: SeoContent = {
   ogTitle: 'Leave a message, drop a thought, or just say hello.',
 }
 
+/** SEO metadata for the blog index page. */
 export const blogsSeoContent: SeoContent = {
   title: `Blogs | ${FULL_NAME}`,
   description:
@@ -45,6 +49,7 @@ export const blogsSeoContent: SeoContent = {
   ogTitle: 'Writing on software, design and personal reflections.',
 }
 
+/** SEO metadata for the skills and technology stack page. */
 export const skillsSeoContent: SeoContent = {
   title: `Skills & Tech Stack | ${FULL_NAME}`,
   description:
@@ -53,6 +58,7 @@ export const skillsSeoContent: SeoContent = {
   ogTitle: 'The tech stack I use to build things.',
 }
 
+/** SEO metadata for the testimonials page. */
 export const testimonialsSeoContent: SeoContent = {
   title: `Testimonials | ${FULL_NAME}`,
   description:
@@ -61,6 +67,7 @@ export const testimonialsSeoContent: SeoContent = {
   ogTitle: 'Kind words from people who (mostly) like me.',
 }
 
+/** SEO metadata for the catalog page. */
 export const catalogSeoContent: SeoContent = {
   title: `Catalog | ${FULL_NAME}`,
   description:
@@ -69,6 +76,7 @@ export const catalogSeoContent: SeoContent = {
   ogTitle: 'A curated log of media and entertainment.',
 }
 
+/** SEO metadata for the photos page. */
 export const photosSeoContent: SeoContent = {
   title: `Photos | ${FULL_NAME}`,
   description:
@@ -77,6 +85,7 @@ export const photosSeoContent: SeoContent = {
   ogTitle: 'A small collection of photos I have taken.',
 }
 
+/** SEO metadata for the component registry page. */
 export const componentsSeoContent: SeoContent = {
   title: `Components | ${FULL_NAME}`,
   description:

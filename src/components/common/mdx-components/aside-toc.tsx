@@ -1,10 +1,11 @@
 'use client'
 
 import { useMemo } from 'react'
-import { cn } from '@/utils/utils'
-import { parseTocFromContent } from './utils/parse-toc'
-import { useActiveHeading, scrollToHeading } from './hooks/use-active-heading'
 import { Icons } from '@/components/ui/icons'
+import { useSoundEffects } from '@/hooks/use-sound-effects'
+import { cn } from '@/utils/utils'
+import { scrollToHeading, useActiveHeading } from './hooks/use-active-heading'
+import { parseTocFromContent } from './utils/parse-toc'
 
 /** Props for {@link AsideTOC}. */
 interface AsideTOCProps {
@@ -21,6 +22,7 @@ interface AsideTOCProps {
  * @param className - Optional CSS classes for custom container styling.
  */
 export const AsideTOC = ({ content, className }: AsideTOCProps) => {
+  const { select, hoverTick } = useSoundEffects()
   const items = useMemo(() => (content ? parseTocFromContent(content) : []), [content])
   const activeId = useActiveHeading(items)
 
@@ -39,7 +41,12 @@ export const AsideTOC = ({ content, className }: AsideTOCProps) => {
           {items.map(({ id, level, text }) => (
             <button
               key={id}
-              onClick={() => scrollToHeading(id)}
+              type="button"
+              onClick={() => {
+                select()
+                scrollToHeading(id)
+              }}
+              onMouseEnter={hoverTick}
               className={cn('group block text-left', level > 2 && 'ml-6')}
             >
               <span

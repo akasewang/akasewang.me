@@ -1,5 +1,8 @@
+'use client'
+
 import Link from 'next/link'
 import { Icons } from '@/components/ui/icons'
+import { useSoundEffects } from '@/hooks/use-sound-effects'
 import { cn } from '@/utils/utils'
 
 /** Props for {@link ViewAll}. */
@@ -16,9 +19,13 @@ interface ViewAllProps {
  * @param label - The text to display.
  */
 export function ViewAll({ href, label, className }: ViewAllProps) {
+  const { hoverLink, navigate: navigateSound } = useSoundEffects()
+
   return (
     <Link
       href={href}
+      onMouseEnter={hoverLink}
+      onClick={navigateSound}
       className={cn(
         'group flex w-fit items-center gap-1 text-sm text-muted-foreground transition-colors duration-300 hover:text-primary',
         className,

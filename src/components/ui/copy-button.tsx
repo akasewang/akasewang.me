@@ -1,8 +1,10 @@
 'use client'
 
-import React, { useState } from 'react'
-import { m, AnimatePresence, type HTMLMotionProps } from 'framer-motion'
+import { AnimatePresence, type HTMLMotionProps, m } from 'framer-motion'
+import type React from 'react'
+import { useState } from 'react'
 import { Icons } from '@/components/ui/icons'
+import { useSoundEffects } from '@/hooks/use-sound-effects'
 import { cn } from '@/utils/utils'
 
 /** Props for {@link CopyButton}. */
@@ -28,18 +30,21 @@ export function CopyButton({
   copied: controlledCopied,
   ...props
 }: CopyButtonProps) {
+  const { success, error, hoverTick } = useSoundEffects()
   const [internalCopied, setInternalCopied] = useState(false)
   const isCopied = controlledCopied ?? internalCopied
 
   const handleCopy = async (e: React.MouseEvent<HTMLButtonElement>) => {
-    onClick?.(e as any)
-    if (controlledCopied !== undefined) return
+    onClick?.(e)
+    if (e.defaultPrevented || controlledCopied !== undefined) return
 
     try {
       await navigator.clipboard.writeText(value)
+      success()
       setInternalCopied(true)
       setTimeout(() => setInternalCopied(false), 1500)
     } catch (err) {
+      error()
       console.error(err)
     }
   }
@@ -50,6 +55,10 @@ export function CopyButton({
     <m.button
       type="button"
       onClick={handleCopy}
+      onMouseEnter={(e) => {
+        hoverTick()
+        props.onMouseEnter?.(e)
+      }}
       whileTap={{ scale: 0.94 }}
       transition={{ type: 'spring', stiffness: 500, damping: 30 }}
       aria-label={isCopied ? 'Copied to clipboard' : 'Copy to clipboard'}

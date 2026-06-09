@@ -1,8 +1,9 @@
 'use client'
 
-import type { ReactNode } from 'react'
 import Link from 'next/link'
+import type { ReactNode } from 'react'
 import { AnimatedArrow } from '@/components/ui/animated-arrow'
+import { useSoundEffects } from '@/hooks/use-sound-effects'
 import { cn } from '@/utils/utils'
 
 /** Props for {@link LinkText}. */
@@ -24,6 +25,7 @@ interface LinkTextProps {
  * @param showIcon - If true, appends an `AnimatedArrow` icon to the end of the text.
  */
 export function LinkText({ href, children, className, target, showIcon = true }: LinkTextProps) {
+  const { hoverLink, navigate: navigateSound } = useSoundEffects()
   const isExternal = href.startsWith('http')
   const linkTarget = target ?? (isExternal ? '_blank' : undefined)
 
@@ -32,6 +34,8 @@ export function LinkText({ href, children, className, target, showIcon = true }:
       href={href}
       target={linkTarget}
       rel={linkTarget === '_blank' ? 'noopener noreferrer' : undefined}
+      onMouseEnter={hoverLink}
+      onClick={navigateSound}
       className={cn(
         'group inline-block whitespace-nowrap mx-0.5 pb-[1px] text-sm text-primary',
         'from-border bg-[image:linear-gradient(currentColor,currentColor),linear-gradient(var(--tw-gradient-from),var(--tw-gradient-from))]',

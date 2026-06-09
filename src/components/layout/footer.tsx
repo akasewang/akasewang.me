@@ -5,6 +5,7 @@ import { ViewCounter } from '@/components/common/view-counter'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { footerContent } from '@/data/content/layout-content'
 import { useKeyboardShortcut } from '@/hooks/use-keyboard-shortcut'
+import { useSoundEffects } from '@/hooks/use-sound-effects'
 
 const { license, licenseHref, ownerName } = footerContent
 const currentYear = new Date().getFullYear()
@@ -14,8 +15,10 @@ const currentYear = new Date().getFullYear()
  * Displays licensing, copyright and global site visitor metrics.
  */
 export function Footer() {
+  const { hoverLink, navigate: navigateSound } = useSoundEffects()
   useKeyboardShortcut('l', () => {
     if (licenseHref) {
+      navigateSound()
       window.open(licenseHref, '_blank', 'noopener,noreferrer')
     }
   })
@@ -33,6 +36,8 @@ export function Footer() {
                       href={licenseHref}
                       target="_blank"
                       rel="noopener noreferrer"
+                      onMouseEnter={hoverLink}
+                      onClick={navigateSound}
                       className="transition-colors duration-300 hover:text-foreground"
                     >
                       {license}
@@ -51,7 +56,7 @@ export function Footer() {
         </p>
 
         <div className="text-sm tracking-wide text-muted-foreground/50">
-          {/* Use the 'visitors' type to aggregate unique IP visits across the entire domain, rather than total page views */}
+          {/** Use visitor counting to aggregate unique IP visits across the entire domain rather than total page views. */}
           <ViewCounter type="visitors" />
         </div>
       </div>

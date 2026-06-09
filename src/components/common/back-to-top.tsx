@@ -1,24 +1,25 @@
 'use client'
 
-import { useState, useEffect, useRef, useCallback } from 'react'
 import {
-  m,
   AnimatePresence,
-  useScroll,
-  useTransform,
+  m,
   useMotionValueEvent,
+  useScroll,
   useSpring,
+  useTransform,
   type Variants,
 } from 'framer-motion'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { Icons } from '@/components/ui/icons'
-import { commonContent } from '@/data/content/layout-content'
 import {
-  BACK_TO_TOP_SIZE,
   BACK_TO_TOP_CENTER,
-  BACK_TO_TOP_RADIUS,
   BACK_TO_TOP_CIRCUMFERENCE,
+  BACK_TO_TOP_RADIUS,
+  BACK_TO_TOP_SIZE,
 } from '@/constants/constants'
-import { SPRING_TRANSITION, SMOOTH_SPRING_TRANSITION } from '@/constants/ui'
+import { SMOOTH_SPRING_TRANSITION, SPRING_TRANSITION } from '@/constants/ui'
+import { commonContent } from '@/data/content/layout-content'
+import { useSoundEffects } from '@/hooks/use-sound-effects'
 
 const buttonVariants: Variants = {
   initial: { opacity: 0, scale: 0.5, y: 20 },
@@ -46,6 +47,7 @@ const iconVariants: Variants = {
  * The button functions dually as a "scroll down to next section" and "back to top" action depending on scroll position.
  */
 export function BackToTop() {
+  const { navigate: navigateSound, hoverTick } = useSoundEffects()
   const { scrollYProgress, scrollY } = useScroll()
   const springProgress = useSpring(scrollYProgress, { stiffness: 250, damping: 40, bounce: 0 })
   const dashoffset = useTransform(springProgress, [0, 0.9], [BACK_TO_TOP_CIRCUMFERENCE, 0])
@@ -107,6 +109,7 @@ export function BackToTop() {
   })
 
   const handleAction = useCallback(() => {
+    navigateSound()
     if (mode === 'up') {
       return window.scrollTo({ top: 0, behavior: 'smooth' })
     }
@@ -129,7 +132,7 @@ export function BackToTop() {
       top: targetTop,
       behavior: 'smooth',
     })
-  }, [mode])
+  }, [mode, navigateSound])
 
   const Icon = mode === 'down' ? Icons.arrowDownward : Icons.doubleArrowUp
 
@@ -139,6 +142,7 @@ export function BackToTop() {
         <m.button
           type="button"
           onClick={handleAction}
+          onMouseEnter={hoverTick}
           aria-label={mode === 'down' ? 'Scroll to next section' : commonContent.backToTop}
           variants={buttonVariants}
           initial="initial"

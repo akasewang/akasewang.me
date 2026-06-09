@@ -2,12 +2,14 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useKeyboardShortcut } from '@/hooks/use-keyboard-shortcut'
-import { useGithubStars } from '@/hooks/use-github-stars'
-import { Icons } from '@/components/ui/icons'
+import { Icons, VolumeOffIcon, VolumeOnIcon } from '@/components/ui/icons'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
+import { SITE, USERNAME } from '@/constants/constants'
 import { navbarContent } from '@/data/content/layout-content'
-import { USERNAME, SITE } from '@/constants/constants'
+import { useAudioPreference } from '@/hooks/use-audio-preference'
+import { useGithubStars } from '@/hooks/use-github-stars'
+import { useKeyboardShortcut } from '@/hooks/use-keyboard-shortcut'
+import { useSoundEffects } from '@/hooks/use-sound-effects'
 import { cn } from '@/utils/utils'
 
 const NAV_ITEMS = [
@@ -26,6 +28,8 @@ const ICON_BUTTON_STYLES =
  * Monitors `usePathname` to dynamically style the active route link.
  */
 export function Navbar() {
+  const { isAudioEnabled, setAudioEnabled } = useAudioPreference()
+  const { hoverLink, navigate: navigateSound, toggle } = useSoundEffects()
   const pathname = usePathname()
   const {
     count: githubStars,
@@ -34,13 +38,32 @@ export function Navbar() {
   } = useGithubStars()
   const githubUrl = `https://github.com/${USERNAME}/${SITE}`
 
+  const handleAudioToggle = () => {
+    const nextAudioEnabled = !isAudioEnabled
+
+    if (nextAudioEnabled) {
+      setAudioEnabled(true)
+      toggle(true)
+      return
+    }
+
+    toggle(false)
+    setAudioEnabled(false)
+  }
+
+  useKeyboardShortcut('a', handleAudioToggle)
+
   useKeyboardShortcut('g', () => {
+    navigateSound()
     window.open(githubUrl, '_blank', 'noopener,noreferrer')
   })
 
   useKeyboardShortcut('r', () => {
+    navigateSound()
     window.open('/feed.xml', '_blank', 'noopener,noreferrer')
   })
+
+  const AudioIcon = isAudioEnabled ? VolumeOnIcon : VolumeOffIcon
 
   return (
     <nav className="absolute inset-x-0 top-[var(--banner-offset,0px)] z-50 transition-[top] duration-300 ease-out">
@@ -49,6 +72,8 @@ export function Navbar() {
           <Link
             href="/"
             aria-label={navbarContent.home}
+            onMouseEnter={hoverLink}
+            onClick={navigateSound}
             className="relative flex h-8 shrink-0 items-center justify-center text-primary transition-[color,top] duration-300 md:fixed md:left-8 md:top-[calc(1.5rem_+_var(--banner-offset,0px))]"
           >
             <Icons.initials className="size-9" />
@@ -60,6 +85,8 @@ export function Navbar() {
                 key={href}
                 href={href}
                 aria-label={label}
+                onMouseEnter={hoverLink}
+                onClick={navigateSound}
                 className={cn(
                   'relative flex h-8 shrink-0 items-center justify-center text-sm font-medium transition-colors duration-300',
                   pathname === href ? 'text-primary' : 'text-secondary hover:text-primary',
@@ -72,15 +99,36 @@ export function Navbar() {
 
             <Tooltip>
               <TooltipTrigger asChild>
+                <button
+                  type="button"
+                  aria-label={isAudioEnabled ? 'Turn audio off' : 'Turn audio on'}
+                  aria-pressed={isAudioEnabled}
+                  aria-keyshortcuts="A"
+                  onMouseEnter={hoverLink}
+                  onClick={handleAudioToggle}
+                  className={cn(ICON_BUTTON_STYLES, '-ml-[7px]')}
+                >
+                  <AudioIcon className="size-4.5" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent side="bottom" shortcut="A">
+                {isAudioEnabled ? 'Audio On' : 'Audio Off'}
+              </TooltipContent>
+            </Tooltip>
+
+            <Tooltip>
+              <TooltipTrigger asChild>
                 <a
                   href={githubUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="GitHub Repository"
+                  onMouseEnter={hoverLink}
+                  onClick={navigateSound}
                   className={cn(
                     ICON_BUTTON_STYLES,
                     'hidden md:flex',
-                    '-ml-[10px]',
+                    '-ml-[17px]',
                     githubStars !== null && 'w-auto px-2.5',
                   )}
                 >
@@ -106,9 +154,11 @@ export function Navbar() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="RSS Feed"
-                  className={cn(ICON_BUTTON_STYLES, '-ml-[5px] md:-ml-[15px]')}
+                  onMouseEnter={hoverLink}
+                  onClick={navigateSound}
+                  className={cn(ICON_BUTTON_STYLES, '-ml-[15px]')}
                 >
-                  <Icons.rss className="size-[21.5px]" />
+                  <Icons.rss className="size-[22px]" />
                 </a>
               </TooltipTrigger>
               <TooltipContent side="bottom" shortcut="R">

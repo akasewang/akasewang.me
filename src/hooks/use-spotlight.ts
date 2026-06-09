@@ -1,4 +1,18 @@
-import { useRef, useState, useEffect } from 'react'
+import { useEffect, useRef, useState } from 'react'
+
+/** Cursor movement payload emitted by {@link useSpotlight} when the spotlight position changes. */
+export interface SpotlightMoveState {
+  phase: 'enter' | 'move'
+  intensity: number
+  x: number
+  y: number
+  ratioX: number
+  ratioY: number
+}
+
+interface UseSpotlightOptions {
+  onMove?: (state: SpotlightMoveState) => void
+}
 
 /**
  * Drives a velocity reactive spotlight effect. Tracks the cursor inside the container and
@@ -9,7 +23,9 @@ import { useRef, useState, useEffect } from 'react'
  * @returns ref - Attach this to the container element being spotlit.
  * @returns isHovering - Whether the cursor is currently inside the container.
  */
-export function useSpotlight<T extends HTMLElement = HTMLElement>() {
+export function useSpotlight<T extends HTMLElement = HTMLElement>({
+  onMove,
+}: UseSpotlightOptions = {}) {
   const ref = useRef<T>(null)
   const [isHovering, setIsHovering] = useState(false)
 
@@ -22,7 +38,7 @@ export function useSpotlight<T extends HTMLElement = HTMLElement>() {
     let lastY = 0
     let lastTime = 0
 
-    const handleMouseMove = (e: MouseEvent) => {
+    const handleMouseMove = (e: MouseEvent, phase: SpotlightMoveState['phase'] = 'move') => {
       /** Debounce layout thrashing by syncing DOM updates with the browser's native repaint cycle */
       cancelAnimationFrame(animationFrameId)
 
@@ -46,7 +62,7 @@ export function useSpotlight<T extends HTMLElement = HTMLElement>() {
            * Fades out smoothly as the mouse slows down.
            */
           const raw = Math.min(velocity / 2.5, 1)
-          intensity = 0.4 + 0.6 * (1 - Math.pow(1 - raw, 3))
+          intensity = 0.4 + 0.6 * (1 - (1 - raw) ** 3)
         }
 
         lastX = e.clientX
@@ -56,13 +72,21 @@ export function useSpotlight<T extends HTMLElement = HTMLElement>() {
         el.style.setProperty('--mx', `${x}px`)
         el.style.setProperty('--my', `${y}px`)
         el.style.setProperty('--spotlight-intensity', intensity.toString())
+        onMove?.({
+          phase,
+          intensity,
+          x,
+          y,
+          ratioX: x / rect.width,
+          ratioY: y / rect.height,
+        })
       })
     }
 
     const handleMouseEnter = (e: MouseEvent) => {
       lastTime = 0
       setIsHovering(true)
-      handleMouseMove(e)
+      handleMouseMove(e, 'enter')
     }
 
     const handleMouseLeave = () => {
@@ -81,7 +105,7 @@ export function useSpotlight<T extends HTMLElement = HTMLElement>() {
       el.removeEventListener('mouseleave', handleMouseLeave)
       cancelAnimationFrame(animationFrameId)
     }
-  }, [])
+  }, [onMove])
 
   return { ref, isHovering }
 }

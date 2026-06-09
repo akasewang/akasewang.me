@@ -1,7 +1,10 @@
+'use client'
+
 import Link from 'next/link'
-import { cn } from '@/utils/utils'
 import { Icons } from '@/components/ui/icons'
 import { SeparatorSlash } from '@/components/ui/separator-slash'
+import { useSoundEffects } from '@/hooks/use-sound-effects'
+import { cn } from '@/utils/utils'
 
 /** Props for {@link BackButton}. */
 interface BackButtonProps {
@@ -19,11 +22,14 @@ interface BackButtonProps {
  * @param className - Optional CSS classes for custom sizing or positioning.
  */
 export function BackButton({ href = '/', label, className }: BackButtonProps) {
+  const { hoverLink, navigate: navigateSound } = useSoundEffects()
   const resolvedLabel = (label || href.split('/')[1] || 'home').toLowerCase()
 
   return (
     <Link
       href={href}
+      onMouseEnter={hoverLink}
+      onClick={navigateSound}
       className={cn(
         'group flex w-fit items-center text-sm text-muted-foreground transition-colors duration-300 hover:text-primary',
         className,

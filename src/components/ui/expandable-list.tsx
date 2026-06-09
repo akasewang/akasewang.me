@@ -1,10 +1,11 @@
 'use client'
 
-import { useRef, useState, useMemo, type ReactNode } from 'react'
-import { m, AnimatePresence, type Transition } from 'framer-motion'
+import { AnimatePresence, m, type Transition } from 'framer-motion'
+import { type ReactNode, useMemo, useRef, useState } from 'react'
 import { HoverHighlight } from '@/components/ui/hover-highlight'
 import { Icons } from '@/components/ui/icons'
 import { sharedContent } from '@/data/content/landing-content'
+import { useSoundEffects } from '@/hooks/use-sound-effects'
 import { cn } from '@/utils/utils'
 
 /** Props for {@link ExpandableList}. */
@@ -24,6 +25,7 @@ const smoothTransition: Transition = { duration: 0.3, ease: 'easeInOut' }
  * @param initialCount - The number of items to show before truncating the list (defaults to 3).
  */
 export function ExpandableList<T>({ items, renderItem, initialCount = 3 }: ExpandableListProps<T>) {
+  const { toggle, hoverTick } = useSoundEffects()
   const [showAll, setShowAll] = useState(false)
   const hasMore = items.length > initialCount
 
@@ -59,7 +61,11 @@ export function ExpandableList<T>({ items, renderItem, initialCount = 3 }: Expan
           <m.button
             layout
             transition={smoothTransition}
-            onClick={() => setShowAll((prev) => !prev)}
+            onClick={() => {
+              toggle(!showAll)
+              setShowAll((prev) => !prev)
+            }}
+            onMouseEnter={hoverTick}
             className="group mt-6 inline-flex self-start items-center gap-1.5 text-sm text-muted-foreground transition-colors duration-300 hover:text-primary"
             aria-expanded={showAll}
           >

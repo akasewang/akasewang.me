@@ -4,14 +4,19 @@ import Link from 'next/link'
 import { ViewCounter } from '@/components/common/view-counter'
 import { NewTag } from '@/components/ui/new-tag'
 import { SeparatorBullet } from '@/components/ui/separator-bullet'
-import { formatDateString, isNew, cn } from '@/utils/utils'
+import { useSoundEffects } from '@/hooks/use-sound-effects'
 import type { RegistryItem } from '@/types/registry'
+import { cn, formatDateString, isNew } from '@/utils/utils'
 
 /** Props for {@link ComponentCard}. */
 interface ComponentCardProps {
   item: RegistryItem
   className?: string
 }
+
+/** Shared row classes hoisted so registry lists do not rebuild the long class string on each render. */
+const CARD_BASE_CLASSES =
+  'group relative z-10 -mx-2 -my-1.5 flex flex-col rounded-xl px-2 py-1.5 transition-[transform,scale] duration-300 ease-out active:scale-[0.99] active:duration-200 sm:-mx-3 sm:-my-2 sm:px-3 sm:py-2'
 
 /**
  * Displays metadata such as the component's name, description, release date and view count.
@@ -20,15 +25,12 @@ interface ComponentCardProps {
  * @param item - The registry item data containing slug, name, description and date.
  * @param className - Optional CSS classes for custom container styling.
  */
-
-/** from needlessly reparsing these massive string literals on every single rerender of the list. */
-const CARD_BASE_CLASSES =
-  'group relative z-10 -mx-2 -my-1.5 flex flex-col rounded-xl px-2 py-1.5 transition-[transform,scale] duration-300 ease-out active:scale-[0.99] active:duration-200 sm:-mx-3 sm:-my-2 sm:px-3 sm:py-2'
-
 export function ComponentCard({
   item: { name, slug, description, date },
   className,
 }: ComponentCardProps) {
+  const { hoverCard, navigate: navigateSound } = useSoundEffects()
+
   return (
     /**
      * Disable default Next.js aggressive prefetching.
@@ -38,6 +40,8 @@ export function ComponentCard({
     <Link
       href={`/components/${slug}`}
       prefetch={false}
+      onMouseEnter={hoverCard}
+      onClick={navigateSound}
       data-highlight-item
       className={className ? cn(CARD_BASE_CLASSES, className) : CARD_BASE_CLASSES}
     >

@@ -1,11 +1,12 @@
 'use client'
 
-import { useState } from 'react'
-import { cn } from '@/utils/utils'
-import { PhotoOverlay } from '@/components/photos/photo-overlay'
 import { m } from 'framer-motion'
+import { useState } from 'react'
+import { PhotoOverlay } from '@/components/photos/photo-overlay'
 import { ZOOM_EASE } from '@/constants/ui'
+import { useSoundEffects } from '@/hooks/use-sound-effects'
 import type { Photo } from '@/types/photos'
+import { cn } from '@/utils/utils'
 
 /**
  * Automatically wraps standard Markdown images (`![alt](url)`) and provides a clickable overlay.
@@ -29,6 +30,7 @@ export function ZoomableImage({
   className,
   ...props
 }: React.ImgHTMLAttributes<HTMLImageElement>) {
+  const { zoom, hoverCard } = useSoundEffects()
   const [isOpen, setIsOpen] = useState(false)
 
   const parsedWidth = width ? Number(width) : 1920
@@ -46,7 +48,11 @@ export function ZoomableImage({
     <figure className="m-0 my-6 block w-full">
       <button
         type="button"
-        onClick={() => setIsOpen(true)}
+        onClick={() => {
+          zoom(true)
+          setIsOpen(true)
+        }}
+        onMouseEnter={hoverCard}
         className="block w-full cursor-zoom-in overflow-hidden rounded-xl text-left"
       >
         <m.div

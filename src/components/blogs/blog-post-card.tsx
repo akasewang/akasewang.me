@@ -4,8 +4,9 @@ import Link from 'next/link'
 import { ViewCounter } from '@/components/common/view-counter'
 import { NewTag } from '@/components/ui/new-tag'
 import { SeparatorBullet } from '@/components/ui/separator-bullet'
-import { formatDateString, isNew, cn } from '@/utils/utils'
+import { useSoundEffects } from '@/hooks/use-sound-effects'
 import type { BlogPost } from '@/types/blog'
+import { cn, formatDateString, isNew } from '@/utils/utils'
 
 /** Props for {@link BlogPostCard}. */
 interface BlogPostCardProps {
@@ -21,10 +22,14 @@ export function BlogPostCard({
   post: { title, slug, date, excerpt },
   className,
 }: BlogPostCardProps) {
+  const { hoverCard, navigate: navigateSound } = useSoundEffects()
+
   return (
     <Link
       href={`/blogs/${slug}`}
       prefetch={false}
+      onMouseEnter={hoverCard}
+      onClick={navigateSound}
       data-highlight-item
       className={cn(
         'group relative z-10 -mx-2 -my-1.5 flex flex-col rounded-xl px-2 py-1.5 transition-[transform,scale] duration-300 ease-out active:scale-[0.99] active:duration-200 sm:-mx-3 sm:-my-2 sm:px-3 sm:py-2',

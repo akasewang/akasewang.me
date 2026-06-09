@@ -1,11 +1,12 @@
 'use client'
 
 import Image from 'next/image'
-import { VerifiedIcon } from '@/components/ui/icons'
 import { GradientAvatar } from '@/components/ui/gradient-avatar'
+import { VerifiedIcon } from '@/components/ui/icons'
 import { SpotlightCard } from '@/components/ui/spotlight'
-import { cn } from '@/utils/utils'
+import { useSoundEffects } from '@/hooks/use-sound-effects'
 import type { Testimonial } from '@/types/home'
+import { cn } from '@/utils/utils'
 
 /** Props for {@link TestimonialCard}. */
 interface TestimonialCardProps {
@@ -33,6 +34,7 @@ export function TestimonialCard({
   className,
 }: TestimonialCardProps) {
   const isLink = !!url
+  const { spotlightSweep, navigate: navigateSound } = useSoundEffects()
 
   const renderContent = (isReveal: boolean = false) => (
     <figure className={cn(TESTIMONIAL_FIGURE_CLASSES, isReveal ? 'px-6 py-5' : 'relative z-10')}>
@@ -78,6 +80,8 @@ export function TestimonialCard({
       isLink && 'active:scale-[0.98] active:duration-200',
       className,
     ),
+    onSpotlightMove: spotlightSweep,
+    onClick: isLink ? navigateSound : undefined,
   }
 
   if (isLink) {

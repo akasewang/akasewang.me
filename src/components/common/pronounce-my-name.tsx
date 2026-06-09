@@ -1,13 +1,14 @@
 'use client'
 
-import { useRef, useCallback } from 'react'
+import { useCallback, useRef } from 'react'
 import { VolumeIcon, type VolumeIconHandle } from '@/components/ui/icons'
-import { useSoundLazy } from '@/hooks/use-sound'
-import { trackEvent } from '@/lib/events'
-import { useKeyboardShortcut } from '@/hooks/use-keyboard-shortcut'
-import { cn } from '@/utils/utils'
-import { commonContent } from '@/data/content/layout-content'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
+import { commonContent } from '@/data/content/layout-content'
+import { useKeyboardShortcut } from '@/hooks/use-keyboard-shortcut'
+import { useSoundLazy } from '@/hooks/use-sound'
+import { useSoundEffects } from '@/hooks/use-sound-effects'
+import { trackEvent } from '@/lib/events'
+import { cn } from '@/utils/utils'
 
 /** Props for {@link PronounceMyName}. */
 interface PronounceMyNameProps {
@@ -24,11 +25,17 @@ interface PronounceMyNameProps {
  */
 export function PronounceMyName({ className, namePronunciationUrl }: PronounceMyNameProps) {
   const { play, preload } = useSoundLazy(namePronunciationUrl)
+  const { hoverTick } = useSoundEffects()
   const volumeIconRef = useRef<VolumeIconHandle>(null)
+
+  const handlePointerEnter = useCallback(() => {
+    hoverTick()
+    preload()
+  }, [hoverTick, preload])
 
   const handlePlayClick = useCallback(() => {
     volumeIconRef.current?.startAnimation()
-    play()
+    play(1, true)
     trackEvent({ name: 'play_name_pronunciation' })
   }, [play])
 
@@ -39,7 +46,7 @@ export function PronounceMyName({ className, namePronunciationUrl }: PronounceMy
       <TooltipTrigger asChild>
         <button
           type="button"
-          onPointerEnter={preload}
+          onPointerEnter={handlePointerEnter}
           onClick={handlePlayClick}
           aria-label={commonContent.pronounceName}
           className={cn(

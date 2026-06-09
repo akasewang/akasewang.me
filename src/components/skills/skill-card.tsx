@@ -2,8 +2,9 @@
 
 import Image from 'next/image'
 import { SpotlightCard } from '@/components/ui/spotlight'
-import { cn } from '@/utils/utils'
+import { useSoundEffects } from '@/hooks/use-sound-effects'
 import type { Skill } from '@/types/home'
+import { cn } from '@/utils/utils'
 
 /** Props for {@link SkillCard}. */
 interface SkillCardProps {
@@ -22,6 +23,7 @@ const SKILL_NAME_BASE_CLASSES = 'whitespace-nowrap font-mono text-xs font-medium
  */
 export function SkillCard({ skill: { url, icon, name }, className }: SkillCardProps) {
   const isLink = !!url
+  const { spotlightSweep, navigate: navigateSound } = useSoundEffects()
 
   const renderContent = (isReveal: boolean = false) => {
     const inner = (
@@ -60,6 +62,8 @@ export function SkillCard({ skill: { url, icon, name }, className }: SkillCardPr
     revealLayer: isLink ? renderContent(true) : undefined,
     outerSize: 120,
     className: cn(SKILL_CARD_BASE_CLASSES, isLink && 'active:scale-[0.97]', className),
+    onSpotlightMove: spotlightSweep,
+    onClick: isLink ? navigateSound : undefined,
   }
 
   if (isLink) {

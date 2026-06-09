@@ -1,12 +1,13 @@
 'use client'
 
-import { useEffect } from 'react'
+import { AnimatePresence, m } from 'framer-motion'
 import Image from 'next/image'
-import { m, AnimatePresence } from 'framer-motion'
+import { useCallback, useEffect } from 'react'
 import { Portal } from '@/components/ui/portal'
 import { ZOOM_EASE } from '@/constants/ui'
-import type { Photo } from '@/types/photos'
 import { useScrollLock } from '@/hooks/use-scroll-lock'
+import { useSoundEffects } from '@/hooks/use-sound-effects'
+import type { Photo } from '@/types/photos'
 
 /** Props for {@link PhotoOverlay}; `photo` is `null` when nothing is zoomed. */
 interface PhotoOverlayProps {
@@ -22,18 +23,24 @@ interface PhotoOverlayProps {
  * shared `layoutId` so the grid thumbnail morphs into the overlay.
  */
 export function PhotoOverlay({ photo, isOpen, onClose }: PhotoOverlayProps) {
+  const { zoom } = useSoundEffects()
   useScrollLock(isOpen)
+
+  const handleClose = useCallback(() => {
+    zoom(false)
+    onClose()
+  }, [onClose, zoom])
 
   useEffect(() => {
     if (!isOpen) return
 
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose()
+      if (e.key === 'Escape') handleClose()
     }
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [isOpen, onClose])
+  }, [handleClose, isOpen])
 
   return (
     <Portal>
@@ -45,7 +52,7 @@ export function PhotoOverlay({ photo, isOpen, onClose }: PhotoOverlayProps) {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.3 }}
-              onClick={onClose}
+              onClick={handleClose}
               className="absolute inset-0 bg-background/80 backdrop-blur-md"
             />
 
@@ -57,7 +64,7 @@ export function PhotoOverlay({ photo, isOpen, onClose }: PhotoOverlayProps) {
                 aspectRatio: `${photo.width} / ${photo.height}`,
                 width: `min(90vw, calc(90vh * ${photo.width} / ${photo.height}))`,
               }}
-              onClick={onClose}
+              onClick={handleClose}
             >
               <Image
                 src={photo.url}

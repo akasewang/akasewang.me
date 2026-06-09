@@ -17,79 +17,79 @@
    */
   :root {
 
-    /* neutral-950 */
+    /** neutral-950 */
     --background: oklch(0.145 0 0);
 
-    /* neutral-350 */
+    /** neutral-350 */
     --foreground: oklch(0.789 0 0);
 
-    /* neutral-950 */
+    /** neutral-950 */
     --card: oklch(0.145 0 0);
 
-    /* neutral-910 */
+    /** neutral-910 */
     --toast: oklch(0.193 0 0);
 
-    /* neutral-910 */
+    /** neutral-910 */
     --floating: oklch(0.193 0 0);
 
-    /* neutral-925 */
+    /** neutral-925 */
     --code-block: oklch(0.175 0 0);
 
-    /* neutral-915 */    
+    /** neutral-915 */
     --code-tab: oklch(0.205 0 0);
 
-    /* neutral-100 */
+    /** neutral-100 */
     --primary: oklch(0.97 0 0);
 
-    /* neutral-925 */
+    /** neutral-925 */
     --primary-foreground: oklch(0.175 0 0);
 
-    /* neutral-450 */
+    /** neutral-450 */
     --secondary: oklch(0.632 0 0);
 
-    /* neutral-850 */
+    /** neutral-850 */
     --muted: oklch(0.237 0 0);
 
-    /* neutral-500 */
+    /** neutral-500 */
     --muted-foreground: oklch(0.556 0 0);
 
-    /* neutral-950 */
+    /** neutral-950 */
     --dropdown-background: oklch(0.145 0 0);
 
-    /* neutral-825 */
+    /** neutral-825 */
     --border: oklch(0.253 0 0);
 
-    /* neutral-825 */
+    /** neutral-825 */
     --ring: oklch(0.253 0 0);
 
-    /* red-500 */
+    /** red-500 */
     --destructive: oklch(58.03% 0.21468 27.177);
 
-    /* blue-500 */
+    /** blue-500 */
     --verified: oklch(0.623 0.214 259.815);
 
-    /* blue-600 */
+    /** blue-600 */
     --verified-deep: oklch(0.546 0.245 262.881);
 
-    /* green-500 */
+    /** green-500 */
     --success: oklch(0.696 0.170 162.000);
 
-    /* yellow-500 */
+    /** yellow-500 */
     --warning: oklch(0.800 0.160 85.000);
 
-    /* 30% neutral-800 */
+    /** 30% neutral-800 */
     --accent: color-mix(in oklab, var(--muted) 30%, transparent);
 
-    /* 30% neutral-800 */
+    /** 30% neutral-800 */
     --overlay-accent: color-mix(in oklab, var(--muted) 30%, transparent);
 
-    /* 60% neutral-825 */
+    /** 60% neutral-825 */
     --accent-border: color-mix(in oklab, var(--ring) 60%, transparent);
 
-    /* 60% neutral-825 */
+    /** 60% neutral-825 */
     --overlay-accent-border: color-mix(in oklab, var(--ring) 60%, transparent);
 
-    /* shadows — soft diffused glow */
+    /** shadows — soft diffused glow */
     --shadow-xs: 0 1px 2px oklch(0% 0 0 / 0.08);
     --shadow-sm: 0 1px 3px oklch(0% 0 0 / 0.06), 0 2px 8px oklch(0% 0 0 / 0.06);
     --shadow: 0 2px 6px oklch(0% 0 0 / 0.06), 0 4px 16px oklch(0% 0 0 / 0.06);
@@ -98,22 +98,22 @@
     --shadow-xl: 0 6px 16px oklch(0% 0 0 / 0.1), 0 20px 48px oklch(0% 0 0 / 0.1);
     --shadow-2xl: 0 8px 24px oklch(0% 0 0 / 0.12), 0 32px 64px oklch(0% 0 0 / 0.12);
     
-    /* inner shadows */
+    /** inner shadows */
     --shadow-inner: inset 0 2px 8px oklch(0% 0 0 / 0.6);
     --shadow-inner-sm: inset 0 1px 4px oklch(0% 0 0 / 0.4);
 
-    /* directional shadows */
+    /** directional shadows */
     --shadow-l-md: -4px 0 12px -2px oklch(0% 0 0 / 0.6);
     --shadow-l-lg: -8px 0 16px -4px oklch(0% 0 0 / 0.8);
     --shadow-l-xl: -12px 0 24px -4px oklch(0% 0 0 / 0.9);
 
-    /* border radius */
+    /** border radius */
     --radius: 0.35rem;
 
-    /* spacing */
+    /** spacing */
     --spacing: 0.25rem;
 
-    /* announcement banner height; toggled to 0 once dismissed */
+    /** announcement banner height; toggled to 0 once dismissed */
     --banner-offset: 0px;
   }
 

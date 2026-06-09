@@ -1,21 +1,22 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
+import { useCallback, useEffect, useState } from 'react'
+import { toast } from 'sonner'
+import { EmptyState } from '@/components/common/empty-state'
+import { Icons } from '@/components/ui/icons'
+import { MESSAGES_PER_PAGE } from '@/constants/constants'
+import { messageBoardContent as t } from '@/data/content/message-board-content'
 import { useAdmin } from '@/hooks/use-admin'
 import { useInfiniteScroll } from '@/hooks/use-infinite-scroll'
-import { messageBoardContent as t } from '@/data/content/message-board-content'
+import { useSoundEffects } from '@/hooks/use-sound-effects'
 import {
-  getMessageBoardMessages,
   deleteMessageBoardMessage,
+  getMessageBoardMessages,
   replyMessageBoardMessage,
 } from '@/lib/actions/message-board-actions'
 import type { MessageBoardEntry } from '@/types/message-board'
-import { MessageBubbles } from './message-bubbles'
-import { Icons } from '@/components/ui/icons'
-import { EmptyState } from '@/components/common/empty-state'
-import { toast } from 'sonner'
-import { MESSAGES_PER_PAGE } from '@/constants/constants'
 import { cn } from '@/utils/utils'
+import { MessageBubbles } from './message-bubbles'
 
 /** Props for {@link MessageBoardList}; `null` signals the server query failed (offline). */
 interface MessageBoardListProps {
@@ -33,6 +34,7 @@ const GLASS_PANEL_CLASS = 'bg-muted/40 backdrop-blur-md ring-1 ring-inset ring-r
  * @param messages - The initial page of messages prefetched by the server component.
  */
 export function MessageBoardList({ messages: initialMessages }: MessageBoardListProps) {
+  const { destructive, hoverTick, tap, error: errorSound } = useSoundEffects()
   const { adminKey, logoutAdmin } = useAdmin()
 
   const [messages, setMessages] = useState<MessageBoardEntry[]>(initialMessages || [])
@@ -51,15 +53,17 @@ export function MessageBoardList({ messages: initialMessages }: MessageBoardList
     async (id: number) => {
       if (!adminKey || !window.confirm('Are you sure you want to delete this message?')) return
 
+      destructive()
       const res = await deleteMessageBoardMessage(id, adminKey)
       if (res.success) {
         setMessages((prev) => prev.filter((m) => m.id !== id))
         toast.success('Message deleted')
       } else {
+        errorSound()
         toast.error(res.error)
       }
     },
-    [adminKey],
+    [adminKey, destructive, errorSound],
   )
 
   const handleReply = useCallback(
@@ -72,10 +76,11 @@ export function MessageBoardList({ messages: initialMessages }: MessageBoardList
         return true
       }
 
+      errorSound()
       toast.error(res.error)
       return false
     },
-    [adminKey],
+    [adminKey, errorSound],
   )
 
   const loadMore = useCallback(async () => {
@@ -143,7 +148,12 @@ export function MessageBoardList({ messages: initialMessages }: MessageBoardList
       {adminKey && (
         <div className="mb-6 flex justify-end">
           <button
-            onClick={logoutAdmin}
+            type="button"
+            onClick={() => {
+              destructive()
+              logoutAdmin()
+            }}
+            onMouseEnter={hoverTick}
             className="rounded-md bg-destructive/10 px-4 py-2 text-xs font-medium text-destructive transition duration-300 hover:bg-destructive/20 active:scale-[0.98] active:duration-200"
           >
             Leave Admin Mode
@@ -172,7 +182,12 @@ export function MessageBoardList({ messages: initialMessages }: MessageBoardList
             <span>{t.connectionLost}</span>
             <span className="mx-1.5 opacity-30">·</span>
             <button
-              onClick={() => setLoadError(false)}
+              type="button"
+              onClick={() => {
+                tap()
+                setLoadError(false)
+              }}
+              onMouseEnter={hoverTick}
               className="relative underline underline-offset-4 transition-colors duration-300 hover:text-foreground active:duration-200"
             >
               {t.retry}
