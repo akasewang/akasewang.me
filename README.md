@@ -20,6 +20,7 @@ For a simple breakdown of how the systems in this portfolio work, check out the 
 - [**MDX & Content Parsing**](./architecture/mdx.md) - Reading local markdown files and swapping HTML for React.
 - [**State & Hooks**](./architecture/state.md) - URL based filtering and custom React hooks.
 - [**UI & Animations**](./architecture/ui.md) - Tailwind v4, custom cursors and Framer Motion effects.
+- [**Audio Feedback Design System**](./architecture/audio-design-system.md) - Global audio preference, keyboard shortcuts and procedural UI sounds.
 - [**Message Board**](./architecture/message-board.md) - Spam protection, rate limiting and admin commands.
 
 ---

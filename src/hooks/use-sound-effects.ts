@@ -220,8 +220,8 @@ function playTone(ctx: AudioContext, options: ToneOptions) {
 /** Procedural sound presets */
 
 /**
- * All UI cues are intentionally short and share a restrained output chain. The sounds now live in
- * a tighter midrange so the interface feels like one instrument instead of scattered effects.
+ * UI cues share one output chain and a tight midrange, so the interface feels like one
+ * instrument instead of scattered effects.
  */
 
 function playHoverTick(ctx: AudioContext) {
@@ -470,8 +470,8 @@ function playMedia(ctx: AudioContext, playing: boolean) {
 
 /**
  * Provides procedurally generated UI sound effects for interactive elements.
- * Sounds are synthesised in real-time using the Web Audio API. The palette is normalized around
- * short 100-160 ms cues with a shared output compressor so no individual sound jumps out.
+ * Sounds are synthesised in real-time using the Web Audio API. Most cues are short
+ * 100-160 ms gestures, while spotlight hover keeps one movement-reactive voice alive briefly.
  */
 export function useSoundEffects() {
   /** Plays a hover preset only if the shared throttle window has elapsed, so mixed sweeps never buzz. */

@@ -53,7 +53,7 @@ Every interactive element still makes a sound on hover (consistency), but the *t
 
 *   **Consistency rule:** within a category every element uses the same hover sound — no "card that sounds" vs "card that doesn't". Differentiation is *across* categories only.
 *   **Shared throttle:** `hoverTick`, `hoverLink`, and `hoverCard` share one 60 ms throttle, so a fast sweep across mixed elements never buzzes regardless of which textures it crosses. `spotlightSweep` is different: it plays one low entry bloom on pointer enter, then keeps one audible, low, non-tonal audio voice alive while the cursor moves, modulating filter, gain, and a very light stereo pan from spotlight position/intensity before fading out shortly after movement stops.
-*   **Subtlety:** hover is the most frequent event, so all four are quiet; `hoverLink` is the quietest of all since links are hovered most.
+*   **Subtlety:** hover is the most frequent event, so all four stay lighter than action sounds; `hoverLink` remains the lightest since links are hovered most.
 *   **Do NOT use on:** Non-interactive elements, or controls that make no click sound. `PronounceMyName` uses `hoverTick` on hover and the real speech clip on click.
 
 ## 2. Navigation (`navigate`)
