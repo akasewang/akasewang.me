@@ -37,7 +37,7 @@ export const commonContent: CommonContent = {
  * Top announcement banner content.
  */
 export const announcementBanner: AnnouncementBannerContent = {
-  message: "Building something? Click here if you want seamless design and development",
+  message: 'Building something? Click here if you want seamless design and development',
   href: 'https://noddy.studio/',
   dismissLabel: 'Dismiss banner',
 }

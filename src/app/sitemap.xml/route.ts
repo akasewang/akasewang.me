@@ -84,7 +84,9 @@ ${urls
     <lastmod>${page.lastModified}</lastmod>
     <priority>${page.priority}</priority>
     <changefreq>${page.changefreq}</changefreq>${(page.images ?? [])
-      .map((image) => `\n    <image:image>\n      <image:loc>${image}</image:loc>\n    </image:image>`)
+      .map(
+        (image) => `\n    <image:image>\n      <image:loc>${image}</image:loc>\n    </image:image>`,
+      )
       .join('')}
   </url>`,
   )

@@ -27,10 +27,9 @@ const nextConfig: NextConfig = withMDX({
   },
   experimental: {
     /**
-     * Origins permitted to invoke Server Actions. The site serves the same app from several
-     * domains (canonical: www.akasewang.me) and a Server Action rejects any request whose origin
-     * doesn't match an allowed host so each domain must be present for the newsletter and message
-     * board forms to work on it.
+     * Allowed Server Action origins for the site's alternate domains. Next lists this under
+     * experiments because the config key still lives under `experimental`, not because this
+     * allowlist is unsafe.
      */
     serverActions: {
       allowedOrigins: [
