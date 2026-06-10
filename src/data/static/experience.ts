@@ -7,7 +7,7 @@ import type { TimelineItemProps } from '@/types/site'
  */
 export const experiences: TimelineItemProps[] = [
   {
-    id: 'noddy-founder',
+    id: 'noddy-studio-founder',
     title: 'Independent Web Developer & Designer',
     startDate: '08.2025',
     description: [
@@ -18,7 +18,7 @@ export const experiences: TimelineItemProps[] = [
     ],
     defaultExpanded: true,
     tech: ['TypeScript', 'Next.js', 'PostgreSQL', 'AWS', 'Figma', 'Framer'],
-    links: [{ text: 'Noddy', url: 'https://noddy.studio', prefix: 'at' }],
+    links: [{ text: 'Noddy Studio', url: 'https://noddy.studio', prefix: 'at' }],
   },
   {
     id: 'innovun-global-swe-trainee',
