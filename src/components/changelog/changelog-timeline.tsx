@@ -158,7 +158,7 @@ export function ChangelogTimeline({ days }: ChangelogTimelineProps) {
         const isLast = index === days.length - 1
 
         return (
-          <div key={day.date} className="relative pb-3 last:pb-2 sm:pb-8 sm:pl-8 sm:last:pb-2">
+          <div key={day.date} className="relative pb-3 last:pb-2 sm:pb-6 sm:pl-8 sm:last:pb-2">
             <div
               aria-hidden
               className={cn(
@@ -186,7 +186,7 @@ export function ChangelogTimeline({ days }: ChangelogTimelineProps) {
               Commits on {day.label}
             </h2>
 
-            <div className="-mx-2 mt-3 sm:-mx-3 sm:mt-2">
+            <div className="-mx-2 mt-4 sm:-mx-3 sm:mt-1">
               {day.commits.map((commit) => (
                 <CommitRow key={commit.sha} commit={commit} />
               ))}
