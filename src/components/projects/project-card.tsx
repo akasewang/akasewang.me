@@ -22,7 +22,7 @@ interface ProjectCardProps {
  * scroll intersection to save battery and bandwidth.
  */
 export const ProjectCard = memo(function ProjectCard({ project }: ProjectCardProps) {
-  const { title, slug, video, image, date, period } = project
+  const { title, slug, video, image, date, period, external } = project
   const { hoverCard, navigate: navigateSound } = useSoundEffects()
   const videoRef = useRef<HTMLVideoElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
@@ -52,8 +52,10 @@ export const ProjectCard = memo(function ProjectCard({ project }: ProjectCardPro
       transition={SPRING_TRANSITION}
     >
       <Link
-        href={`/projects/${slug}`}
-        prefetch={false}
+        href={external || `/projects/${slug}`}
+        target={external ? '_blank' : undefined}
+        rel={external ? 'noopener noreferrer' : undefined}
+        prefetch={!external ? false : undefined}
         onMouseEnter={hoverCard}
         onClick={navigateSound}
         className="group block w-full rounded-xl"

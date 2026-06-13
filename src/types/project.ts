@@ -35,6 +35,8 @@ export interface ProjectPostData {
   type?: ProjectCategory
   /** Optional span the project ran over. */
   period?: ProjectPeriod
+  /** Optional URL to redirect directly to instead of rendering the MDX page. */
+  external?: string
   /** Optional external or related links. */
   links?: ProjectLink[]
   /** Optional technologies used, rendered as tags. */

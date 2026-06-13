@@ -50,6 +50,9 @@ function toChangelogCommit(entry: GithubCommitEntry, date: Date): ChangelogCommi
         blocks.push(currentBlock.join('\n'))
         currentBlock = []
       }
+      if (blocks.length > 0 && blocks[blocks.length - 1] !== '') {
+        blocks.push('')
+      }
     } else if (line.startsWith('- ') || line.startsWith('* ')) {
       if (currentBlock.length > 0) {
         blocks.push(currentBlock.join('\n'))
@@ -62,6 +65,10 @@ function toChangelogCommit(entry: GithubCommitEntry, date: Date): ChangelogCommi
 
   if (currentBlock.length > 0) {
     blocks.push(currentBlock.join('\n'))
+  }
+
+  if (blocks.length > 0 && blocks[blocks.length - 1] === '') {
+    blocks.pop()
   }
 
   const body = blocks

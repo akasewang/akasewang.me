@@ -69,15 +69,19 @@ function CommitRow({ commit }: { commit: ChangelogCommit }) {
       </div>
 
       <ExpandableContent isExpanded={isExpanded}>
-        <div className="space-y-1.5 px-2 pb-2 pt-1 text-sm leading-relaxed text-foreground sm:px-3">
+        <div className="flex flex-col gap-1.5 px-2 pb-2 pt-1 text-sm leading-relaxed text-foreground sm:px-3">
           {commit.body.map((block, index) => {
+            if (!block) {
+              return <div key={`${commit.sha}-${index}`} aria-hidden />
+            }
+
             const isBullet = block.startsWith('- ') || block.startsWith('* ')
             const content = isBullet ? block.slice(2).trim() : block
 
             return (
               <div
                 key={`${commit.sha}-${index}`}
-                className={cn('flex items-start gap-3', !isBullet && 'pb-1.5')}
+                className="flex items-start gap-3"
               >
                 {isBullet && (
                   <div className="flex w-5 shrink-0 justify-center">
