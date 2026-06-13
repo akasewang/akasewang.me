@@ -83,7 +83,7 @@ export const Callout = ({ type = 'info', title, children, className }: CalloutPr
       </div>
       <div
         className={cn(
-          'pl-10.5 pr-4 pb-3 pt-1.5 text-pretty text-xs leading-relaxed text-foreground/90',
+          'pl-10 pr-3.5 pb-2.5 pt-1.5 text-pretty text-xs leading-relaxed text-foreground/90',
           '[&>[role=paragraph]]:my-0 [&>[role=paragraph]+[role=paragraph]]:mt-3 [&_[role=paragraph]]:text-xs',
           '[&>ol]:ml-0 [&>ol]:my-0 [&>ol]:list-decimal [&>ol]:pl-5',
           '[&>ul]:ml-0 [&>ul]:my-0 [&>ul]:list-disc [&>ul]:pl-5',
