@@ -93,13 +93,13 @@ export const Tabs = ({ items, defaultIndex = 0, className, children }: TabsProps
       value={safeIndex.toString()}
       onValueChange={handleValueChange}
       className={cn(
-        'relative isolate my-6 not-prose rounded-xl border border-border/50 bg-code-tab',
+        'relative isolate my-6 not-prose rounded-xl border border-border/60 bg-code-tab',
         className,
       )}
     >
       <RadixTabs.List
         aria-label="Tabs"
-        className="flex items-center gap-1 overflow-x-auto border-b border-border/40 p-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        className="flex items-center gap-1 overflow-x-auto border-b border-border/50 p-1.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       >
         {validChildren.map((child, i) => {
           const value = i.toString()
@@ -117,14 +117,14 @@ export const Tabs = ({ items, defaultIndex = 0, className, children }: TabsProps
                   'group relative flex min-w-16 items-center justify-center whitespace-nowrap rounded-lg px-3.5 py-1.5 font-mono text-xs font-medium lowercase transition-colors duration-300',
                   isActive
                     ? 'text-primary'
-                    : 'text-muted-foreground hover:bg-background/40 hover:text-foreground/80',
+                    : 'text-muted-foreground hover:text-foreground',
                 )}
               >
                 <span className="relative z-10">{label}</span>
                 {isActive && (
                   <m.div
                     layoutId={`active-tab-${id}`}
-                    className="absolute inset-0 z-0 rounded-lg bg-background shadow-[inset_0_1px_2px_0_oklch(0_0_0/0.25)] ring-1 ring-border/50"
+                    className="absolute inset-0 z-0 rounded-lg bg-background shadow-[inset_0_1px_2px_0_oklch(0_0_0/0.25)] ring-1 ring-border/60"
                     transition={SMOOTH_SPRING_TRANSITION}
                   />
                 )}
@@ -149,7 +149,7 @@ export const Tabs = ({ items, defaultIndex = 0, className, children }: TabsProps
               exit="exit"
               transition={SWIPE_TRANSITION}
               className={cn(
-                'w-full p-2 focus:outline-none flex flex-col gap-1.5 [&>*]:!my-0 [&>[role=paragraph]]:px-2 [&>p]:px-2 [&>ul]:px-2 [&>ol]:px-2 [&>h1]:px-2 [&>h2]:px-2 [&>h3]:px-2',
+                'w-full p-1.5 focus:outline-none flex flex-col gap-1.5 [&>*]:!my-0 [&>[role=paragraph]]:px-1.5 [&>p]:px-1.5 [&>ul]:px-1.5 [&>ol]:px-1.5 [&>h1]:px-1.5 [&>h2]:px-1.5 [&>h3]:px-1.5',
                 activeNode?.props.className,
               )}
             >

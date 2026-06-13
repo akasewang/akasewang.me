@@ -23,7 +23,7 @@ const Table = forwardRef<
 >(({ className, containerClassName, ...props }, ref) => (
   <div
     className={cn(
-      'relative my-6 w-full overflow-x-auto rounded-xl border border-border/50 bg-code-block not-prose',
+      'relative my-6 w-full overflow-x-auto rounded-xl border border-border/60 bg-code-block not-prose',
       '[&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-muted [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar]:h-1.5',
       containerClassName,
     )}
@@ -39,7 +39,7 @@ Table.displayName = 'Table'
 
 const TableHeader = styled(
   'thead',
-  'border-b border-border/40 bg-code-tab/50 [&_tr]:border-0',
+  'border-b border-border/50 bg-code-tab/50 [&_tr]:border-0',
   'TableHeader',
 )
 const TableBody = styled(
@@ -49,23 +49,23 @@ const TableBody = styled(
 )
 const TableFooter = styled(
   'tfoot',
-  'border-t border-border/40 bg-code-tab/30 font-medium [&>tr]:last:border-b-0',
+  'border-t border-border/50 bg-code-tab/30 font-medium [&>tr]:last:border-b-0',
   'TableFooter',
 )
-const TableRow = styled('tr', 'border-b border-border/25', 'TableRow')
+const TableRow = styled('tr', 'border-b border-border/30', 'TableRow')
 const TableHead = styled(
   'th',
-  'whitespace-nowrap px-4 py-2.5 text-left align-middle font-mono text-[10px] font-medium lowercase tracking-widest text-muted-foreground [&:has([role=checkbox])]:pr-0',
+  'whitespace-nowrap px-3.5 py-2 text-left align-middle font-mono text-[10px] font-medium lowercase tracking-widest text-muted-foreground [&:has([role=checkbox])]:pr-0',
   'TableHead',
 )
 const TableCell = styled(
   'td',
-  'px-4 py-2.5 align-middle text-xs leading-relaxed text-foreground [&:has([role=checkbox])]:pr-0',
+  'px-3.5 py-2 align-middle text-xs leading-relaxed text-foreground [&:has([role=checkbox])]:pr-0',
   'TableCell',
 )
 const TableCaption = styled(
   'caption',
-  'px-4 py-2.5 text-[11px] text-muted-foreground',
+  'px-3.5 py-2 text-[11px] text-muted-foreground',
   'TableCaption',
 )
 

@@ -55,7 +55,7 @@ export async function ComponentSource({ src, title, className }: ComponentSource
 
   if (codeString === null) {
     return (
-      <div className="my-8 rounded-xl border border-border/50 bg-card p-6 text-center text-sm text-muted-foreground">
+      <div className="my-8 rounded-xl border border-border/60 bg-card p-6 text-center text-sm text-muted-foreground">
         Source file <code>{src}</code> not found.
       </div>
     )

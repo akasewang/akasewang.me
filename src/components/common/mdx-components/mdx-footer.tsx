@@ -25,7 +25,7 @@ export function MdxFooter({ quote, backHref = '/', backLabel, className }: MdxFo
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={SMOOTH_SPRING_TRANSITION}
-      className={cn('mt-10 space-y-4 border-t border-border/40 pt-6', className)}
+      className={cn('mt-10 space-y-4', className)}
     >
       {quote && (
         <blockquote className="max-w-2xl text-pretty font-serif text-base italic leading-relaxed text-muted-foreground">

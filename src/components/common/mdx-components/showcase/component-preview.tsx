@@ -24,7 +24,7 @@ export function ComponentPreview({ children, code, className }: ComponentPreview
   const canvas = (
     <div
       className={cn(
-        'relative flex min-h-[400px] w-full items-center justify-center overflow-hidden rounded-xl border border-border/50 bg-background',
+        'relative flex min-h-[400px] w-full items-center justify-center overflow-hidden rounded-xl border border-border/60 bg-background',
         className,
       )}
     >

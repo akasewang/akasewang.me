@@ -75,7 +75,7 @@ export const Callout = ({ type = 'info', title, children, className }: CalloutPr
         className,
       )}
     >
-      <div className="flex select-none items-center gap-3 px-4 pb-0 pt-3">
+      <div className="flex select-none items-center gap-3 px-3.5 pb-0 pt-2.5">
         <Icon className={cn('size-3.5 shrink-0 opacity-80', accent)} aria-hidden />
         <span id={labelId} className="text-xs font-medium tracking-tight text-primary opacity-90">
           {title ?? label}

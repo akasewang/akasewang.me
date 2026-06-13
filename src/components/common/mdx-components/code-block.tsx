@@ -77,9 +77,9 @@ export const Pre = ({
      * letting it use `sticky` to float elegantly while scrolling, which is impossible
      * with traditional `absolute` positioning inside an `overflow-x-auto` container.
      */
-    <figure className="group/pre relative isolate my-6 grid w-full max-w-full not-prose rounded-xl border border-border/50 bg-code-block">
+    <figure className="group/pre relative isolate my-6 grid w-full max-w-full not-prose rounded-xl border border-border/60 bg-code-block">
       {hasHeader && (
-        <figcaption className="col-start-1 row-start-1 flex h-9 select-none items-center rounded-t-[inherit] border-b border-border/40 bg-code-tab/50 px-4">
+        <figcaption className="col-start-1 row-start-1 flex h-9 select-none items-center rounded-t-[inherit] border-b border-border/50 bg-code-tab/50 px-3.5">
           <span className="font-mono text-[10px] font-medium lowercase tracking-widest text-muted-foreground">
             {label}
           </span>
@@ -89,7 +89,7 @@ export const Pre = ({
         <div
           className={cn(
             'pointer-events-none sticky z-20 col-start-1 row-start-1 self-start justify-self-end',
-            hasHeader ? 'top-1.5 row-span-2 pt-1.5 pr-2' : 'top-2.5 pt-2.5 pr-2.5',
+            hasHeader ? 'top-1 row-span-2 pt-1 pr-1.5' : 'top-2 pt-2 pr-2',
           )}
         >
           <CopyButton
@@ -117,7 +117,7 @@ export const Pre = ({
       )}
       <pre
         className={cn(
-          'col-start-1 overflow-x-auto px-4.5 py-3.5 font-mono text-xs leading-relaxed',
+          'col-start-1 overflow-x-auto px-4 py-3 font-mono text-xs leading-relaxed',
           hasHeader ? 'row-start-2' : 'row-start-1',
           '[&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-muted [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar]:h-1.5',
           className,
