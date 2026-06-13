@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { Icons } from '@/components/ui/icons'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { SITE, USERNAME } from '@/constants/constants'
@@ -16,7 +16,6 @@ const NAV_ITEMS = [
   { href: '/blogs', label: navbarContent.blogs, Icon: Icons.blogs },
   { href: '/projects', label: navbarContent.projects, Icon: Icons.projects },
   { href: '/photos', label: navbarContent.photos, Icon: Icons.photos },
-  { href: '/changelog', label: navbarContent.changelog, Icon: Icons.gitRepository },
 ]
 
 const ICON_BUTTON_STYLES =
@@ -28,6 +27,7 @@ const ICON_BUTTON_STYLES =
  * Monitors `usePathname` to dynamically style the active route link.
  */
 export function Navbar() {
+  const router = useRouter()
   const { isAudioEnabled, setAudioEnabled } = useAudioPreference()
   const { hoverLink, navigate: navigateSound, toggle } = useSoundEffects()
   const pathname = usePathname()
@@ -51,7 +51,7 @@ export function Navbar() {
     setAudioEnabled(false)
   }
 
-  useKeyboardShortcut('F1', handleAudioToggle)
+  useKeyboardShortcut('f1', handleAudioToggle)
 
   useKeyboardShortcut('g', () => {
     navigateSound()
@@ -61,6 +61,12 @@ export function Navbar() {
   useKeyboardShortcut('r', () => {
     navigateSound()
     window.open('/feed.xml', '_blank', 'noopener,noreferrer')
+  })
+
+
+  useKeyboardShortcut('e', () => {
+    navigateSound()
+    router.push('/experiments')
   })
 
   const AudioIcon = isAudioEnabled ? Icons.volumeUp : Icons.volumeMute
@@ -103,7 +109,7 @@ export function Navbar() {
                   type="button"
                   aria-label={isAudioEnabled ? 'Turn sound effects off' : 'Turn sound effects on'}
                   aria-pressed={isAudioEnabled}
-                  aria-keyshortcuts="F1"
+                  aria-keyshortcuts="f1"
                   onMouseEnter={hoverLink}
                   onClick={handleAudioToggle}
                   className={cn(ICON_BUTTON_STYLES, '-ml-[7px]')}
@@ -113,6 +119,27 @@ export function Navbar() {
               </TooltipTrigger>
               <TooltipContent side="bottom" shortcut="F1">
                 {isAudioEnabled ? 'Sound Effects On' : 'Sound Effects Off'}
+              </TooltipContent>
+            </Tooltip>
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Link
+                  href="/experiments"
+                  aria-label={navbarContent.experiments}
+                  onMouseEnter={hoverLink}
+                  onClick={navigateSound}
+                  className={cn(
+                    ICON_BUTTON_STYLES,
+                    '-ml-[14px]',
+                    pathname === '/experiments' && 'text-primary',
+                  )}
+                >
+                  <Icons.experiments className="size-4.5" />
+                </Link>
+              </TooltipTrigger>
+              <TooltipContent side="bottom" shortcut="E">
+                {navbarContent.experiments}
               </TooltipContent>
             </Tooltip>
 

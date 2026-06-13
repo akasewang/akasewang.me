@@ -51,7 +51,7 @@ TooltipTrigger.displayName = Trigger.displayName
  */
 export const TooltipContent = forwardRef<
   ComponentRef<typeof Content>,
-  ComponentPropsWithoutRef<typeof Content> & { shortcut?: ReactNode }
+  ComponentPropsWithoutRef<typeof Content> & { shortcut?: ReactNode | string[] }
 >(({ className, sideOffset = 6, children, shortcut, ...props }, ref) => (
   <Portal>
     <Content
@@ -64,7 +64,15 @@ export const TooltipContent = forwardRef<
       {...props}
     >
       {children}
-      {shortcut && <Kbd>{shortcut}</Kbd>}
+      {shortcut && (
+        <div className="flex items-center gap-1">
+          {Array.isArray(shortcut) ? (
+            shortcut.map((key, i) => <Kbd key={i}>{key}</Kbd>)
+          ) : (
+            <Kbd>{shortcut}</Kbd>
+          )}
+        </div>
+      )}
       <Arrow className="fill-primary" />
     </Content>
   </Portal>

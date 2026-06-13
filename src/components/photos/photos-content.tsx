@@ -115,7 +115,7 @@ export function PhotosContent() {
         {filteredPhotos.length > 0 ? (
           <div
             key="photo-grid"
-            className="columns-1 gap-4 space-y-4 sm:columns-2 lg:columns-3 xl:columns-4"
+            className="columns-1 gap-2 space-y-2 sm:columns-2 sm:gap-2.5 sm:space-y-2.5 lg:columns-3 xl:columns-4"
           >
             {filteredPhotos.map((photo) => (
               <PhotoCard

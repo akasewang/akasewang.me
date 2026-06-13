@@ -1,16 +1,16 @@
 'use client'
 
-import { useMemo, useEffect } from 'react'
-import { usePathname } from 'next/navigation'
 import { AnimatePresence, m } from 'framer-motion'
+import { usePathname } from 'next/navigation'
+import { useEffect, useMemo } from 'react'
+import { EmptyState } from '@/components/common/empty-state'
+import { SectionTitle } from '@/components/layout/section-title'
+import { ProjectCard } from '@/components/projects/project-card'
 import { useViews } from '@/components/providers/views-context'
 import { ViewAll } from '@/components/ui/view-all'
-import { ProjectCard } from '@/components/projects/project-card'
-import { EmptyState } from '@/components/common/empty-state'
-import { landingPageContent } from '@/data/content/landing-content'
-import { SectionTitle } from '@/components/layout/section-title'
 import { SPRING_TRANSITION } from '@/constants/ui'
-import type { ProjectPostData, ProjectCategory } from '@/types/project'
+import { landingPageContent } from '@/data/content/landing-content'
+import type { ProjectCategory, ProjectPostData } from '@/types/project'
 
 /** Props for {@link FeaturedProjects}. */
 interface FeaturedProjectsProps {
@@ -63,7 +63,11 @@ export function FeaturedProjects({
       <>
         <AnimatePresence mode="popLayout">
           {displayed.length > 0 ? (
-            <m.div key="project-grid" layout className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+            <m.div
+              key="project-grid"
+              layout
+              className="grid grid-cols-1 gap-2 sm:grid-cols-2 sm:gap-2.5"
+            >
               {displayed.map((project) => (
                 <m.div
                   key={project.slug}

@@ -85,7 +85,7 @@ export function SlugNavigation({ prev, next, basePath, content, url, title }: Sl
     }
   }
 
-  useKeyboardShortcut('C', handleCopy)
+  useKeyboardShortcut('c', handleCopy, { shiftKey: true })
   useKeyboardShortcut('arrowleft', () => navigateTo(prev))
   useKeyboardShortcut('arrowright', () => navigateTo(next))
 
@@ -130,7 +130,7 @@ export function SlugNavigation({ prev, next, basePath, content, url, title }: Sl
             aria-label="Copy content"
           />
         </TooltipTrigger>
-        <TooltipContent side="bottom" align="center" sideOffset={6} shortcut="C">
+        <TooltipContent side="bottom" align="center" sideOffset={6} shortcut={['Shift', 'C']}>
           Copy content
         </TooltipContent>
       </Tooltip>

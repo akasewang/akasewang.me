@@ -11,7 +11,7 @@ export function Kbd({ children, className, ...props }: KbdProps) {
   return (
     <kbd
       className={cn(
-        'pointer-events-none inline-flex min-h-[18px] min-w-[18px] select-none items-center justify-center rounded-[4px] px-0.5',
+        'pointer-events-none inline-flex min-h-[18px] min-w-[18px] select-none items-center justify-center rounded-[4px] px-1.5',
         'ring-1 ring-inset ring-neutral-700/80 retina:ring-[0.5px]',
         'bg-gradient-to-br from-neutral-600 via-neutral-700 to-neutral-800',
         'font-sans text-[9px] font-bold tracking-wide text-neutral-200',

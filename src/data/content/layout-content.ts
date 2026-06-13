@@ -1,4 +1,5 @@
 import { FULL_NAME } from '@/constants/constants'
+import pkg from '../../../package.json'
 import type {
   NavbarContent,
   FooterContent,
@@ -17,7 +18,9 @@ export const navbarContent: NavbarContent = {
   blogs: 'Blogs',
   projects: 'Projects',
   photos: 'Photos',
+  experiments: 'Experiments',
   changelog: 'Changelog',
+  catalog: 'Catalog',
 }
 
 /** Footer attribution and content license. */
@@ -25,7 +28,7 @@ export const footerContent: FooterContent = {
   ownerName: FULL_NAME,
   license: 'CC BY-NC-SA 4.0',
   licenseHref: 'https://creativecommons.org/licenses/by-nc-sa/4.0/',
-  changelogLabel: 'changelog',
+  changelogLabel: `v${pkg.version}`,
   changelogHref: '/changelog',
 }
 

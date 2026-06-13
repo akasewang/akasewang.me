@@ -36,6 +36,7 @@ export async function GET(): Promise<Response> {
     { path: '/message-board', priority: '0.6', changefreq: 'monthly' },
     { path: '/newsletter', priority: '0.8', changefreq: 'monthly' },
     { path: '/photos', priority: '0.4', changefreq: 'monthly' },
+    { path: '/experiments', priority: '0.5', changefreq: 'weekly' },
     { path: '/catalog', priority: '0.4', changefreq: 'monthly' },
     { path: '/skills', priority: '0.8', changefreq: 'monthly' },
     { path: '/testimonials', priority: '0.7', changefreq: 'monthly' },

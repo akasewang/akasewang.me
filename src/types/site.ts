@@ -13,8 +13,12 @@ export interface NavbarContent {
   projects: string
   /** Photos link label. */
   photos: string
+  /** Experiments link label. */
+  experiments: string
   /** Changelog link label. */
   changelog: string
+  /** Catalog link label. */
+  catalog: string
 }
 
 /** Footer attribution and optional license link. */

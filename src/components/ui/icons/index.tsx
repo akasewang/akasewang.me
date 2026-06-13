@@ -173,6 +173,11 @@ export const Icons = {
       <path d="M21 3a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1zM11 13H4v6h7zm9 0h-7v6h7zm-9-8H4v6h7zm9 0h-7v6h7z" />
     </svg>
   ),
+  catalog: ({ size = 24, ...props }: IconProps) => (
+    <svg viewBox="0 0 24 24" fill="currentColor" width={size} height={size} {...props}>
+      <path d="M13 4h8v2h-8zm0 7h8v2h-8zm0 7h8v2h-8zm-6.5 1a2 2 0 1 1 0-4a2 2 0 0 1 0 4m0 2a4 4 0 1 0 0-8a4 4 0 0 0 0 8M5 6v3h3V6zM3 4h7v7H3z" />
+    </svg>
+  ),
   layoutPanel: ({ size = 24, ...props }: IconProps) => (
     <svg viewBox="0 0 24 24" fill="currentColor" width={size} height={size} {...props}>
       <path d="M22 20a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h18a1 1 0 0 1 1 1zm-11-5H4v4h7zm9-4h-7v8h7zm-9-6H4v8h7zm9 0h-7v4h7z" />
@@ -181,6 +186,11 @@ export const Icons = {
   terminal: ({ size = 24, ...props }: IconProps) => (
     <svg viewBox="0 0 24 24" fill="currentColor" width={size} height={size} {...props}>
       <path d="M11 19h8v-2h-8v2zm-7.6-6.1L2 11.5l5.5-5.5l1.42 1.4L4.82 11.5L8.92 15.6l-1.42 1.4z" />
+    </svg>
+  ),
+  experiments: ({ size = 24, ...props }: IconProps) => (
+    <svg viewBox="0 0 24 24" fill="currentColor" width={size} height={size} {...props}>
+      <path d="M16 2v2h-1v3.243a8 8 0 0 0 .736 3.352l4.281 9.276A1.5 1.5 0 0 1 18.655 22H5.344a1.5 1.5 0 0 1-1.362-2.129l4.281-9.276A8 8 0 0 0 9 7.243V4H8V2zm-2.613 8.001h-2.776q-.156.545-.374 1.071l-.158.362L6.124 20h11.75l-3.954-8.566A10 10 0 0 1 13.387 10M11 7.243q0 .38-.028.758h2.057a10 10 0 0 1-.02-.364L13 7.243V4h-2z" />
     </svg>
   ),
   gitCommit: ({ size = 24, ...props }: IconProps) => (

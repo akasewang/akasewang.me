@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { ViewCounter } from '@/components/common/view-counter'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { footerContent } from '@/data/content/layout-content'
@@ -16,10 +17,22 @@ const currentYear = new Date().getFullYear()
  */
 export function Footer() {
   const { hoverLink, navigate: navigateSound } = useSoundEffects()
+  useKeyboardShortcut(
+    'l',
+    () => {
+      if (licenseHref) {
+        navigateSound()
+        window.open(licenseHref, '_blank', 'noopener,noreferrer')
+      }
+    },
+    { shiftKey: true },
+  )
+
+  const router = useRouter()
   useKeyboardShortcut('l', () => {
-    if (licenseHref) {
+    if (changelogHref) {
       navigateSound()
-      window.open(licenseHref, '_blank', 'noopener,noreferrer')
+      router.push(changelogHref)
     }
   })
 
@@ -27,8 +40,10 @@ export function Footer() {
     <footer className="py-6">
       <div className="mx-auto flex max-w-[800px] flex-col items-center justify-between gap-2 px-8 sm:flex-row">
         <p className="text-sm text-muted-foreground/50">
+          &copy; {currentYear} {ownerName}
           {license && (
-            <span className="mr-1">
+            <>
+              <span className="mx-1.5">•</span>
               {licenseHref ? (
                 <Tooltip>
                   <TooltipTrigger asChild>
@@ -43,32 +58,37 @@ export function Footer() {
                       {license}
                     </Link>
                   </TooltipTrigger>
-                  <TooltipContent side="top" shortcut="L">
+                  <TooltipContent side="top" shortcut={['Shift', 'L']}>
                     View License
                   </TooltipContent>
                 </Tooltip>
               ) : (
                 license
               )}
-            </span>
+            </>
           )}
-          &copy; {currentYear} {ownerName}
         </p>
 
         <div className="flex items-center gap-3 text-sm tracking-wide text-muted-foreground/50">
-          {changelogLabel && changelogHref && (
-            <Link
-              href={changelogHref}
-              onMouseEnter={hoverLink}
-              onClick={navigateSound}
-              className="transition-colors duration-300 hover:text-foreground"
-            >
-              {changelogLabel}
-            </Link>
-          )}
-
-          {/** Use visitor counting to aggregate unique IP visits across the entire domain rather than total page views. */}
           <ViewCounter type="visitors" />
+
+          {changelogLabel && changelogHref && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Link
+                  href={changelogHref}
+                  onMouseEnter={hoverLink}
+                  onClick={navigateSound}
+                  className="transition-colors duration-300 hover:text-foreground font-mono"
+                >
+                  {changelogLabel}
+                </Link>
+              </TooltipTrigger>
+              <TooltipContent side="top" shortcut="L">
+                View Changelog
+              </TooltipContent>
+            </Tooltip>
+          )}
         </div>
       </div>
     </footer>

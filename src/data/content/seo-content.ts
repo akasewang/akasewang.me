@@ -85,6 +85,15 @@ export const changelogSeoContent: SeoContent = {
   ogTitle: 'Every update shipped to this site.',
 }
 
+/** SEO metadata for the experiments page. */
+export const experimentsSeoContent: SeoContent = {
+  title: `Experiments | ${FULL_NAME}`,
+  description:
+    'A playground of interactive creative coding sketches. Generative fields, particle systems and shader like toys I build to see if an idea feels good before it grows up.',
+  imageAlt: `Experiments - ${FULL_NAME}`,
+  ogTitle: 'A playground of interactive creative coding sketches.',
+}
+
 /** SEO metadata for the photos page. */
 export const photosSeoContent: SeoContent = {
   title: `Photos | ${FULL_NAME}`,
