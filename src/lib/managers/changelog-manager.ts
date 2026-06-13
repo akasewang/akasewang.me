@@ -39,7 +39,32 @@ function getCommitDate(entry: GithubCommitEntry): Date {
 /** Maps a raw GitHub API entry into the UI ready {@link ChangelogCommit} shape. */
 function toChangelogCommit(entry: GithubCommitEntry, date: Date): ChangelogCommit {
   const [subject, ...rest] = entry.commit.message.split('\n')
-  const body = rest.map((line) => line.trim()).filter(Boolean)
+  const blocks: string[] = []
+  let currentBlock: string[] = []
+
+  for (let line of rest) {
+    line = line.trim()
+
+    if (!line) {
+      if (currentBlock.length > 0) {
+        blocks.push(currentBlock.join('\n'))
+        currentBlock = []
+      }
+    } else if (line.startsWith('- ') || line.startsWith('* ')) {
+      if (currentBlock.length > 0) {
+        blocks.push(currentBlock.join('\n'))
+      }
+      currentBlock = [line]
+    } else {
+      currentBlock.push(line)
+    }
+  }
+
+  if (currentBlock.length > 0) {
+    blocks.push(currentBlock.join('\n'))
+  }
+
+  const body = blocks
 
   const account = entry.author
   /** Request a small avatar variant since the UI renders it at roughly 16px. */
