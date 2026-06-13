@@ -71,7 +71,7 @@ export const Callout = ({ type = 'info', title, children, className }: CalloutPr
       aria-labelledby={labelId}
       style={{ '--callout-hue': hue } as CSSProperties}
       className={cn(
-        'relative isolate not-prose my-6 overflow-hidden rounded-xl bg-[color-mix(in_oklab,var(--callout-hue)_6%,oklch(0.23_0_0_/_0.3))] motion-safe:animate-in motion-safe:fade-in-0 motion-safe:duration-300',
+        'relative isolate not-prose my-6 overflow-hidden rounded-xl border border-[color-mix(in_oklab,var(--callout-hue)_18%,transparent)] bg-[color-mix(in_oklab,var(--callout-hue)_6%,oklch(0.23_0_0_/_0.3))] motion-safe:animate-in motion-safe:fade-in-0 motion-safe:duration-300',
         className,
       )}
     >

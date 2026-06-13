@@ -9,10 +9,8 @@ import { ProjectDemo } from './project-demo'
 import { AsideTOC } from './aside-toc'
 import { LinkText } from '@/components/ui/link-text'
 import { ZoomableImage } from './zoomable-image'
-import { ComponentPreview } from '@/components/registry/component-preview'
-import { ComponentInstall } from '@/components/registry/component-install'
-import { ComponentSource } from '@/components/registry/component-source'
-import { DownloadCounter } from '@/components/registry/download-counter'
+import { ComponentPreview } from './showcase/component-preview'
+import { ComponentSource } from './showcase/component-source'
 
 /**
  * Global MDX configuration and component mapping.
@@ -50,7 +48,5 @@ export const MDX_COMPONENTS = {
   AsideTOC,
   ZoomableImage,
   ComponentPreview,
-  ComponentInstall,
   ComponentSource,
-  DownloadCounter,
 }

@@ -108,7 +108,7 @@ export function ProjectDemo({ image, video, title }: ProjectDemoProps) {
   return (
     <div className="my-8 w-full not-prose" ref={containerRef}>
       <figure
-        className="group/demo relative isolate m-0 select-none overflow-hidden rounded-xl bg-muted/40 motion-safe:animate-in motion-safe:fade-in-0 motion-safe:duration-500"
+        className="group/demo relative isolate m-0 select-none overflow-hidden rounded-xl border border-border/50 bg-muted/40 motion-safe:animate-in motion-safe:fade-in-0 motion-safe:duration-500"
         onMouseEnter={() => {
           if (video) hoverCard()
           updateState({ isHovered: true })

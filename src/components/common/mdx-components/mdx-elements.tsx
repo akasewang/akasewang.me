@@ -70,7 +70,7 @@ export const mdxElements = {
     <code
       className={
         className ||
-        'rounded-md bg-muted/50 px-1.5 py-0.5 font-mono text-xs text-secondary whitespace-nowrap'
+        'rounded-md bg-muted/50 px-1.5 py-0.5 font-mono text-xs text-secondary whitespace-nowrap ring-1 ring-inset ring-border/30'
       }
       {...props}
     >

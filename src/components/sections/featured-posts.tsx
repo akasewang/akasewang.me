@@ -7,6 +7,7 @@ import { ViewAll } from '@/components/ui/view-all'
 import { HoverHighlight } from '@/components/ui/hover-highlight'
 import { BlogPostCard } from '@/components/blogs/blog-post-card'
 import { useViews } from '@/components/providers/views-context'
+import { blogsListingContent } from '@/data/content/blogs-content'
 import { landingPageContent } from '@/data/content/landing-content'
 import { SectionTitle } from '@/components/layout/section-title'
 import { EmptyState } from '@/components/common/empty-state'
@@ -21,6 +22,13 @@ interface FeaturedPostsProps {
 }
 
 const { featuredPosts } = landingPageContent.sections
+
+/** Category specific empty state copy, falling back to the generic message. */
+const EMPTY_MESSAGES: Partial<Record<BlogCategory, string>> = {
+  technical: blogsListingContent.noTechnical,
+  personal: blogsListingContent.noPersonal,
+  'short-notes': blogsListingContent.noShortNotes,
+}
 
 /**
  * Featured Posts Section.
@@ -38,9 +46,10 @@ export function FeaturedPosts({ filterType, searchQuery, posts }: FeaturedPostsP
 
     const isFiltering = filterType && filterType !== 'all'
     if (isFiltering) {
-      filtered = filtered.filter((p) =>
-        filterType === 'technical' ? p.type !== 'personal' : p.type === 'personal',
-      )
+      filtered = filtered.filter((p) => {
+        const postType = p.type || 'technical'
+        return postType === filterType
+      })
     }
 
     if (searchQuery) {
@@ -81,7 +90,12 @@ export function FeaturedPosts({ filterType, searchQuery, posts }: FeaturedPostsP
             ))}
           </m.div>
         ) : (
-          <EmptyState key="no-posts" message="no posts found." />
+          <EmptyState
+            key="no-posts"
+            message={
+              (!searchQuery && filterType && EMPTY_MESSAGES[filterType]) || 'no posts found.'
+            }
+          />
         )}
       </AnimatePresence>
 

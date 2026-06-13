@@ -8,6 +8,7 @@ import { CopyButton } from '@/components/ui/copy-button'
 interface PreProps extends HTMLAttributes<HTMLPreElement> {
   copyable?: boolean
   raw?: boolean
+  title?: string
 }
 
 /**
@@ -24,14 +25,42 @@ const extractCode = (node: ReactNode): string => {
 }
 
 /**
- * Custom `<pre>` renderer for MDX code blocks. Extracts the code text to power a floating
- * hover copy to clipboard button.
- *
- * @param copyable - Whether to display the copy button hover action. Defaults to true.
- * @param raw - If true, bypasses the styled wrapper and renders a standard HTML pre tag.
+ * Walk the element tree for a `language-*` class to detect the fenced code language.
+ * rehype-highlight leaves this class on the inner `<code>` element rather than the `<pre>`.
  */
-export const Pre = ({ copyable = true, raw = false, className, children, ...props }: PreProps) => {
+const extractLanguage = (node: ReactNode): string | null => {
+  if (Array.isArray(node)) {
+    for (const child of node) {
+      const lang = extractLanguage(child)
+      if (lang) return lang
+    }
+    return null
+  }
+  if (!isValidElement(node)) return null
+  const { className, children } = node.props as { className?: string; children?: ReactNode }
+  return /language-([\w-]+)/.exec(className ?? '')?.[1] ?? extractLanguage(children ?? null)
+}
+
+/**
+ * Custom `<pre>` renderer for MDX code blocks. Detects the fenced language to render a slim
+ * header bar with a label and extracts the code text to power a copy to clipboard button.
+ * Blocks without a detectable language fall back to a frameless layout where the copy
+ * button is revealed on hover.
+ *
+ * @param copyable - Whether to display the copy to clipboard button. Defaults to true.
+ * @param raw - If true, bypasses the styled wrapper and renders a standard HTML pre tag.
+ * @param title - Optional label for the header bar overriding the detected language.
+ */
+export const Pre = ({
+  copyable = true,
+  raw = false,
+  title,
+  className,
+  children,
+  ...props
+}: PreProps) => {
   const code = useMemo(() => extractCode(children), [children])
+  const label = useMemo(() => title ?? extractLanguage(children), [title, children])
 
   if (raw)
     return (
@@ -40,33 +69,56 @@ export const Pre = ({ copyable = true, raw = false, className, children, ...prop
       </pre>
     )
 
+  const hasHeader = Boolean(label)
+
   return (
     /**
-     * By placing both the CopyButton container and the `<pre>` in col-start-1 row-start-1,
-     * the button can use `sticky top-2.5` to float elegantly while scrolling, which is
-     * impossible with traditional `absolute` positioning inside an `overflow-x-auto` container.
+     * The CopyButton container spans every grid row alongside the header and the `<pre>`,
+     * letting it use `sticky` to float elegantly while scrolling, which is impossible
+     * with traditional `absolute` positioning inside an `overflow-x-auto` container.
      */
-    <figure className="group/pre relative isolate my-6 w-full max-w-full not-prose rounded-xl bg-code-block grid">
+    <figure className="group/pre relative isolate my-6 grid w-full max-w-full not-prose rounded-xl border border-border/50 bg-code-block">
+      {hasHeader && (
+        <figcaption className="col-start-1 row-start-1 flex h-9 select-none items-center rounded-t-[inherit] border-b border-border/40 bg-code-tab/50 px-4">
+          <span className="font-mono text-[10px] font-medium lowercase tracking-widest text-muted-foreground">
+            {label}
+          </span>
+        </figcaption>
+      )}
       {copyable && (
-        <div className="col-start-1 row-start-1 sticky top-2.5 z-20 justify-self-end self-start pointer-events-none pr-2.5 py-2.5">
+        <div
+          className={cn(
+            'pointer-events-none sticky z-20 col-start-1 row-start-1 self-start justify-self-end',
+            hasHeader ? 'top-1.5 row-span-2 pt-1.5 pr-2' : 'top-2.5 pt-2.5 pr-2.5',
+          )}
+        >
           <CopyButton
             value={code}
             iconSize={14}
             className={cn(
-              'pointer-events-auto flex size-6 items-center justify-center scale-[0.95] rounded-md opacity-0 backdrop-blur-sm',
+              'pointer-events-auto flex size-6 items-center justify-center rounded-md',
               'transition-[color,background-color,opacity,transform,scale] duration-200 ease-out',
-              'bg-transparent text-secondary',
-              'hover:bg-background/80 hover:text-primary',
-              'group-hover/pre:scale-100 group-hover/pre:opacity-100',
-              'data-[copied=true]:scale-100 data-[copied=true]:text-primary data-[copied=true]:opacity-100',
-              '[@media(hover:none)]:scale-100 [@media(hover:none)]:opacity-100',
+              hasHeader
+                ? cn(
+                    'text-muted-foreground backdrop-blur-sm',
+                    'hover:bg-background/70 hover:text-primary',
+                    'data-[copied=true]:text-primary',
+                  )
+                : cn(
+                    'scale-[0.95] bg-transparent text-secondary opacity-0 backdrop-blur-sm',
+                    'hover:bg-background/80 hover:text-primary',
+                    'group-hover/pre:scale-100 group-hover/pre:opacity-100',
+                    'data-[copied=true]:scale-100 data-[copied=true]:text-primary data-[copied=true]:opacity-100',
+                    '[@media(hover:none)]:scale-100 [@media(hover:none)]:opacity-100',
+                  ),
             )}
           />
         </div>
       )}
       <pre
         className={cn(
-          'col-start-1 row-start-1 overflow-x-auto px-4.5 py-3.5 font-mono text-xs leading-relaxed',
+          'col-start-1 overflow-x-auto px-4.5 py-3.5 font-mono text-xs leading-relaxed',
+          hasHeader ? 'row-start-2' : 'row-start-1',
           '[&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-muted [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar]:h-1.5',
           className,
         )}

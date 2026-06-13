@@ -76,6 +76,15 @@ export const catalogSeoContent: SeoContent = {
   ogTitle: 'A curated log of media and entertainment.',
 }
 
+/** SEO metadata for the changelog page. */
+export const changelogSeoContent: SeoContent = {
+  title: `Changelog | ${FULL_NAME}`,
+  description:
+    'A running log of every update shipped to this site, pulled straight from the GitHub commit history. This website is a product and these are its release notes.',
+  imageAlt: `Changelog - ${FULL_NAME}`,
+  ogTitle: 'Every update shipped to this site.',
+}
+
 /** SEO metadata for the photos page. */
 export const photosSeoContent: SeoContent = {
   title: `Photos | ${FULL_NAME}`,
@@ -83,13 +92,4 @@ export const photosSeoContent: SeoContent = {
     'A small collection of photos I have taken. Mostly just proof that I step away from my keyboard sometimes.',
   imageAlt: `Photos - ${FULL_NAME}`,
   ogTitle: 'A small collection of photos I have taken.',
-}
-
-/** SEO metadata for the component registry page. */
-export const componentsSeoContent: SeoContent = {
-  title: `Components | ${FULL_NAME}`,
-  description:
-    'A registry of reusable UI components and micro interactions I have built for my projects.',
-  imageAlt: `Components - ${FULL_NAME}`,
-  ogTitle: 'Reusable UI components and interactions.',
 }

@@ -14,8 +14,8 @@ export const generateId = (text: string): string =>
     .replace(/^-+|-+$/g, '')
 
 /**
- * Builds a table of contents from MDX/markdown content. Prefers existing `<h2>`–`<h4>` tags
- * with `id` attributes and otherwise falls back to parsing `##`–`####` markdown headings
+ * Builds a table of contents from MDX/markdown content. Prefers existing `<h2>` to `<h4>` tags
+ * with `id` attributes and otherwise falls back to parsing `##` to `####` markdown headings
  * (ignoring fenced code blocks), generating ids via {@link generateId}.
  */
 export function parseTocFromContent(content: string): TocItem[] {

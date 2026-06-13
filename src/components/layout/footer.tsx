@@ -7,7 +7,7 @@ import { footerContent } from '@/data/content/layout-content'
 import { useKeyboardShortcut } from '@/hooks/use-keyboard-shortcut'
 import { useSoundEffects } from '@/hooks/use-sound-effects'
 
-const { license, licenseHref, ownerName } = footerContent
+const { license, licenseHref, ownerName, changelogLabel, changelogHref } = footerContent
 const currentYear = new Date().getFullYear()
 
 /**
@@ -55,7 +55,18 @@ export function Footer() {
           &copy; {currentYear} {ownerName}
         </p>
 
-        <div className="text-sm tracking-wide text-muted-foreground/50">
+        <div className="flex items-center gap-3 text-sm tracking-wide text-muted-foreground/50">
+          {changelogLabel && changelogHref && (
+            <Link
+              href={changelogHref}
+              onMouseEnter={hoverLink}
+              onClick={navigateSound}
+              className="transition-colors duration-300 hover:text-foreground"
+            >
+              {changelogLabel}
+            </Link>
+          )}
+
           {/** Use visitor counting to aggregate unique IP visits across the entire domain rather than total page views. */}
           <ViewCounter type="visitors" />
         </div>

@@ -40,7 +40,7 @@ export function ProfilePicture({ src, alt, className }: ProfilePictureProps) {
           rotate: thread1.rotate,
           scale: thread1.scale,
         }}
-        className="absolute -inset-[3px] -z-10 border border-primary/80 opacity-70"
+        className="absolute -inset-[3.5px] -z-10 border border-primary/80 opacity-70"
       />
       <m.div
         suppressHydrationWarning
@@ -49,7 +49,7 @@ export function ProfilePicture({ src, alt, className }: ProfilePictureProps) {
           rotate: thread2.rotate,
           scale: thread2.scale,
         }}
-        className="absolute -inset-[3px] -z-10 border border-primary/60 opacity-45"
+        className="absolute -inset-[3.5px] -z-10 border border-primary/60 opacity-45"
       />
       <m.div
         suppressHydrationWarning
@@ -58,7 +58,7 @@ export function ProfilePicture({ src, alt, className }: ProfilePictureProps) {
           rotate: thread3.rotate,
           scale: thread3.scale,
         }}
-        className="absolute -inset-[3px] -z-10 border border-primary/40 opacity-25"
+        className="absolute -inset-[3.5px] -z-10 border border-primary/40 opacity-25"
       />
       <m.div
         suppressHydrationWarning

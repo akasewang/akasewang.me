@@ -22,8 +22,7 @@ const nextConfig: NextConfig = withMDX({
   pageExtensions: ['ts', 'tsx', 'js', 'jsx', 'md', 'mdx'],
   outputFileTracingIncludes: {
     '/feed.xml': ['./docs/blogs/**/*'],
-    '/r/*': ['./src/registry/**/*'],
-    '/sitemap.xml': ['./docs/blogs/**/*', './docs/components/**/*', './docs/projects/**/*'],
+    '/sitemap.xml': ['./docs/blogs/**/*', './docs/projects/**/*'],
   },
   experimental: {
     /**
@@ -49,6 +48,11 @@ const nextConfig: NextConfig = withMDX({
       {
         protocol: 'https',
         hostname: 'picsum.photos',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'avatars.githubusercontent.com',
         pathname: '/**',
       },
     ],

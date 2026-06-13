@@ -9,4 +9,5 @@ export const blogsListingContent: BlogsListingContent = {
   subtitle: 'More thoughts than I know what to do with.',
   noTechnical: 'No technical articles published yet.',
   noPersonal: 'No personal blogs published yet.',
+  noShortNotes: 'No short notes published yet.',
 }

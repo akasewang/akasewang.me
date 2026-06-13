@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { USERNAME, SITE } from '@/constants/constants'
 
 const CACHE_KEY = 'github_stars_cache'
 const CACHE_TTL = 15 * 60 * 1000
@@ -11,9 +10,11 @@ let sharedFetchPromise: Promise<number | null> | null = null
 
 /**
  * React hook to fetch and cache GitHub stars for the site's repository.
- * Utilizes a shared promise to prevent network spam if used in multiple components,
- * and localStorage to prevent rate limiting across tabs and page navigations.
- * Includes strict Error Boundaries for incognito/privacy mode storage blocks.
+ * Calls the internal `/api/github-stars` proxy (which holds the optional `GITHUB_TOKEN`
+ * server side) rather than the GitHub API directly. Utilizes a shared promise to prevent
+ * network spam if used in multiple components, and localStorage to prevent refetching
+ * across tabs and page navigations. Includes strict Error Boundaries for
+ * incognito/privacy mode storage blocks.
  */
 export function useGithubStars() {
   const [stars, setStars] = useState<number | null>(null)
@@ -22,7 +23,7 @@ export function useGithubStars() {
     let isMounted = true
 
     const fetchStars = async () => {
-      /** 1. Attempt to read from cache first to avoid hitting GitHub API rate limits. */
+      /** 1. Read from cache first for an instant paint and to skip a network round trip on repeat visits. */
       try {
         const cached = localStorage.getItem(CACHE_KEY)
         if (cached) {
@@ -39,13 +40,13 @@ export function useGithubStars() {
       try {
         /** 2. If another component is already fetching, piggyback on that promise. */
         if (!sharedFetchPromise) {
-          sharedFetchPromise = fetch(`https://api.github.com/repos/${USERNAME}/${SITE}`)
+          sharedFetchPromise = fetch('/api/github-stars')
             .then((res) => {
               if (!res.ok) throw new Error('API limit or network error')
               return res.json()
             })
             .then((data) => {
-              const count = data.stargazers_count
+              const count = data.count
               if (typeof count === 'number') {
                 try {
                   /** 3. Cache the result for future visits across all tabs. */

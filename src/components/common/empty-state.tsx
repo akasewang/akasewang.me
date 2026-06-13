@@ -14,7 +14,7 @@ interface EmptyStateProps {
 /**
  * A standard UI component used to display a visually appealing message when no data is available.
  * Note: This component is intentionally purely functional (no framer-motion) so that parent
- * components (like RegistryList) can cleanly handle `AnimatePresence` and `layout` shifts.
+ * components (like filtered lists) can cleanly handle `AnimatePresence` and `layout` shifts.
  *
  * @param title - Optional heading to display above the message.
  * @param message - The primary text explaining the empty state.

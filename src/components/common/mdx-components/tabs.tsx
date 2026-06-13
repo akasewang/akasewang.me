@@ -8,8 +8,10 @@ import {
   type ReactElement,
   type ReactNode,
   useCallback,
+  useEffect,
   useId,
   useMemo,
+  useRef,
   useState,
 } from 'react'
 import {
@@ -38,7 +40,8 @@ interface TabProps {
 
 /**
  * A tabbed container that turns each child `<Tab>` into a tab (labelled from `items` or the
- * tab's `title`), with an animated active tab indicator.
+ * tab's `title`), with an animated active tab indicator. Panels cross slide in the direction
+ * of travel while the container springs between panel heights instead of snapping.
  *
  * @param items - Optional array of strings to use as tab labels, overriding child `title` props.
  * @param defaultIndex - The index of the tab to activate by default.
@@ -49,6 +52,8 @@ export const Tabs = ({ items, defaultIndex = 0, className, children }: TabsProps
   const id = useId()
   const [activeIndex, setActiveIndex] = useState(defaultIndex)
   const [direction, setDirection] = useState(1)
+  const [panelHeight, setPanelHeight] = useState<number | 'auto'>('auto')
+  const panelRef = useRef<HTMLDivElement | null>(null)
 
   const validChildren = useMemo(
     () => Children.toArray(children).filter(isValidElement) as ReactElement<TabProps>[],
@@ -70,15 +75,31 @@ export const Tabs = ({ items, defaultIndex = 0, className, children }: TabsProps
   const safeIndex = activeIndex < validChildren.length ? activeIndex : 0
   const activeNode = validChildren[safeIndex]
 
+  /**
+   * Track the rendered height of the active panel so the container can spring smoothly
+   * between panels of different sizes. The observer also catches late layout shifts
+   * like images loading or the viewport resizing.
+   */
+  useEffect(() => {
+    const node = panelRef.current
+    if (!node) return
+    const observer = new ResizeObserver(() => setPanelHeight(node.offsetHeight))
+    observer.observe(node)
+    return () => observer.disconnect()
+  }, [safeIndex])
+
   return (
     <RadixTabs.Root
       value={safeIndex.toString()}
       onValueChange={handleValueChange}
-      className={cn('relative isolate my-6 not-prose rounded-xl bg-code-tab', className)}
+      className={cn(
+        'relative isolate my-6 not-prose rounded-xl border border-border/50 bg-code-tab',
+        className,
+      )}
     >
       <RadixTabs.List
         aria-label="Tabs"
-        className="flex items-center gap-1 overflow-x-auto px-2 pt-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        className="flex items-center gap-1 overflow-x-auto border-b border-border/40 p-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       >
         {validChildren.map((child, i) => {
           const value = i.toString()
@@ -93,15 +114,17 @@ export const Tabs = ({ items, defaultIndex = 0, className, children }: TabsProps
                 transition={SPRING_TRANSITION}
                 onMouseEnter={hoverTick}
                 className={cn(
-                  'group relative flex min-w-16 items-center justify-center rounded-lg px-3 py-1 font-mono text-xs font-medium lowercase transition-colors duration-300',
-                  isActive ? 'text-foreground' : 'text-muted-foreground hover:text-foreground/80',
+                  'group relative flex min-w-16 items-center justify-center whitespace-nowrap rounded-lg px-3.5 py-1.5 font-mono text-xs font-medium lowercase transition-colors duration-300',
+                  isActive
+                    ? 'text-primary'
+                    : 'text-muted-foreground hover:bg-background/40 hover:text-foreground/80',
                 )}
               >
                 <span className="relative z-10">{label}</span>
                 {isActive && (
                   <m.div
                     layoutId={`active-tab-${id}`}
-                    className="absolute inset-0 z-0 rounded-lg bg-background"
+                    className="absolute inset-0 z-0 rounded-lg bg-background shadow-[inset_0_1px_2px_0_oklch(0_0_0/0.25)] ring-1 ring-border/50"
                     transition={SMOOTH_SPRING_TRANSITION}
                   />
                 )}
@@ -110,10 +133,15 @@ export const Tabs = ({ items, defaultIndex = 0, className, children }: TabsProps
           )
         })}
       </RadixTabs.List>
-      <div className="relative overflow-hidden">
+      <m.div
+        animate={{ height: panelHeight }}
+        transition={SWIPE_TRANSITION}
+        className="relative overflow-hidden"
+      >
         <AnimatePresence mode="popLayout" initial={false} custom={direction}>
           <RadixTabs.Content key={safeIndex} value={safeIndex.toString()} asChild forceMount>
             <m.div
+              ref={panelRef}
               custom={direction}
               variants={SWIPE_VARIANTS}
               initial="enter"
@@ -129,7 +157,7 @@ export const Tabs = ({ items, defaultIndex = 0, className, children }: TabsProps
             </m.div>
           </RadixTabs.Content>
         </AnimatePresence>
-      </div>
+      </m.div>
     </RadixTabs.Root>
   )
 }

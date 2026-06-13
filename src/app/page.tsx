@@ -9,12 +9,10 @@ import { Achievements } from '@/components/sections/achievements'
 import { Bookmarks } from '@/components/sections/bookmarks'
 import { FeaturedProjects } from '@/components/sections/featured-projects'
 import { FeaturedPosts } from '@/components/sections/featured-posts'
-import { FeaturedComponents } from '@/components/sections/featured-components'
 import { Volunteer } from '@/components/sections/volunteer'
 import { NewsletterSubscription } from '@/components/common/newsletter-subscription'
 import { getAllBlogPosts } from '@/lib/managers/blog-manager'
 import { getAllProjects } from '@/lib/managers/project-manager'
-import { getRegistryComponents } from '@/registry/registry-sync'
 
 import { constructMetadata, getOgImageUrl } from '@/lib/metadata'
 import { homeSeoContent } from '@/data/content/seo-content'
@@ -36,11 +34,7 @@ export async function generateMetadata(): Promise<Metadata> {
  */
 export default async function Home() {
   /** Fetch all required MDX data streams simultaneously before yielding the React tree */
-  const [blogPosts, projects, components] = await Promise.all([
-    getAllBlogPosts(),
-    getAllProjects(),
-    getRegistryComponents(),
-  ])
+  const [blogPosts, projects] = await Promise.all([getAllBlogPosts(), getAllProjects()])
 
   return (
     <main className="flex-1">
@@ -50,7 +44,6 @@ export default async function Home() {
         <Experience />
         <Volunteer />
         <FeaturedProjects projects={projects} />
-        <FeaturedComponents components={components} />
         <FeaturedPosts posts={blogPosts} />
         <Education />
         <Achievements />

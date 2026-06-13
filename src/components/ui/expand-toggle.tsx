@@ -13,7 +13,7 @@ interface ExpandToggleProps {
 const FLUID_SPRING = { type: 'spring', bounce: 0, duration: 0.4 } as const
 
 /**
- * A purely visual expand/collapse chevron indicator driven by `isExpanded`. Controlled — it
+ * A purely visual expand/collapse chevron indicator driven by `isExpanded`. Controlled, it
  * manages no state or click handlers of its own.
  *
  * @param isExpanded - The external state controlling whether the toggle shows as open or closed.

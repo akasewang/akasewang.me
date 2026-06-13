@@ -4,6 +4,7 @@ import { format, isToday, isYesterday, parse, isValid } from 'date-fns'
 import {
   READING_SPEED,
   DATE_DISPLAY_FORMAT,
+  LONG_DATE_DISPLAY_FORMAT,
   DATE_PARSING_PATTERNS,
   YEAR_REGEX,
   MONTH_YEAR_REGEX,
@@ -113,7 +114,7 @@ export function formatTime(date: Date): string {
 export function formatDayLabel(date: Date): string {
   if (isToday(date)) return 'Today'
   if (isYesterday(date)) return 'Yesterday'
-  return format(date, 'd MMMM yyyy')
+  return format(date, LONG_DATE_DISPLAY_FORMAT)
 }
 
 /**

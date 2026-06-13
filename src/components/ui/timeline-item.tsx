@@ -1,12 +1,14 @@
 'use client'
 
-import { memo, useMemo, useState } from 'react'
+import { memo, useMemo } from 'react'
 import { Bullet } from '@/components/ui/bullet'
+import { ExpandableContent } from '@/components/ui/expandable-content'
 import { ExpandToggle } from '@/components/ui/expand-toggle'
 import { LinkText } from '@/components/ui/link-text'
 import { SeparatorDate } from '@/components/ui/separator-date'
 import { SeparatorSlash } from '@/components/ui/separator-slash'
 import { Tag } from '@/components/ui/tag'
+import { useExpandableRow } from '@/hooks/use-expandable-row'
 import { useSoundEffects } from '@/hooks/use-sound-effects'
 import type { TimelineItemProps } from '@/types/site'
 import { renderWithLinks } from '@/utils/content-utils'
@@ -34,9 +36,9 @@ export const TimelineItem = memo(function TimelineItem({
   tech,
   defaultExpanded = false,
 }: TimelineItemProps) {
-  const [isExpanded, setIsExpanded] = useState(defaultExpanded)
+  const { isExpanded, handleClick, handleKeyDown } = useExpandableRow(defaultExpanded)
   const hasContent = !!description?.length
-  const { toggle, hoverCard } = useSoundEffects()
+  const { hoverCard } = useSoundEffects()
 
   const parsedLines = useMemo(() => {
     if (!hasContent) return null
@@ -69,30 +71,6 @@ export const TimelineItem = memo(function TimelineItem({
       )
     })
   }, [description, hasContent])
-
-  const isNestedInteractiveTarget = (e: React.SyntheticEvent<HTMLElement>) =>
-    e.target instanceof Element &&
-    e.target !== e.currentTarget &&
-    e.target.closest('a, button, input, select, textarea, [role="button"]') !== e.currentTarget
-
-  const handleToggle = () => {
-    toggle(!isExpanded)
-    setIsExpanded((prev) => !prev)
-  }
-
-  const handleCardClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (isNestedInteractiveTarget(e)) return
-    handleToggle()
-  }
-
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
-    if (isNestedInteractiveTarget(e)) return
-
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault()
-      handleToggle()
-    }
-  }
 
   const itemSummary = (
     <>
@@ -149,7 +127,7 @@ export const TimelineItem = memo(function TimelineItem({
           role="button"
           tabIndex={0}
           aria-expanded={isExpanded}
-          onClick={handleCardClick}
+          onClick={handleClick}
           onKeyDown={handleKeyDown}
           onMouseEnter={hoverCard}
           data-highlight-item
@@ -162,19 +140,11 @@ export const TimelineItem = memo(function TimelineItem({
       )}
 
       {parsedLines && (
-        <div
-          className={cn(
-            'grid transition-[grid-template-rows,opacity] duration-300 ease-in-out',
-            isExpanded ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0',
-          )}
-          aria-hidden={!isExpanded}
-        >
-          <div className="overflow-hidden">
-            <div className="space-y-1.5 text-pretty pt-2 text-sm leading-relaxed text-foreground sm:pt-3">
-              {parsedLines}
-            </div>
+        <ExpandableContent isExpanded={isExpanded}>
+          <div className="space-y-1.5 text-pretty pt-2 text-sm leading-relaxed text-foreground sm:pt-3">
+            {parsedLines}
           </div>
-        </div>
+        </ExpandableContent>
       )}
 
       {!!tech?.length && (

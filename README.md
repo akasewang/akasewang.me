@@ -16,7 +16,6 @@ Source code for the personal portfolio, blog and digital footprint of Akash Dewa
 For a simple breakdown of how the systems in this portfolio work, check out the documentation:
 
 - [**System Overview**](./architecture/overview.md) - Hosting, database and SEO.
-- [**Component Registry API**](./architecture/registry.md) - How the `/r/[slug]` API serves components to the Shadcn CLI.
 - [**MDX & Content Parsing**](./architecture/mdx.md) - Reading local markdown files and swapping HTML for React.
 - [**State & Hooks**](./architecture/state.md) - URL based filtering and custom React hooks.
 - [**UI & Animations**](./architecture/ui.md) - Tailwind v4, custom cursors and Framer Motion effects.
@@ -33,7 +32,7 @@ This portfolio is built to be fast, secure and easy to maintain.
 
 - **Dynamic Images**: Social media preview images are generated from code automatically, so we don't need to manually create images for every new blog post.
 - **Structured Data**: The site automatically adds data tags to help Google and other search engines understand the content.
-- **Shareable Links**: When you filter or sort a list (like the component registry), the URL updates. If you send that link to a friend, they see exactly what you see.
+- **Shareable Links**: When you filter or sort a list (like the blog), the URL updates. If you send that link to a friend, they see exactly what you see.
 
 ### Database & Tracking
 
@@ -43,8 +42,7 @@ This portfolio is built to be fast, secure and easy to maintain.
 
 ### Content & Components
 
-- **Markdown (MDX)**: All blogs and projects are written in Markdown. We read these files locally and swap standard HTML for custom React components — styled links, tables, callouts, steps, tabs and zoomable images all render through our own components.
-- **Shadcn Registry**: Developers can use the Shadcn CLI to download components directly from this site using `npx shadcn add <component>`.
+- **Markdown (MDX)**: All blogs and projects are written in Markdown. We read these files locally and swap standard HTML for custom React components: styled links, tables, callouts, steps, tabs and zoomable images all render through our own components.
 - **Weekly Emails**: An automated cron job sends the site admin a weekly summary of new newsletter subscribers.
 
 ### Styling & Standards

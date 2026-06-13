@@ -53,7 +53,7 @@ export function ZoomableImage({
           setIsOpen(true)
         }}
         onMouseEnter={hoverCard}
-        className="block w-full cursor-zoom-in overflow-hidden rounded-xl text-left"
+        className="block w-full cursor-zoom-in overflow-hidden rounded-xl border border-border/50 text-left"
       >
         <m.div
           layoutId={`photo-${photo.id}`}

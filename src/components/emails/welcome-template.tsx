@@ -132,8 +132,8 @@ export const WelcomeTemplate = ({
   optInDate,
 }: WelcomeTemplateProps) => {
   const previewText = isResubscribe
-    ? `Good to have you back — ${FULL_NAME}`
-    : `You're on the list — ${FULL_NAME}`
+    ? `Good to have you back - ${FULL_NAME}`
+    : `You're on the list - ${FULL_NAME}`
 
   const eyebrow = isResubscribe ? 'welcome back' : 'new subscriber'
 

@@ -103,11 +103,6 @@ export const Icons = {
       <path d="M2 6c0-.552.455-1 .992-1h18.016c.548 0 .992.445.992 1v14c0 .552-.455 1-.992 1H2.992A.994.994 0 0 1 2 20zm2 1v12h16V7zm10 9a3 3 0 1 0 0-6a3 3 0 0 0 0 6m0 2a5 5 0 1 1 0-10a5 5 0 0 1 0 10M4 2h6v2H4z" />
     </svg>
   ),
-  components: ({ size = 24, ...props }: IconProps) => (
-    <svg viewBox="0 0 24 24" fill="currentColor" width={size} height={size} {...props}>
-      <path d="M7 5a4 4 0 1 1 8 0h3a1 1 0 0 1 1 1v3a4 4 0 0 1 0 8v3a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1zm4-2a2 2 0 0 0-1.886 2.667A1 1 0 0 1 8.17 7H5v12h12v-3.17a1 1 0 0 1 1.333-.944Q18.646 15 19 15a2 2 0 1 0-.667-3.886A1 1 0 0 1 17 10.17V7h-3.17a1 1 0 0 1-.944-1.333Q13 5.355 13 5a2 2 0 0 0-2-2" />
-    </svg>
-  ),
   chatUpload: ({ size = 24, ...props }: IconProps) => (
     <svg viewBox="0 0 24 24" fill="currentColor" width={size} height={size} {...props}>
       <path d="M6.455 19L2 22.5V4a1 1 0 0 1 1-1h18a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1zM4 18.385L5.763 17H20V5H4zM13 11v4h-2v-4H8l4-4l4 4z" />
@@ -186,6 +181,16 @@ export const Icons = {
   terminal: ({ size = 24, ...props }: IconProps) => (
     <svg viewBox="0 0 24 24" fill="currentColor" width={size} height={size} {...props}>
       <path d="M11 19h8v-2h-8v2zm-7.6-6.1L2 11.5l5.5-5.5l1.42 1.4L4.82 11.5L8.92 15.6l-1.42 1.4z" />
+    </svg>
+  ),
+  gitCommit: ({ size = 24, ...props }: IconProps) => (
+    <svg viewBox="0 0 24 24" fill="currentColor" width={size} height={size} {...props}>
+      <path d="M15.874 13a4.002 4.002 0 0 1-7.748 0H3v-2h5.126a4.002 4.002 0 0 1 7.748 0H21v2zM12 14a2 2 0 1 0 0-4a2 2 0 0 0 0 4" />
+    </svg>
+  ),
+  gitRepository: ({ size = 24, ...props }: IconProps) => (
+    <svg viewBox="0 0 24 24" fill="currentColor" width={size} height={size} {...props}>
+      <path d="M18 16v-2h1V4H6v10.035Q6.245 14 6.5 14H8v2H6.5a1.5 1.5 0 0 0 0 3H10v2H6.5A3.5 3.5 0 0 1 3 17.5V5a3 3 0 0 1 3-3h14a1 1 0 0 1 1 1v17a1 1 0 0 1-1 1h-4v-2h3v-3zM7 5h2v2H7zm0 3h2v2H7zm7 9v6h-2v-6H9l4-5l4 5z" />
     </svg>
   ),
   volumeUp: ({ size = 24, ...props }: IconProps) => (

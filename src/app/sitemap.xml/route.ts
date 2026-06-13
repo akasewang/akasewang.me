@@ -1,6 +1,5 @@
 import { getAllBlogPosts } from '@/lib/managers/blog-manager'
 import { getAllProjects } from '@/lib/managers/project-manager'
-import { getAllComponentDocs } from '@/lib/managers/component-manager'
 import { photos } from '@/data/static/photos'
 import { parseDate } from '@/utils/utils'
 import { SITE_URL } from '@/constants/constants'
@@ -16,18 +15,14 @@ interface SitemapUrl {
 
 /**
  * Generates an XML Sitemap for search engine crawlers (Googlebot, Bingbot, etc.).
- * Dynamically aggregates all static routes, blog posts, projects and component docs so the
+ * Dynamically aggregates all static routes, blog posts and projects so the
  * site's content stays accurately and freshly indexed. The photos page also lists its gallery
  * images via the image sitemap extension so they can surface in Google Images.
  *
  * @returns An XML Response containing the full URL set.
  */
 export async function GET(): Promise<Response> {
-  const [blogPosts, projectPosts, componentDocs] = await Promise.all([
-    getAllBlogPosts(),
-    getAllProjects(),
-    getAllComponentDocs(),
-  ])
+  const [blogPosts, projectPosts] = await Promise.all([getAllBlogPosts(), getAllProjects()])
 
   const currentDate = new Date().toISOString()
 
@@ -37,7 +32,6 @@ export async function GET(): Promise<Response> {
   const staticPages = [
     { path: '', priority: '1.0', changefreq: 'weekly' },
     { path: '/blogs', priority: '0.9', changefreq: 'daily' },
-    { path: '/components', priority: '0.9', changefreq: 'weekly' },
     { path: '/projects', priority: '0.8', changefreq: 'weekly' },
     { path: '/message-board', priority: '0.6', changefreq: 'monthly' },
     { path: '/newsletter', priority: '0.8', changefreq: 'monthly' },
@@ -45,6 +39,7 @@ export async function GET(): Promise<Response> {
     { path: '/catalog', priority: '0.4', changefreq: 'monthly' },
     { path: '/skills', priority: '0.8', changefreq: 'monthly' },
     { path: '/testimonials', priority: '0.7', changefreq: 'monthly' },
+    { path: '/changelog', priority: '0.6', changefreq: 'daily' },
   ]
 
   const urls: SitemapUrl[] = [
@@ -65,12 +60,6 @@ export async function GET(): Promise<Response> {
       url: `${SITE_URL}/projects/${project.slug}`,
       lastModified: parseDate(project.date),
       priority: '0.8',
-      changefreq: 'weekly',
-    })),
-    ...componentDocs.map((doc) => ({
-      url: `${SITE_URL}/components/${doc.slug}`,
-      lastModified: parseDate(doc.date),
-      priority: '0.7',
       changefreq: 'weekly',
     })),
   ]

@@ -57,7 +57,7 @@ const getShareUrl = (network: string, url: string, title: string) => {
     case 'Facebook':
       return `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`
     case 'WhatsApp':
-      return `https://api.whatsapp.com/send?text=${encodeURIComponent(`${title} — ${url}`)}`
+      return `https://api.whatsapp.com/send?text=${encodeURIComponent(`${title} - ${url}`)}`
     case 'Email':
       return `mailto:?subject=${encodedTitle}&body=${encodedUrl}`
     default:

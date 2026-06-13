@@ -45,8 +45,8 @@ export async function incrementViewAction(slug: string) {
  * @returns A dictionary mapping each slug to its current view count.
  */
 export async function getViewsBatchAction(slugs: string[]) {
-  /** Return empty maps immediately if the array is empty to save a database call */
-  if (!slugs?.length) return { views: {}, installs: {} }
+  /** Return an empty map immediately if the array is empty to save a database call */
+  if (!slugs?.length) return { views: {} }
 
   try {
     /** Fetch all requested slugs in a single IN clause for optimal performance */
@@ -54,55 +54,20 @@ export async function getViewsBatchAction(slugs: string[]) {
       .select({
         slug: views.slug,
         count: views.count,
-        installs: views.installs,
       })
       .from(views)
       .where(inArray(views.slug, slugs))
 
-    /** Prefill maps with 0 for all requested slugs to handle missing database rows gracefully */
+    /** Prefill the map with 0 for all requested slugs to handle missing database rows gracefully */
     const viewsMap: Record<string, number> = Object.fromEntries(slugs.map((slug) => [slug, 0]))
-    const installsMap: Record<string, number> = Object.fromEntries(slugs.map((slug) => [slug, 0]))
 
     for (const row of result) {
       viewsMap[row.slug] = row.count
-      installsMap[row.slug] = row.installs
     }
 
-    return { views: viewsMap, installs: installsMap }
+    return { views: viewsMap }
   } catch (error) {
     console.error(logContent.view.batchFetchError, error)
-    return { views: null, installs: null }
-  }
-}
-
-/**
- * Server action that atomically increments the CLI install count for a specific route slug.
- * Uses a Postgres upsert (`ON CONFLICT DO UPDATE`) operation to prevent race conditions.
- *
- * @param slug - The unique identifier/path of the component being installed.
- * @returns An object containing the new total `installs` count.
- */
-export async function incrementInstallAction(slug: string) {
-  /** Abort if no slug is provided to prevent database errors */
-  if (!slug) return { installs: null }
-
-  try {
-    /**
-     * Perform an atomic Postgres upsert. If the slug doesn't exist, insert it with installs = 1.
-     * If it exists, let the database engine increment the count to prevent race conditions.
-     */
-    const [result] = await db
-      .insert(views)
-      .values({ slug, installs: 1 })
-      .onConflictDoUpdate({
-        target: views.slug,
-        set: { installs: sql`${views.installs} + 1` },
-      })
-      .returning({ installs: views.installs })
-
-    return { installs: result?.installs ?? 0 }
-  } catch (error) {
-    console.error('Error incrementing installs:', error)
-    return { installs: null }
+    return { views: null }
   }
 }

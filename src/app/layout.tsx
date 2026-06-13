@@ -72,12 +72,6 @@ const jsonLd = [
 ]
 
 /**
- * Prepaint script that reserves the announcement banner's height via `--banner-offset`
- * before hydration, preventing a layout shift when the banner mounts.
- */
-const bannerOffsetScript = `document.documentElement.style.setProperty('--banner-offset','2.5rem')`
-
-/**
  * Main application layout that wraps all pages.
  * Wraps the DOM tree in global context providers (Tooltips, View tracking, Toasters).
  */
@@ -95,7 +89,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
-        <script dangerouslySetInnerHTML={{ __html: bannerOffsetScript }} />
       </head>
       <body className="bg-background font-sans text-foreground antialiased">
         <MotionProvider>

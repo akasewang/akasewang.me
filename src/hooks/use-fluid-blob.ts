@@ -54,7 +54,7 @@ export function useFluidBlob(
     let scaleControls: { stop: () => void } | undefined
     let rotateControls: { stop: () => void } | undefined
 
-    /** Drives the fluid shape morph — fastest cadence so the blob feels alive. */
+    /** Drives the fluid shape morph at the fastest cadence so the blob feels alive. */
     const morph = () => {
       hasStartedRef.current = true
       const duration = (intervalMs * rand(0.5, 0.9)) / 1000

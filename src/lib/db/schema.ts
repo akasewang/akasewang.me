@@ -13,7 +13,6 @@ import {
 export const views = pgTable('views', {
   slug: text('slug').primaryKey(),
   count: integer('count').default(0).notNull(),
-  installs: integer('installs').default(0).notNull(),
 })
 
 /**

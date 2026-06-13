@@ -9,11 +9,11 @@ import {
 } from '@/utils/mdx-utils'
 
 /**
- * Factory function that creates strongly typed content managers (for blogs, projects, components).
+ * Factory function that creates strongly typed content managers (for blogs and projects).
  * Abstracts away the boilerplate of reading MDX files, parsing frontmatter and sorting by date.
  *
  * @param directory - The absolute, statically scoped directory containing the MDX files.
- * @param entityName - The singular name of the entity for error logging (e.g., 'blog', 'component').
+ * @param entityName - The singular name of the entity for error logging (e.g., 'blog', 'project').
  * @returns An object with `getSlugs`, `getPost` and `getAll` methods.
  */
 export function createMdxManager<T extends { date: string }>(

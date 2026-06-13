@@ -14,8 +14,9 @@ import { useSoundEffects } from '@/hooks/use-sound-effects'
  * can be temporarily closed via the trailing icon.
  *
  * Drives the global `--banner-offset` CSS variable so the navbar and page content
- * shift down while the banner is visible. The prepaint reservation is handled by an
- * inline script in the root layout to avoid layout shift before hydration.
+ * shift down while the banner is visible. The variable defaults to the banner height
+ * in globals.css, so the space is reserved from first paint with no layout shift and no
+ * inline script, and is set to 0 here when the banner is dismissed.
  */
 export function AnnouncementBanner() {
   const { tap, clickPop, hoverLink, hoverTick } = useSoundEffects()

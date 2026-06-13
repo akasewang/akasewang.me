@@ -16,8 +16,8 @@ export const navbarContent: NavbarContent = {
   home: 'Home',
   blogs: 'Blogs',
   projects: 'Projects',
-  components: 'Components',
   photos: 'Photos',
+  changelog: 'Changelog',
 }
 
 /** Footer attribution and content license. */
@@ -25,6 +25,8 @@ export const footerContent: FooterContent = {
   ownerName: FULL_NAME,
   license: 'CC BY-NC-SA 4.0',
   licenseHref: 'https://creativecommons.org/licenses/by-nc-sa/4.0/',
+  changelogLabel: 'changelog',
+  changelogHref: '/changelog',
 }
 
 /** Shared chrome labels reused across pages (name pronunciation, back to top). */

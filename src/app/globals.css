@@ -89,7 +89,7 @@
     /** 60% neutral-825 */
     --overlay-accent-border: color-mix(in oklab, var(--ring) 60%, transparent);
 
-    /** shadows — soft diffused glow */
+    /** shadows: soft diffused glow */
     --shadow-xs: 0 1px 2px oklch(0% 0 0 / 0.08);
     --shadow-sm: 0 1px 3px oklch(0% 0 0 / 0.06), 0 2px 8px oklch(0% 0 0 / 0.06);
     --shadow: 0 2px 6px oklch(0% 0 0 / 0.06), 0 4px 16px oklch(0% 0 0 / 0.06);
@@ -113,8 +113,8 @@
     /** spacing */
     --spacing: 0.25rem;
 
-    /** announcement banner height; toggled to 0 once dismissed */
-    --banner-offset: 0px;
+    /** announcement banner height, reserved from first paint and toggled to 0 once dismissed */
+    --banner-offset: 2.5rem;
   }
 
   /**
@@ -346,6 +346,7 @@
     }
     &[data-state='closed'] { animation: fade-scale-out 200ms cubic-bezier(0.4, 0, 1, 1) both; }
   }
+
 
   .dropdown-elegant {
     will-change: opacity, transform;

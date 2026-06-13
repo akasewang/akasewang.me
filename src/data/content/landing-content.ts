@@ -4,7 +4,7 @@ import type { SharedContent } from '@/types/site'
 
 /**
  * Landing Page Content Model.
- * Centralized text for the home page — hero bio, section titles and action labels —
+ * Centralized text for the home page (hero bio, section titles and action labels)
  * so content can be updated without touching React component logic.
  */
 export const landingPageContent: LandingPageContent = {
@@ -15,9 +15,9 @@ export const landingPageContent: LandingPageContent = {
     roles: ROLES,
     aboutTitle: 'about me.',
     about: [
-      "Hey there! I'm a data science grad and software engineer who likes to [build applications](/projects) that help myself and others be more productive and enjoy the process of creating.",
-      'I also learned [UI UX design](https://noddy.studio/) to stay involved in building applications from start to finish, giving me a better understanding of the overall development process while occasionally building [reusable components](/components) to make my workflow more efficient.',
-      "I write about what I'm working on or learning on my [blogs](/blogs), which you can [subscribe](/newsletter) for email updates. Outside of programming, I enjoy photography, playing games and watching anime and movies. My [photos](/photos) and [catalog](/catalog) are there if you want to take a peek.",
+      "Hey there! I'm a data science grad and software engineer who likes to [build applications](/projects) that help myself and others be more productive and [design reusable components](https://ui.noddy.studio/) to enjoy the process of creating.",
+      "I [write about](/blogs) what I'm working on or learning and share occasional email updates with [subscribers](/newsletter).",
+      "Outside of programming, I enjoy [taking photos](/photos), playing games and keeping a [catalog](/catalog) of the anime and movies I watch.",
     ],
     findMeOn: 'Find me on',
     connectText: 'Interested in working together? Feel free to schedule a meet!',
@@ -41,10 +41,6 @@ export const landingPageContent: LandingPageContent = {
     featuredPosts: {
       title: 'featured posts.',
       viewAll: 'view all posts',
-    },
-    featuredComponents: {
-      title: 'featured components.',
-      viewAll: 'view all components',
     },
   },
 }

@@ -32,6 +32,8 @@ export const TWO_WEEKS_MS = 1209600000
 export const PRESENT = 'Present'
 /** Canonical date output format used by shared formatting helpers. */
 export const DATE_DISPLAY_FORMAT = 'dd.MM.yyyy'
+/** Long form date output used for day labels (e.g. "13 June 2026"). */
+export const LONG_DATE_DISPLAY_FORMAT = 'd MMMM yyyy'
 /** Accepted date input formats parsed by shared date utilities. */
 export const DATE_PARSING_PATTERNS = [
   'dd.MM.yyyy',

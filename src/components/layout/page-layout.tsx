@@ -18,7 +18,7 @@ interface PageLayoutProps {
   animate?: boolean
 }
 
-/** Shared layout shell used by dynamic top level routes (Blogs, Projects, Registry). */
+/** Shared layout shell used by dynamic top level routes (Blogs, Projects, Photos). */
 export function PageLayout({
   children,
   title,

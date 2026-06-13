@@ -15,8 +15,8 @@ import { cn } from '@/utils/utils'
 const NAV_ITEMS = [
   { href: '/blogs', label: navbarContent.blogs, Icon: Icons.blogs },
   { href: '/projects', label: navbarContent.projects, Icon: Icons.projects },
-  { href: '/components', label: navbarContent.components, Icon: Icons.components },
   { href: '/photos', label: navbarContent.photos, Icon: Icons.photos },
+  { href: '/changelog', label: navbarContent.changelog, Icon: Icons.gitRepository },
 ]
 
 const ICON_BUTTON_STYLES =

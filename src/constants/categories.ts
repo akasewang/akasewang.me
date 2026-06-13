@@ -45,13 +45,5 @@ export const BLOG_CATEGORIES = [
   { value: 'all', label: 'All' },
   { value: 'technical', label: 'Technical' },
   { value: 'personal', label: 'Personal' },
-] as const
-
-/** Component registry filters by component kind. */
-export const COMPONENT_CATEGORIES = [
-  { value: 'all', label: 'All' },
-  { value: 'effects', label: 'Effects' },
-  { value: 'ui-elements', label: 'UI Elements' },
-  { value: 'navigation', label: 'Navigation' },
-  { value: 'layout', label: 'Layout' },
+  { value: 'short-notes', label: 'Short Notes' },
 ] as const

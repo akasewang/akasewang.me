@@ -32,8 +32,12 @@ export const Step = ({ title, children }: StepProps) => {
   return (
     <div className="group relative pb-6 pl-8 last:pb-2">
       <div className="absolute bottom-0 left-0 top-0 w-px border-l border-dashed border-border group-last:w-4 group-last:border-b" />
-      <div className="absolute -left-3 top-0 z-10 flex size-6 items-center justify-center rounded-lg bg-muted font-mono text-[10px] font-medium text-secondary [counter-increment:step] before:content-[counter(step,decimal-leading-zero)]" />
-      {title && <h3 className="!mt-0 font-serif italic text-primary">{title}</h3>}
+      <div className="absolute -left-3 top-0 z-10 flex size-6 items-center justify-center rounded-lg bg-muted font-mono text-[10px] font-medium text-secondary ring-1 ring-border/50 [counter-increment:step] before:content-[counter(step,decimal-leading-zero)]" />
+      {title && (
+        <h3 className="!mt-0 font-serif text-base font-medium italic leading-snug text-primary">
+          {title}
+        </h3>
+      )}
       <div className="mt-1 [&>p:last-child]:mb-0 [&>pre:last-child]:mb-0">{children}</div>
     </div>
   )
