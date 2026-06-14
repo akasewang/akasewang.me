@@ -33,7 +33,7 @@ export function PageLayout({
 
   return (
     <main className={cn('space-y-8', animate && 'animate-page-simple', className)}>
-      {/** Automatically inject Breadcrumb JSON-LD schema into the document head for rich SEO results in search engines. */}
+      {/** Inline Breadcrumb JSON-LD for breadcrumb rich results when a breadcrumb is provided. */}
       {breadcrumbJson && <script type="application/ld+json">{breadcrumbJson}</script>}
 
       {(title || subtitle) && <PageHeader title={title || ''} subtitle={subtitle} />}

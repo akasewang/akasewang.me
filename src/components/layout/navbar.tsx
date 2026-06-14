@@ -63,7 +63,6 @@ export function Navbar() {
     window.open('/feed.xml', '_blank', 'noopener,noreferrer')
   })
 
-
   useKeyboardShortcut('e', () => {
     navigateSound()
     router.push('/experiments')
@@ -105,25 +104,6 @@ export function Navbar() {
 
             <Tooltip>
               <TooltipTrigger asChild>
-                <button
-                  type="button"
-                  aria-label={isAudioEnabled ? 'Turn sound effects off' : 'Turn sound effects on'}
-                  aria-pressed={isAudioEnabled}
-                  aria-keyshortcuts="f1"
-                  onMouseEnter={hoverLink}
-                  onClick={handleAudioToggle}
-                  className={cn(ICON_BUTTON_STYLES, '-ml-[7px]')}
-                >
-                  <AudioIcon className="size-4.5" />
-                </button>
-              </TooltipTrigger>
-              <TooltipContent side="bottom" shortcut="F1">
-                {isAudioEnabled ? 'Sound Effects On' : 'Sound Effects Off'}
-              </TooltipContent>
-            </Tooltip>
-
-            <Tooltip>
-              <TooltipTrigger asChild>
                 <Link
                   href="/experiments"
                   aria-label={navbarContent.experiments}
@@ -131,7 +111,7 @@ export function Navbar() {
                   onClick={navigateSound}
                   className={cn(
                     ICON_BUTTON_STYLES,
-                    '-ml-[14px]',
+                    '-ml-[7px]',
                     pathname === '/experiments' && 'text-primary',
                   )}
                 >
@@ -171,6 +151,25 @@ export function Navbar() {
               </TooltipTrigger>
               <TooltipContent side="bottom" shortcut="G">
                 {formattedStarsFull !== null ? `${formattedStarsFull} Stars` : 'Source Code'}
+              </TooltipContent>
+            </Tooltip>
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  type="button"
+                  aria-label={isAudioEnabled ? 'Turn sound effects off' : 'Turn sound effects on'}
+                  aria-pressed={isAudioEnabled}
+                  aria-keyshortcuts="f1"
+                  onMouseEnter={hoverLink}
+                  onClick={handleAudioToggle}
+                  className={cn(ICON_BUTTON_STYLES, '-ml-[14px] md:-ml-[17px]')}
+                >
+                  <AudioIcon className="size-4.5" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent side="bottom" shortcut="F1">
+                {isAudioEnabled ? 'Sound Effects On' : 'Sound Effects Off'}
               </TooltipContent>
             </Tooltip>
 

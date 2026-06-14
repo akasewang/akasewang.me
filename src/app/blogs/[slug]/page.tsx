@@ -52,7 +52,6 @@ export default async function BlogPost({ params }: { params: paramsType }) {
   const { slug } = await params
   const post = await getBlogPost(slug)
 
-  /** Trigger a Next.js 404 boundary if the requested post does not exist */
   if (!post) notFound()
 
   const { content, data } = post
@@ -70,7 +69,6 @@ export default async function BlogPost({ params }: { params: paramsType }) {
     { name: title, url: `${SITE_URL}/blogs/${postSlug}` },
   ])
 
-  /** Calculate adjacent posts for chronological next/prev reading navigation */
   const allPosts = await getAllBlogPosts()
   const currentIndex = allPosts.findIndex((p) => p.slug === postSlug)
   const nextPost = currentIndex > 0 ? allPosts[currentIndex - 1] : undefined

@@ -195,7 +195,10 @@ export const NewsletterTemplate = ({
   const handle = `${USERNAME}.me`
   return (
     <Html>
-      <Head />
+      <Head>
+        <meta name="color-scheme" content="light" />
+        <meta name="supported-color-schemes" content="light" />
+      </Head>
       <Preview>
         {blogExcerpt || blogTitle} {'​'.repeat(150)}
       </Preview>
@@ -266,3 +269,5 @@ export const NewsletterTemplate = ({
     </Html>
   )
 }
+
+export default NewsletterTemplate

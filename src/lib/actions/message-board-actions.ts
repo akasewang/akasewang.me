@@ -8,6 +8,7 @@ import { revalidatePath } from 'next/cache'
 import { toastContent } from '@/data/content/toast-content'
 import { MESSAGES_PER_PAGE } from '@/constants/constants'
 import type { ActionResult } from '@/types/actions'
+import type { MessageBoardEntry } from '@/types/message-board'
 
 /** Verifies an admin secret against the configured password (false if none is set). */
 const isAdmin = (secret: string) =>
@@ -61,7 +62,7 @@ export async function submitMessageBoardMessage(formData: FormData): Promise<Act
 export async function getMessageBoardMessages(
   offset = 0,
   limit = MESSAGES_PER_PAGE,
-): Promise<ActionResult<{ messages: any[]; hasMore: boolean }>> {
+): Promise<ActionResult<{ messages: MessageBoardEntry[]; hasMore: boolean }>> {
   try {
     const data = await db.query.messageBoard.findMany({
       columns: { ip: false },

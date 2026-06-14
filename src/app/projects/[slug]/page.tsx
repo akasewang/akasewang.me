@@ -10,7 +10,7 @@ import { ViewCounter } from '@/components/common/view-counter'
 import { getReadingTime, formatDateString } from '@/utils/utils'
 import { getProject, getProjectSlugs, getAllProjects } from '@/lib/managers/project-manager'
 import { SlugNavigation } from '@/components/common/slug-navigation'
-import { getBreadcrumbSchema } from '@/lib/json-ld'
+import { getBreadcrumbSchema, getProjectSchema } from '@/lib/json-ld'
 import { SITE_URL, FULL_NAME } from '@/constants/constants'
 import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
@@ -53,19 +53,18 @@ export default async function ProjectPost({ params }: { params: paramsType }) {
   const { slug } = await params
   const post = await getProject(slug)
 
-  /** Trigger a Next.js 404 boundary if the user requests a nonexistent project */
   if (!post) notFound()
 
   const { content, data } = post
   const { title, excerpt, date, slug: postSlug, tech, links, image, video } = data
 
+  const projectJsonLd = getProjectSchema({ title, excerpt, date, slug: postSlug, tech })
   const breadcrumbJsonLd = getBreadcrumbSchema([
     { name: 'Home', url: SITE_URL },
     { name: 'Projects', url: `${SITE_URL}/projects` },
     { name: title, url: `${SITE_URL}/projects/${postSlug}` },
   ])
 
-  /** Calculate adjacent projects for previous/next chronological navigation */
   const allProjects = await getAllProjects()
   const currentIndex = allProjects.findIndex((p) => p.slug === postSlug)
   const nextProject = currentIndex > 0 ? allProjects[currentIndex - 1] : undefined
@@ -80,7 +79,7 @@ export default async function ProjectPost({ params }: { params: paramsType }) {
       <div className="relative space-y-6 animate-page-simple">
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify([projectJsonLd, breadcrumbJsonLd]) }}
         />
 
         <div className="flex items-start justify-between gap-4">

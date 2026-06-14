@@ -5,8 +5,8 @@ import { newsletterSubscribers } from '@/lib/db/schema'
 import { eq } from 'drizzle-orm'
 import { toastContent } from '@/data/content/toast-content'
 import { logContent } from '@/data/content/log-content'
-import { Resend } from 'resend'
 import { render } from '@react-email/components'
+import { getResend, SENDER_EMAIL } from '@/lib/resend'
 import { WelcomeTemplate } from '@/components/emails/welcome-template'
 import React from 'react'
 import { FULL_NAME } from '@/constants/constants'
@@ -14,21 +14,6 @@ import type { ActionResult } from '@/types/actions'
 
 /** Basic email shape validation for subscription input. */
 const EMAIL_REGEX = /^[\w.-]+@[a-zA-Z\d.-]+\.[a-zA-Z]{2,}$/
-
-let resendInstance: Resend | null = null
-/** Lazily instantiates a singleton Resend client, throwing if the API key is not configured. */
-function getResend() {
-  if (!resendInstance) {
-    if (!process.env.RESEND_API_KEY) {
-      throw new Error('Missing RESEND_API_KEY')
-    }
-    resendInstance = new Resend(process.env.RESEND_API_KEY)
-  }
-  return resendInstance
-}
-
-/** From address for outgoing mail, falling back to Resend's onboarding sender. */
-const SENDER_EMAIL = process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev'
 
 /**
  * Server action to handle newsletter subscriptions.

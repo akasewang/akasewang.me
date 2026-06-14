@@ -89,6 +89,41 @@ export function getBlogPostingSchema({
 }
 
 /**
+ * Builds a CreativeWork schema for a single project case study. Mirrors {@link getBlogPostingSchema}
+ * so project pages expose a primary entity to search engines rather than only a breadcrumb trail.
+ *
+ * @param props - The project's title, excerpt, date, slug and optional tech tags.
+ * @returns A JSON-LD compliant `CreativeWork` schema object.
+ */
+export function getProjectSchema({
+  title,
+  excerpt,
+  date,
+  slug,
+  tech,
+}: {
+  title: string
+  excerpt: string
+  date: string
+  slug: string
+  tech?: string[]
+}) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'CreativeWork',
+    name: title,
+    headline: title,
+    description: excerpt,
+    datePublished: date,
+    author: PERSON_SCHEMA,
+    creator: PERSON_SCHEMA,
+    url: `${SITE_URL}/projects/${slug}`,
+    image: getOgImageUrl(title, 'Project'),
+    ...(tech && tech.length > 0 && { keywords: tech.join(', ') }),
+  }
+}
+
+/**
  * Generates a ProfilePage schema representing the main portfolio landing page.
  * Includes the page's breadcrumb hierarchy and links to the main entity (the user).
  *

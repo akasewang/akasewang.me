@@ -1,11 +1,9 @@
 import type { MetadataRoute } from 'next'
 import { SITE_URL } from '@/constants/constants'
 
-/** AI training, AI search and scraping bots blocked from the entire site. */
+/** AI training and scraping bots blocked site wide. Answer engines go in AI_SEARCH_BOTS. */
 const BLOCKED_AI_BOTS = [
   'GPTBot',
-  'ChatGPT-User',
-  'OAI-SearchBot',
   'CCBot',
   'anthropic-ai',
   'Claude-Web',
@@ -13,8 +11,6 @@ const BLOCKED_AI_BOTS = [
   'Google-Extended',
   'Meta-ExternalAgent',
   'Meta-ExternalFetcher',
-  'PerplexityBot',
-  'YouBot',
   'Applebot-Extended',
   'Amazonbot',
   'Bytespider',
@@ -24,6 +20,9 @@ const BLOCKED_AI_BOTS = [
   'Omgili',
   'FacebookBot',
 ]
+
+/** AI answer engines allowed so the site can surface in ChatGPT, Perplexity and You.com. */
+const AI_SEARCH_BOTS = ['OAI-SearchBot', 'ChatGPT-User', 'PerplexityBot', 'YouBot']
 
 /** Traditional search engine crawlers explicitly allowed for SEO. */
 const SEARCH_ENGINE_BOTS = [
@@ -48,9 +47,10 @@ const SOCIAL_CRAWLERS = [
 
 /**
  * Generates the site's `/robots.txt`.
- * Blocks AI training and scraping bots site wide, explicitly allows traditional search and social
- * preview crawlers and keeps `/api` off limits for everyone else. The sitemap URL and host derive
- * from `SITE_URL` so they always match the canonical domain.
+ * Blocks AI training and scraping bots site wide, explicitly allows traditional search engines, AI
+ * answer engines that cite sources and social preview crawlers, and keeps `/api` off limits for
+ * everyone else. The sitemap URL and host derive from `SITE_URL` so they always match the canonical
+ * domain.
  *
  * @returns A Next.js robots descriptor served at `/robots.txt`.
  */
@@ -60,9 +60,10 @@ export default function robots(): MetadataRoute.Robots {
       { userAgent: BLOCKED_AI_BOTS, disallow: '/' },
       { userAgent: '*', allow: '/', disallow: '/api/', crawlDelay: 0 },
       { userAgent: SEARCH_ENGINE_BOTS, allow: '/' },
+      { userAgent: AI_SEARCH_BOTS, allow: '/' },
       { userAgent: SOCIAL_CRAWLERS, allow: '/' },
     ],
     sitemap: `${SITE_URL}/sitemap.xml`,
-    host: SITE_URL,
+    host: new URL(SITE_URL).host,
   }
 }

@@ -157,7 +157,10 @@ export const WelcomeTemplate = ({
 
   return (
     <Html>
-      <Head />
+      <Head>
+        <meta name="color-scheme" content="light" />
+        <meta name="supported-color-schemes" content="light" />
+      </Head>
       <Preview>
         {previewText} {'​'.repeat(150)}
       </Preview>
@@ -208,3 +211,5 @@ export const WelcomeTemplate = ({
     </Html>
   )
 }
+
+export default WelcomeTemplate

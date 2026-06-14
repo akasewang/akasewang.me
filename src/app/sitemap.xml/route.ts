@@ -26,6 +26,16 @@ export async function GET(): Promise<Response> {
 
   const currentDate = new Date().toISOString()
 
+  /** Newest content date, a stable `lastmod` for static pages instead of the per request time. */
+  const newestContentDate =
+    [...blogPosts, ...projectPosts]
+      .map((item) => parseDate(item.date))
+      .sort((a, b) => +new Date(a) - +new Date(b))
+      .at(-1) ?? currentDate
+
+  /** Clamp to now so a future dated post never emits a `lastmod` in the future. */
+  const lastContentUpdate = newestContentDate > currentDate ? currentDate : newestContentDate
+
   /** Absolute URLs of every gallery image surfaced on the `/photos` entry. */
   const photoImages = photos.map((photo) => `${SITE_URL}${photo.url}`)
 
@@ -46,7 +56,7 @@ export async function GET(): Promise<Response> {
   const urls: SitemapUrl[] = [
     ...staticPages.map(({ path, priority, changefreq }) => ({
       url: `${SITE_URL}${path}`,
-      lastModified: currentDate,
+      lastModified: lastContentUpdate,
       priority,
       changefreq,
       ...(path === '/photos' && photoImages.length > 0 && { images: photoImages }),

@@ -1,4 +1,4 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 import { Analytics } from '@vercel/analytics/react'
 
@@ -35,6 +35,17 @@ export async function generateMetadata(): Promise<Metadata> {
     icons: {
       apple: '/profpic.png',
     },
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        'max-image-preview': 'large',
+        'max-snippet': -1,
+        'max-video-preview': -1,
+      },
+    },
     alternates: {
       canonical: SITE_URL,
       types: {
@@ -54,11 +65,18 @@ export async function generateMetadata(): Promise<Metadata> {
         },
       ],
     },
+    /** Both are @handles not domains despite the `site` name: `site` the publisher, `creator` the author. */
     twitter: {
       card: 'summary_large_image',
+      site: `@${USERNAME}`,
       creator: `@${USERNAME}`,
     },
   }
+}
+
+/** Browser chrome colour matching the site's dark surface so mobile address bars blend in. */
+export const viewport: Viewport = {
+  themeColor: '#0a0a0a',
 }
 
 /**

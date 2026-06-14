@@ -17,7 +17,7 @@ export const landingPageContent: LandingPageContent = {
     about: [
       "Hey there! I'm a data science grad and software engineer who likes to [build applications](/projects) that help myself and others be more productive and [design reusable components](https://ui.noddy.studio/) to enjoy the process of creating.",
       "I [write about](/blogs) what I'm working on or learning and share occasional email updates with [subscribers](/newsletter).",
-      "Outside of programming, I enjoy [taking photos](/photos), playing games and keeping a [catalog](/catalog) of the anime and movies I watch.",
+      'Outside of programming, I enjoy [taking photos](/photos), playing games and keeping a [catalog](/catalog) of the anime and movies I watch.',
     ],
     findMeOn: 'Find me on',
     connectText: 'Interested in working together? Feel free to schedule a meet!',

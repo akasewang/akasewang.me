@@ -37,7 +37,6 @@ export function ViewCounter({ slug, readOnly = false, type = 'views' }: ViewCoun
     if (!effectiveSlug || processedSlug.current === effectiveSlug) return
 
     if (readOnly) {
-      /** Trigger a nonmutating database fetch via the global ViewsContext */
       requestView(effectiveSlug)
     } else {
       /** Fire and forget a database increment while optimistically updating the UI */

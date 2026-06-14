@@ -17,7 +17,7 @@ export function isAudioEnabled() {
 }
 
 /** Updates and broadcasts the global sound-effects preference for the current page load. */
-export function setAudioEnabled(enabled: boolean) {
+function setAudioEnabled(enabled: boolean) {
   audioEnabled = enabled
   notifySubscribers()
 }

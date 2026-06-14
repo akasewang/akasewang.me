@@ -18,7 +18,7 @@ export const metadata: Metadata = {
 /**
  * Admin Newsletter Route.
  * Provides a UI to manually trigger newsletter dispatches for specific blog posts.
- * Note: Actual authentication is handled at the API route layer (`/api/newsletter/send`).
+ * Note: Authentication is enforced inside the `broadcastNewsletter` server action via the admin password.
  */
 export default async function AdminNewsletterPage() {
   const blogs = await getAllBlogPosts()

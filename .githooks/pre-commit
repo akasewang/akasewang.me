@@ -1,0 +1,11 @@
+#!/bin/sh
+#
+# Formats the complete codebase with Biome before every commit, then re-stages the files that were
+# already staged so the commit reflects fully formatted code. Git has no pre-add hook, so this runs
+# at the closest point (pre-commit).
+
+files=$(git diff --cached --name-only --diff-filter=d)
+[ -z "$files" ] && exit 0
+
+npm run format || exit 1
+printf '%s\n' "$files" | xargs git add --

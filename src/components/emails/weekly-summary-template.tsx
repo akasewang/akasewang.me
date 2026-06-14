@@ -164,7 +164,10 @@ export const WeeklySummaryTemplate = ({
 
   return (
     <Html>
-      <Head />
+      <Head>
+        <meta name="color-scheme" content="light" />
+        <meta name="supported-color-schemes" content="light" />
+      </Head>
       <Preview>
         {headingText} {'​'.repeat(150)}
       </Preview>
@@ -222,3 +225,5 @@ export const WeeklySummaryTemplate = ({
     </Html>
   )
 }
+
+export default WeeklySummaryTemplate

@@ -25,7 +25,7 @@ interface SpotlightProps {
  * @param outerSize - Base pixel radius for the spotlight gradients. Defaults to 140.
  * @param children - Optional content masked to reveal only directly under the cursor.
  */
-export function Spotlight({
+function Spotlight({
   isHovering,
   outerSize = 140,
   children,

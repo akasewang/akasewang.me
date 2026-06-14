@@ -5,6 +5,11 @@ import type { UnsubscribePageContent } from '@/types/newsletter'
  * Centralized static configuration and text definitions.
  */
 export const unsubscribeContent: UnsubscribePageContent = {
+  confirmTitle: 'Confirm Unsubscribe',
+  confirmDescription:
+    'Click below to stop receiving the newsletter. You can resubscribe whenever you like.',
+  confirmButton: 'Unsubscribe',
+  confirmPending: 'Removing you...',
   successTitle: 'Unsubscribed Successfully',
   successDescription: "You've been removed from our list. We're sorry to see you go!",
   invalidTitle: 'Invalid Link',

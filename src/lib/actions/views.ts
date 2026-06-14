@@ -13,7 +13,6 @@ import { logContent } from '@/data/content/log-content'
  * @returns An object containing the new total `views` count.
  */
 export async function incrementViewAction(slug: string) {
-  /** Abort if no slug is provided to prevent database errors */
   if (!slug) return { views: null }
 
   try {
@@ -45,7 +44,6 @@ export async function incrementViewAction(slug: string) {
  * @returns A dictionary mapping each slug to its current view count.
  */
 export async function getViewsBatchAction(slugs: string[]) {
-  /** Return an empty map immediately if the array is empty to save a database call */
   if (!slugs?.length) return { views: {} }
 
   try {

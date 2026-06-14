@@ -48,8 +48,16 @@ export interface AdminNewsletterContent {
   buttonSuccess: string
 }
 
-/** Copy for the unsubscribe page across its success, invalid and error states. */
+/** Copy for the unsubscribe page across its confirm, success, invalid and error states. */
 export interface UnsubscribePageContent {
+  /** Heading shown on the confirmation prompt before any change is made. */
+  confirmTitle: string
+  /** Description shown on the confirmation prompt before any change is made. */
+  confirmDescription: string
+  /** Label for the button that performs the unsubscribe. */
+  confirmButton: string
+  /** Button label shown while the unsubscribe request is in flight. */
+  confirmPending: string
   /** Heading shown after a successful unsubscribe. */
   successTitle: string
   /** Description shown after a successful unsubscribe. */

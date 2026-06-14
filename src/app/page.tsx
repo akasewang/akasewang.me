@@ -32,7 +32,6 @@ export async function generateMetadata(): Promise<Metadata> {
  * Performs parallel data fetching for all featured content sections to minimize TTFB.
  */
 export default async function Home() {
-  /** Fetch all required MDX data streams simultaneously before yielding the React tree */
   const [blogPosts, projects] = await Promise.all([getAllBlogPosts(), getAllProjects()])
 
   return (

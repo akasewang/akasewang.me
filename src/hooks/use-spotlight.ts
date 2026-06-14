@@ -53,7 +53,6 @@ export function useSpotlight<T extends HTMLElement = HTMLElement>({
         if (lastTime > 0) {
           const dx = e.clientX - lastX
           const dy = e.clientY - lastY
-          /** Calculate raw cursor velocity (pixels per millisecond) */
           const velocity = Math.sqrt(dx * dx + dy * dy) / Math.max(now - lastTime, 1)
 
           /**

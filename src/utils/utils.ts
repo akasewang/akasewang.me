@@ -45,13 +45,10 @@ export function getReadingTime(content: string): number {
  * @returns A valid Javascript Date object, or null if the input is unparseable.
  */
 export function parseAnyDate(dateStr?: string | Date): Date | null {
-  /** Return early if no date is provided */
   if (!dateStr) return null
 
-  /** Pass through valid Date objects immediately */
   if (dateStr instanceof Date) return isValid(dateStr) ? dateStr : null
 
-  /** Abort if the input is not a string at this point */
   if (typeof dateStr !== 'string') return null
 
   const normalized = dateStr.trim()
@@ -61,7 +58,6 @@ export function parseAnyDate(dateStr?: string | Date): Date | null {
   /** Use current date as the reference point for relative parsing */
   const referenceDate = new Date()
 
-  /** Iteratively attempt to parse the string against predefined known formats */
   for (const fmt of DATE_PARSING_PATTERNS) {
     const parsedDate = parse(normalized, fmt, referenceDate)
     if (isValid(parsedDate)) return parsedDate
@@ -128,33 +124,27 @@ export function formatDayLabel(date: Date): string {
 export function formatDateString(dateStr?: string | Date): string {
   if (!dateStr) return ''
 
-  /** Immediately return the exact string 'Present' if matched */
   if (typeof dateStr === 'string' && dateStr.trim().toLowerCase() === PRESENT.toLowerCase()) {
     return PRESENT
   }
 
-  /** Attempt to resolve the input into a valid Date object */
   const date = parseAnyDate(dateStr)
 
   if (typeof dateStr === 'string') {
-    /** If parsing failed, fallback to returning the raw unparsed string */
+    /** If parsing failed, fall back to returning the raw unparsed string instead of losing it. */
     if (!date) return dateStr
 
     const normalized = dateStr.trim()
-    /** Format as just the year if only a year was provided */
     if (YEAR_REGEX.test(normalized)) return format(date, 'yyyy')
 
-    /** Format as month and year if no exact day was provided */
     if (MONTH_YEAR_REGEX.test(normalized) || TEXT_MONTH_YEAR_REGEX.test(normalized))
       return format(date, 'MM.yyyy')
 
-    /** Format as full standard date if all components are present */
     if (FULL_DATE_REGEX.test(normalized)) return format(date, 'dd.MM.yyyy')
   } else if (!date) {
     return ''
   }
 
-  /** Apply the default global date format if no specific pattern matched */
   return format(date, DATE_DISPLAY_FORMAT)
 }
 

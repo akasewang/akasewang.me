@@ -79,10 +79,7 @@ function CommitRow({ commit }: { commit: ChangelogCommit }) {
             const content = isBullet ? block.slice(2).trim() : block
 
             return (
-              <div
-                key={`${commit.sha}-${index}`}
-                className="flex items-start gap-3"
-              >
+              <div key={`${commit.sha}-${index}`} className="flex items-start gap-3">
                 {isBullet && (
                   <div className="flex w-5 shrink-0 justify-center">
                     <Bullet className="mt-[9px]" />

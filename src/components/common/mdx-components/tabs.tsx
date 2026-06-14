@@ -54,7 +54,12 @@ const baseOverlap = (count: number) => Math.min(16, 8 + count * 2)
  * The signed x offset to slide a hovered tab out from under the selection, capped at
  * {@link HOVER_SLIDE} and clamped so its leading edge never crosses the panel's rounded corner.
  */
-const hoverShift = (tab: HTMLElement, list: HTMLElement | null, index: number, selected: number) => {
+const hoverShift = (
+  tab: HTMLElement,
+  list: HTMLElement | null,
+  index: number,
+  selected: number,
+) => {
   if (!list || index === selected) return 0
   const towardsLeft = index < selected
   const left = tab.offsetLeft - list.scrollLeft
@@ -180,7 +185,10 @@ export const Tabs = ({ items, defaultIndex = 0, className, children }: TabsProps
                 type="button"
                 onMouseEnter={(event) => {
                   hoverTick()
-                  setHover({ index: i, shift: hoverShift(event.currentTarget, listRef.current, i, safeIndex) })
+                  setHover({
+                    index: i,
+                    shift: hoverShift(event.currentTarget, listRef.current, i, safeIndex),
+                  })
                 }}
                 onMouseLeave={() => setHover(null)}
                 style={{ zIndex, marginLeft: i === 0 ? 0 : -overlap, boxShadow }}

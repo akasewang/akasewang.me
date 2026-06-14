@@ -1,4 +1,3 @@
-import withMDX from '@next/mdx'
 import type { NextConfig } from 'next'
 
 const securityHeaders = [
@@ -12,14 +11,8 @@ const securityHeaders = [
   },
 ]
 
-const nextConfig: NextConfig = withMDX({
-  extension: /\.mdx?$/,
-  options: {
-    remarkPlugins: [],
-    rehypePlugins: [],
-  },
-})({
-  pageExtensions: ['ts', 'tsx', 'js', 'jsx', 'md', 'mdx'],
+const nextConfig: NextConfig = {
+  pageExtensions: ['ts', 'tsx', 'js', 'jsx'],
   outputFileTracingIncludes: {
     '/feed.xml': ['./docs/blogs/**/*'],
     '/sitemap.xml': ['./docs/blogs/**/*', './docs/projects/**/*'],
@@ -65,6 +58,6 @@ const nextConfig: NextConfig = withMDX({
       },
     ]
   },
-})
+}
 
 export default nextConfig

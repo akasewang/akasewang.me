@@ -3,8 +3,8 @@
 import React from 'react'
 import { db } from '@/lib/db/drizzle'
 import { newsletterSubscribers } from '@/lib/db/schema'
-import { Resend } from 'resend'
 import { getAllBlogPosts, getBlogPost } from '@/lib/managers/blog-manager'
+import { getResend, SENDER_EMAIL } from '@/lib/resend'
 import { render } from '@react-email/components'
 import { NewsletterTemplate } from '@/components/emails/newsletter-template'
 import { eq } from 'drizzle-orm'
@@ -12,20 +12,6 @@ import { SITE_URL, FULL_NAME, READING_SPEED } from '@/constants/constants'
 import { toastContent } from '@/data/content/toast-content'
 import { logContent } from '@/data/content/log-content'
 import type { ActionResult } from '@/types/actions'
-
-let resendInstance: Resend | null = null
-
-/** Lazily instantiates a singleton Resend client, throwing if the API key is not configured. */
-function getResend() {
-  if (!resendInstance) {
-    if (!process.env.RESEND_API_KEY) throw new Error('Missing RESEND_API_KEY')
-    resendInstance = new Resend(process.env.RESEND_API_KEY)
-  }
-  return resendInstance
-}
-
-/** From address for outgoing mail, falling back to Resend's onboarding sender. */
-const SENDER_EMAIL = process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev'
 
 /**
  * Secure admin server action that builds an HTML email template for a new blog post.
@@ -61,10 +47,8 @@ export async function broadcastNewsletter(
     ])
 
     const targetPost = posts.find((p) => p.slug === blogSlug)
-    /** Abort if the requested post slug does not map to a real MDX document */
     if (!targetPost) return { success: false, error: toasts.postNotFound }
 
-    /** Do not execute email generation logic if the subscriber list is empty */
     if (!activeSubscribers.length) return { success: false, error: toasts.noSubscribers }
 
     const previousPosts = posts
@@ -75,11 +59,9 @@ export async function broadcastNewsletter(
         url: `${SITE_URL}/blogs/${post.slug}`,
       }))
 
-    /** Calculate a dynamic reading time for the newsletter based on actual word count */
     const wordCount = fullPost?.content?.trim().split(/\s+/).length || 0
     const readingTime = Math.max(1, Math.ceil(wordCount / READING_SPEED))
 
-    /** Compile the React Email component into a raw HTML string for the email clients */
     const baseHtmlContent = await render(
       React.createElement(NewsletterTemplate, {
         blogTitle: targetPost.title,

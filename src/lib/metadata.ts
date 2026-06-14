@@ -72,11 +72,13 @@ export function constructMetadata({
         authors: [FULL_NAME],
       }),
     },
+    /** Both are @handles not domains despite the `site` name: `site` the publisher, `creator` the author. */
     twitter: {
       card: 'summary_large_image',
       title,
       description,
       images: [image],
+      site: `@${USERNAME}`,
       creator: `@${USERNAME}`,
     },
   }

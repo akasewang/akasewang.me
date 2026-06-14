@@ -10,7 +10,7 @@ type CacheEntry = { buffer: AudioBuffer; loading: Promise<AudioBuffer> }
  * This prevents identical sounds (like multiple fast clicks) from downloading/decoding multiple times.
  */
 const audioCache = new Map<string, CacheEntry | null>()
-/** A single shared Web Audio API context used across the entire application to prevent hitting browser hardware limits. */
+/** A single shared Web Audio API context, reused app wide to avoid browser hardware limits. */
 let sharedAudioContext: AudioContext | null = null
 
 /** Lazily creates (and then reuses) the shared AudioContext, with a webkit fallback for older Safari. */
@@ -32,9 +32,8 @@ function getAudioContext(): AudioContext | null {
 /** Fetches and decodes an audio file, deduplicating concurrent requests via the shared cache. */
 function loadAudio(url: string, audioCtx: AudioContext): Promise<AudioBuffer> {
   const cached = audioCache.get(url)
-  /** If the audio is already fully decoded and cached, return it instantly */
   if (cached?.buffer) return Promise.resolve(cached.buffer)
-  /** If the audio is currently downloading/decoding from a previous request, return the pending Promise to prevent race conditions */
+  /** Reuse the in flight Promise for a concurrent request so the file is fetched and decoded once. */
   if (cached?.loading) return cached.loading
 
   const loadingPromise = fetch(url)
