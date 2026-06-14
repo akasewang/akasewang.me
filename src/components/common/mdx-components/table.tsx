@@ -24,7 +24,7 @@ const Table = forwardRef<
   <div
     className={cn(
       'relative my-6 w-full overflow-x-auto rounded-xl border border-border/60 bg-code-block not-prose',
-      '[&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-muted [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar]:h-1.5',
+      '[scrollbar-width:none] [&::-webkit-scrollbar]:hidden',
       containerClassName,
     )}
   >
@@ -55,17 +55,17 @@ const TableFooter = styled(
 const TableRow = styled('tr', 'border-b border-border/30', 'TableRow')
 const TableHead = styled(
   'th',
-  'whitespace-nowrap px-3.5 py-2 text-left align-middle font-mono text-[10px] font-medium lowercase tracking-widest text-muted-foreground [&:has([role=checkbox])]:pr-0',
+  'whitespace-nowrap px-4 py-2.5 text-left align-middle font-mono text-[10px] font-medium lowercase tracking-widest text-muted-foreground [&:has([role=checkbox])]:pr-0',
   'TableHead',
 )
 const TableCell = styled(
   'td',
-  'px-3.5 py-2 align-middle text-xs leading-relaxed text-foreground [&:has([role=checkbox])]:pr-0',
+  'px-4 py-2.5 align-middle text-xs leading-relaxed text-foreground [&:has([role=checkbox])]:pr-0',
   'TableCell',
 )
 const TableCaption = styled(
   'caption',
-  'px-3.5 py-2 text-[11px] text-muted-foreground',
+  'px-4 py-2.5 text-[11px] text-muted-foreground',
   'TableCaption',
 )
 

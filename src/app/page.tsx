@@ -9,7 +9,6 @@ import { Achievements } from '@/components/sections/achievements'
 import { Bookmarks } from '@/components/sections/bookmarks'
 import { FeaturedProjects } from '@/components/sections/featured-projects'
 import { FeaturedPosts } from '@/components/sections/featured-posts'
-import { Volunteer } from '@/components/sections/volunteer'
 import { NewsletterSubscription } from '@/components/common/newsletter-subscription'
 import { getAllBlogPosts } from '@/lib/managers/blog-manager'
 import { getAllProjects } from '@/lib/managers/project-manager'
@@ -42,7 +41,6 @@ export default async function Home() {
         <HeroSection />
         <Skills />
         <Experience />
-        <Volunteer />
         <FeaturedProjects projects={projects} />
         <FeaturedPosts posts={blogPosts} />
         <Education />

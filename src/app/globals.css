@@ -38,6 +38,9 @@
     /** neutral-915 */
     --code-tab: oklch(0.205 0 0);
 
+    /** neutral-870 - unselected tabs sitting a touch lighter than the selected tab and panel */
+    --code-tab-bar: oklch(0.245 0 0);
+
     /** neutral-100 */
     --primary: oklch(0.97 0 0);
 
@@ -106,6 +109,8 @@
     --shadow-l-md: -4px 0 12px -2px oklch(0% 0 0 / 0.6);
     --shadow-l-lg: -8px 0 16px -4px oklch(0% 0 0 / 0.8);
     --shadow-l-xl: -12px 0 24px -4px oklch(0% 0 0 / 0.9);
+    /** upward shadow lifting a tabbed surface above the tab connected behind it */
+    --shadow-t-sm: 0 -2px 4px 0 oklch(0% 0 0 / 0.3);
 
     /** border radius */
     --radius: 0.35rem;
@@ -200,6 +205,7 @@
   --color-floating: var(--floating);
   --color-code-block: var(--code-block);
   --color-code-tab: var(--code-tab);
+  --color-code-tab-bar: var(--code-tab-bar);
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
   --color-secondary: var(--secondary);
@@ -236,6 +242,7 @@
   --shadow-l-md: var(--shadow-l-md);
   --shadow-l-lg: var(--shadow-l-lg);
   --shadow-l-xl: var(--shadow-l-xl);
+  --shadow-t-sm: var(--shadow-t-sm);
   --shadow-inner: var(--shadow-inner);
   --shadow-inner-sm: var(--shadow-inner-sm);
 

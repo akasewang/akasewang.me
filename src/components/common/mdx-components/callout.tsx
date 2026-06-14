@@ -53,8 +53,8 @@ const VARIANTS: Record<
 }
 
 /**
- * A styled MDX admonition box (note, tip, warning, error, success) with an icon, label,
- * and a variant tinted background.
+ * A styled MDX admonition (note, tip, warning, error, success): the icon and label sit in a
+ * small tab that connects to the variant tinted content container below it.
  *
  * @param type - The semantic variant of the callout (info, tip, warn, error, success).
  * @param title - Optional custom title to display instead of the default type label.
@@ -69,21 +69,28 @@ export const Callout = ({ type = 'info', title, children, className }: CalloutPr
     <div
       role="note"
       aria-labelledby={labelId}
-      style={{ '--callout-hue': hue } as CSSProperties}
+      style={
+        {
+          '--callout-hue': hue,
+          '--callout-border': 'color-mix(in oklab, var(--callout-hue) 18%, transparent)',
+          '--callout-surface': 'color-mix(in oklab, var(--callout-hue) 6%, oklch(0.23 0 0 / 0.3))',
+          '--callout-tab': 'color-mix(in oklab, var(--callout-hue) 12%, oklch(0.26 0 0 / 0.45))',
+        } as CSSProperties
+      }
       className={cn(
-        'relative isolate not-prose my-6 overflow-hidden rounded-xl border border-[color-mix(in_oklab,var(--callout-hue)_18%,transparent)] bg-[color-mix(in_oklab,var(--callout-hue)_6%,oklch(0.23_0_0_/_0.3))] motion-safe:animate-in motion-safe:fade-in-0 motion-safe:duration-300',
+        'relative isolate not-prose my-6 flex flex-col motion-safe:animate-in motion-safe:fade-in-0 motion-safe:duration-300',
         className,
       )}
     >
-      <div className="flex select-none items-center gap-3 px-3.5 pb-0 pt-2.5">
+      <div className="relative z-0 ml-4 flex w-fit max-w-[calc(100%-2rem)] select-none items-center gap-2 self-start rounded-t-lg border border-b-0 border-[var(--callout-border)] bg-[var(--callout-tab)] px-3 pt-1.5 pb-2">
         <Icon className={cn('size-3.5 shrink-0 opacity-80', accent)} aria-hidden />
-        <span id={labelId} className="text-xs font-medium tracking-tight text-primary opacity-90">
+        <span id={labelId} className="text-xs font-medium tracking-tight text-primary/90">
           {title ?? label}
         </span>
       </div>
       <div
         className={cn(
-          'pl-10 pr-3.5 pb-2.5 pt-1.5 text-pretty text-xs leading-relaxed text-foreground/90',
+          'relative z-10 overflow-hidden rounded-xl border border-[var(--callout-border)] bg-[var(--callout-surface)] px-4 py-3 text-pretty text-xs leading-relaxed text-foreground/90 shadow-t-sm',
           '[&>[role=paragraph]]:my-0 [&>[role=paragraph]+[role=paragraph]]:mt-3 [&_[role=paragraph]]:text-xs',
           '[&>ol]:ml-0 [&>ol]:my-0 [&>ol]:list-decimal [&>ol]:pl-5',
           '[&>ul]:ml-0 [&>ul]:my-0 [&>ul]:list-disc [&>ul]:pl-5',

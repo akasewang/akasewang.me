@@ -3,6 +3,7 @@
 import { isValidElement, useMemo, type HTMLAttributes, type ReactNode } from 'react'
 import { cn } from '@/utils/utils'
 import { CopyButton } from '@/components/ui/copy-button'
+import { useInTabPanel } from './contexts/tab-panel-context'
 
 /** Props for {@link Pre}. */
 interface PreProps extends HTMLAttributes<HTMLPreElement> {
@@ -42,14 +43,13 @@ const extractLanguage = (node: ReactNode): string | null => {
 }
 
 /**
- * Custom `<pre>` renderer for MDX code blocks. Detects the fenced language to render a slim
- * header bar with a label and extracts the code text to power a copy to clipboard button.
- * Blocks without a detectable language fall back to a frameless layout where the copy
- * button is revealed on hover.
+ * Custom `<pre>` renderer for MDX code blocks. Renders the code in a bordered surface with a
+ * copy to clipboard button floating over it; when a language is detected it adds a label tab
+ * connected above the surface, which is omitted when the block is inside a tab panel.
  *
  * @param copyable - Whether to display the copy to clipboard button. Defaults to true.
  * @param raw - If true, bypasses the styled wrapper and renders a standard HTML pre tag.
- * @param title - Optional label for the header bar overriding the detected language.
+ * @param title - Optional label overriding the detected language.
  */
 export const Pre = ({
   copyable = true,
@@ -61,6 +61,7 @@ export const Pre = ({
 }: PreProps) => {
   const code = useMemo(() => extractCode(children), [children])
   const label = useMemo(() => title ?? extractLanguage(children), [title, children])
+  const inTabPanel = useInTabPanel()
 
   if (raw)
     return (
@@ -69,63 +70,51 @@ export const Pre = ({
       </pre>
     )
 
-  const hasHeader = Boolean(label)
+  const hasHeader = Boolean(label) && !inTabPanel
 
-  return (
-    /**
-     * The CopyButton container spans every grid row alongside the header and the `<pre>`,
-     * letting it use `sticky` to float elegantly while scrolling, which is impossible
-     * with traditional `absolute` positioning inside an `overflow-x-auto` container.
-     */
-    <figure className="group/pre relative isolate my-6 grid w-full max-w-full not-prose rounded-xl border border-border/60 bg-code-block">
-      {hasHeader && (
-        <figcaption className="col-start-1 row-start-1 flex h-9 select-none items-center rounded-t-[inherit] border-b border-border/50 bg-code-tab/50 px-3.5">
-          <span className="font-mono text-[10px] font-medium lowercase tracking-widest text-muted-foreground">
-            {label}
-          </span>
-        </figcaption>
-      )}
+  const codeArea = (
+    <div className={cn('relative grid', hasHeader && 'z-10')}>
       {copyable && (
-        <div
-          className={cn(
-            'pointer-events-none sticky z-20 col-start-1 row-start-1 self-start justify-self-end',
-            hasHeader ? 'top-1 row-span-2 pt-1 pr-1.5' : 'top-2 pt-2 pr-2',
-          )}
-        >
+        <div className="pointer-events-none sticky top-2.5 z-20 col-start-1 row-start-1 self-start justify-self-end pt-2.5 pr-2.5 pb-2.5">
           <CopyButton
             value={code}
             iconSize={14}
             className={cn(
               'pointer-events-auto flex size-6 items-center justify-center rounded-md',
               'transition-[color,background-color,opacity,transform,scale] duration-200 ease-out',
-              hasHeader
-                ? cn(
-                    'text-muted-foreground backdrop-blur-sm',
-                    'hover:bg-background/70 hover:text-primary',
-                    'data-[copied=true]:text-primary',
-                  )
-                : cn(
-                    'scale-[0.95] bg-transparent text-secondary opacity-0 backdrop-blur-sm',
-                    'hover:bg-background/80 hover:text-primary',
-                    'group-hover/pre:scale-100 group-hover/pre:opacity-100',
-                    'data-[copied=true]:scale-100 data-[copied=true]:text-primary data-[copied=true]:opacity-100',
-                    '[@media(hover:none)]:scale-100 [@media(hover:none)]:opacity-100',
-                  ),
+              'scale-[0.95] bg-transparent text-secondary opacity-0 backdrop-blur-sm',
+              'hover:bg-background/80 hover:text-primary',
+              'group-hover/pre:scale-100 group-hover/pre:opacity-100',
+              'data-[copied=true]:scale-100 data-[copied=true]:text-primary data-[copied=true]:opacity-100',
+              '[@media(hover:none)]:scale-100 [@media(hover:none)]:opacity-100',
             )}
           />
         </div>
       )}
       <pre
         className={cn(
-          'col-start-1 overflow-x-auto px-4 py-3 font-mono text-xs leading-relaxed',
-          hasHeader ? 'row-start-2' : 'row-start-1',
-          '[&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-muted [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar]:h-1.5',
+          'col-start-1 row-start-1 overflow-x-auto rounded-xl border border-border/60 bg-code-block px-4.5 py-3.5 font-mono text-xs leading-relaxed',
+          '[scrollbar-width:none] [&::-webkit-scrollbar]:hidden',
+          hasHeader && 'shadow-t-sm',
           className,
         )}
         {...props}
       >
         {children}
       </pre>
+    </div>
+  )
+
+  return (
+    <figure className="group/pre relative isolate my-6 flex w-full max-w-full flex-col not-prose">
+      {hasHeader && (
+        <figcaption className="relative z-0 ml-4 -mb-2 flex w-fit max-w-[calc(100%-2rem)] select-none items-center self-start rounded-t-lg border border-b-0 border-border/60 bg-floating px-4 pt-1 pb-3">
+          <span className="font-mono text-[10px] font-medium lowercase tracking-widest text-muted-foreground">
+            {label}
+          </span>
+        </figcaption>
+      )}
+      {codeArea}
     </figure>
   )
 }
