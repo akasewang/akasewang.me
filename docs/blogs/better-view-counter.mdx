@@ -43,7 +43,7 @@ The provider waits for `50ms` (`BATCH_DELAY`). If multiple view requests arrive 
 
 Let's examine how the [ViewsProvider](https://github.com/akasewang/akasewang.me/blob/main/src/components/providers/views-context.tsx) implements this:
 
-```tsx
+```tsx title="src/components/providers/views-context.tsx"
 const BATCH_DELAY = 50
 
 /**
@@ -105,7 +105,7 @@ To prevent users from falsely inflating metrics by spamming the browser reload b
 1. **`localStorage` (Global Cache)**: We store retrieved view counts in `localStorage` with a `5 minute` TTL (`CACHE_DURATION = 5 * 60 * 1000`). If a user navigates back and forth between pages, we serve view counts instantly from the local cache, eliminating database queries entirely.
 2. **`sessionStorage` (Increment Lock)**: When a user visits an article, we attempt to increment the view count. We write a unique key (`viewed-${slug}`) to the browser's `sessionStorage`. If that key already exists, we know they've already viewed the post during this session, so we fall back to a safe, read only query.
 
-```tsx
+```tsx title="src/components/providers/views-context.tsx"
 const incrementViews = useCallback(
   async (slug: string) => {
     const sessionKey = `viewed-${slug}`
@@ -146,7 +146,7 @@ If the slug has never been visited, we insert a new record with `count = 1`. If 
 
 Let's check the Server Action code inside [views.ts](https://github.com/akasewang/akasewang.me/blob/main/src/lib/actions/views.ts):
 
-```ts
+```ts title="src/lib/actions/views.ts"
 'use server'
 
 import { sql } from 'drizzle-orm'
@@ -193,7 +193,7 @@ This single roundtrip handles the insert, update and return queries inside a sin
 
 Similarly, our batch retrieval uses the SQL `IN` operator to fetch all post counts in a single database roundtrip, converting the database response array back into an optimized index map:
 
-```ts
+```ts title="src/lib/actions/views.ts"
 import { inArray } from 'drizzle-orm'
 import { logContent } from '@/data/content/log-content'
 

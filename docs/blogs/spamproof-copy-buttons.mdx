@@ -24,7 +24,7 @@ Because we want to keep our initial page load lightning fast, we use Framer Moti
 
 To make this work, wrap your application (or component tree) in a `LazyMotion` provider:
 
-```tsx
+```tsx title="src/components/providers/motion-provider.tsx"
 'use client'
 
 import { LazyMotion, domMax } from 'framer-motion'
@@ -57,7 +57,7 @@ This allows the incoming icon to slide into the exact same spatial coordinate wi
 <Tabs items={[" Naive Icon Swap", "PopLayout Swap"]}>
   <Tab title=" Naive Icon Swap">
 
-    ```tsx
+    ```tsx title="src/components/ui/copy-button.tsx"
     // The incoming check icon is pushed down by the outgoing copy icon
     return (
       <button className="flex items-center">
@@ -69,7 +69,7 @@ This allows the incoming icon to slide into the exact same spatial coordinate wi
   <Tab title="PopLayout Swap">
     By wrapping the icons inside AnimatePresence with absolute dimensions:
 
-    ```tsx
+    ```tsx title="src/components/ui/copy-button.tsx"
     return (
       <span className="relative" style={{ width: iconSize, height: iconSize }}>
         <AnimatePresence initial={false} mode="popLayout">
@@ -100,7 +100,7 @@ To solve this, we can design a simple click guard: if the state is already `copi
 
 Let's examine how the [CopyButton](https://github.com/akasewang/akasewang.me/blob/main/src/components/ui/copy-button.tsx) component handles this:
 
-```tsx
+```tsx title="src/components/ui/copy-button.tsx"
 /**
  * A button that copies `value` to the clipboard, swapping the copy icon for a check on success.
  * Works uncontrolled (manages its own brief "copied" state) or controlled (via the `copied` prop).
@@ -151,7 +151,7 @@ Flat, immediate state transitions make buttons feel rigid. To make our copy butt
 ### Layer A: The Click Squeeze (`whileTap`)
 When the user presses down, the button physically squeezes in slightly (`scale: 0.94`), using a high stiffness spring animation. This mimics the mechanical feedback of a physical keyboard switch:
 
-```tsx
+```tsx title="src/components/ui/copy-button.tsx"
 <m.button
   whileTap={{ scale: 0.94 }}
   transition={{ type: 'spring', stiffness: 500, damping: 30 }}
@@ -166,7 +166,7 @@ As the copy icon exits, it rotates `45 degrees` and fades out. Simultaneously, t
 
 Because we specify an custom ease curve `[0.23, 1, 0.32, 1]` (a dramatic cubic bezier), the transition feels snappy and incredibly premium.
 
-```tsx
+```tsx title="src/components/ui/copy-button.tsx"
 <m.span
   key={isCopied ? 'check' : 'copy'}
   initial={{ scale: 0.5, opacity: 0, rotate: -45 }}
@@ -184,7 +184,7 @@ Sometimes you want the copy button to manage its own state (e.g., inside an MDX 
 
 To handle both cases seamlessly, we support both **uncontrolled** internal state and **controlled** parent props:
 
-```tsx
+```tsx title="src/components/ui/copy-button.tsx"
 const [internalCopied, setInternalCopied] = useState(false)
 // If the parent passes 'copied', use it. Otherwise, fallback to local state.
 const isCopied = controlledCopied ?? internalCopied

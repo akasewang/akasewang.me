@@ -82,7 +82,7 @@ export const Callout = ({ type = 'info', title, children, className }: CalloutPr
         className,
       )}
     >
-      <div className="relative z-0 ml-4 flex w-fit max-w-[calc(100%-2rem)] select-none items-center gap-2 self-start rounded-t-lg border border-b-0 border-[var(--callout-border)] bg-[var(--callout-tab)] px-3 pt-1.5 pb-2">
+      <div className="relative z-0 ml-4 flex w-fit max-w-[calc(100%-2rem)] select-none items-center gap-2 self-start rounded-t-lg border border-b-0 border-[var(--callout-border)] bg-[var(--callout-tab)] px-3 py-1.5">
         <Icon className={cn('size-3.5 shrink-0 opacity-80', accent)} aria-hidden />
         <span id={labelId} className="text-xs font-medium tracking-tight text-primary/90">
           {title ?? label}

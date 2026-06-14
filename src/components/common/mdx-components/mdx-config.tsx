@@ -18,11 +18,32 @@ import { ComponentSource } from './showcase/component-source'
  * to the `next-mdx-remote` parser used across blogs, projects and component documentation.
  */
 
+/**
+ * Remark plugin to extract the `title="path"` meta string from code blocks
+ * and pass it down as a standard property to the `<pre>` element via hProperties.
+ */
+const remarkCodeMeta = () => (tree: any) => {
+  const visit = (node: any) => {
+    if (node.type === 'code' && node.meta) {
+      const match = /title="([^"]+)"/.exec(node.meta) || /title='([^']+)'/.exec(node.meta)
+      if (match) {
+        node.data = node.data || {}
+        node.data.hProperties = node.data.hProperties || {}
+        node.data.hProperties.title = match[1]
+      }
+    }
+    if (node.children) {
+      node.children.forEach(visit)
+    }
+  }
+  visit(tree)
+}
+
 /** Configure server side syntax highlighting (rehypeHighlight) and GitHub Flavored Markdown (remarkGfm) */
 export const MDX_OPTIONS = {
   mdxOptions: {
     rehypePlugins: [rehypeHighlight as any],
-    remarkPlugins: [remarkGfm],
+    remarkPlugins: [remarkCodeMeta, remarkGfm],
   },
 }
 

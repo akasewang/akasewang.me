@@ -27,7 +27,7 @@ For example, when writing coordinate mappings, theme definitions or configuratio
   <Tab title="My Semantic Layout">
     We align keys and values so they can be easily scanned and cross referenced at a glance:
 
-    ```ts
+    ```ts title="src/config/alignments.ts"
     const VIEWPORT_ALIGNMENTS = {
       top:    { x: 0.5, y: 0.0, anchor: 'center-top' },
       center: { x: 0.5, y: 0.5, anchor: 'center'      },
@@ -41,7 +41,7 @@ For example, when writing coordinate mappings, theme definitions or configuratio
   <Tab title="Prettier's Output">
     Prettier flattens the custom spacing, turning it into a uniform block:
 
-    ```ts
+    ```ts title="src/config/alignments.ts"
     const VIEWPORT_ALIGNMENTS = {
       top: { x: 0.5, y: 0.0, anchor: "center-top" },
       center: { x: 0.5, y: 0.5, anchor: "center" },
@@ -68,7 +68,7 @@ This is known as the **"Line Length Cliff."**
   <Tab title="79 Characters">
     A concise, readable, single line function call that fits perfectly on your screen:
 
-    ```ts
+    ```ts title="src/api/fetch-user.ts"
     const response = await fetchUserData(userId, { includeProfile: true, active: false });
     ```
 
@@ -76,7 +76,7 @@ This is known as the **"Line Length Cliff."**
   <Tab title="81 Characters">
     Adding a small parameter (`verbose: true`) pushes the line length to 81. Prettier violently breaks it apart:
 
-    ```ts
+    ```ts title="src/api/fetch-user.ts"
     const response = await fetchUserData(userId, {
       includeProfile: true,
       active: false,
@@ -103,7 +103,7 @@ This vertical explosion leads to two major issues:
 
 When Prettier makes a block of code unreadable, how do you fix it? Your only choice is to add a disable comment:
 
-```ts
+```ts title="src/utils/matrix.ts"
 // prettier-ignore
 const matrix = [
   [1, 0, 0],

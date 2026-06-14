@@ -42,6 +42,29 @@ const extractLanguage = (node: ReactNode): string | null => {
   return /language-([\w-]+)/.exec(className ?? '')?.[1] ?? extractLanguage(children ?? null)
 }
 
+/* Extract the `title="..."` value from the `meta` string prop passed by MDX to the `<code>` element. */
+const extractMetaTitle = (node: ReactNode): string | null => {
+  if (Array.isArray(node)) {
+    for (const child of node) {
+      const title = extractMetaTitle(child)
+      if (title) return title
+    }
+    return null
+  }
+  if (!isValidElement(node)) return null
+  const { meta, title, children } = node.props as {
+    meta?: string
+    title?: string
+    children?: ReactNode
+  }
+  if (title) return title
+  if (meta && typeof meta === 'string') {
+    const match = /title="([^"]+)"/.exec(meta) || /title='([^']+)'/.exec(meta)
+    if (match) return match[1]
+  }
+  return extractMetaTitle(children ?? null)
+}
+
 /**
  * Custom `<pre>` renderer for MDX code blocks. Renders the code in a bordered surface with a
  * copy to clipboard button floating over it; when a language is detected it adds a label tab
@@ -60,7 +83,11 @@ export const Pre = ({
   ...props
 }: PreProps) => {
   const code = useMemo(() => extractCode(children), [children])
-  const label = useMemo(() => title ?? extractLanguage(children), [title, children])
+  const metaTitle = useMemo(() => extractMetaTitle(children), [children])
+  const label = useMemo(
+    () => title ?? metaTitle ?? extractLanguage(children),
+    [title, metaTitle, children],
+  )
   const inTabPanel = useInTabPanel()
 
   if (raw)

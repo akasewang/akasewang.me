@@ -68,7 +68,7 @@ To make this performant and prevent browser layout thrashing, we combine this ma
 
 Let's check the core React hook that handles this logic:
 
-```ts
+```ts title="src/hooks/use-active-heading.ts"
 import { useEffect, useState } from 'react'
 import type { TocItem } from '../utils/parse-toc'
 
@@ -133,7 +133,7 @@ This is problematic because:
 
 To solve this, we implement a custom, smooth scrolling helper that scrolls to the heading with a comfortable negative padding offset:
 
-```ts
+```ts title="src/hooks/use-active-heading.ts"
 export function scrollToHeading(id: string, yOffset = -100): void {
   const element = document.getElementById(id)
   if (element)
@@ -152,7 +152,7 @@ Because we only want to display the Table of Contents on larger desktops, we use
 
 Here is the simplified layout of our [AsideTOC](https://github.com/akasewang/akasewang.me/blob/main/src/components/common/mdx-components/aside-toc.tsx) component:
 
-```tsx
+```tsx title="src/components/common/mdx-components/aside-toc.tsx"
 'use client'
 
 import { useMemo } from 'react'

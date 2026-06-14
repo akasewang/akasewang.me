@@ -11,7 +11,7 @@ When building list grids or search dashboards (like a portfolio project grid, a 
 
 It makes absolute sense at first. You create a state for the search query, another for the active category tab and a third for the sort dropdown:
 
-```tsx
+```tsx title="src/components/projects/project-tabs.tsx"
 const [searchQuery, setSearchQuery] = useState('')
 const [category, setCategory] = useState('all')
 const [sortBy, setSortBy] = useState('date-desc')
@@ -51,7 +51,7 @@ To ensure that updating the URL doesn't cause a jarring vertical jump to the top
 
 Let's examine how this parameter merging is structured in [project-tabs.tsx](https://github.com/akasewang/akasewang.me/blob/main/src/components/projects/project-tabs.tsx):
 
-```tsx
+```tsx title="src/components/projects/project-tabs.tsx"
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
@@ -102,7 +102,7 @@ By binding our state triggers directly to this parameter merger, our inputs and 
 
 When a user types or clicks, we update the URL, Next.js re renders the component with the new `searchParams` and our layout filters the items.
 
-```tsx
+```tsx title="src/components/projects/project-tabs.tsx"
 const handleCategoryChange = (val: string) => {
   updateParams({ category: val })
 }
@@ -120,7 +120,7 @@ const handleSortChange = (val: string) => {
 
 To keep the page lightning fast, we filter and sort our project array directly inside a React `useMemo` block, ensuring that we only recalculate list coordinates when the projects or active sorting parameters change:
 
-```tsx
+```tsx title="src/components/projects/project-tabs.tsx"
   const sortedProjects = useMemo(() => {
     let result = [...projects]
 

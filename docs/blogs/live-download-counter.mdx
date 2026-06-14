@@ -24,8 +24,7 @@ Following the Shadcn philosophy, we start by building a completely isolated, sta
 
 It simply accepts a `value` prop, pads it with leading zeros to maintain a consistent width (e.g., `00420`) and maps over each digit to render it inside a dedicated tile.
 
-```tsx
-// src/components/ui/download-counter.tsx
+```tsx title="src/components/ui/download-counter.tsx"
 'use client'
 
 import * as React from 'react'
@@ -72,8 +71,7 @@ Because it's decoupled, you can use it anywhere immediately with static data:
 
 To make the counter live, we need a place to store the metrics. We create a minimalist PostgreSQL table that tracks the total `installs` for each unique component `slug`.
 
-```typescript
-// src/lib/db/schema.ts
+```typescript title="src/lib/db/schema.ts"
 import { pgTable, varchar, integer } from 'drizzle-orm/pg-core'
 
 export const component_metrics = pgTable('component_metrics', {
@@ -90,8 +88,7 @@ The increment action is where things get interesting. If we run a standard `SELE
 
 To solve this, we rely on Drizzle's `onConflictDoUpdate` to perform an **Atomic Upsert**. We push the math down to the PostgreSQL engine itself, ensuring the increment is perfectly transactional.
 
-```typescript
-// src/lib/actions/views.ts
+```typescript title="src/lib/actions/views.ts"
 'use server'
 
 import { db } from '@/lib/db/drizzle'
@@ -137,8 +134,7 @@ Now we need to bridge the server and the client. We build a React client compone
 
 While waiting for the network response, we return a smooth `animate-pulse` skeleton. Once the database integer arrives, we pass it into our pure `DownloadCounter` UI.
 
-```tsx
-// src/components/live-counter.tsx
+```tsx title="src/components/live-counter.tsx"
 'use client'
 
 import { useEffect, useState } from 'react'
@@ -168,8 +164,7 @@ Finally, we need to actually trigger the `incrementInstallAction` whenever someo
 
 In our Next.js API route that serves the component JSON payload, we invoke the server action, but we **do not await it**. By using `.catch()` instead of `await`, we create a "fire and forget" telemetry ping. The CLI payload is returned to the user instantly, while the database upsert happens silently in the background.
 
-```typescript
-// src/app/r/[slug]/route.ts
+```typescript title="src/app/r/[slug]/route.ts"
 import { incrementInstallAction } from '@/lib/actions/views'
 import { NextResponse } from 'next/server'
 
