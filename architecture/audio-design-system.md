@@ -26,7 +26,7 @@ All procedural cues should sit in the same perceived range: roughly 100-160 ms a
 | `hoverTick` | crisp sine+triangle blip | hovering a discrete control (button/menu/tab/filter) |
 | `hoverLink` | whisper-soft high blip | hovering a navigation link |
 | `hoverCard` | mellow low pad | hovering a large content/media card |
-| `spotlightSweep(state)` | soft low brushed movement | moving across a spotlight card (Skill/Testimonial) |
+| `spotlightSweep(state)` | soft low brushed movement | moving across a spotlight card (Skill/Testimonial/Experiment) |
 | `navigate` | rising 3-note arpeggio whoosh | going somewhere (route/scroll) |
 | `clickPop` | bass thump + crisp snap | primary button press |
 | `toggle(open)` | directional two-tone chime | boolean open/close, expand/collapse |
@@ -46,9 +46,9 @@ Every interactive element still makes a sound on hover (consistency), but the *t
 
 | Element type | Sound | Examples |
 |---|---|---|
-| Navigation link | `hoverLink` | Navbar items, home logo, GitHub/RSS, footer license, `LinkText`, View All, Back, Carousel, prev/next arrows |
+| Navigation link | `hoverLink` | Navbar items, home logo, hero profile picture, GitHub/RSS, footer license, `LinkText`, View All, Back, Carousel, prev/next arrows |
 | Large content / media card | `hoverCard` | Blog/Project cards, photo tiles, the project demo video, MDX zoomable images, timeline rows |
-| Spotlight card | `spotlightSweep(state)` | Skill cards, Testimonial cards (matches their velocity-reactive spotlight reveal) |
+| Spotlight card | `spotlightSweep(state)` | Skill cards, Testimonial cards, Experiment tiles (matches their velocity-reactive spotlight reveal) |
 | Discrete control | `hoverTick` | CTA `Button`, icon buttons, Select/Dropdown items + triggers, Tabs, Category filters, TOC headings, Copy, Back-to-Top, banner dismiss, message-board actions, photos view toggle |
 
 *   **Consistency rule:** within a category every element uses the same hover sound, no "card that sounds" vs "card that doesn't". Differentiation is *across* categories only.
@@ -58,7 +58,7 @@ Every interactive element still makes a sound on hover (consistency), but the *t
 
 ## 2. Navigation (`navigate`)
 **Trigger:** Clicking something that routes to a new page/section or scrolls.
-**Do use on:** Internal links (Navbar items, home logo, Blog/Project cards), external links (Social/Skill/Testimonial links, GitHub/RSS), Back/Forward arrows, "View All", inline text links (`LinkText`), Back-to-Top / scroll-to-section.
+**Do use on:** Internal links (Navbar items, home logo, Blog/Project cards), external links (Social/Skill/Testimonial links, hero profile picture, GitHub/RSS), Back/Forward arrows, "View All", inline text links (`LinkText`), Back-to-Top / scroll-to-section.
 **Keyboard parity:** Shortcuts that navigate (`g` GitHub, `r` RSS, `l` License, arrow keys for prev/next) also fire `navigate`, so keyboard and pointer feel identical.
 **Do NOT use on:** State changes that stay on the current view.
 

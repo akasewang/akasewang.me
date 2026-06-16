@@ -2,6 +2,7 @@
 
 import { m, useReducedMotion } from 'framer-motion'
 import Image from 'next/image'
+import { useSoundEffects } from '@/hooks/use-sound-effects'
 import { cn } from '@/utils/utils'
 import { SpinningCircularText } from './spinning-circular-text'
 
@@ -17,6 +18,7 @@ const DURATION = 4
 
 export function ProfilePicture({ src, alt, href, label, className }: ProfilePictureProps) {
   const shouldReduceMotion = useReducedMotion()
+  const { hoverLink, navigate: navigateSound } = useSoundEffects()
 
   const textToSpin = `${label} `.repeat(2)
 
@@ -26,6 +28,8 @@ export function ProfilePicture({ src, alt, href, label, className }: ProfilePict
       target="_blank"
       rel="noopener noreferrer"
       aria-label={label}
+      onMouseEnter={hoverLink}
+      onClick={navigateSound}
       className={cn(
         'group relative z-10 flex size-[4.25rem] shrink-0 items-center justify-center overflow-visible rounded-full transition-transform duration-300 active:scale-[0.92]',
         className,

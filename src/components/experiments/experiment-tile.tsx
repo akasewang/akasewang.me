@@ -2,6 +2,7 @@
 
 import { m } from 'framer-motion'
 import { useSoundEffects } from '@/hooks/use-sound-effects'
+import { useSpotlight } from '@/hooks/use-spotlight'
 import type { Experiment } from '@/types/experiments'
 
 interface ExperimentTileProps {
@@ -11,14 +12,15 @@ interface ExperimentTileProps {
 
 export function ExperimentTile({ experiment, index }: ExperimentTileProps) {
   const { Component, name } = experiment
-  const { hoverCard } = useSoundEffects()
+  const { spotlightSweep } = useSoundEffects()
+  const { ref } = useSpotlight<HTMLDivElement>({ onMove: spotlightSweep })
 
   return (
     <m.div
+      ref={ref}
       initial={{ opacity: 0, scale: 0.96, y: 14 }}
       animate={{ opacity: 1, scale: 1, y: 0 }}
       transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1], delay: Math.min(index * 0.06, 0.6) }}
-      onPointerEnter={hoverCard}
       aria-label={name}
       className="group relative overflow-hidden rounded-2xl border border-border bg-card shadow-sm col-span-2 row-span-2"
     >
