@@ -3,23 +3,15 @@
 import type { CSSProperties, PointerEvent } from 'react'
 import { useEffect, useRef } from 'react'
 
-/** Custom properties the orb reads for its highlight position. */
 type OrbStyle = CSSProperties & { '--px': string; '--py': string }
 
 const REST = { x: 0.5, y: 0.38 }
 
-/**
- * Glossy 3D orb you can polish with the cursor. The specular highlight tracks the pointer through
- * CSS custom properties so the sphere reads as wet glass, the whole body tilts toward the cursor and
- * a conic sheen rotates endlessly across its surface. The highlight is eased toward its target every
- * frame, so it glides after the cursor and drifts smoothly back to rest on leave instead of snapping.
- * Values are written straight to the DOM so dragging the light never triggers a React render.
- */
 export function Orb() {
   const ref = useRef<HTMLDivElement | null>(null)
   const target = useRef({ ...REST })
   const current = useRef({ ...REST })
-  /** Starts the easing loop on demand; replaced by the effect while mounted. */
+
   const wake = useRef(() => {})
 
   const onMove = (e: PointerEvent<HTMLDivElement>) => {
@@ -49,7 +41,7 @@ export function Orb() {
       const t = target.current
       const dx = t.x - c.x
       const dy = t.y - c.y
-      /** Settle and idle the loop once the highlight reaches its target. */
+
       if (Math.abs(dx) < 0.0004 && Math.abs(dy) < 0.0004) {
         c.x = t.x
         c.y = t.y

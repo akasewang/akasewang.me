@@ -1,11 +1,10 @@
+import type { Metadata } from 'next'
 import { Suspense } from 'react'
-import { PhotosContent } from '@/components/photos/photos-content'
-import { constructMetadata, getOgImageUrl } from '@/lib/metadata'
-import { Metadata } from 'next'
-import { photosSeoContent } from '@/data/content/seo-content'
 import { PageLayout } from '@/components/layout/page-layout'
+import { PhotosContent } from '@/components/photos/photos-content'
+import { photosSeoContent } from '@/data/content/seo-content'
+import { constructMetadata, getOgImageUrl } from '@/lib/metadata'
 
-/** Statically generated metadata for the Photography gallery page. */
 export async function generateMetadata(): Promise<Metadata> {
   return constructMetadata({
     title: photosSeoContent.title,
@@ -15,11 +14,6 @@ export async function generateMetadata(): Promise<Metadata> {
   })
 }
 
-/**
- * Main Photos Route.
- * Renders the photo gallery inside a Suspense boundary so image fetching and the
- * client side gallery can stream in without blocking the initial paint.
- */
 export default function PhotosPage() {
   return (
     <PageLayout

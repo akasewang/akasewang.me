@@ -23,10 +23,6 @@ const SHARED_CAROUSEL_PROPS = {
   renderItem: (item: Testimonial) => <TestimonialCard testimonial={item} className="w-[400px]" />,
 }
 
-/**
- * Renders a dual row infinite scrolling carousel of client/peer testimonials.
- * Includes a global keyboard shortcut ('T') to navigate to the full testimonials directory.
- */
 export function Testimonials() {
   const router = useRouter()
   const { navigate: navigateSound } = useSoundEffects()

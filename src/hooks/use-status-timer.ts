@@ -1,94 +1,112 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
-/**
- * Custom hook for managing time based status states (success/error) with automatic cooldown and countdown timers.
- * Useful for handling temporary UI states like "Copied to clipboard" or rate limiting error messages.
- *
- * @param {string} [storageKey] - Optional key to persist the countdown in localStorage across navigations.
- * @returns {object} An object containing success/error states, the current countdown value and methods to trigger them.
- */
 export function useStatusTimer(storageKey?: string) {
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [expiresAt, setExpiresAt] = useState<number | null>(null)
-  const [countdown, setCountdown] = useState(0)
+  const [now, setNow] = useState(() => Date.now())
+  const countdown = expiresAt ? Math.max(0, Math.ceil((expiresAt - now) / 1000)) : 0
+  const timerStorageKey = storageKey ? `status-timer-${storageKey}` : null
 
   useEffect(() => {
-    if (!storageKey) return
+    if (!expiresAt) return
+
+    const interval = setInterval(() => setNow(Date.now()), 1000)
+
+    return () => clearInterval(interval)
+  }, [expiresAt])
+
+  useEffect(() => {
+    if (!timerStorageKey) return
 
     const syncFromStorage = (valueStr: string | null) => {
       if (valueStr) {
         try {
           const stored = JSON.parse(valueStr)
           if (stored.expiresAt && stored.expiresAt > Date.now()) {
+            setNow(Date.now())
             setExpiresAt(stored.expiresAt)
             setSuccess(!!stored.success)
             setError(stored.error || null)
             return
-          } else {
-            localStorage.removeItem(`status-timer-${storageKey}`)
           }
-        } catch (e) {}
+
+          try {
+            if (timerStorageKey) localStorage.removeItem(timerStorageKey)
+          } catch {}
+        } catch {}
       }
 
       setExpiresAt(null)
       setSuccess(false)
       setError(null)
+      setNow(Date.now())
     }
 
-    syncFromStorage(localStorage.getItem(`status-timer-${storageKey}`))
+    try {
+      syncFromStorage(timerStorageKey ? localStorage.getItem(timerStorageKey) : null)
+    } catch {
+      syncFromStorage(null)
+    }
 
     const handleStorageEvent = (e: StorageEvent) => {
-      if (e.key === `status-timer-${storageKey}`) {
+      if (e.key === timerStorageKey) {
         syncFromStorage(e.newValue)
       }
     }
 
     window.addEventListener('storage', handleStorageEvent)
     return () => window.removeEventListener('storage', handleStorageEvent)
-  }, [storageKey])
+  }, [timerStorageKey])
 
   useEffect(() => {
-    if (!expiresAt) {
-      setCountdown(0)
-      return
-    }
+    if (!expiresAt) return
 
-    const tick = () => {
-      const now = Date.now()
-      if (expiresAt > now) {
-        setCountdown(Math.ceil((expiresAt - now) / 1000))
-      } else {
-        setCountdown(0)
+    const timeout = setTimeout(
+      () => {
         setSuccess(false)
         setError(null)
         setExpiresAt(null)
-        if (storageKey) localStorage.removeItem(`status-timer-${storageKey}`)
-      }
-    }
+        try {
+          if (timerStorageKey) localStorage.removeItem(timerStorageKey)
+        } catch {}
+      },
+      Math.max(0, expiresAt - Date.now()),
+    )
 
-    tick()
-    const interval = setInterval(tick, 1000)
-
-    return () => clearInterval(interval)
-  }, [expiresAt, storageKey])
+    return () => clearTimeout(timeout)
+  }, [expiresAt, timerStorageKey])
 
   const persistState = useCallback(
     (sec: number, isSuccess: boolean, errMsg: string | null) => {
+      setNow(Date.now())
+
+      if (sec <= 0) {
+        setExpiresAt(null)
+        try {
+          if (timerStorageKey) localStorage.removeItem(timerStorageKey)
+        } catch {}
+        return
+      }
+
       const expires = Date.now() + sec * 1000
       setExpiresAt(expires)
-      if (storageKey && sec > 0) {
-        localStorage.setItem(
-          `status-timer-${storageKey}`,
-          JSON.stringify({
-            expiresAt: expires,
-            success: isSuccess,
-            error: errMsg,
-          }),
-        )
+      try {
+        if (timerStorageKey) {
+          localStorage.setItem(
+            timerStorageKey,
+            JSON.stringify({
+              expiresAt: expires,
+              success: isSuccess,
+              error: errMsg,
+            }),
+          )
+        }
+      } catch {
+        return
       }
     },
-    [storageKey],
+    [timerStorageKey],
   )
 
   const startCountdown = useCallback(
@@ -113,9 +131,11 @@ export function useStatusTimer(storageKey?: string) {
     setSuccess(false)
     setError(null)
     setExpiresAt(null)
-    setCountdown(0)
-    if (storageKey) localStorage.removeItem(`status-timer-${storageKey}`)
-  }, [storageKey])
+    setNow(Date.now())
+    try {
+      if (timerStorageKey) localStorage.removeItem(timerStorageKey)
+    } catch {}
+  }, [timerStorageKey])
 
   return {
     success,

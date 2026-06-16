@@ -1,17 +1,7 @@
-import { type ReactNode } from 'react'
+import type { ReactNode } from 'react'
 import { LinkText } from '@/components/ui/link-text'
 import { LINK_REGEX } from '@/constants/constants'
 
-/**
- * Renders a plain string into a ReactNode, converting inline markdown links
- * (`[label](url)`) into interactive `LinkText` elements.
- *
- * Useful for user provided text such as timeline items or bios, where full MDX
- * compilation is overkill but basic link interactivity is still needed.
- *
- * @param text - The raw text string, optionally containing markdown links.
- * @returns A ReactNode array of text segments and links, or the original string if it contains no links.
- */
 export function renderWithLinks(text: string): ReactNode {
   if (!text) return text
 

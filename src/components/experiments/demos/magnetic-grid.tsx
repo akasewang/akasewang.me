@@ -5,20 +5,12 @@ import { useAnimatedCanvas } from '@/hooks/use-animated-canvas'
 
 const GAP = 17
 const TAU = Math.PI * 2
-/** Resting dot colour, paired with `globalAlpha` so untouched dots never format a string. */
+
 const IDLE_FILL = 'rgb(166, 176, 224)'
 
-/**
- * A magnetic dot field. The lattice breathes on a slow sine while the cursor drags a luminous well
- * across it: nearby dots are repelled into a tight crater, swell, and ignite in a fixed periwinkle
- * accent. The well rides a smoothed cursor and an eased strength, so it trails fluidly and relaxes
- * shut when the pointer leaves. Its radius scales with the tile so the effect stays proportional at
- * any size.
- */
 export function MagneticGrid() {
-  /** Cursor influence weight, eased in fast and out slow, that scales the whole well. */
   const strength = useRef(0)
-  /** Smoothed pointer the well trails, primed on the first pointer entry. */
+
   const mouse = useRef({ x: 0, y: 0, primed: false })
 
   const canvasRef = useAnimatedCanvas(({ ctx, width, height, time, pointer }) => {
@@ -46,7 +38,7 @@ export function MagneticGrid() {
     const my = m.y
     const radius = Math.min(width, height) * 0.6
     const invRadius = 1 / radius
-    /** Fixed periwinkle accent the dots ignite to near the cursor. */
+
     const hue = 212
 
     for (let y = GAP / 2; y < height; y += GAP) {
@@ -62,7 +54,7 @@ export function MagneticGrid() {
           if (d2 < radius * radius) {
             const d = Math.sqrt(d2) || 1
             const f = 1 - d * invRadius
-            /** Squared falloff gives a tight, defined crater rather than a soft smear. */
+
             prox = f * f * s
             const push = prox * 16
             dx = (ox / d) * push
@@ -77,7 +69,6 @@ export function MagneticGrid() {
           ctx.globalAlpha = 1
           ctx.fillStyle = `hsla(${hue}, 95%, ${64 + prox * 28}%, ${Math.min(1, 0.3 + prox)})`
         } else {
-          /** Untouched dots reuse one cached colour and only vary their alpha. */
           ctx.globalAlpha = 0.13 + breathe * 0.1
           ctx.fillStyle = IDLE_FILL
         }

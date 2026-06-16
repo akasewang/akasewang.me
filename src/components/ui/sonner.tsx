@@ -28,12 +28,6 @@ const TOAST_OPTIONS = {
   },
 }
 
-/**
- * A highly customized toast notification provider built on top of the `sonner` library.
- * Ensures toasts match the site's design tokens.
- *
- * @param props - Standard Sonner Toaster props.
- */
 export function Toaster(props: ComponentProps<typeof Sonner>) {
   return (
     <Sonner

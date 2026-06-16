@@ -1,9 +1,5 @@
 import { PageLayout } from '@/components/layout/page-layout'
 
-/**
- * Global 404 Error Page.
- * Automatically triggered by Next.js when a requested route does not exist.
- */
 export default function NotFound() {
   return (
     <PageLayout

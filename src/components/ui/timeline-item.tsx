@@ -2,8 +2,8 @@
 
 import { memo, useMemo } from 'react'
 import { Bullet } from '@/components/ui/bullet'
-import { ExpandableContent } from '@/components/ui/expandable-content'
 import { ExpandToggle } from '@/components/ui/expand-toggle'
+import { ExpandableContent } from '@/components/ui/expandable-content'
 import { LinkText } from '@/components/ui/link-text'
 import { SeparatorDate } from '@/components/ui/separator-date'
 import { SeparatorSlash } from '@/components/ui/separator-slash'
@@ -14,18 +14,6 @@ import type { TimelineItemProps } from '@/types/site'
 import { renderWithLinks } from '@/utils/content-utils'
 import { cn, formatDateString } from '@/utils/utils'
 
-/**
- * Supports rendering markdown style links, lists and technological tags.
- *
- * @param id - A unique identifier for the timeline item, used for anchor scrolling.
- * @param title - The primary heading (e.g., job title or degree).
- * @param links - An optional array of navigational links to display below the title.
- * @param startDate - The starting date of the timeline entry.
- * @param endDate - The optional ending date of the timeline entry.
- * @param description - An array of strings representing the body text; dashed strings become bullets.
- * @param tech - An optional array of string tags representing technologies used.
- * @param defaultExpanded - Whether the body content is visible on initial load.
- */
 export const TimelineItem = memo(function TimelineItem({
   id,
   title,
@@ -122,7 +110,6 @@ export const TimelineItem = memo(function TimelineItem({
   return (
     <div id={id} className="scroll-mt-24">
       {hasContent ? (
-        /** biome-ignore lint/a11y/useSemanticElements: This expandable summary contains links, so a real button would nest interactive controls. */
         <div
           role="button"
           tabIndex={0}

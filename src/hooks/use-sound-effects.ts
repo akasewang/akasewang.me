@@ -43,12 +43,6 @@ type ToneOptions = {
   delay?: number
 }
 
-/** Shared AudioContext */
-
-/**
- * Lazily creates (and then reuses) a shared AudioContext for procedural sound effects.
- * Uses the same singleton strategy as `use-sound.ts` for the Web Audio API context.
- */
 let sharedCtx: AudioContext | null = null
 let sharedOutput: SharedOutput | null = null
 let spotlightVoice: SpotlightVoice | null = null
@@ -165,9 +159,7 @@ function releaseSpotlightVoice(ctx: AudioContext, idleDelay = 140) {
 
       try {
         voice.noise.stop()
-      } catch {
-        /** The nodes may already be stopped if audio is toggled during a release fade. */
-      }
+      } catch {}
 
       voice.noise.disconnect()
       voice.noiseFilter.disconnect()
@@ -180,10 +172,6 @@ function releaseSpotlightVoice(ctx: AudioContext, idleDelay = 140) {
   }, idleDelay)
 }
 
-/**
- * Resumes the AudioContext if it was suspended due to browser autoplay policy.
- * Browsers require at least one user gesture before the context is allowed to produce sound.
- */
 function resumeIfNeeded(ctx: AudioContext) {
   if (ctx.state === 'suspended') ctx.resume().catch(() => {})
 }
@@ -216,13 +204,6 @@ function playTone(ctx: AudioContext, options: ToneOptions) {
   osc.start(start)
   osc.stop(stopAt)
 }
-
-/** Procedural sound presets */
-
-/**
- * UI cues share one output chain and a tight midrange, so the interface feels like one
- * instrument instead of scattered effects.
- */
 
 function playHoverTick(ctx: AudioContext) {
   resumeIfNeeded(ctx)
@@ -466,13 +447,7 @@ function playMedia(ctx: AudioContext, playing: boolean) {
   })
 }
 
-/**
- * Provides procedurally generated UI sound effects for interactive elements.
- * Sounds are synthesised in real-time using the Web Audio API. Most cues are short
- * 100-160 ms gestures, while spotlight hover keeps one movement-reactive voice alive briefly.
- */
 export function useSoundEffects() {
-  /** Plays a hover preset only if the shared throttle window has elapsed, so mixed sweeps never buzz. */
   const throttledHover = useCallback((play: (ctx: AudioContext) => void) => {
     if (!isAudioEnabled()) return
 

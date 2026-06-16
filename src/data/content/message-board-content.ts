@@ -1,9 +1,5 @@
 import type { MessageBoardContent } from '@/types/message-board'
 
-/**
- * Message Board Content Data Dictionary.
- * Centralized static configuration and text definitions.
- */
 export const messageBoardContent: MessageBoardContent = {
   title: 'message board.',
   subtitle: 'Your message is safe with me (and the entire internet).',

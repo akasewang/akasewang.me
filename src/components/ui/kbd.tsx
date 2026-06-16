@@ -1,12 +1,10 @@
-import React from 'react'
+import type React from 'react'
 import { cn } from '@/utils/utils'
 
-/** Props for {@link Kbd}. */
 interface KbdProps extends React.HTMLAttributes<HTMLElement> {
   children: React.ReactNode
 }
 
-/** A styled `<kbd>` keycap for displaying keyboard shortcuts, e.g. inside tooltips or docs. */
 export function Kbd({ children, className, ...props }: KbdProps) {
   return (
     <kbd

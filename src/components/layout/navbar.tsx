@@ -21,11 +21,6 @@ const NAV_ITEMS = [
 const ICON_BUTTON_STYLES =
   'relative flex size-8 items-center justify-center rounded-lg bg-transparent text-secondary ring-1 ring-transparent transition-[background-color,color,transform,scale,opacity,box-shadow] duration-300 hover:bg-accent hover:text-primary hover:ring-accent-border active:scale-[0.95] active:duration-200 retina:ring-[0.5px]'
 
-/**
- * Global navigation header.
- * Uses fixed positioning on desktop and absolute on mobile to stay out of the document flow.
- * Monitors `usePathname` to dynamically style the active route link.
- */
 export function Navbar() {
   const router = useRouter()
   const { isAudioEnabled, setAudioEnabled } = useAudioPreference()
@@ -71,7 +66,7 @@ export function Navbar() {
   const AudioIcon = isAudioEnabled ? Icons.volumeUp : Icons.volumeMute
 
   return (
-    <nav className="absolute inset-x-0 top-[var(--banner-offset,0px)] z-50 transition-[top] duration-300 ease-out">
+    <nav className="absolute inset-x-0 top-0 z-50">
       <div className="mx-auto px-8 py-6">
         <div className="flex items-center justify-between md:justify-end">
           <Link
@@ -79,7 +74,7 @@ export function Navbar() {
             aria-label={navbarContent.home}
             onMouseEnter={hoverLink}
             onClick={navigateSound}
-            className="relative flex h-8 shrink-0 items-center justify-center text-primary transition-[color,top] duration-300 md:fixed md:left-8 md:top-[calc(1.5rem_+_var(--banner-offset,0px))]"
+            className="relative flex h-8 shrink-0 items-center justify-center text-primary transition-colors duration-300 md:fixed md:left-8 md:top-6"
           >
             <Icons.initials className="size-9" />
           </Link>

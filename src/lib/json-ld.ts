@@ -1,15 +1,14 @@
 import {
-  SITE_URL,
-  FULL_NAME,
-  SITE_DESCRIPTION,
-  ROLES,
   CORE_TECHS,
+  FULL_NAME,
+  ROLES,
   SECONDARY_TECHS,
+  SITE_DESCRIPTION,
+  SITE_URL,
 } from '@/constants/constants'
-import { getOgImageUrl } from '@/lib/metadata'
 import { activeSocials } from '@/data/static/social'
+import { getOgImageUrl } from '@/lib/metadata'
 
-/** Shared JSON-LD `Person` node for the site owner, reused across the other schemas. */
 const PERSON_SCHEMA = {
   '@type': 'Person',
   name: FULL_NAME,
@@ -21,22 +20,10 @@ const PERSON_SCHEMA = {
   sameAs: activeSocials.map((social) => social.href),
 }
 
-/**
- * Returns the standard Person schema for the portfolio owner.
- * Includes bio, skills and social links to build a unified identity graph for search engines.
- *
- * @returns A JSON-LD compliant `Person` schema object.
- */
 export function getPersonSchema() {
   return PERSON_SCHEMA
 }
 
-/**
- * Generates the primary WebSite schema structure.
- * Enables rich search features and defines the internal search action for the site.
- *
- * @returns A JSON-LD compliant `WebSite` schema object.
- */
 export function getWebsiteSchema() {
   return {
     '@context': 'https://schema.org',
@@ -57,12 +44,6 @@ export function getWebsiteSchema() {
   }
 }
 
-/**
- * Creates a BlogPosting schema for individual blog articles to improve SEO and content discoverability.
- *
- * @param props - An object containing the blog post's title, excerpt, date, slug and optional image.
- * @returns A JSON-LD compliant `BlogPosting` schema object.
- */
 export function getBlogPostingSchema({
   title,
   excerpt,
@@ -88,13 +69,6 @@ export function getBlogPostingSchema({
   }
 }
 
-/**
- * Builds a CreativeWork schema for a single project case study. Mirrors {@link getBlogPostingSchema}
- * so project pages expose a primary entity to search engines rather than only a breadcrumb trail.
- *
- * @param props - The project's title, excerpt, date, slug and optional tech tags.
- * @returns A JSON-LD compliant `CreativeWork` schema object.
- */
 export function getProjectSchema({
   title,
   excerpt,
@@ -123,12 +97,6 @@ export function getProjectSchema({
   }
 }
 
-/**
- * Generates a ProfilePage schema representing the main portfolio landing page.
- * Includes the page's breadcrumb hierarchy and links to the main entity (the user).
- *
- * @returns A JSON-LD compliant `ProfilePage` schema object.
- */
 export function getProfilePageSchema() {
   return {
     '@context': 'https://schema.org',
@@ -153,13 +121,6 @@ export function getProfilePageSchema() {
   }
 }
 
-/**
- * Constructs a BreadcrumbList schema to indicate page hierarchy and navigational structure.
- * Crucial for displaying clean, nested breadcrumbs in Google Search results.
- *
- * @param items - An array of objects representing each step in the breadcrumb path (name and URL).
- * @returns A JSON-LD compliant `BreadcrumbList` schema object.
- */
 export function getBreadcrumbSchema(items: { name: string; url: string }[]) {
   return {
     '@context': 'https://schema.org',

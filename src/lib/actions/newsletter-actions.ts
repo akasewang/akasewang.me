@@ -1,39 +1,29 @@
 'use server'
 
+import { render } from '@react-email/components'
+import { eq } from 'drizzle-orm'
 import React from 'react'
+import { NewsletterTemplate } from '@/components/emails/newsletter-template'
+import { FULL_NAME, READING_SPEED, SITE_URL } from '@/constants/constants'
+import { logContent } from '@/data/content/log-content'
+import { toastContent } from '@/data/content/toast-content'
 import { db } from '@/lib/db/drizzle'
 import { newsletterSubscribers } from '@/lib/db/schema'
 import { getAllBlogPosts, getBlogPost } from '@/lib/managers/blog-manager'
 import { getResend, SENDER_EMAIL } from '@/lib/resend'
-import { render } from '@react-email/components'
-import { NewsletterTemplate } from '@/components/emails/newsletter-template'
-import { eq } from 'drizzle-orm'
-import { SITE_URL, FULL_NAME, READING_SPEED } from '@/constants/constants'
-import { toastContent } from '@/data/content/toast-content'
-import { logContent } from '@/data/content/log-content'
 import type { ActionResult } from '@/types/actions'
 
-/**
- * Secure admin server action that builds an HTML email template for a new blog post.
- * Broadcasts the email in batches via Resend to all active subscribers.
- *
- * @param blogSlug - The slug of the newly published blog post to feature.
- * @param adminSecret - The secret password to verify admin privileges.
- * @returns An ActionResult indicating success and the count of emails dispatched.
- */
 export async function broadcastNewsletter(
   blogSlug: string,
   adminSecret: string,
 ): Promise<ActionResult<{ count: number }>> {
   const toasts = toastContent.newsletter
 
-  /** Verify admin credentials immediately to prevent unauthorized broadcasts */
   if (!process.env.ADMIN_PASSWORD || adminSecret !== process.env.ADMIN_PASSWORD) {
     return { success: false, error: toasts.unauthorized }
   }
 
   try {
-    /** Run intensive data fetching queries in parallel to minimize latency */
     const [posts, fullPost, activeSubscribers] = await Promise.all([
       getAllBlogPosts(),
       getBlogPost(blogSlug),
@@ -74,10 +64,6 @@ export async function broadcastNewsletter(
       }),
     )
 
-    /**
-     * Map over every active subscriber and inject their unique unsubscribe token directly
-     * into the precompiled HTML string, which is much faster than rerendering per recipient.
-     */
     const payloads = activeSubscribers.map((s) => ({
       from: `${FULL_NAME} <${SENDER_EMAIL}>`,
       to: s.email,
@@ -87,7 +73,6 @@ export async function broadcastNewsletter(
 
     const resend = getResend()
 
-    /** Chunk payloads into batches of 100 to adhere to Resend API rate limits */
     for (let i = 0; i < payloads.length; i += 100) {
       const { error } = await resend.batch.send(payloads.slice(i, i + 100))
       if (error) throw new Error(error.message)

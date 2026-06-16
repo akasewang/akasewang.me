@@ -12,13 +12,11 @@ import { useKeyboardShortcut } from '@/hooks/use-keyboard-shortcut'
 import { useSoundEffects } from '@/hooks/use-sound-effects'
 import { cn } from '@/utils/utils'
 
-/** A single prev/next navigation target (slug + title). */
 interface NavItem {
   slug: string
   title: string
 }
 
-/** Props for {@link SlugNavigation}. */
 interface SlugNavigationProps {
   prev?: NavItem
   next?: NavItem
@@ -34,18 +32,6 @@ const BUTTON_ACTIVE_STYLES =
   'hover:bg-accent hover:ring-accent-border hover:text-primary active:scale-[0.95] active:duration-200'
 const BUTTON_DISABLED_STYLES = 'cursor-not-allowed opacity-20'
 
-/**
- * A combined navigation and utility toolbar displayed on detailed content pages (like individual blog posts).
- * Features previous/next content navigation, a "copy raw content" button and a social sharing dropdown.
- * Includes global keyboard shortcuts (Left/Right arrows for nav, 'C' for copy).
- *
- * @param prev - Navigation item data for the preceding content.
- * @param next - Navigation item data for the succeeding content.
- * @param basePath - The base URL path (e.g., '/blog') for constructing navigation links.
- * @param content - The raw string content (usually Markdown/MDX) to be copied to the clipboard.
- * @param url - The absolute URL of the current page, passed to the SocialShare component.
- * @param title - The title of the current page, passed to the SocialShare component.
- */
 export function SlugNavigation({ prev, next, basePath, content, url, title }: SlugNavigationProps) {
   const {
     navigate: navigateSound,

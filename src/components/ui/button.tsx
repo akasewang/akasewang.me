@@ -10,7 +10,6 @@ import { toastContent } from '@/data/content/toast-content'
 import { useSoundEffects } from '@/hooks/use-sound-effects'
 import { cn } from '@/utils/utils'
 
-/** Props for {@link Button}. */
 interface ButtonProps extends HTMLMotionProps<'button'> {
   isPending?: boolean
   isSuccess?: boolean
@@ -19,7 +18,7 @@ interface ButtonProps extends HTMLMotionProps<'button'> {
   successText?: string
   successIcon?: ElementType
   defaultText: string
-  defaultIcon: ElementType
+  defaultIcon?: ElementType
   showArrow?: boolean
   variant?: 'primary' | 'secondary' | 'minimal'
 }
@@ -30,26 +29,12 @@ const VARIANT_STYLES = {
   secondary:
     'ring-1 ring-inset ring-ring retina:ring-[0.5px] bg-gradient-to-b from-muted/60 to-muted/20 text-foreground shadow-[0_2px_4px_oklch(0%_0_0/0.2),inset_0_1px_1px_oklch(100%_0_0/0.1),inset_0_-1px_1px_oklch(0%_0_0/0.4)] backdrop-blur-md group-[:hover:not(:active)]:from-muted/80 group-[:hover:not(:active)]:to-muted/40 group-[:hover:not(:active)]:shadow-[0_4px_8px_oklch(0%_0_0/0.3),inset_0_1px_1px_oklch(100%_0_0/0.15),inset_0_-1px_1px_oklch(0%_0_0/0.4)] group-active:bg-muted/80 group-active:shadow-inner',
   minimal:
-    'ring-1 ring-inset ring-ring retina:ring-[0.5px] bg-transparent text-secondary group-[:hover:not(:active)]:bg-accent group-[:hover:not(:active)]:text-primary group-[:hover:not(:active)]:shadow-sm group-active:bg-accent/80 group-active:text-primary group-active:shadow-inner-sm',
+    'ring-1 ring-inset ring-ring retina:ring-[0.5px] bg-background text-secondary group-[:hover:not(:active)]:bg-surface-40 group-[:hover:not(:active)]:text-primary group-[:hover:not(:active)]:shadow-sm group-active:bg-surface-30 group-active:text-primary group-active:shadow-inner-sm',
 }
 
 const SUCCESS_STYLES =
   'ring-1 ring-inset ring-success/30 retina:ring-[0.5px] bg-success/10 text-success shadow-[0_2px_4px_oklch(0%_0_0/0.2),inset_0_1px_1px_oklch(100%_0_0/0.1)]'
 
-/**
- * A versatile Button component with built in handling for pending and success states commonly used in forms.
- *
- * @param isPending - If true, displays the `loadingText` and a spinner in the right box.
- * @param isSuccess - If true (and `countdown > 0`), displays the success state styling.
- * @param countdown - A numeric value used to render a cooldown timer in the right box.
- * @param loadingText - Text to display while `isPending` is true.
- * @param successText - Text to display when `isSuccess` is true.
- * @param successIcon - The icon component to display in the success state.
- * @param defaultText - The primary text label for the button.
- * @param defaultIcon - The primary icon component to display next to the default text.
- * @param showArrow - If true, renders a right side box with an animated hover arrow.
- * @param variant - Visual style variant (`primary`, `secondary`, or `minimal`).
- */
 export function Button({
   isPending = false,
   isSuccess = false,
@@ -108,7 +93,7 @@ export function Button({
     if (countdown > 0) return <span>wait</span>
     return (
       <>
-        <DefaultIcon className="size-4" />
+        {DefaultIcon && <DefaultIcon className="size-4" />}
         <span>{defaultText}</span>
       </>
     )

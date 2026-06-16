@@ -1,7 +1,3 @@
-/**
- * Log Content Data Dictionary.
- * Centralized static configuration and text definitions.
- */
 export const logContent = {
   view: {
     incrementError: 'Error incrementing view (likely offline)',

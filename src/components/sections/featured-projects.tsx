@@ -12,7 +12,6 @@ import { SPRING_TRANSITION } from '@/constants/ui'
 import { landingPageContent } from '@/data/content/landing-content'
 import type { ProjectCategory, ProjectPostData } from '@/types/project'
 
-/** Props for {@link FeaturedProjects}. */
 interface FeaturedProjectsProps {
   filterType?: ProjectCategory
   projects: ProjectPostData[]
@@ -21,12 +20,6 @@ interface FeaturedProjectsProps {
 
 const { featuredProjects } = landingPageContent.sections
 
-/**
- * Featured Projects Section.
- * A dual purpose component that renders a subset of projects on the home page
- * or acts as the fully searchable/filterable grid on the main `/projects` listing.
- * Animates using the lightweight `m` component injected from the root `MotionProvider`.
- */
 export function FeaturedProjects({
   filterType,
   projects,
@@ -60,32 +53,30 @@ export function FeaturedProjects({
     <section id="projects" className="space-y-8 animate-page-simple">
       {isHomePage && <SectionTitle>{featuredProjects.title}</SectionTitle>}
 
-      <>
-        <AnimatePresence mode="popLayout">
-          {displayed.length > 0 ? (
-            <m.div
-              key="project-grid"
-              layout
-              className="grid grid-cols-1 gap-2 sm:grid-cols-2 sm:gap-2.5"
-            >
-              {displayed.map((project) => (
-                <m.div
-                  key={project.slug}
-                  layout
-                  initial={{ opacity: 0, scale: 0.98 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.96 }}
-                  transition={SPRING_TRANSITION}
-                >
-                  <ProjectCard project={project} />
-                </m.div>
-              ))}
-            </m.div>
-          ) : (
-            <EmptyState key="no-projects" message="no projects found in this category." />
-          )}
-        </AnimatePresence>
-      </>
+      <AnimatePresence mode="popLayout">
+        {displayed.length > 0 ? (
+          <m.div
+            key="project-grid"
+            layout
+            className="grid grid-cols-1 gap-2 sm:grid-cols-2 sm:gap-2.5"
+          >
+            {displayed.map((project) => (
+              <m.div
+                key={project.slug}
+                layout
+                initial={{ opacity: 0, scale: 0.98 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.96 }}
+                transition={SPRING_TRANSITION}
+              >
+                <ProjectCard project={project} />
+              </m.div>
+            ))}
+          </m.div>
+        ) : (
+          <EmptyState key="no-projects" message="no projects found in this category." />
+        )}
+      </AnimatePresence>
 
       {isHomePage && <ViewAll href="/projects" label={featuredProjects.viewAll} />}
     </section>

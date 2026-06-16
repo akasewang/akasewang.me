@@ -8,16 +8,11 @@ import { useSoundEffects } from '@/hooks/use-sound-effects'
 import type { BlogPost } from '@/types/blog'
 import { cn, formatDateString, isNew } from '@/utils/utils'
 
-/** Props for {@link BlogPostCard}. */
 interface BlogPostCardProps {
   post: BlogPost
   className?: string
 }
 
-/**
- * A list row linking to a blog post, showing its title (with a "new" tag for recent posts),
- * date, view count and a two line excerpt. Used in the featured/listing post lists.
- */
 export function BlogPostCard({
   post: { title, slug, date, excerpt },
   className,

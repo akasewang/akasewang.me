@@ -1,11 +1,11 @@
 'use client'
 
-import { useRef } from 'react'
 import Image from 'next/image'
+import { useRef } from 'react'
 import { EmptyState } from '@/components/common/empty-state'
 import { Bullet } from '@/components/ui/bullet'
-import { ExpandableContent } from '@/components/ui/expandable-content'
 import { ExpandToggle } from '@/components/ui/expand-toggle'
+import { ExpandableContent } from '@/components/ui/expandable-content'
 import { GradientAvatar } from '@/components/ui/gradient-avatar'
 import { HoverHighlight } from '@/components/ui/hover-highlight'
 import { Icons } from '@/components/ui/icons'
@@ -14,21 +14,13 @@ import { useSoundEffects } from '@/hooks/use-sound-effects'
 import type { ChangelogCommit, ChangelogDay } from '@/types/changelog'
 import { cn } from '@/utils/utils'
 
-/** Props for {@link ChangelogTimeline}. */
 interface ChangelogTimelineProps {
   days: ChangelogDay[]
 }
 
-/** Shared classes for the mobile marker's dashed connector stubs (flanking the icon). */
 const MOBILE_STUB_CLASS =
   'absolute left-1/2 h-3 w-px -translate-x-1/2 border-l border-dashed border-border'
 
-/**
- * A single expandable commit row. The whole row toggles a detail panel with the commit
- * body and an author line (avatar, profile link and timestamp). The short SHA in the
- * summary links to the commit on GitHub. On mobile the SHA stacks below the subject
- * (like the timeline date) with the toggle pinned to the top right corner.
- */
 function CommitRow({ commit }: { commit: ChangelogCommit }) {
   const { isExpanded, handleClick, handleKeyDown } = useExpandableRow()
   const { hoverCard, hoverLink, navigate: navigateSound } = useSoundEffects()
@@ -126,14 +118,6 @@ function CommitRow({ commit }: { commit: ChangelogCommit }) {
   )
 }
 
-/**
- * Changelog Timeline.
- * Renders the site's commit history grouped by day. On desktop a dashed rail with commit
- * markers runs down the left of each group; on mobile the marker moves inline into the day
- * heading and the rail collapses to a short connector that only bridges the gap between
- * day groups, mirroring GitHub's responsive commit list. Rows are lit by the shared
- * {@link HoverHighlight} glide and expand in place to reveal the commit details.
- */
 export function ChangelogTimeline({ days }: ChangelogTimelineProps) {
   const listRef = useRef<HTMLDivElement>(null)
 

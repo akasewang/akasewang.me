@@ -1,38 +1,63 @@
 'use server'
 
+import { and, desc, eq, gt, lt } from 'drizzle-orm'
+import { revalidatePath } from 'next/cache'
+import { headers } from 'next/headers'
+import { MESSAGES_PER_PAGE } from '@/constants/constants'
+import { toastContent } from '@/data/content/toast-content'
 import { db } from '@/lib/db/drizzle'
 import { messageBoard } from '@/lib/db/schema'
-import { desc, eq, and, gt } from 'drizzle-orm'
-import { headers } from 'next/headers'
-import { revalidatePath } from 'next/cache'
-import { toastContent } from '@/data/content/toast-content'
-import { MESSAGES_PER_PAGE } from '@/constants/constants'
 import type { ActionResult } from '@/types/actions'
 import type { MessageBoardEntry } from '@/types/message-board'
 
-/** Verifies an admin secret against the configured password (false if none is set). */
-const isAdmin = (secret: string) =>
-  process.env.ADMIN_PASSWORD && secret === process.env.ADMIN_PASSWORD
+const isAdmin = (secret: unknown) =>
+  typeof secret === 'string' &&
+  Boolean(process.env.ADMIN_PASSWORD) &&
+  secret === process.env.ADMIN_PASSWORD
 
-/**
- * Server action to submit a new message to the public message board.
- * Includes rate limiting (based on IP) and basic honeypot bot protection.
- *
- * @param formData - The submitted form data containing `name`, `message` and the hidden `honey` field.
- * @returns An ActionResult indicating success or specific validation/rate limit errors.
- */
+const MESSAGE_MIN_LENGTH = 2
+const MESSAGE_MAX_LENGTH = 500
+const NAME_MAX_LENGTH = 80
+const REPLY_MAX_LENGTH = 500
+const RATE_LIMIT_WINDOW_MS = 120000
+const MAX_MESSAGES_PER_PAGE = 50
+
+type MessageBoardCursor = Pick<MessageBoardEntry, 'id'>
+
+function normalizeLimit(limit: number) {
+  if (!Number.isFinite(limit)) return MESSAGES_PER_PAGE
+  return Math.min(MAX_MESSAGES_PER_PAGE, Math.max(1, Math.floor(limit)))
+}
+
+function normalizeCursor(cursor?: MessageBoardCursor | null) {
+  if (!cursor || !Number.isInteger(cursor.id) || cursor.id <= 0) return null
+  return { id: cursor.id }
+}
+
+async function getClientIp() {
+  const requestHeaders = await headers()
+  const forwardedFor = requestHeaders.get('x-forwarded-for')?.split(',')[0]?.trim()
+  const realIp = requestHeaders.get('x-real-ip')?.trim()
+
+  return forwardedFor || realIp || '127.0.0.1'
+}
+
 export async function submitMessageBoardMessage(formData: FormData): Promise<ActionResult> {
   const { messageBoard: toasts } = toastContent
   const name = formData.get('name')?.toString().trim()
   const message = formData.get('message')?.toString().trim()
 
   if (formData.get('honey')) return { success: false, error: toasts.botDetected }
-  if (!name || name.length < 2) return { success: false, error: toasts.invalidName }
-  if (!message || message.length < 2) return { success: false, error: toasts.invalidMessage }
-  if (message.length > 500) return { success: false, error: toasts.messageTooLong }
+  if (!name || name.length < MESSAGE_MIN_LENGTH || name.length > NAME_MAX_LENGTH) {
+    return { success: false, error: toasts.invalidName }
+  }
+  if (!message || message.length < MESSAGE_MIN_LENGTH) {
+    return { success: false, error: toasts.invalidMessage }
+  }
+  if (message.length > MESSAGE_MAX_LENGTH) return { success: false, error: toasts.messageTooLong }
 
-  const ip = (await headers()).get('x-forwarded-for')?.split(',')[0] || '127.0.0.1'
-  const twoMinutesAgo = new Date(Date.now() - 120000)
+  const ip = await getClientIp()
+  const twoMinutesAgo = new Date(Date.now() - RATE_LIMIT_WINDOW_MS)
 
   try {
     const lastMessage = await db.query.messageBoard.findFirst({
@@ -51,31 +76,27 @@ export async function submitMessageBoardMessage(formData: FormData): Promise<Act
   }
 }
 
-/**
- * Server action to fetch a paginated list of message board entries.
- * Sorted chronologically (newest first). Excludes sensitive fields like IP address.
- *
- * @param offset - The number of records to skip.
- * @param limit - The maximum number of records to return.
- * @returns An ActionResult containing the messages array and a `hasMore` boolean for infinite scroll.
- */
 export async function getMessageBoardMessages(
-  offset = 0,
+  cursor?: MessageBoardCursor | null,
   limit = MESSAGES_PER_PAGE,
 ): Promise<ActionResult<{ messages: MessageBoardEntry[]; hasMore: boolean }>> {
   try {
+    const normalizedLimit = normalizeLimit(limit)
+    const normalizedCursor = normalizeCursor(cursor)
+    const cursorFilter = normalizedCursor ? lt(messageBoard.id, normalizedCursor.id) : undefined
+
     const data = await db.query.messageBoard.findMany({
       columns: { ip: false },
-      orderBy: [desc(messageBoard.createdAt)],
-      limit: limit + 1,
-      offset,
+      where: cursorFilter,
+      orderBy: [desc(messageBoard.id)],
+      limit: normalizedLimit + 1,
     })
 
     return {
       success: true,
       data: {
-        messages: data.slice(0, limit),
-        hasMore: data.length > limit,
+        messages: data.slice(0, normalizedLimit),
+        hasMore: data.length > normalizedLimit,
       },
     }
   } catch (error) {
@@ -84,18 +105,14 @@ export async function getMessageBoardMessages(
   }
 }
 
-/**
- * Secure admin server action to permanently delete a specific message board entry by ID.
- *
- * @param id - The database ID of the message to delete.
- * @param adminSecret - The secret password to verify admin privileges.
- * @returns An ActionResult indicating success or authorization failure.
- */
 export async function deleteMessageBoardMessage(
   id: number,
   adminSecret: string,
 ): Promise<ActionResult> {
   if (!isAdmin(adminSecret)) return { success: false, error: toastContent.newsletter.unauthorized }
+  if (!Number.isInteger(id) || id <= 0) {
+    return { success: false, error: toastContent.messageBoard.deleteError }
+  }
 
   try {
     await db.delete(messageBoard).where(eq(messageBoard.id, id))
@@ -107,23 +124,26 @@ export async function deleteMessageBoardMessage(
   }
 }
 
-/**
- * Secure admin server action to attach an official reply to a user's message board entry.
- *
- * @param id - The database ID of the target message.
- * @param reply - The admin's reply text.
- * @param adminSecret - The secret password to verify admin privileges.
- * @returns An ActionResult indicating success or authorization failure.
- */
 export async function replyMessageBoardMessage(
   id: number,
   reply: string,
   adminSecret: string,
 ): Promise<ActionResult> {
   if (!isAdmin(adminSecret)) return { success: false, error: toastContent.newsletter.unauthorized }
+  if (!Number.isInteger(id) || id <= 0) {
+    return { success: false, error: toastContent.messageBoard.replyError }
+  }
+  if (typeof reply !== 'string')
+    return { success: false, error: toastContent.messageBoard.replyError }
+
+  const trimmedReply = reply.trim()
+  if (!trimmedReply) return { success: false, error: toastContent.messageBoard.invalidMessage }
+  if (trimmedReply.length > REPLY_MAX_LENGTH) {
+    return { success: false, error: toastContent.messageBoard.messageTooLong }
+  }
 
   try {
-    await db.update(messageBoard).set({ adminReply: reply }).where(eq(messageBoard.id, id))
+    await db.update(messageBoard).set({ adminReply: trimmedReply }).where(eq(messageBoard.id, id))
     revalidatePath('/message-board')
     return { success: true, data: undefined }
   } catch (error) {

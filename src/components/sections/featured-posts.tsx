@@ -1,20 +1,19 @@
 'use client'
 
-import { useRef, useMemo, useEffect } from 'react'
+import { AnimatePresence, m } from 'framer-motion'
 import { usePathname } from 'next/navigation'
-import { m, AnimatePresence } from 'framer-motion'
-import { ViewAll } from '@/components/ui/view-all'
-import { HoverHighlight } from '@/components/ui/hover-highlight'
+import { useEffect, useMemo, useRef } from 'react'
 import { BlogPostCard } from '@/components/blogs/blog-post-card'
+import { EmptyState } from '@/components/common/empty-state'
+import { SectionTitle } from '@/components/layout/section-title'
 import { useViews } from '@/components/providers/views-context'
+import { HoverHighlight } from '@/components/ui/hover-highlight'
+import { ViewAll } from '@/components/ui/view-all'
+import { SPRING_TRANSITION } from '@/constants/ui'
 import { blogsListingContent } from '@/data/content/blogs-content'
 import { landingPageContent } from '@/data/content/landing-content'
-import { SectionTitle } from '@/components/layout/section-title'
-import { EmptyState } from '@/components/common/empty-state'
-import { SPRING_TRANSITION } from '@/constants/ui'
-import type { BlogPost, BlogCategory } from '@/types/blog'
+import type { BlogCategory, BlogPost } from '@/types/blog'
 
-/** Props for {@link FeaturedPosts}. */
 interface FeaturedPostsProps {
   filterType?: BlogCategory
   searchQuery?: string
@@ -23,18 +22,12 @@ interface FeaturedPostsProps {
 
 const { featuredPosts } = landingPageContent.sections
 
-/** Category specific empty state copy, falling back to the generic message. */
 const EMPTY_MESSAGES: Partial<Record<BlogCategory, string>> = {
   technical: blogsListingContent.noTechnical,
   personal: blogsListingContent.noPersonal,
   'short-notes': blogsListingContent.noShortNotes,
 }
 
-/**
- * Featured Posts Section.
- * A dual purpose component that renders a subset of blog posts on the home page.
- * or acts as the fully searchable/filterable list on the main `/blogs` listing.
- */
 export function FeaturedPosts({ filterType, searchQuery, posts }: FeaturedPostsProps) {
   const pathname = usePathname()
   const isHomePage = pathname === '/'

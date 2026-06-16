@@ -2,11 +2,6 @@ import { FIRST_NAME, LAST_NAME, ROLES } from '@/constants/constants'
 import type { LandingPageContent } from '@/types/home'
 import type { SharedContent } from '@/types/site'
 
-/**
- * Landing Page Content Model.
- * Centralized text for the home page (hero bio, section titles and action labels)
- * so content can be updated without touching React component logic.
- */
 export const landingPageContent: LandingPageContent = {
   hero: {
     firstName: FIRST_NAME,
@@ -15,9 +10,9 @@ export const landingPageContent: LandingPageContent = {
     roles: ROLES,
     aboutTitle: 'about me.',
     about: [
-      "Hey there! I'm a data science grad and software engineer who likes to [build applications](/projects) that help myself and others be more productive and [design reusable components](https://ui.noddy.studio/) to enjoy the process of creating.",
-      "I [write about](/blogs) what I'm working on or learning and share occasional email updates with [subscribers](/newsletter).",
-      'Outside of programming, I enjoy [taking photos](/photos), playing games and keeping a [catalog](/catalog) of the anime and movies I watch.',
+      "Hey there! I'm a software engineer who likes to [build applications](/projects) that make everyday things a little easier for me and the people around me and design [reusable components](https://ui.noddy.studio/) for the joy of making things.",
+      "When I'm not building, I [write about](/blogs) what I'm working on or figuring out along the way and send the occasional email update to [subscribers](/newsletter) who like to follow along.",
+      'Away from the keyboard, I enjoy [taking photos](/photos), playing games and keeping a [catalog](/catalog) of the anime and movies I watch.',
     ],
     findMeOn: 'Find me on',
     connectText: 'Interested in working together? Feel free to schedule a meet!',
@@ -26,6 +21,8 @@ export const landingPageContent: LandingPageContent = {
     mailMeAt: 'or mail me at',
     inactivePrefix: 'No longer active on',
     scheduleMeetUrl: 'https://cal.com/akasewang',
+    designsLabel: 'Click for designs •',
+    designsUrl: 'https://noddy.studio/',
   },
   sections: {
     experience: 'experience.',
@@ -45,7 +42,6 @@ export const landingPageContent: LandingPageContent = {
   },
 }
 
-/** Shared "show more / show less" toggle labels reused across expandable lists. */
 export const sharedContent: SharedContent = {
   more: 'show more',
   less: 'show less',

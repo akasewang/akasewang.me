@@ -1,34 +1,25 @@
-import { MdxFooter } from '@/components/common/mdx-components/mdx-footer'
+import type { Metadata } from 'next'
+import { notFound } from 'next/navigation'
 import { MDXRemote } from 'next-mdx-remote/rsc'
-import { MDX_OPTIONS, MDX_COMPONENTS } from '@/components/common/mdx-components/mdx-config'
 import { AsideTOC } from '@/components/common/mdx-components/aside-toc'
+import { MDX_COMPONENTS, MDX_OPTIONS } from '@/components/common/mdx-components/mdx-config'
+import { MdxFooter } from '@/components/common/mdx-components/mdx-footer'
+import { MdxPostHeader } from '@/components/common/mdx-components/mdx-post-header'
 import { ProjectDemo } from '@/components/common/mdx-components/project-demo'
 import { LinkText } from '@/components/ui/link-text'
-import { SeparatorBullet } from '@/components/ui/separator-bullet'
 import { SeparatorSlash } from '@/components/ui/separator-slash'
-import { ViewCounter } from '@/components/common/view-counter'
-import { getReadingTime, formatDateString } from '@/utils/utils'
-import { getProject, getProjectSlugs, getAllProjects } from '@/lib/managers/project-manager'
-import { SlugNavigation } from '@/components/common/slug-navigation'
+import { FULL_NAME, SITE_URL } from '@/constants/constants'
 import { getBreadcrumbSchema, getProjectSchema } from '@/lib/json-ld'
-import { SITE_URL, FULL_NAME } from '@/constants/constants'
-import { Metadata } from 'next'
-import { notFound } from 'next/navigation'
+import { getAllProjects, getProject, getProjectSlugs } from '@/lib/managers/project-manager'
 import { constructMetadata, getOgImageUrl } from '@/lib/metadata'
 
-/**
- * Next.js static generation hook.
- * Precomputes all possible project showcase paths at build time for instant delivery.
- */
 export async function generateStaticParams() {
   return getProjectSlugs()
 }
 
-/** Resolved dynamic route params for a single project. */
-export type paramsType = Promise<{ slug: string }>
+type PageParams = Promise<{ slug: string }>
 
-/** Dynamically resolves Open Graph and SEO metadata based on the requested project's MDX frontmatter. */
-export async function generateMetadata({ params }: { params: paramsType }): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: PageParams }): Promise<Metadata> {
   const { slug } = await params
   const post = await getProject(slug)
 
@@ -45,11 +36,7 @@ export async function generateMetadata({ params }: { params: paramsType }): Prom
   })
 }
 
-/**
- * Server Component responsible for rendering an individual project case study.
- * Hydrates the MDX content, calculates navigation and renders demo visuals (video/image).
- */
-export default async function ProjectPost({ params }: { params: paramsType }) {
+export default async function ProjectPost({ params }: { params: PageParams }) {
   const { slug } = await params
   const post = await getProject(slug)
 
@@ -82,30 +69,16 @@ export default async function ProjectPost({ params }: { params: paramsType }) {
           dangerouslySetInnerHTML={{ __html: JSON.stringify([projectJsonLd, breadcrumbJsonLd]) }}
         />
 
-        <div className="flex items-start justify-between gap-4">
-          <div className="space-y-2">
-            <h1 className="text-balance font-serif text-2xl font-medium italic leading-snug text-primary">
-              {title}
-            </h1>
-
-            <div className="flex items-center text-xs text-muted-foreground">
-              <span>{formatDateString(date)}</span>
-              <SeparatorBullet />
-              <ViewCounter slug={postSlug} readOnly={false} />
-              <SeparatorBullet />
-              <span>{getReadingTime(content)} min read</span>
-            </div>
-          </div>
-
-          <SlugNavigation
-            prev={prevProject ? { slug: prevProject.slug, title: prevProject.title } : undefined}
-            next={nextProject ? { slug: nextProject.slug, title: nextProject.title } : undefined}
-            basePath="/projects"
-            content={content}
-            url={`${SITE_URL}/projects/${postSlug}`}
-            title={title}
-          />
-        </div>
+        <MdxPostHeader
+          title={title}
+          date={date}
+          slug={postSlug}
+          content={content}
+          prev={prevProject ? { slug: prevProject.slug, title: prevProject.title } : undefined}
+          next={nextProject ? { slug: nextProject.slug, title: nextProject.title } : undefined}
+          basePath="/projects"
+          url={`${SITE_URL}/projects/${postSlug}`}
+        />
 
         <div className="space-y-2">
           <p className="text-pretty text-sm leading-relaxed text-muted-foreground">{excerpt}</p>

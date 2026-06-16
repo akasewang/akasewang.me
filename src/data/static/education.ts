@@ -1,9 +1,5 @@
 import type { TimelineItemProps } from '@/types/site'
 
-/**
- * Education Data Dictionary.
- * Centralized static configuration and text definitions.
- */
 export const education: TimelineItemProps[] = [
   {
     id: 'bachelor-of-technology-in-data-science',

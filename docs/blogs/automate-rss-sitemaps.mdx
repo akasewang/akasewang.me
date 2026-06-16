@@ -34,24 +34,12 @@ import { getAllBlogPosts } from '@/lib/managers/blog-manager'
 import { getAllProjects } from '@/lib/managers/project-manager'
 import { parseDate } from '@/utils/utils'
 import { SITE_URL } from '@/constants/constants'
-
-/**
- * Generates an XML Sitemap for search engine crawlers (Googlebot, Bingbot, etc.).
- * Dynamically aggregates all static routes, blog posts and projects so the site's
- * content stays accurately and freshly indexed.
- *
- * @returns An XML Response containing the full URL set.
- */
 export async function GET(): Promise<Response> {
-  // 1. Fetch both blogs and projects concurrently to optimize connection pools
   const [blogPosts, projectPosts] = await Promise.all([
     getAllBlogPosts(),
     getAllProjects(),
   ])
-
   const currentDate = new Date().toISOString()
-
-  // 2. Define static routes with priority and change frequencies
   const staticPages = [
     { path: '', priority: '1.0', changefreq: 'weekly' },
     { path: '/blogs', priority: '0.9', changefreq: 'daily' },
@@ -64,8 +52,6 @@ export async function GET(): Promise<Response> {
     { path: '/skills', priority: '0.8', changefreq: 'monthly' },
     { path: '/testimonials', priority: '0.7', changefreq: 'monthly' },
   ]
-
-  // 3. Map dynamic posts to exact XML schemas
   const urls = [
     ...staticPages.map(({ path, priority, changefreq }) => ({
       url: `${SITE_URL}${path}`,
@@ -86,8 +72,6 @@ export async function GET(): Promise<Response> {
       changefreq: 'weekly',
     })),
   ]
-
-  // 4. Compile sitemap XML string
   const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${urls
@@ -101,8 +85,6 @@ ${urls
   )
   .join('\n')}
 </urlset>`
-
-  // 5. Send programmatic Response with XML Content-Type header
   return new Response(sitemap, {
     headers: {
       'Content-Type': 'application/xml',
@@ -128,14 +110,6 @@ import { parseDate } from '@/utils/utils'
 import { SITE_URL, FULL_NAME } from '@/constants/constants'
 import { getOgImageUrl } from '@/lib/metadata'
 import { homeSeoContent } from '@/data/content/seo-content'
-
-/**
- * Generates an RSS XML feed for the blog.
- * Scans all published blog posts and compiles them into a standard RSS 2.0 format.
- * Includes caching headers to prevent regenerating the XML on every request.
- *
- * @returns An XML Response containing the full RSS feed.
- */
 export async function GET() {
   const feed = new RSS({
     title: `${FULL_NAME}'s Blog`,
@@ -149,12 +123,9 @@ export async function GET() {
     image_url: getOgImageUrl(homeSeoContent.ogTitle),
     webMaster: FULL_NAME,
   })
-
   try {
     const allPosts: BlogPost[] = await getAllBlogPosts()
     const blogPosts = allPosts
-
-    // Map posts into standard RSS items
     blogPosts.forEach((post) => {
       feed.item({
         title: post.title,
@@ -166,8 +137,6 @@ export async function GET() {
         categories: post.type ? [post.type] : [],
       })
     })
-
-    // Return the generated XML with headers
     return new Response(feed.xml({ indent: true }), {
       headers: {
         'Content-Type': 'application/xml',

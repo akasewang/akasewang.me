@@ -16,3 +16,4 @@ For pages with filtering or sorting (blogs, projects, catalog), the active state
 - **useViews / ViewsProvider**: Batches and caches view count reads. See the View Counter in the [overview](overview.md).
 - **useGithubStars**: Reads the star count from the internal `/api/github-stars` proxy, dedupes concurrent callers with a module level shared promise, and caches in `localStorage` for 15 minutes so repeat visits paint instantly.
 - **useAdmin**: Tracks admin auth and listens for the browser `storage` event, so logging out in one tab instantly logs you out in every other open tab.
+- **useContentListState**: A generic hook that wires up category filtering, text search and sort order for any content list page (blogs, projects, catalog). It reads the initial state from URL search params, syncs changes back with `replaceState` (no navigation), and prefetches view counts for the visible items.

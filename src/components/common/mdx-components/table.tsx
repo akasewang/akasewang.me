@@ -1,17 +1,19 @@
-import { forwardRef, type ComponentProps } from 'react'
+import {
+  type ComponentProps,
+  type ComponentPropsWithoutRef,
+  type ComponentRef,
+  createElement,
+  type ElementType,
+  forwardRef,
+} from 'react'
 
 import { cn } from '@/utils/utils'
 
-/**
- * Creates a styled, ref forwarding wrapper around a native HTML element.
- * Reduces the repeated forwardRef + className merge boilerplate to a single call.
- */
-function styled<T extends keyof HTMLElementTagNameMap>(Tag: T, base: string, name: string) {
-  const Comp = forwardRef<HTMLElementTagNameMap[T], ComponentProps<T>>(
-    ({ className, ...props }, ref) => (
-      /** @ts-expect-error polymorphic ref/props are structurally sound but hard to narrow */
-      <Tag ref={ref} className={cn(base, className)} {...props} />
-    ),
+function styled<T extends ElementType>(Tag: T, base: string, name: string) {
+  type Props = ComponentPropsWithoutRef<T> & { className?: string }
+  type Ref = ComponentRef<T>
+  const Comp = forwardRef<Ref, Props>(({ className, ...props }, ref) =>
+    createElement(Tag, { ...props, ref, className: cn(base, className) }),
   )
   Comp.displayName = name
   return Comp
@@ -39,18 +41,13 @@ Table.displayName = 'Table'
 
 const TableHeader = styled(
   'thead',
-  'border-b border-border/50 bg-code-tab/50 [&_tr]:border-0',
+  'border-b border-border/50 bg-[color-mix(in_oklab,var(--code-tab)_50%,var(--code-block))] [&_tr]:border-0',
   'TableHeader',
 )
 const TableBody = styled(
   'tbody',
-  '[&_tr]:transition-colors [&_tr]:duration-200 [&_tr:hover]:bg-muted/20 [&_tr:last-child]:border-0',
+  '[&_tr]:transition-colors [&_tr]:duration-200 [&_tr:hover]:bg-[color-mix(in_oklab,var(--muted)_20%,var(--code-block))] [&_tr:last-child]:border-0',
   'TableBody',
-)
-const TableFooter = styled(
-  'tfoot',
-  'border-t border-border/50 bg-code-tab/30 font-medium [&>tr]:last:border-b-0',
-  'TableFooter',
 )
 const TableRow = styled('tr', 'border-b border-border/30', 'TableRow')
 const TableHead = styled(
@@ -63,10 +60,5 @@ const TableCell = styled(
   'px-4 py-2.5 align-middle text-xs leading-relaxed text-foreground [&:has([role=checkbox])]:pr-0',
   'TableCell',
 )
-const TableCaption = styled(
-  'caption',
-  'px-4 py-2.5 text-[11px] text-muted-foreground',
-  'TableCaption',
-)
 
-export { Table, TableHeader, TableBody, TableFooter, TableHead, TableRow, TableCell, TableCaption }
+export { Table, TableBody, TableCell, TableHead, TableHeader, TableRow }

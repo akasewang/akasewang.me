@@ -18,11 +18,6 @@ const nextConfig: NextConfig = {
     '/sitemap.xml': ['./docs/blogs/**/*', './docs/projects/**/*'],
   },
   experimental: {
-    /**
-     * Allowed Server Action origins for the site's alternate domains. Next lists this under
-     * experiments because the config key still lives under `experimental`, not because this
-     * allowlist is unsafe.
-     */
     serverActions: {
       allowedOrigins: [
         'akasewang.me',

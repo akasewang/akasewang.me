@@ -1,9 +1,5 @@
 import type { TimelineItemProps } from '@/types/site'
 
-/**
- * Achievements Data Dictionary.
- * Centralized static configuration and text definitions.
- */
 export const achievements: TimelineItemProps[] = [
   {
     id: 'mongodb-diamante-track-winner',

@@ -9,19 +9,12 @@ import { useScrollLock } from '@/hooks/use-scroll-lock'
 import { useSoundEffects } from '@/hooks/use-sound-effects'
 import type { Photo } from '@/types/photos'
 
-/** Props for {@link PhotoOverlay}; `photo` is `null` when nothing is zoomed. */
 interface PhotoOverlayProps {
   photo: Photo | null
   isOpen: boolean
   onClose: () => void
 }
 
-/**
- * A fullscreen portal overlay that displays a high resolution version of a photo.
- * Locks body scroll while open and closes on Escape or a backdrop/image click.
- * Uses Framer Motion's `m` component to inherit the LazyMotion engine from the parent, with a
- * shared `layoutId` so the grid thumbnail morphs into the overlay.
- */
 export function PhotoOverlay({ photo, isOpen, onClose }: PhotoOverlayProps) {
   const { zoom } = useSoundEffects()
   useScrollLock(isOpen)
@@ -59,7 +52,7 @@ export function PhotoOverlay({ photo, isOpen, onClose }: PhotoOverlayProps) {
             <m.div
               layoutId={`photo-${photo.id}`}
               transition={ZOOM_EASE}
-              className="relative z-10 flex transform-gpu overflow-hidden bg-muted/20 shadow-2xl will-change-transform"
+              className="relative z-10 flex transform-gpu overflow-hidden bg-surface-20 shadow-2xl will-change-transform"
               style={{
                 aspectRatio: `${photo.width} / ${photo.height}`,
                 width: `min(90vw, calc(90vh * ${photo.width} / ${photo.height}))`,

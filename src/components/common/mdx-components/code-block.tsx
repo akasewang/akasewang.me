@@ -1,21 +1,16 @@
 'use client'
 
-import { isValidElement, useMemo, type HTMLAttributes, type ReactNode } from 'react'
-import { cn } from '@/utils/utils'
+import { type HTMLAttributes, isValidElement, type ReactNode, useMemo } from 'react'
 import { CopyButton } from '@/components/ui/copy-button'
+import { cn } from '@/utils/utils'
 import { useInTabPanel } from './contexts/tab-panel-context'
 
-/** Props for {@link Pre}. */
 interface PreProps extends HTMLAttributes<HTMLPreElement> {
   copyable?: boolean
   raw?: boolean
   title?: string
 }
 
-/**
- * Recursively walk the React element tree to extract the pure text content of a code block.
- * This is necessary because rehype-highlight breaks the raw string into many nested `<span>` tags.
- */
 const extractCode = (node: ReactNode): string => {
   if (node == null || typeof node === 'boolean') return ''
   if (typeof node === 'string' || typeof node === 'number') return String(node)
@@ -25,10 +20,6 @@ const extractCode = (node: ReactNode): string => {
   return ''
 }
 
-/**
- * Walk the element tree for a `language-*` class to detect the fenced code language.
- * rehype-highlight leaves this class on the inner `<code>` element rather than the `<pre>`.
- */
 const extractLanguage = (node: ReactNode): string | null => {
   if (Array.isArray(node)) {
     for (const child of node) {
@@ -42,7 +33,6 @@ const extractLanguage = (node: ReactNode): string | null => {
   return /language-([\w-]+)/.exec(className ?? '')?.[1] ?? extractLanguage(children ?? null)
 }
 
-/* Extract the `title="..."` value from the `meta` string prop passed by MDX to the `<code>` element. */
 const extractMetaTitle = (node: ReactNode): string | null => {
   if (Array.isArray(node)) {
     for (const child of node) {
@@ -65,15 +55,6 @@ const extractMetaTitle = (node: ReactNode): string | null => {
   return extractMetaTitle(children ?? null)
 }
 
-/**
- * Custom `<pre>` renderer for MDX code blocks. Renders the code in a bordered surface with a
- * copy to clipboard button floating over it; when a language is detected it adds a label tab
- * connected above the surface, which is omitted when the block is inside a tab panel.
- *
- * @param copyable - Whether to display the copy to clipboard button. Defaults to true.
- * @param raw - If true, bypasses the styled wrapper and renders a standard HTML pre tag.
- * @param title - Optional label overriding the detected language.
- */
 export const Pre = ({
   copyable = true,
   raw = false,

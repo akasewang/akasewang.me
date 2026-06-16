@@ -22,7 +22,6 @@ If you handle this naively, you usually end up with two sub optimal patterns:
 const CLASSES = {
   info: 'bg-blue-600/10 border-blue-500/30 text-blue-300',
   success: 'bg-emerald-600/10 border-emerald-500/30 text-emerald-300',
-  // ... and so on for every single variant and child element.
 }
 ```
 
@@ -65,7 +64,6 @@ The modern CSS `color-mix()` function allows you to blend two colors directly in
 We can use it to mix our dynamic `--callout-hue` parameter with our theme’s dark background to calculate a clean, semi transparent background color on the fly, without generating custom opacity classes:
 
 ```css
-/* Mix 6% of our dynamic hue with 94% of our dark container background */
 background-color: color-mix(in oklab, var(--callout-hue) 6%, oklch(0.23 0 0 / 0.3));
 ```
 
@@ -77,19 +75,13 @@ Let's check the core code of [callout.tsx](https://github.com/akasewang/akasewan
 import { useId, type CSSProperties, type ReactNode } from 'react'
 import { Icons } from '@/components/ui/icons'
 import { cn } from '@/utils/utils'
-
-/** The available visual variants for a callout. */
 type CalloutType = 'info' | 'tip' | 'warn' | 'error' | 'success'
-
-/** Props for {@link Callout}. */
 interface CalloutProps {
   type?: CalloutType
   title?: ReactNode
   children: ReactNode
   className?: string
 }
-
-/** Per-variant config: icon, label, text accent color and base hue. */
 const VARIANTS: Record<
   CalloutType,
   { icon: keyof typeof Icons; label: string; accent: string; hue: string }
@@ -100,27 +92,15 @@ const VARIANTS: Record<
   error: { icon: 'alertCircle', label: 'Error', accent: 'text-rose-300', hue: 'oklch(0.6 0.18 20)' },
   success: { icon: 'checkCircle', label: 'Success', accent: 'text-emerald-300', hue: 'oklch(0.6 0.16 160)' },
 }
-
-/**
- * A styled MDX admonition box (note, tip, warning, error, success) with an icon, label,
- * and a variant-tinted background.
- *
- * @param type - The semantic variant of the callout (info, tip, warn, error, success).
- * @param title - Optional custom title to display instead of the default type label.
- * @param className - Optional CSS classes for custom container styling.
- */
 export const Callout = ({ type = 'info', title, children, className }: CalloutProps) => {
   const { icon, label, accent, hue } = VARIANTS[type]
   const Icon = Icons[icon] as React.ComponentType<{ className?: string }>
   const labelId = useId()
-
   return (
     <div
       role="note"
       aria-labelledby={labelId}
-      // 1. Pass the dynamic OKLCH color to the stylesheet
       style={{ '--callout-hue': hue } as CSSProperties}
-      // 2. Mix background and borders using a single unified layout
       className={cn(
         'relative isolate not-prose my-6 overflow-hidden rounded-xl bg-[color-mix(in_oklab,var(--callout-hue)_6%,oklch(0.23_0_0_/_0.3))] motion-safe:animate-in motion-safe:fade-in-0 motion-safe:duration-300',
         className,
@@ -132,8 +112,7 @@ export const Callout = ({ type = 'info', title, children, className }: CalloutPr
           {title ?? label}
         </span>
       </div>
-
-      {/* 3. Inherit spacing, link text colors and code block themes automatically */}
+      {}
       <div
         className={cn(
           'pl-10.5 pr-4 pb-3 pt-1.5 text-pretty text-xs leading-relaxed text-foreground/90',

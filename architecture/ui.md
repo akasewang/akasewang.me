@@ -4,6 +4,7 @@
 
 - Tailwind CSS v4 defines the whole design system in CSS through `@theme` and custom properties (colours are authored in `oklch`), so there is no large JavaScript config file.
 - **Custom Cursor**: The cursor follows the pointer through CSS custom properties updated on `pointermove`, not React state. It stays on the compositor thread (hardware accelerated) and avoids a re-render per frame.
+- **Dot Grid Background**: A full-viewport `<canvas>` draws a grid of dots displaced by 3D simplex noise (`DotGridBackground`). Each dot drifts smoothly over time, and opacity is modulated by the noise derivative to create a breathing effect. The grid rebuilds on resize and pauses when the tab is hidden. Users who prefer reduced motion get a single static frame.
 
 ## Animations (Framer Motion)
 

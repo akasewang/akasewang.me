@@ -1,19 +1,13 @@
 import { FULL_NAME, SITE_DESCRIPTION, SITE_NAME } from '@/constants/constants'
 import type { SeoContent } from '@/types/site'
 
-/**
- * SEO Content Dictionary.
- * Provides the localized metadata, titles and descriptions used across different site routes.
- * Injected into the generic layout SEO configuration to construct dynamic meta tags and Open Graph data.
- */
 export const homeSeoContent: SeoContent = {
   title: `${FULL_NAME} | Software Engineer`,
   description: SITE_DESCRIPTION,
   imageAlt: SITE_NAME,
-  ogTitle: 'Software engineer who designs on the side.',
+  ogTitle: 'My work is better than this tagline.',
 }
 
-/** SEO metadata for the projects listing page. */
 export const projectsSeoContent: SeoContent = {
   title: `Projects | ${FULL_NAME}`,
   description:
@@ -22,7 +16,6 @@ export const projectsSeoContent: SeoContent = {
   ogTitle: 'Selected projects and open source works.',
 }
 
-/** SEO metadata for the newsletter signup page. */
 export const newsletterSeoContent: SeoContent = {
   title: `Newsletter | ${FULL_NAME}`,
   description:
@@ -31,7 +24,6 @@ export const newsletterSeoContent: SeoContent = {
   ogTitle: 'Join my weekly newsletter.',
 }
 
-/** SEO metadata for the public message board page. */
 export const messageBoardSeoContent: SeoContent = {
   title: `Message Board | ${FULL_NAME}`,
   description:
@@ -40,7 +32,6 @@ export const messageBoardSeoContent: SeoContent = {
   ogTitle: 'Leave a message, drop a thought, or just say hello.',
 }
 
-/** SEO metadata for the blog index page. */
 export const blogsSeoContent: SeoContent = {
   title: `Blogs | ${FULL_NAME}`,
   description:
@@ -49,7 +40,6 @@ export const blogsSeoContent: SeoContent = {
   ogTitle: 'Writing on software, design and personal reflections.',
 }
 
-/** SEO metadata for the skills and technology stack page. */
 export const skillsSeoContent: SeoContent = {
   title: `Skills & Tech Stack | ${FULL_NAME}`,
   description:
@@ -58,7 +48,6 @@ export const skillsSeoContent: SeoContent = {
   ogTitle: 'The tech stack I use to build things.',
 }
 
-/** SEO metadata for the testimonials page. */
 export const testimonialsSeoContent: SeoContent = {
   title: `Testimonials | ${FULL_NAME}`,
   description:
@@ -67,7 +56,6 @@ export const testimonialsSeoContent: SeoContent = {
   ogTitle: 'Kind words from people who (mostly) like me.',
 }
 
-/** SEO metadata for the catalog page. */
 export const catalogSeoContent: SeoContent = {
   title: `Catalog | ${FULL_NAME}`,
   description:
@@ -76,7 +64,6 @@ export const catalogSeoContent: SeoContent = {
   ogTitle: 'A curated log of media and entertainment.',
 }
 
-/** SEO metadata for the changelog page. */
 export const changelogSeoContent: SeoContent = {
   title: `Changelog | ${FULL_NAME}`,
   description:
@@ -85,7 +72,6 @@ export const changelogSeoContent: SeoContent = {
   ogTitle: 'Every update shipped to this site.',
 }
 
-/** SEO metadata for the experiments page. */
 export const experimentsSeoContent: SeoContent = {
   title: `Experiments | ${FULL_NAME}`,
   description:
@@ -94,7 +80,6 @@ export const experimentsSeoContent: SeoContent = {
   ogTitle: 'A playground of interactive creative coding sketches.',
 }
 
-/** SEO metadata for the photos page. */
 export const photosSeoContent: SeoContent = {
   title: `Photos | ${FULL_NAME}`,
   description:

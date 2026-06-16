@@ -5,7 +5,6 @@ import { PageLayout } from '@/components/layout/page-layout'
 import { experimentsSeoContent } from '@/data/content/seo-content'
 import { constructMetadata, getOgImageUrl } from '@/lib/metadata'
 
-/** Statically generated metadata for the interactive Experiments page. */
 export async function generateMetadata(): Promise<Metadata> {
   return constructMetadata({
     title: experimentsSeoContent.title,
@@ -15,11 +14,6 @@ export async function generateMetadata(): Promise<Metadata> {
   })
 }
 
-/**
- * Main Experiments Route.
- * Renders the interactive bento grid inside a Suspense boundary, using the same full bleed wide
- * canvas as the photo gallery so the live sketches get the extra horizontal room they deserve.
- */
 export default function ExperimentsPage() {
   return (
     <PageLayout

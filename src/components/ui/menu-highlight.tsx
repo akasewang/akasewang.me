@@ -1,51 +1,80 @@
 'use client'
 
-import { useEffect } from 'react'
 import { m } from 'framer-motion'
-import { useHighlightBox } from '@/hooks/use-highlight-box'
+import { useEffect } from 'react'
+import { type HighlightBox, useHighlightBox } from '@/hooks/use-highlight-box'
 
-/**
- * A floating highlight that tracks the currently `data-highlighted` (or `data-state=checked`)
- * item within `parentRef`, the menu driven counterpart to {@link HoverHighlight}, following
- * Radix's highlight state instead of raw pointer events so keyboard navigation is covered too.
- * The glide, materialize and dissolve motion lives in the shared {@link useHighlightBox}
- * hook; this component only supplies the Radix attribute based item tracking.
- *
- * @param parentRef - The menu content container the highlight is rendered into and scoped to.
- */
-export function MenuHighlight({ parentRef }: { parentRef: React.RefObject<HTMLElement | null> }) {
+const HIGHLIGHTED_ITEM_SELECTOR = '[data-menu-highlight-item][data-highlighted]'
+const CHECKED_ITEM_SELECTOR = '[data-menu-highlight-item][data-state=checked]'
+const MAX_ZERO_BOX_RETRIES = 10
+
+export const MENU_HIGHLIGHT_VIEWPORT_CLASS = 'relative flex flex-col gap-0.5 p-1.5'
+
+const sameBox = (a: HighlightBox | null, b: HighlightBox) =>
+  Boolean(a && a.left === b.left && a.top === b.top && a.right === b.right && a.bottom === b.bottom)
+
+const boxOf = (el: HTMLElement): HighlightBox => {
+  const left = el.offsetLeft
+  const top = el.offsetTop
+  return { left, top, right: left + el.offsetWidth, bottom: top + el.offsetHeight }
+}
+
+export function MenuHighlight({
+  parentRef,
+  returnToChecked = false,
+}: {
+  parentRef: React.RefObject<HTMLElement | null>
+  returnToChecked?: boolean
+}) {
   const { style, moveTo, hide } = useHighlightBox()
 
   useEffect(() => {
     const parent = parentRef.current
     if (!parent) return
+    const root = parent
 
     let frame = 0
+    let zeroBoxRetries = 0
+    let activeItem: HTMLElement | null = null
+    let activeBox: HighlightBox | null = null
 
-    const measure = () => {
-      const active =
-        parent.querySelector<HTMLElement>('[data-highlighted]') ??
-        parent.querySelector<HTMLElement>('[data-state=checked]')
-
-      if (!active) {
-        hide()
-        return
-      }
-
-      /** Offsets are layout values, so the menu's open/close transform never skews them. */
-      const left = active.offsetLeft
-      const top = active.offsetTop
-
-      moveTo({ left, top, right: left + active.offsetWidth, bottom: top + active.offsetHeight })
-    }
-
-    const schedule = () => {
+    function schedule() {
       cancelAnimationFrame(frame)
       frame = requestAnimationFrame(measure)
     }
 
+    function measure() {
+      const active =
+        root.querySelector<HTMLElement>(HIGHLIGHTED_ITEM_SELECTOR) ??
+        root.querySelector<HTMLElement>(CHECKED_ITEM_SELECTOR)
+
+      if (!active) {
+        zeroBoxRetries = 0
+        return
+      }
+
+      const nextBox = boxOf(active)
+
+      if (nextBox.right <= nextBox.left || nextBox.bottom <= nextBox.top) {
+        if (zeroBoxRetries < MAX_ZERO_BOX_RETRIES) {
+          zeroBoxRetries += 1
+          schedule()
+        } else {
+          hide()
+        }
+        return
+      }
+
+      zeroBoxRetries = 0
+      if (active === activeItem && sameBox(activeBox, nextBox)) return
+
+      activeItem = active
+      activeBox = nextBox
+      moveTo(nextBox)
+    }
+
     const observer = new MutationObserver(schedule)
-    observer.observe(parent, {
+    observer.observe(root, {
       subtree: true,
       attributes: true,
       attributeFilter: ['data-highlighted', 'data-state'],
@@ -53,17 +82,39 @@ export function MenuHighlight({ parentRef }: { parentRef: React.RefObject<HTMLEl
 
     measure()
 
-    /** Re-measure after the menu's entrance animation settles late layout. */
+    const handlePointerLeave = () => {
+      zeroBoxRetries = 0
+
+      const checked = returnToChecked
+        ? root.querySelector<HTMLElement>(CHECKED_ITEM_SELECTOR)
+        : null
+
+      if (!checked) {
+        activeItem = null
+        activeBox = null
+        hide()
+        return
+      }
+
+      const nextBox = boxOf(checked)
+      activeItem = checked
+      activeBox = nextBox
+      moveTo(nextBox)
+    }
+
+    root.addEventListener('pointerleave', handlePointerLeave)
+
     const t1 = setTimeout(measure, 50)
     const t2 = setTimeout(measure, 150)
 
     return () => {
       observer.disconnect()
+      root.removeEventListener('pointerleave', handlePointerLeave)
       cancelAnimationFrame(frame)
       clearTimeout(t1)
       clearTimeout(t2)
     }
-  }, [parentRef, moveTo, hide])
+  }, [parentRef, moveTo, hide, returnToChecked])
 
   return (
     <m.div

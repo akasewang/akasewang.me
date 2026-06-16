@@ -12,15 +12,9 @@ import {
   Value,
   Viewport,
 } from '@radix-ui/react-select'
-import {
-  type ComponentPropsWithoutRef,
-  type ComponentRef,
-  forwardRef,
-  useCallback,
-  useRef,
-} from 'react'
+import { type ComponentPropsWithoutRef, type ComponentRef, forwardRef, useRef } from 'react'
 import { Icons } from '@/components/ui/icons'
-import { MenuHighlight } from '@/components/ui/menu-highlight'
+import { MENU_HIGHLIGHT_VIEWPORT_CLASS, MenuHighlight } from '@/components/ui/menu-highlight'
 import { useSoundEffects } from '@/hooks/use-sound-effects'
 import { cn } from '@/utils/utils'
 
@@ -56,7 +50,6 @@ const Select: React.FC<React.ComponentProps<typeof Root>> = ({
 }
 const SelectValue = Value
 
-/** Contains the selected value text and a rotating chevron icon. */
 const SelectTrigger = forwardRef<
   ComponentRef<typeof Trigger>,
   ComponentPropsWithoutRef<typeof Trigger>
@@ -87,29 +80,16 @@ const SelectTrigger = forwardRef<
 })
 SelectTrigger.displayName = Trigger.displayName
 
-/**
- * Renders the select menu panel.
- * Automatically injects the `MenuHighlight` background for zero lag fluid hover effects.
- */
 const SelectContent = forwardRef<
   ComponentRef<typeof Content>,
   ComponentPropsWithoutRef<typeof Content>
 >(({ className, children, position = 'popper', ...props }, forwardedRef) => {
-  const internalRef = useRef<HTMLDivElement>(null)
-
-  const ref = useCallback(
-    (node: HTMLDivElement | null) => {
-      internalRef.current = node
-      if (typeof forwardedRef === 'function') forwardedRef(node)
-      else if (forwardedRef) forwardedRef.current = node
-    },
-    [forwardedRef],
-  )
+  const viewportRef = useRef<HTMLDivElement>(null)
 
   return (
     <Portal>
       <Content
-        ref={ref}
+        ref={forwardedRef}
         position={position}
         sideOffset={6}
         className={cn(
@@ -120,12 +100,13 @@ const SelectContent = forwardRef<
         {...props}
       >
         <Viewport
+          ref={viewportRef}
           className={cn(
-            'relative flex flex-col gap-0.5 p-1.5',
+            MENU_HIGHLIGHT_VIEWPORT_CLASS,
             position === 'popper' && 'h-[var(--radix-select-content-available-height)]',
           )}
         >
-          <MenuHighlight parentRef={internalRef} />
+          <MenuHighlight parentRef={viewportRef} returnToChecked />
           {children}
         </Viewport>
       </Content>
@@ -146,12 +127,13 @@ const SelectItem = forwardRef<ComponentRef<typeof Item>, ComponentPropsWithoutRe
           props.onMouseEnter?.(e)
         }}
         className={cn(
-          'group relative flex w-full select-none items-center gap-2.5 whitespace-nowrap rounded-lg px-2.5 py-1.5 pr-8 text-left text-xs font-medium tracking-tight text-secondary outline-none ring-1 ring-inset ring-transparent transition-colors duration-200 ease-in-out',
+          'group relative z-10 flex w-full select-none items-center gap-2.5 whitespace-nowrap rounded-lg px-2.5 py-1.5 pr-8 text-left text-xs font-medium tracking-tight text-secondary outline-none ring-1 ring-inset ring-transparent transition-colors duration-200 ease-in-out',
           'data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
-          'data-[highlighted]:z-10 data-[highlighted]:text-primary',
+          'data-[highlighted]:text-primary',
           'data-[state=checked]:text-primary',
           className,
         )}
+        data-menu-highlight-item
       >
         <span className="relative z-10 flex w-full items-center gap-2">
           <ItemText>{children}</ItemText>

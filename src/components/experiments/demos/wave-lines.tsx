@@ -4,23 +4,16 @@ import { useRef } from 'react'
 import { useAnimatedCanvas } from '@/hooks/use-animated-canvas'
 
 const LINES = 30
-/** Per line stroke colours are constant, so bake them once instead of formatting every frame. */
+
 const STROKES = Array.from(
   { length: LINES },
   (_, i) => `hsla(${196 + (i / (LINES - 1)) * 130}, 82%, 66%, 0.5)`,
 )
-/** Pre doubled gaussian variances for the cursor dent falloff. */
+
 const VAR_X = 2 * 92 * 92
 const VAR_Y = 2 * 70 * 70
 
-/**
- * Stacked contour lines rippling like a topographic map caught mid wave. Each row is a sum of
- * travelling sines and the cursor presses a soft gaussian dent into the sheet, lifting the lines
- * nearest it toward the pointer. The dent rides a smoothed pointer and its strength eases in and out,
- * so the deformation melts away when the cursor leaves instead of snapping flat.
- */
 export function WaveLines() {
-  /** Smoothed pointer position with an eased dent strength, primed on the first pointer entry. */
   const mouse = useRef({ x: 0, y: 0, strength: 0, primed: false })
 
   const canvasRef = useAnimatedCanvas(({ ctx, width, height, time, pointer }) => {
@@ -34,7 +27,7 @@ export function WaveLines() {
       m.x += (pointer.x - m.x) * 0.15
       m.y += (pointer.y - m.y) * 0.15
     }
-    /** Ease the dent in and out so entering and leaving the tile is smooth. */
+
     m.strength += ((pointer.active ? 1 : 0) - m.strength) * 0.08
     if (!pointer.active && m.strength < 0.01) m.primed = false
 
@@ -42,7 +35,6 @@ export function WaveLines() {
     ctx.globalCompositeOperation = 'lighter'
     ctx.lineWidth = 1.4
 
-    /** Fixed segment count anchored to both edges so lines always span the full width. */
     const segments = Math.max(2, Math.ceil(width / 6))
     const step = width / segments
     const dent = m.strength > 0.001
@@ -51,7 +43,7 @@ export function WaveLines() {
     for (let i = 0; i < LINES; i++) {
       const baseY = (i / (LINES - 1)) * height
       const dentY = dent ? Math.exp(-((baseY - m.y) ** 2) / VAR_Y) * 64 * m.strength : 0
-      /** Phase offsets are constant along a line, so resolve them before walking its points. */
+
       const phaseA = t1 + i * 0.35
       const phaseB = i * 0.2 - t2
 

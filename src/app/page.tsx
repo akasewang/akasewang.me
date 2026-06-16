@@ -1,22 +1,19 @@
-import { Metadata } from 'next'
-
-import { HeroSection } from '@/components/sections/hero-section'
-import { Education } from '@/components/sections/education'
-import { Experience } from '@/components/sections/experiences'
-import { Certifications } from '@/components/sections/certifications'
-import { Skills } from '@/components/sections/skills'
+import type { Metadata } from 'next'
+import { NewsletterSubscription } from '@/components/common/newsletter-subscription'
 import { Achievements } from '@/components/sections/achievements'
 import { Bookmarks } from '@/components/sections/bookmarks'
-import { FeaturedProjects } from '@/components/sections/featured-projects'
+import { Certifications } from '@/components/sections/certifications'
+import { Education } from '@/components/sections/education'
+import { Experience } from '@/components/sections/experiences'
 import { FeaturedPosts } from '@/components/sections/featured-posts'
-import { NewsletterSubscription } from '@/components/common/newsletter-subscription'
+import { FeaturedProjects } from '@/components/sections/featured-projects'
+import { HeroSection } from '@/components/sections/hero-section'
+import { Skills } from '@/components/sections/skills'
+import { homeSeoContent } from '@/data/content/seo-content'
 import { getAllBlogPosts } from '@/lib/managers/blog-manager'
 import { getAllProjects } from '@/lib/managers/project-manager'
-
 import { constructMetadata, getOgImageUrl } from '@/lib/metadata'
-import { homeSeoContent } from '@/data/content/seo-content'
 
-/** Resolves static SEO metadata for the primary home page. */
 export async function generateMetadata(): Promise<Metadata> {
   return constructMetadata({
     title: homeSeoContent.title,
@@ -27,10 +24,6 @@ export async function generateMetadata(): Promise<Metadata> {
   })
 }
 
-/**
- * The main entry point and home page of the application.
- * Performs parallel data fetching for all featured content sections to minimize TTFB.
- */
 export default async function Home() {
   const [blogPosts, projects] = await Promise.all([getAllBlogPosts(), getAllProjects()])
 

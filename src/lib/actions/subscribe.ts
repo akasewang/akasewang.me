@@ -1,36 +1,31 @@
 'use server'
 
+import { render } from '@react-email/components'
+import { eq } from 'drizzle-orm'
+import React from 'react'
+import { WelcomeTemplate } from '@/components/emails/welcome-template'
+import { FULL_NAME } from '@/constants/constants'
+import { logContent } from '@/data/content/log-content'
+import { toastContent } from '@/data/content/toast-content'
 import { db } from '@/lib/db/drizzle'
 import { newsletterSubscribers } from '@/lib/db/schema'
-import { eq } from 'drizzle-orm'
-import { toastContent } from '@/data/content/toast-content'
-import { logContent } from '@/data/content/log-content'
-import { render } from '@react-email/components'
 import { getResend, SENDER_EMAIL } from '@/lib/resend'
-import { WelcomeTemplate } from '@/components/emails/welcome-template'
-import React from 'react'
-import { FULL_NAME } from '@/constants/constants'
 import type { ActionResult } from '@/types/actions'
 
-/** Basic email shape validation for subscription input. */
-const EMAIL_REGEX = /^[\w.-]+@[a-zA-Z\d.-]+\.[a-zA-Z]{2,}$/
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/
+const MAX_EMAIL_LENGTH = 254
 
-/**
- * Server action to handle newsletter subscriptions.
- * Verifies email validity and checks against existing database records to prevent duplicates.
- * Handles resubscriptions and automatically dispatches React Email welcome templates via Resend.
- *
- * @param email - The raw string email address submitted from the client.
- * @returns An ActionResult containing either a success state with boolean `isNew` flag, or an error message string.
- */
 export async function subscribeAction(email: string): Promise<ActionResult<{ isNew: boolean }>> {
   const toasts = toastContent.subscribe
-
-  if (!email || !EMAIL_REGEX.test(email)) {
+  if (typeof email !== 'string') {
     return { success: false, error: toasts.invalidEmail }
   }
 
   const lowerEmail = email.trim().toLowerCase()
+
+  if (!lowerEmail || lowerEmail.length > MAX_EMAIL_LENGTH || !EMAIL_REGEX.test(lowerEmail)) {
+    return { success: false, error: toasts.invalidEmail }
+  }
 
   try {
     const existing = await db.query.newsletterSubscribers.findFirst({

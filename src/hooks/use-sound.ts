@@ -3,22 +3,16 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { isAudioEnabled } from '@/hooks/use-audio-preference'
 
-type CacheEntry = { buffer: AudioBuffer; loading: Promise<AudioBuffer> }
+type CacheEntry = { buffer?: AudioBuffer; loading?: Promise<AudioBuffer> }
 
-/**
- * A global singleton cache mapping audio URLs to their loaded buffers or pending Promises.
- * This prevents identical sounds (like multiple fast clicks) from downloading/decoding multiple times.
- */
-const audioCache = new Map<string, CacheEntry | null>()
-/** A single shared Web Audio API context, reused app wide to avoid browser hardware limits. */
+const audioCache = new Map<string, CacheEntry>()
+
 let sharedAudioContext: AudioContext | null = null
 
-/** Lazily creates (and then reuses) the shared AudioContext, with a webkit fallback for older Safari. */
 function getAudioContext(): AudioContext | null {
   if (typeof window === 'undefined') return null
   if (sharedAudioContext) return sharedAudioContext
 
-  /** Fallback to webkitAudioContext for older Safari browser compatibility */
   const AudioContextClass =
     window.AudioContext ||
     (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext
@@ -29,33 +23,31 @@ function getAudioContext(): AudioContext | null {
   return sharedAudioContext
 }
 
-/** Fetches and decodes an audio file, deduplicating concurrent requests via the shared cache. */
 function loadAudio(url: string, audioCtx: AudioContext): Promise<AudioBuffer> {
   const cached = audioCache.get(url)
   if (cached?.buffer) return Promise.resolve(cached.buffer)
-  /** Reuse the in flight Promise for a concurrent request so the file is fetched and decoded once. */
+
   if (cached?.loading) return cached.loading
 
   const loadingPromise = fetch(url)
-    .then((res) => res.arrayBuffer())
+    .then((res) => {
+      if (!res.ok) throw new Error(`Failed to load audio: ${url}`)
+      return res.arrayBuffer()
+    })
     .then((data) => audioCtx.decodeAudioData(data))
     .then((decoded) => {
-      audioCache.set(url, { buffer: decoded, loading: loadingPromise })
+      audioCache.set(url, { buffer: decoded })
       return decoded
     })
     .catch((err) => {
-      audioCache.set(url, null)
+      audioCache.delete(url)
       throw err
     })
 
-  audioCache.set(url, {
-    buffer: null as unknown as AudioBuffer,
-    loading: loadingPromise,
-  })
+  audioCache.set(url, { loading: loadingPromise })
   return loadingPromise
 }
 
-/** Plays a decoded buffer once through a gain node at the given volume. */
 function playAudioBuffer(buffer: AudioBuffer, audioCtx: AudioContext, volume: number = 1) {
   const source = audioCtx.createBufferSource()
   const gainNode = audioCtx.createGain()
@@ -68,12 +60,6 @@ function playAudioBuffer(buffer: AudioBuffer, audioCtx: AudioContext, volume: nu
   source.start(0)
 }
 
-/**
- * Hook for lazily loading sound effects only when needed (or via explicit preload), returning playback controls and loading states.
- * Uses a global `AudioContext` and an in memory cache to prevent duplicate fetching/decoding across identical URLs.
- * @param url - The URL path to the audio file.
- * @returns {object} An object containing playback and preloading methods and loading state booleans.
- */
 export function useSoundLazy(url: string) {
   const bufferRef = useRef<AudioBuffer | null>(null)
   const [isLoading, setIsLoading] = useState(false)

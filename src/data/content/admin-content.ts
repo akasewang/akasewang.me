@@ -1,9 +1,5 @@
 import type { AdminNewsletterContent } from '@/types/newsletter'
 
-/**
- * Admin Newsletter Content Data Dictionary.
- * Centralized static configuration and text definitions.
- */
 export const adminNewsletterContent: AdminNewsletterContent = {
   title: 'broadcast newsletter.',
   description: 'Send a new broadcast to all your subscribers.',

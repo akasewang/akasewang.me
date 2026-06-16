@@ -1,6 +1,7 @@
 'use client'
 
 import { m } from 'framer-motion'
+import Image from 'next/image'
 import { useState } from 'react'
 import { PhotoOverlay } from '@/components/photos/photo-overlay'
 import { ZOOM_EASE } from '@/constants/ui'
@@ -8,20 +9,6 @@ import { useSoundEffects } from '@/hooks/use-sound-effects'
 import type { Photo } from '@/types/photos'
 import { cn } from '@/utils/utils'
 
-/**
- * Automatically wraps standard Markdown images (`![alt](url)`) and provides a clickable overlay.
- * Reuses the global `<PhotoOverlay>` component for the zoomed state.
- *
- * @example
- * // Default size (Markdown syntax)
- * ![My awesome app dashboard](/images/dashboard.png)
- *
- * @example
- * // Custom size (JSX syntax)
- * <img src="/images/logo.svg" alt="Company Logo" width="400" height="400" />
- *
- * @param props - Standard HTMLImageElement attributes.
- */
 export function ZoomableImage({
   src,
   alt,
@@ -60,13 +47,12 @@ export function ZoomableImage({
           transition={ZOOM_EASE}
           className="relative h-full w-full"
         >
-          <img
+          <Image
             src={src as string}
-            alt={alt}
-            width={width}
-            height={height}
+            alt={alt || 'MDX image'}
+            width={parsedWidth}
+            height={parsedHeight}
             className={cn('h-auto w-full object-cover', className)}
-            loading="lazy"
             {...props}
           />
         </m.div>

@@ -1,9 +1,5 @@
 import type { CatalogItem } from '@/types/catalog'
 
-/**
- * Catalog Data Dictionary.
- * Centralized static configuration and text definitions.
- */
 export const catalog: CatalogItem[] = [
   {
     title: 'Attack on Titan',

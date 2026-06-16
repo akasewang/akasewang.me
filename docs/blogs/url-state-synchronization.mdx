@@ -53,46 +53,30 @@ Let's examine how this parameter merging is structured in [project-tabs.tsx](htt
 
 ```tsx title="src/components/projects/project-tabs.tsx"
 'use client'
-
 import { useState, useEffect, useCallback } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import type { ProjectPostData, ProjectCategory } from '@/types/project'
-
 export function ProjectTabs({ projects }: { projects: ProjectPostData[] }) {
   const searchParams = useSearchParams()
   const router = useRouter()
-
-  // 1. Read parameters directly from URL and synchronize them with local state
-  // to avoid Next.js static hydration mismatches
   const categoryParam = searchParams.get('category')
   const [category, setCategory] = useState<ProjectCategory>(
     categoryParam ? (categoryParam as ProjectCategory) : 'all',
   )
-  
-  // (Additional effects synchronize URL changes back to local state)
-
-  // 2. Define a clean parameter-merging callback
   const updateParams = useCallback(
     (updates: Record<string, string | null>) => {
-      // Read the current active browser parameters
       const params = new URLSearchParams(searchParams)
-
       Object.entries(updates).forEach(([key, value]) => {
         if (value === null || value === 'all' || (key === 'sort' && value === 'date-desc')) {
-          // Clean up URL: remove default values to keep strings short and elegant
           params.delete(key)
         } else {
           params.set(key, value)
         }
       })
-
-      // 3. Replace the active URL state without resetting viewport scroll position
       router.replace(`/projects?${params.toString()}`, { scroll: false })
     },
     [searchParams, router],
   )
-
-  // ...
 }
 ```
 
@@ -106,11 +90,9 @@ When a user types or clicks, we update the URL, Next.js re renders the component
 const handleCategoryChange = (val: string) => {
   updateParams({ category: val })
 }
-
 const handleSearchChange = (val: string) => {
-  updateParams({ q: val || null }) // Clear parameter if search query is empty
+  updateParams({ q: val || null }) 
 }
-
 const handleSortChange = (val: string) => {
   updateParams({ sort: val })
 }
@@ -123,8 +105,6 @@ To keep the page lightning fast, we filter and sort our project array directly i
 ```tsx title="src/components/projects/project-tabs.tsx"
   const sortedProjects = useMemo(() => {
     let result = [...projects]
-
-    // Sort results dynamically based on URL parameter
     if (sortBy === 'date-asc') {
       result.reverse()
     } else if (sortBy === 'views-desc') {
@@ -132,7 +112,6 @@ To keep the page lightning fast, we filter and sort our project array directly i
     } else if (sortBy === 'views-asc') {
       result.sort((a, b) => (getViews(a.slug) || 0) - (getViews(b.slug) || 0))
     }
-
     return result
   }, [projects, sortBy, getViews])
 ```

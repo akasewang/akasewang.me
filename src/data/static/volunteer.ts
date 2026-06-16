@@ -1,9 +1,5 @@
 import type { TimelineItemProps } from '@/types/site'
 
-/**
- * Volunteer Data Dictionary.
- * Centralized static configuration and text definitions.
- */
 export const volunteer: TimelineItemProps[] = [
   {
     id: 'independent-technical-researcher',

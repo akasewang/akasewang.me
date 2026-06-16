@@ -3,7 +3,7 @@
 import { m } from 'framer-motion'
 import Image from 'next/image'
 import { usePathname, useSearchParams } from 'next/navigation'
-import { memo, useCallback, useMemo, useState } from 'react'
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { CategoryFilter } from '@/components/common/category-filter'
 import { EmptyState } from '@/components/common/empty-state'
 import { Icons } from '@/components/ui/icons'
@@ -15,20 +15,8 @@ import type { Category, Photo } from '@/types/photos'
 import { cn } from '@/utils/utils'
 import { PhotoOverlay } from './photo-overlay'
 
-/** Static id→photo lookup, hoisted so zoom/preload don't do O(N) scans on every render. */
 const PHOTO_BY_ID = new Map(photos.map((p) => [p.id, p]))
 
-/**
- * Main container for the Photos gallery page.
- * Manages URL based category filtering, 'cover' vs 'contain' view modes and fullscreen zooming.
- *
- * Performance features:
- * - Uses `new URLSearchParams(searchParams.toString())` to safely update URL state without trailing `?`.
- * - Hoists the static `PHOTO_BY_ID` map to prevent O(N) lookups on every render when zooming.
- * - Suppresses layout morphing animations during view mode toggling via `isToggling`.
- * - Dispatches image preloading to an isolated renderer so hovering over images doesn't trigger
- *   costly root level React rerenders.
- */
 export function PhotosContent() {
   const { toggle, hoverTick } = useSoundEffects()
   const searchParams = useSearchParams()
@@ -38,6 +26,13 @@ export function PhotosContent() {
   const [zoomedPhotoId, setZoomedPhotoId] = useState<string | null>(null)
   const [isToggling, setIsToggling] = useState(false)
   const [preloadIds, setPreloadIds] = useState<Set<string>>(new Set())
+  const toggleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  useEffect(() => {
+    return () => {
+      if (toggleTimerRef.current) clearTimeout(toggleTimerRef.current)
+    }
+  }, [])
 
   const preloadPhoto = useCallback((id: string) => {
     setPreloadIds((prev) => (prev.has(id) ? prev : new Set(prev).add(id)))
@@ -63,7 +58,6 @@ export function PhotosContent() {
       const query = params.toString()
       const newUrl = query ? `${pathname}?${query}` : pathname
 
-      /** Shallow URL update that syncs with `useSearchParams` without triggering a navigation. */
       window.history.replaceState(null, '', newUrl)
     },
     [searchParams, pathname],
@@ -75,7 +69,9 @@ export function PhotosContent() {
     toggle(nextView === 'contain')
     setIsToggling(true)
     setView(nextView)
-    setTimeout(() => setIsToggling(false), 50)
+
+    if (toggleTimerRef.current) clearTimeout(toggleTimerRef.current)
+    toggleTimerRef.current = setTimeout(() => setIsToggling(false), 50)
   }, [toggle, view])
 
   const zoomedPhoto = zoomedPhotoId ? PHOTO_BY_ID.get(zoomedPhotoId) : undefined
@@ -87,7 +83,7 @@ export function PhotosContent() {
 
   return (
     <>
-      <div className="z-50 mb-6 animate-page-simple md:fixed md:left-8 md:top-[calc(6rem_+_var(--banner-offset,0px))] md:mb-0 md:transition-[top] md:duration-300 md:ease-out">
+      <div className="z-50 mb-6 animate-page-simple md:fixed md:left-8 md:top-24 md:mb-0">
         <button
           type="button"
           onClick={handleToggleView}
@@ -144,16 +140,6 @@ export function PhotosContent() {
   )
 }
 
-/**
- * Individual photo item within the gallery grid.
- *
- * @param view - 'cover' forces a square aspect ratio. 'contain' uses the native image ratio.
- * @param isToggling - If true, temporarily overrides the `layout` transition to `duration: 0`
- *                     to instantly snap the image to its new grid shape without a morph animation.
- *                     This keeps the zoom animation smooth while making grid changes instantaneous.
- * @param onZoom - Dispatches the ID to open the `PhotoOverlay`.
- * @param onPreload - Registers the ID in the `PreloadRenderer` on pointer enter/down.
- */
 const PhotoCard = memo(function PhotoCard({
   photo,
   view,
@@ -189,7 +175,7 @@ const PhotoCard = memo(function PhotoCard({
         onPointerDown={() => onPreload(photo.id)}
         style={view === 'contain' ? { aspectRatio: `${photo.width} / ${photo.height}` } : undefined}
         className={cn(
-          'group relative w-full cursor-zoom-in overflow-hidden bg-muted/20',
+          'group relative w-full cursor-zoom-in overflow-hidden bg-surface-20',
           view === 'cover' && 'aspect-square',
           'block border-0 p-0 text-left',
         )}
@@ -215,13 +201,6 @@ const PhotoCard = memo(function PhotoCard({
   )
 })
 
-/**
- * An invisible component that forces the browser to begin downloading high res images
- * before the user actually clicks on them. Rendered in a separate isolated component tree
- * to prevent the main `PhotosContent` from rerendering whenever a new ID is added.
- *
- * @param ids - Set of photo IDs that the user has hovered over.
- */
 const PreloadRenderer = memo(function PreloadRenderer({ ids }: { ids: Set<string> }) {
   if (ids.size === 0) return null
 

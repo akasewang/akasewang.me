@@ -1,18 +1,11 @@
 import RSS from 'rss'
-import type { BlogPost } from '@/types/blog'
-import { getAllBlogPosts } from '@/lib/managers/blog-manager'
-import { parseDate } from '@/utils/utils'
-import { SITE_URL, FULL_NAME } from '@/constants/constants'
-import { getOgImageUrl } from '@/lib/metadata'
+import { FULL_NAME, SITE_URL } from '@/constants/constants'
 import { homeSeoContent } from '@/data/content/seo-content'
+import { getAllBlogPosts } from '@/lib/managers/blog-manager'
+import { getOgImageUrl } from '@/lib/metadata'
+import type { BlogPost } from '@/types/blog'
+import { parseDate } from '@/utils/utils'
 
-/**
- * Generates an RSS XML feed for the blog.
- * Scans all published blog posts and compiles them into a standard RSS 2.0 format.
- * Includes caching headers to prevent regenerating the XML on every request.
- *
- * @returns An XML Response containing the full RSS feed.
- */
 export async function GET() {
   const feed = new RSS({
     title: `${FULL_NAME}'s Blog`,
@@ -49,7 +42,7 @@ export async function GET() {
         'Cache-Control': 's-maxage=3600, stale-while-revalidate',
       },
     })
-  } catch (error) {
+  } catch {
     return new Response('Error generating feed', { status: 500 })
   }
 }

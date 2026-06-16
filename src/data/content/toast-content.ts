@@ -1,9 +1,5 @@
 import type { ToastMessages } from '@/types/site'
 
-/**
- * Toast Content Data Dictionary.
- * Centralized static configuration and text definitions.
- */
 export const toastContent: ToastMessages = {
   newsletter: {
     success: 'All clear! Newsletter broadcast sent successfully.',

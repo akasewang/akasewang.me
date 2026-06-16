@@ -6,7 +6,6 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 import { useSoundEffects } from '@/hooks/use-sound-effects'
 import { cn } from '@/utils/utils'
 
-/** Props for {@link CarouselButton}. */
 interface CarouselButtonProps {
   href: string
   label: string
@@ -15,15 +14,6 @@ interface CarouselButtonProps {
   className?: string
 }
 
-/**
- * A floating link button (e.g. to a full directory page) shown beside a carousel,
- * wrapped in a tooltip that surfaces its label and optional keyboard shortcut.
- *
- * @param href - The destination URL for the link.
- * @param label - The accessible label and tooltip text.
- * @param shortcut - An optional keyboard shortcut to display in the tooltip.
- * @param tooltipSide - Where the tooltip should appear relative to the button.
- */
 export function CarouselButton({
   href,
   label,

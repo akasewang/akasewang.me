@@ -1,19 +1,11 @@
 import type { ReactNode } from 'react'
 import { cn } from '@/utils/utils'
 
-/** Props for {@link ExpandableContent}. */
 interface ExpandableContentProps {
   isExpanded: boolean
   children: ReactNode
 }
 
-/**
- * Collapsible wrapper that animates between zero and natural height via the CSS grid
- * `grid-template-rows` trick, fading in sync. Purely visual and controlled, pair it
- * with {@link useExpandableRow} for the toggle behavior.
- *
- * @param isExpanded - The external state controlling whether the content is visible.
- */
 export function ExpandableContent({ isExpanded, children }: ExpandableContentProps) {
   return (
     <div

@@ -42,10 +42,6 @@ const iconVariants: Variants = {
   exit: (isDown: boolean) => ({ opacity: 0, y: isDown ? 20 : -20, scale: 0.5 }),
 }
 
-/**
- * A floating action button that appears when the user scrolls down the page.
- * The button functions dually as a "scroll down to next section" and "back to top" action depending on scroll position.
- */
 export function BackToTop() {
   const { navigate: navigateSound, hoverTick } = useSoundEffects()
   const { scrollYProgress, scrollY } = useScroll()

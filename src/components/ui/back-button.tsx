@@ -4,25 +4,16 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { Icons } from '@/components/ui/icons'
 import { SeparatorSlash } from '@/components/ui/separator-slash'
-import { useSoundEffects } from '@/hooks/use-sound-effects'
 import { useKeyboardShortcut } from '@/hooks/use-keyboard-shortcut'
+import { useSoundEffects } from '@/hooks/use-sound-effects'
 import { cn } from '@/utils/utils'
 
-/** Props for {@link BackButton}. */
 interface BackButtonProps {
   href?: string
   label?: string
   className?: string
 }
 
-/**
- * A back navigation link styled as a terminal `cd ..` command; reveals the destination
- * label on hover.
- *
- * @param href - The target URL to navigate to (defaults to '/').
- * @param label - Optional explicit label. If omitted, derives a label from the URL path.
- * @param className - Optional CSS classes for custom sizing or positioning.
- */
 export function BackButton({ href = '/', label, className }: BackButtonProps) {
   const router = useRouter()
   const { hoverLink, navigate: navigateSound } = useSoundEffects()

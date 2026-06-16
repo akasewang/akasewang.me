@@ -8,7 +8,6 @@ import { useSoundEffects } from '@/hooks/use-sound-effects'
 import type { Testimonial } from '@/types/home'
 import { cn } from '@/utils/utils'
 
-/** Props for {@link TestimonialCard}. */
 interface TestimonialCardProps {
   testimonial: Testimonial
   className?: string
@@ -24,11 +23,6 @@ const TESTIMONIAL_QUOTE_CLASSES =
 
 const TESTIMONIAL_ROLE_CLASSES = 'truncate font-mono text-xs font-medium tracking-tight'
 
-/**
- * Testimonial Card Component.
- * Displays a client or peer review.
- * Dynamically renders a provided image or a fallback `GradientAvatar` if no image is supplied.
- */
 export function TestimonialCard({
   testimonial: { url, quote, author, role, image },
   className,
@@ -99,10 +93,6 @@ export function TestimonialCard({
   )
 }
 
-/**
- * Internal rendering helper for the testimonial author's avatar.
- * Conditionally renders a Next.js optimized Image or a fallback GradientAvatar.
- */
 function AuthorAvatar({
   image,
   author,

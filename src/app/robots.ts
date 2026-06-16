@@ -1,7 +1,6 @@
 import type { MetadataRoute } from 'next'
 import { SITE_URL } from '@/constants/constants'
 
-/** AI training and scraping bots blocked site wide. Answer engines go in AI_SEARCH_BOTS. */
 const BLOCKED_AI_BOTS = [
   'GPTBot',
   'CCBot',
@@ -21,10 +20,8 @@ const BLOCKED_AI_BOTS = [
   'FacebookBot',
 ]
 
-/** AI answer engines allowed so the site can surface in ChatGPT, Perplexity and You.com. */
 const AI_SEARCH_BOTS = ['OAI-SearchBot', 'ChatGPT-User', 'PerplexityBot', 'YouBot']
 
-/** Traditional search engine crawlers explicitly allowed for SEO. */
 const SEARCH_ENGINE_BOTS = [
   'Googlebot',
   'Bingbot',
@@ -34,7 +31,6 @@ const SEARCH_ENGINE_BOTS = [
   'YandexBot',
 ]
 
-/** Social media crawlers allowed so shared links can render link previews. */
 const SOCIAL_CRAWLERS = [
   'facebookexternalhit',
   'Twitterbot',
@@ -45,15 +41,6 @@ const SOCIAL_CRAWLERS = [
   'DiscordBot',
 ]
 
-/**
- * Generates the site's `/robots.txt`.
- * Blocks AI training and scraping bots site wide, explicitly allows traditional search engines, AI
- * answer engines that cite sources and social preview crawlers, and keeps `/api` off limits for
- * everyone else. The sitemap URL and host derive from `SITE_URL` so they always match the canonical
- * domain.
- *
- * @returns A Next.js robots descriptor served at `/robots.txt`.
- */
 export default function robots(): MetadataRoute.Robots {
   return {
     rules: [

@@ -1,22 +1,21 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 const STORAGE_KEY = 'adminKey'
 const TOGGLE_EVENT = 'adminModeToggled'
 
-/**
- * Hook for managing client side admin authentication state via `localStorage`.
- * Synchronizes the admin state across multiple browser tabs using `storage` events.
- * Synchronizes state within the same tab using custom `adminModeToggled` events.
- *
- * @returns {object} An object containing the current `adminKey` and methods to login/logout.
- */
 export function useAdmin() {
   const [adminKey, setAdminKey] = useState<string | null>(null)
 
   useEffect(() => {
-    const syncState = () => setAdminKey(localStorage.getItem(STORAGE_KEY))
+    const syncState = () => {
+      try {
+        setAdminKey(localStorage.getItem(STORAGE_KEY))
+      } catch {
+        setAdminKey(null)
+      }
+    }
 
     const handleStorage = (e: StorageEvent) => {
       if (e.key === STORAGE_KEY) {
@@ -26,11 +25,6 @@ export function useAdmin() {
 
     syncState()
 
-    /**
-     * Dual event listener strategy:
-     * - `adminModeToggled` is a custom event used to sync state across components within the *same* browser tab.
-     * - `storage` is a native browser event that automatically syncs state across *different* browser tabs.
-     */
     window.addEventListener(TOGGLE_EVENT, syncState)
     window.addEventListener('storage', handleStorage)
 
@@ -42,13 +36,21 @@ export function useAdmin() {
 
   const loginAdmin = useCallback((key: string) => {
     if (typeof window === 'undefined') return
-    localStorage.setItem(STORAGE_KEY, key)
+    try {
+      localStorage.setItem(STORAGE_KEY, key)
+      setAdminKey(key)
+    } catch {
+      setAdminKey(null)
+    }
     window.dispatchEvent(new Event(TOGGLE_EVENT))
   }, [])
 
   const logoutAdmin = useCallback(() => {
     if (typeof window === 'undefined') return
-    localStorage.removeItem(STORAGE_KEY)
+    try {
+      localStorage.removeItem(STORAGE_KEY)
+    } catch {}
+    setAdminKey(null)
     window.dispatchEvent(new Event(TOGGLE_EVENT))
   }, [])
 

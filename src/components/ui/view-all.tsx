@@ -5,19 +5,12 @@ import { Icons } from '@/components/ui/icons'
 import { useSoundEffects } from '@/hooks/use-sound-effects'
 import { cn } from '@/utils/utils'
 
-/** Props for {@link ViewAll}. */
 interface ViewAllProps {
   href: string
   label: string
   className?: string
 }
 
-/**
- * A "view all" link with an underline on hover label and a forward arrow, linking to a full listing.
- *
- * @param href - The destination URL for the link.
- * @param label - The text to display.
- */
 export function ViewAll({ href, label, className }: ViewAllProps) {
   const { hoverLink, navigate: navigateSound } = useSoundEffects()
 

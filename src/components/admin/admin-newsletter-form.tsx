@@ -20,11 +20,6 @@ import { useStatusTimer } from '@/hooks/use-status-timer'
 import { broadcastNewsletter } from '@/lib/actions/newsletter-actions'
 import type { BlogPost } from '@/types/blog'
 
-/**
- * Admin only form to broadcast a selected blog post to all subscribers.
- * Requires the admin password and posts to the `broadcastNewsletter` server action,
- * surfacing success/error via toasts and a short cooldown countdown.
- */
 export function AdminNewsletterForm({ blogs }: { blogs: BlogPost[] }) {
   const [adminSecret, setAdminSecret] = useState('')
   const [selectedBlogSlug, setSelectedBlogSlug] = useState(blogs[0]?.slug || '')

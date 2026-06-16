@@ -1,9 +1,5 @@
 import type { TimelineItemProps } from '@/types/site'
 
-/**
- * Bookmarks Data Dictionary.
- * Centralized static configuration and text definitions.
- */
 export const bookmarks: TimelineItemProps[] = [
   {
     id: 'understanding-react-server-components',

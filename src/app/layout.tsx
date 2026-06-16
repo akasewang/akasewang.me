@@ -1,28 +1,22 @@
-import type { Metadata, Viewport } from 'next'
-import { SpeedInsights } from '@vercel/speed-insights/next'
 import { Analytics } from '@vercel/analytics/react'
-
-import { Navbar } from '@/components/layout/navbar'
+import { SpeedInsights } from '@vercel/speed-insights/next'
+import type { Metadata, Viewport } from 'next'
+import { BackToTop } from '@/components/common/back-to-top'
+import { DotGridBackground } from '@/components/layout/dot-grid-background'
 import { Footer } from '@/components/layout/footer'
-import { AnnouncementBanner } from '@/components/layout/announcement-banner'
+import { Navbar } from '@/components/layout/navbar'
+import { MotionProvider } from '@/components/providers/motion-provider'
 import { ViewsProvider } from '@/components/providers/views-context'
 import { Toaster } from '@/components/ui/sonner'
-import { BackToTop } from '@/components/common/back-to-top'
 import { TooltipProvider } from '@/components/ui/tooltip'
-import { MotionProvider } from '@/components/providers/motion-provider'
-
-import { fontSans, fontSerif, fontMono } from '@/lib/fonts'
-import { getPersonSchema, getWebsiteSchema, getProfilePageSchema } from '@/lib/json-ld'
-import { FULL_NAME, SITE_NAME, USERNAME, SITE_URL, ALL_KEYWORDS } from '@/constants/constants'
-import { getOgImageUrl } from '@/lib/metadata'
+import { ALL_KEYWORDS, FULL_NAME, SITE_NAME, SITE_URL, USERNAME } from '@/constants/constants'
 import { homeSeoContent } from '@/data/content/seo-content'
+import { fontMono, fontSans, fontSerif } from '@/lib/fonts'
+import { getPersonSchema, getProfilePageSchema, getWebsiteSchema } from '@/lib/json-ld'
+import { getOgImageUrl } from '@/lib/metadata'
 
 import './globals.css'
 
-/**
- * Generates the SEO metadata for the application.
- * Uses global constants and localized content blocks to dynamically inject OpenGraph, Twitter Cards and canonical URLs.
- */
 export async function generateMetadata(): Promise<Metadata> {
   return {
     title: homeSeoContent.title,
@@ -65,7 +59,7 @@ export async function generateMetadata(): Promise<Metadata> {
         },
       ],
     },
-    /** Both are @handles not domains despite the `site` name: `site` the publisher, `creator` the author. */
+
     twitter: {
       card: 'summary_large_image',
       site: `@${USERNAME}`,
@@ -74,25 +68,16 @@ export async function generateMetadata(): Promise<Metadata> {
   }
 }
 
-/** Browser chrome colour matching the site's dark surface so mobile address bars blend in. */
 export const viewport: Viewport = {
   themeColor: '#0a0a0a',
 }
 
-/**
- * JSON-LD structured data for rich search results.
- * Instantiates the Person, Website and ProfilePage schemas based on schema.org standards.
- */
 const jsonLd = [
   { '@context': 'https://schema.org', ...getPersonSchema() },
   getWebsiteSchema(),
   getProfilePageSchema(),
 ]
 
-/**
- * Main application layout that wraps all pages.
- * Wraps the DOM tree in global context providers (Tooltips, View tracking, Toasters).
- */
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html
@@ -108,12 +93,12 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
-      <body className="bg-background font-sans text-foreground antialiased">
+      <body className="font-sans text-foreground antialiased">
+        <DotGridBackground />
         <MotionProvider>
           <TooltipProvider delayDuration={0}>
             <ViewsProvider>
-              <AnnouncementBanner />
-              <div className="mx-auto flex min-h-screen max-w-[800px] flex-col pb-20 pt-[calc(3rem_+_var(--banner-offset,0px))] transition-[padding] duration-300 ease-out md:pb-12">
+              <div className="mx-auto flex min-h-screen max-w-[800px] flex-col pb-20 pt-12 md:pb-12">
                 <Navbar />
                 <main className="flex-grow px-8 py-12">{children}</main>
                 <Footer />

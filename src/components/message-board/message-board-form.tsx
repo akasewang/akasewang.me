@@ -13,19 +13,11 @@ import { useSoundEffects } from '@/hooks/use-sound-effects'
 import { useStatusTimer } from '@/hooks/use-status-timer'
 import { submitMessageBoardMessage } from '@/lib/actions/message-board-actions'
 
-/** Secret message that, when posted, logs the admin out instead of submitting. */
 const ADMIN_LOGOUT_COMMAND = process.env.NEXT_PUBLIC_ADMIN_LOGOUT_COMMAND || '/logout'
-/** Secret prefix (`/admin <password>`) that authenticates an admin instead of posting. */
+
 const ADMIN_LOGIN_PREFIX = process.env.NEXT_PUBLIC_ADMIN_LOGIN_PREFIX || '/admin '
 const mbToast = toastContent.messageBoard
 
-/**
- * A client side form component for submitting messages to the message board.
- * Includes built in honeypot spam protection, rate limiting countdowns,
- * and secret admin command parsing (`/admin password`, `/logout`).
- *
- * @returns A fully interactive form with animated submission states.
- */
 export function MessageBoardForm() {
   const [isPending, setIsPending] = useState(false)
   const { success, countdown, startCountdown, showError, resetStatus } =
@@ -45,20 +37,11 @@ export function MessageBoardForm() {
   async function action(formData: FormData) {
     const trimmedMessage = (formData.get('message') as string)?.trim() || ''
 
-    /**
-     * Parse the submission for secret admin commands.
-     * If the message matches the logout command (e.g., '/logout'), clear the admin cookie
-     * and abort the database submission.
-     */
     if (trimmedMessage === ADMIN_LOGOUT_COMMAND) {
       logoutAdmin()
       return handleAdminCommand(mbToast.adminLogout, destructive)
     }
 
-    /**
-     * If the message starts with the admin login prefix (e.g., '/admin '),
-     * attempt to authenticate using the provided password string instead of posting a public message.
-     */
     if (trimmedMessage.startsWith(ADMIN_LOGIN_PREFIX)) {
       const password = trimmedMessage.slice(ADMIN_LOGIN_PREFIX.length).trim()
       if (password) {
@@ -92,7 +75,6 @@ export function MessageBoardForm() {
 
   return (
     <form ref={formRef} action={action} className="flex flex-col gap-4">
-      {/** Honeypot field that automated spam bots fill out and the server silently rejects. */}
       <input type="text" name="honey" className="hidden" tabIndex={-1} autoComplete="off" />
 
       <Input

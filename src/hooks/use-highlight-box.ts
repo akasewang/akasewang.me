@@ -1,7 +1,7 @@
 'use client'
 
+import { animate, useMotionValue } from 'framer-motion'
 import { useCallback, useRef } from 'react'
-import { animate, useMotionValue, useTransform } from 'framer-motion'
 import {
   HIGHLIGHT_APPEAR_SPRING,
   HIGHLIGHT_FADE_IN,
@@ -10,7 +10,6 @@ import {
   HIGHLIGHT_TRAIL_SPRING,
 } from '@/constants/ui'
 
-/** Target box edges, in pixels relative to the highlight's positioned parent. */
 export interface HighlightBox {
   left: number
   top: number
@@ -18,7 +17,6 @@ export interface HighlightBox {
   bottom: number
 }
 
-/** Lazily created media query so reduced motion tracks live OS changes mid session. */
 let reduceMotionQuery: MediaQueryList | null = null
 const prefersReducedMotion = () => {
   if (typeof window === 'undefined') return false
@@ -26,62 +24,31 @@ const prefersReducedMotion = () => {
   return reduceMotionQuery.matches
 }
 
-/**
- * Shared motion engine for the floating highlight components ({@link HoverHighlight}
- * and {@link MenuHighlight}). Owns the box edge motion values and the glide behavior,
- * leaving each consumer to supply only its item tracking strategy.
- *
- * On the first `moveTo` the highlight materializes on the item's full box (fading in
- * while relaxing from a slight shrink, so it breathes into place rather than popping).
- * Subsequent moves animate the four box edges independently: the leading edge springs
- * ahead and the trailing edge follows, stretching the highlight toward the direction
- * of travel. `hide` dissolves it with a gentle exhale. All motion runs through Framer
- * Motion values and the imperative `animate()` API, so following items never triggers
- * a React rerender. A `prefers-reduced-motion` preference snaps instead of gliding.
- *
- * @returns `style` to spread on the highlight `m.div`, plus `moveTo`/`hide` controls.
- */
 export function useHighlightBox() {
   const left = useMotionValue(0)
   const top = useMotionValue(0)
-  const right = useMotionValue(0)
-  const bottom = useMotionValue(0)
+  const width = useMotionValue(0)
+  const height = useMotionValue(0)
   const opacity = useMotionValue(0)
   const scale = useMotionValue(1)
 
-  /** Box size derived from the animated edges so width/height never need springs of their own. */
-  const width = useTransform(() => right.get() - left.get())
-  const height = useTransform(() => bottom.get() - top.get())
-
-  /**
-   * While hidden, the box is snapped onto the next target while opacity and scale ease
-   * in, so it appears at full size (no growing into shape). Once visible, it glides.
-   */
   const visibleRef = useRef(false)
 
   const moveTo = useCallback(
     (box: HighlightBox) => {
-      if (visibleRef.current && !prefersReducedMotion()) {
-        /**
-         * Pick the leading edge per axis from the direction of travel: moving down means
-         * the bottom edge arrives first, moving up the top edge, likewise horizontally.
-         */
-        const movingDown = box.top >= top.get()
-        const movingRight = box.left >= left.get()
+      const nextWidth = Math.max(0, box.right - box.left)
+      const nextHeight = Math.max(0, box.bottom - box.top)
 
-        animate(top, box.top, movingDown ? HIGHLIGHT_TRAIL_SPRING : HIGHLIGHT_LEAD_SPRING)
-        animate(bottom, box.bottom, movingDown ? HIGHLIGHT_LEAD_SPRING : HIGHLIGHT_TRAIL_SPRING)
-        animate(left, box.left, movingRight ? HIGHLIGHT_TRAIL_SPRING : HIGHLIGHT_LEAD_SPRING)
-        animate(right, box.right, movingRight ? HIGHLIGHT_LEAD_SPRING : HIGHLIGHT_TRAIL_SPRING)
+      if (visibleRef.current && !prefersReducedMotion()) {
+        animate(left, box.left, HIGHLIGHT_LEAD_SPRING)
+        animate(top, box.top, HIGHLIGHT_LEAD_SPRING)
+        animate(width, nextWidth, HIGHLIGHT_TRAIL_SPRING)
+        animate(height, nextHeight, HIGHLIGHT_TRAIL_SPRING)
       } else {
-        /**
-         * `jump` (not `set`) so an in flight spring is cancelled rather than resuming next
-         * frame; used for the first appearance and for every move under reduced motion.
-         */
         left.jump(box.left)
         top.jump(box.top)
-        right.jump(box.right)
-        bottom.jump(box.bottom)
+        width.jump(nextWidth)
+        height.jump(nextHeight)
       }
 
       if (!visibleRef.current) {
@@ -96,7 +63,7 @@ export function useHighlightBox() {
         }
       }
     },
-    [left, top, right, bottom, opacity, scale],
+    [left, top, width, height, opacity, scale],
   )
 
   const hide = useCallback(() => {
@@ -104,7 +71,6 @@ export function useHighlightBox() {
     if (prefersReducedMotion()) {
       opacity.jump(0)
     } else {
-      /** Dissolve with a gentle exhale so the wash recedes rather than switching off. */
       animate(opacity, 0, HIGHLIGHT_FADE_OUT)
       animate(scale, 0.985, HIGHLIGHT_FADE_OUT)
     }

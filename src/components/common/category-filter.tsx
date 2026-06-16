@@ -6,21 +6,12 @@ import { SMOOTH_SPRING_TRANSITION, SPRING_TRANSITION } from '@/constants/ui'
 import { useSoundEffects } from '@/hooks/use-sound-effects'
 import { cn } from '@/utils/utils'
 
-/** Props for {@link CategoryFilter}. */
 interface CategoryFilterProps<T extends string> {
   categories: readonly { value: T; label: string }[]
   value: T
   onChange: (value: T) => void
 }
 
-/**
- * A horizontal row of category buttons with an animated active pill indicator, used to filter
- * content by distinct categories (e.g. blog topics, component types).
- *
- * @param categories - Array of category objects containing a strictly typed `value` and display `label`.
- * @param value - The currently active category value.
- * @param onChange - Callback fired when a category is selected.
- */
 export function CategoryFilter<T extends string>({
   categories,
   value,

@@ -2,26 +2,17 @@
 
 import { AnimatePresence, type HTMLMotionProps, m } from 'framer-motion'
 import type React from 'react'
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Icons } from '@/components/ui/icons'
 import { useSoundEffects } from '@/hooks/use-sound-effects'
 import { cn } from '@/utils/utils'
 
-/** Props for {@link CopyButton}. */
 interface CopyButtonProps extends HTMLMotionProps<'button'> {
   value: string
   iconSize?: number
   copied?: boolean
 }
 
-/**
- * A button that copies `value` to the clipboard, swapping the copy icon for a check on success.
- * Works uncontrolled (manages its own brief "copied" state) or controlled (via the `copied` prop).
- *
- * @param value - The text string to copy to the clipboard.
- * @param iconSize - The pixel size of the rendered icon.
- * @param copied - If provided, the button acts as a controlled component reacting to this external state.
- */
 export function CopyButton({
   value,
   iconSize = 14,
@@ -33,6 +24,13 @@ export function CopyButton({
   const { success, error, hoverTick } = useSoundEffects()
   const [internalCopied, setInternalCopied] = useState(false)
   const isCopied = controlledCopied ?? internalCopied
+  const resetTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  useEffect(() => {
+    return () => {
+      if (resetTimerRef.current) clearTimeout(resetTimerRef.current)
+    }
+  }, [])
 
   const handleCopy = async (e: React.MouseEvent<HTMLButtonElement>) => {
     onClick?.(e)
@@ -42,7 +40,9 @@ export function CopyButton({
       await navigator.clipboard.writeText(value)
       success()
       setInternalCopied(true)
-      setTimeout(() => setInternalCopied(false), 1500)
+
+      if (resetTimerRef.current) clearTimeout(resetTimerRef.current)
+      resetTimerRef.current = setTimeout(() => setInternalCopied(false), 1500)
     } catch (err) {
       error()
       console.error(err)

@@ -1,10 +1,10 @@
-import React from 'react'
+import type React from 'react'
 import { Icons } from '@/components/ui/icons'
 import { cn } from '@/utils/utils'
 import { Pre } from './code-block'
-import { ZoomableImage } from './zoomable-image'
-import { generateId } from './utils/parse-toc'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './table'
+import { generateId } from './utils/parse-toc'
+import { ZoomableImage } from './zoomable-image'
 
 const HEADING_SIZES = {
   1: 'mb-4 mt-8 font-serif text-2xl font-medium italic leading-snug text-primary',
@@ -17,13 +17,6 @@ const HEADING_SIZES = {
 
 const ICON_SIZES = { 1: 22, 2: 18, 3: 16, 4: 14, 5: 12, 6: 10 } as const
 
-/**
- * Higher order function that generates a customized heading component.
- * Automatically injects an anchor link and a hashtag icon to support the TOC.
- *
- * @param level - The heading level (1-6) to generate.
- * @returns A React functional component for the specified heading level.
- */
 const createHeading = (level: 1 | 2 | 3 | 4 | 5 | 6) => {
   const HeadingComponent = ({
     children,
@@ -55,10 +48,6 @@ const createHeading = (level: 1 | 2 | 3 | 4 | 5 | 6) => {
   return HeadingComponent
 }
 
-/**
- * MDX HTML Element Overrides.
- * Automatically generates anchor links for all heading levels to support the table of contents.
- */
 export const mdxElements = {
   h1: createHeading(1),
   h2: createHeading(2),
@@ -70,7 +59,7 @@ export const mdxElements = {
     <code
       className={
         className ||
-        'rounded-md bg-muted/50 px-1.5 py-0.5 font-mono text-xs text-secondary whitespace-nowrap ring-1 ring-inset ring-border/40'
+        'rounded-md bg-surface-50 px-1.5 py-0.5 font-mono text-xs text-secondary whitespace-nowrap ring-1 ring-inset ring-border/40'
       }
       {...props}
     >

@@ -6,16 +6,11 @@ import { type ComponentProps, forwardRef, useImperativeHandle, useState } from '
 const VOLUME_SPEAKER_PATH =
   'M6.603 10L10 7.22v9.56L6.603 14H3v-4zM2 16h3.889l5.294 4.332a.5.5 0 0 0 .817-.387V4.055a.5.5 0 0 0-.817-.387L5.89 8H2a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1'
 
-/** Imperative handle to drive the volume icon's sound wave animation from a parent. */
 export interface VolumeIconHandle {
   startAnimation: () => void
   stopAnimation: () => void
 }
 
-/**
- * A speaker icon whose sound waves animate in when `startAnimation()` is called via its ref.
- * Used to give audio feedback (e.g. the name pronunciation button).
- */
 export const VolumeIcon = forwardRef<VolumeIconHandle, ComponentProps<'svg'>>((props, ref) => {
   const [isPlaying, setIsPlaying] = useState(false)
 

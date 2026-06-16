@@ -1,27 +1,17 @@
+import { render } from '@react-email/components'
+import { and, eq, gte } from 'drizzle-orm'
 import { NextResponse } from 'next/server'
+import React from 'react'
+import { WeeklySummaryTemplate } from '@/components/emails/weekly-summary-template'
 import { db } from '@/lib/db/drizzle'
 import { newsletterSubscribers } from '@/lib/db/schema'
-import { gte } from 'drizzle-orm'
-import { render } from '@react-email/components'
-import { WeeklySummaryTemplate } from '@/components/emails/weekly-summary-template'
-import React from 'react'
 import { getResend, SENDER_EMAIL } from '@/lib/resend'
 
-/** Recipient for the weekly summary (the site admin); the route 500s if it's unset. */
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL
 
-/**
- * Scheduled cron job route that executes weekly to aggregate and report new newsletter subscribers.
- * This route must be called with a Bearer token matching `CRON_SECRET` for authorization.
- * If new subscribers exist, it renders a React Email template and sends it to the admin.
- *
- * @param request - The incoming HTTP request containing the authorization header.
- * @returns A JSON response indicating the execution status and subscriber count.
- */
 export async function GET(request: Request) {
   const authHeader = request.headers.get('authorization')
 
-  /** Reject when the secret is unset so an empty secret cannot be matched, or when the token differs. */
   if (!process.env.CRON_SECRET || authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
@@ -35,7 +25,10 @@ export async function GET(request: Request) {
     oneWeekAgo.setDate(oneWeekAgo.getDate() - 7)
 
     const recentSubscribers = await db.query.newsletterSubscribers.findMany({
-      where: gte(newsletterSubscribers.createdAt, oneWeekAgo),
+      where: and(
+        eq(newsletterSubscribers.isActive, true),
+        gte(newsletterSubscribers.createdAt, oneWeekAgo),
+      ),
       columns: { email: true },
     })
 

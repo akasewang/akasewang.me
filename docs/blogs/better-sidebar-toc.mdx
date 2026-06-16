@@ -71,31 +71,22 @@ Let's check the core React hook that handles this logic:
 ```ts title="src/hooks/use-active-heading.ts"
 import { useEffect, useState } from 'react'
 import type { TocItem } from '../utils/parse-toc'
-
 export function useActiveHeading(items: TocItem[], offset = 120): string {
   const [activeId, setActiveId] = useState('')
-
   useEffect(() => {
     if (!items.length) return
-
-    // 1. Gather all heading elements in the DOM
     const headingElements = items
       .map((item) => ({ id: item.id, el: document.getElementById(item.id) }))
       .filter((h): h is { id: string; el: HTMLElement } => h.el !== null)
-
     let ticking = false
-
     const handleScroll = () => {
       if (!ticking) {
-        // 2. Debounce math execution inside the next render frame
         window.requestAnimationFrame(() => {
           let current = ''
           const isAtBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 10
-          
           if (isAtBottom && headingElements.length > 0) {
             current = headingElements[headingElements.length - 1].id
           } else {
-            // 3. Scan bottom to top to find the closest element above our offset line
             for (let i = headingElements.length - 1; i >= 0; i--) {
               if (headingElements[i].el.getBoundingClientRect().top <= offset) {
                 current = headingElements[i].id
@@ -103,21 +94,16 @@ export function useActiveHeading(items: TocItem[], offset = 120): string {
               }
             }
           }
-
           setActiveId(current)
           ticking = false
         })
         ticking = true
       }
     }
-
-    // 4. Register passive scroll listener
     window.addEventListener('scroll', handleScroll, { passive: true })
-    handleScroll() // Trigger initial check
-
+    handleScroll() 
     return () => window.removeEventListener('scroll', handleScroll)
   }, [items, offset])
-
   return activeId
 }
 ```
@@ -154,33 +140,19 @@ Here is the simplified layout of our [AsideTOC](https://github.com/akasewang/aka
 
 ```tsx title="src/components/common/mdx-components/aside-toc.tsx"
 'use client'
-
 import { useMemo } from 'react'
 import { cn } from '@/utils/utils'
 import { parseTocFromContent } from './utils/parse-toc'
 import { useActiveHeading, scrollToHeading } from './hooks/use-active-heading'
 import { Icons } from '@/components/ui/icons'
-
-/** Props for {@link AsideTOC}. */
 interface AsideTOCProps {
   content?: string
   className?: string
 }
-
-/**
- * Sidebar navigation component that dynamically generates and displays a Table of Contents (TOC).
- * Uses a scroll-spying hook to highlight the currently active heading as the user scrolls.
- * Only visible on large screens (xl breakpoint).
- *
- * @param content - The raw Markdown/MDX string content to parse for headings.
- * @param className - Optional CSS classes for custom container styling.
- */
 export const AsideTOC = ({ content, className }: AsideTOCProps) => {
   const items = useMemo(() => (content ? parseTocFromContent(content) : []), [content])
   const activeId = useActiveHeading(items)
-
   if (!items.length) return null
-
   return (
     <nav
       className={cn(

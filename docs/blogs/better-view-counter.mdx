@@ -45,26 +45,14 @@ Let's examine how the [ViewsProvider](https://github.com/akasewang/akasewang.me/
 
 ```tsx title="src/components/providers/views-context.tsx"
 const BATCH_DELAY = 50
-
-/**
- * Context provider that manages view counts across the application.
- * Implements a batching strategy to group multiple view requests into a single API call.
- * preventing network spam when rendering large lists of items (e.g., the component registry).
- * Also caches view counts locally to optimize navigation.
- *
- * @param children - The React tree to wrap with the provider.
- */
 export function ViewsProvider({ children }: { children: ReactNode }) {
   const [viewsMap, setViewsMap] = useState<Record<string, number | null>>({})
   const viewsMapRef = useRef<Record<string, number | null>>({})
-
   const [installsMap, setInstallsMap] = useState<Record<string, number | null>>({})
   const installsMapRef = useRef<Record<string, number | null>>({})
-
   const pendingSlugsRef = useRef<Set<string>>(new Set())
   const fetchingRef = useRef<Set<string>>(new Set())
   const batchTimeoutRef = useRef<NodeJS.Timeout | null>(null)
-
   const prefetchViews = useCallback(
     async (slugs: string[]) => {
       let hasNew = false
@@ -78,11 +66,8 @@ export function ViewsProvider({ children }: { children: ReactNode }) {
           hasNew = true
         }
       }
-
       if (!hasNew) return
-
       if (batchTimeoutRef.current) clearTimeout(batchTimeoutRef.current)
-
       batchTimeoutRef.current = setTimeout(() => {
         const slugsToFetch = Array.from(pendingSlugsRef.current)
         pendingSlugsRef.current.clear()
@@ -91,8 +76,6 @@ export function ViewsProvider({ children }: { children: ReactNode }) {
     },
     [fetchBatch],
   )
-
-  // ...
 }
 ```
 
@@ -109,12 +92,10 @@ To prevent users from falsely inflating metrics by spamming the browser reload b
 const incrementViews = useCallback(
   async (slug: string) => {
     const sessionKey = `viewed-${slug}`
-
     if (typeof window !== 'undefined' && sessionStorage.getItem(sessionKey)) {
       requestView(slug)
       return
     }
-
     try {
       const data = await incrementViewAction(slug)
       setViewsMap((prev) => {
@@ -122,7 +103,6 @@ const incrementViews = useCallback(
         syncCache(viewsMapRef.current, installsMapRef.current)
         return viewsMapRef.current
       })
-
       if (data.views !== null && typeof window !== 'undefined') {
         sessionStorage.setItem(sessionKey, 'true')
       }
@@ -148,28 +128,13 @@ Let's check the Server Action code inside [views.ts](https://github.com/akasewan
 
 ```ts title="src/lib/actions/views.ts"
 'use server'
-
 import { sql } from 'drizzle-orm'
 import { db } from '@/lib/db/drizzle'
 import { views } from '@/lib/db/schema'
 import { logContent } from '@/data/content/log-content'
-
-/**
- * Server action that atomically increments the view count for a specific route slug.
- * Uses a Postgres upsert (`ON CONFLICT DO UPDATE`) operation to prevent race conditions.
- *
- * @param slug - The unique identifier/path of the page being viewed.
- * @returns An object containing the new total `views` count.
- */
 export async function incrementViewAction(slug: string) {
-  /** Abort if no slug is provided to prevent database errors */
   if (!slug) return { views: null }
-
   try {
-    /**
-     * Perform an atomic Postgres upsert. If the slug doesn't exist, insert it with count = 1.
-     * If it exists, let the database engine increment the count to prevent race conditions.
-     */
     const [result] = await db
       .insert(views)
       .values({ slug, count: 1 })
@@ -178,7 +143,6 @@ export async function incrementViewAction(slug: string) {
         set: { count: sql`${views.count} + 1` },
       })
       .returning({ count: views.count })
-
     return { views: result?.count ?? 0 }
   } catch (error) {
     console.error(logContent.view.incrementError, error)
@@ -196,20 +160,9 @@ Similarly, our batch retrieval uses the SQL `IN` operator to fetch all post coun
 ```ts title="src/lib/actions/views.ts"
 import { inArray } from 'drizzle-orm'
 import { logContent } from '@/data/content/log-content'
-
-/**
- * Server action to efficiently fetch the view counts for multiple route slugs in a single query.
- * Optimized for grid/list views where showing views for dozens of items at once is necessary.
- *
- * @param slugs - An array of unique page identifiers.
- * @returns A dictionary mapping each slug to its current view count.
- */
 export async function getViewsBatchAction(slugs: string[]) {
-  /** Return empty maps immediately if the array is empty to save a database call */
   if (!slugs?.length) return { views: {}, installs: {} }
-
   try {
-    /** Fetch all requested slugs in a single IN clause for optimal performance */
     const result = await db
       .select({
         slug: views.slug,
@@ -218,16 +171,12 @@ export async function getViewsBatchAction(slugs: string[]) {
       })
       .from(views)
       .where(inArray(views.slug, slugs))
-
-    /** Pre-fill maps with 0 for all requested slugs to handle missing database rows gracefully */
     const viewsMap: Record<string, number> = Object.fromEntries(slugs.map((slug) => [slug, 0]))
     const installsMap: Record<string, number> = Object.fromEntries(slugs.map((slug) => [slug, 0]))
-
     for (const row of result) {
       viewsMap[row.slug] = row.count
       installsMap[row.slug] = row.installs
     }
-
     return { views: viewsMap, installs: installsMap }
   } catch (error) {
     console.error(logContent.view.batchFetchError, error)

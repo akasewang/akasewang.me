@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useState } from 'react'
 import { toast } from 'sonner'
 import { EmptyState } from '@/components/common/empty-state'
 import { Icons } from '@/components/ui/icons'
@@ -18,36 +18,21 @@ import type { MessageBoardEntry } from '@/types/message-board'
 import { cn } from '@/utils/utils'
 import { MessageBubbles } from './message-bubbles'
 
-/** Props for {@link MessageBoardList}; `null` signals the server query failed (offline). */
 interface MessageBoardListProps {
   messages: MessageBoardEntry[] | null
 }
 
-/** Frosted glass panel styling for the loading indicator. */
-const GLASS_PANEL_CLASS = 'bg-muted/40 backdrop-blur-md ring-1 ring-inset ring-ring/80'
+const LOADING_PANEL_CLASS = 'bg-surface-40 ring-1 ring-inset ring-ring/80'
 
-/**
- * A client side, infinite scrolling list of message board entries. It seeds from the
- * server rendered first page and loads older messages as the sentinel scrolls into view.
- * When an admin is authenticated, it enables inline delete and reply actions.
- *
- * @param messages - The initial page of messages prefetched by the server component.
- */
 export function MessageBoardList({ messages: initialMessages }: MessageBoardListProps) {
   const { destructive, hoverTick, tap, error: errorSound } = useSoundEffects()
   const { adminKey, logoutAdmin } = useAdmin()
+  const initialMessageList = initialMessages ?? []
 
-  const [messages, setMessages] = useState<MessageBoardEntry[]>(initialMessages || [])
+  const [messages, setMessages] = useState<MessageBoardEntry[]>(() => initialMessageList)
   const [loading, setLoading] = useState(false)
-  const [hasMore, setHasMore] = useState((initialMessages?.length || 0) >= MESSAGES_PER_PAGE)
+  const [hasMore, setHasMore] = useState(initialMessageList.length >= MESSAGES_PER_PAGE)
   const [loadError, setLoadError] = useState(false)
-
-  useEffect(() => {
-    if (initialMessages) {
-      setMessages(initialMessages)
-      setHasMore(initialMessages.length >= MESSAGES_PER_PAGE)
-    }
-  }, [initialMessages])
 
   const handleDelete = useCallback(
     async (id: number) => {
@@ -90,17 +75,23 @@ export function MessageBoardList({ messages: initialMessages }: MessageBoardList
     setLoadError(false)
 
     try {
-      const response = await getMessageBoardMessages(messages.length)
+      const lastMessage = messages.at(-1)
+      const cursor = lastMessage ? { id: lastMessage.id } : null
+      const response = await getMessageBoardMessages(cursor)
       if (!response.success) throw new Error(response.error)
 
-      setMessages((prev) => [...prev, ...response.data.messages])
+      setMessages((prev) => {
+        const seenIds = new Set(prev.map((message) => message.id))
+        const nextMessages = response.data.messages.filter((message) => !seenIds.has(message.id))
+        return [...prev, ...nextMessages]
+      })
       setHasMore(response.data.hasMore ?? false)
     } catch {
       setLoadError(true)
     } finally {
       setLoading(false)
     }
-  }, [loading, hasMore, messages.length])
+  }, [loading, hasMore, messages])
 
   const observerTarget = useInfiniteScroll<HTMLDivElement>(
     loadMore,
@@ -116,14 +107,14 @@ export function MessageBoardList({ messages: initialMessages }: MessageBoardList
     return <EmptyState message={t.noMessagesLabel} className="py-20" />
   }
 
-  let prevDateString: string | null = null
-
   const messageElements = messages.map((msg, index) => {
     const msgDate = new Date(msg.createdAt)
     const currentDateString = msgDate.toDateString()
-    const showDayHeader = prevDateString !== currentDateString
-
-    prevDateString = currentDateString
+    const previousMessage = messages[index - 1]
+    const previousDateString = previousMessage
+      ? new Date(previousMessage.createdAt).toDateString()
+      : null
+    const showDayHeader = previousDateString !== currentDateString
 
     return (
       <div
@@ -168,7 +159,7 @@ export function MessageBoardList({ messages: initialMessages }: MessageBoardList
           <div
             className={cn(
               'flex items-center gap-3 rounded-full px-4 py-2 text-sm text-muted-foreground',
-              GLASS_PANEL_CLASS,
+              LOADING_PANEL_CLASS,
             )}
           >
             <div className="size-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
@@ -185,7 +176,7 @@ export function MessageBoardList({ messages: initialMessages }: MessageBoardList
               type="button"
               onClick={() => {
                 tap()
-                setLoadError(false)
+                loadMore()
               }}
               onMouseEnter={hoverTick}
               className="relative underline underline-offset-4 transition-colors duration-300 hover:text-foreground active:duration-200"

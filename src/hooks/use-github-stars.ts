@@ -1,21 +1,24 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 const CACHE_KEY = 'github_stars_cache'
 const CACHE_TTL = 15 * 60 * 1000
 
-/** Module level variable to deduplicate simultaneous in flight requests across components. */
 let sharedFetchPromise: Promise<number | null> | null = null
 
-/**
- * React hook to fetch and cache GitHub stars for the site's repository.
- * Calls the internal `/api/github-stars` proxy (which holds the optional `GITHUB_TOKEN`
- * server side) rather than the GitHub API directly. Utilizes a shared promise to prevent
- * network spam if used in multiple components, and localStorage to prevent refetching
- * across tabs and page navigations. Includes strict Error Boundaries for
- * incognito/privacy mode storage blocks.
- */
+function isFreshCache(value: unknown): value is { count: number; timestamp: number } {
+  if (!value || typeof value !== 'object') return false
+
+  const cached = value as { count?: unknown; timestamp?: unknown }
+  return (
+    typeof cached.count === 'number' &&
+    Number.isFinite(cached.count) &&
+    typeof cached.timestamp === 'number' &&
+    Date.now() - cached.timestamp < CACHE_TTL
+  )
+}
+
 export function useGithubStars() {
   const [stars, setStars] = useState<number | null>(null)
 
@@ -23,22 +26,18 @@ export function useGithubStars() {
     let isMounted = true
 
     const fetchStars = async () => {
-      /** 1. Read from cache first for an instant paint and to skip a network round trip on repeat visits. */
       try {
         const cached = localStorage.getItem(CACHE_KEY)
         if (cached) {
-          const { count, timestamp } = JSON.parse(cached)
-          if (Date.now() - timestamp < CACHE_TTL) {
-            if (isMounted) setStars(count)
+          const parsedCache = JSON.parse(cached)
+          if (isFreshCache(parsedCache)) {
+            if (isMounted) setStars(parsedCache.count)
             return
           }
         }
-      } catch {
-        /** Silently ignore storage errors (e.g., Safari private mode, strict ad blockers). */
-      }
+      } catch {}
 
       try {
-        /** 2. If another component is already fetching, piggyback on that promise. */
         if (!sharedFetchPromise) {
           sharedFetchPromise = fetch('/api/github-stars')
             .then((res) => {
@@ -49,11 +48,8 @@ export function useGithubStars() {
               const count = data.count
               if (typeof count === 'number') {
                 try {
-                  /** 3. Cache the result for future visits across all tabs. */
                   localStorage.setItem(CACHE_KEY, JSON.stringify({ count, timestamp: Date.now() }))
-                } catch {
-                  /** Silently ignore storage errors. */
-                }
+                } catch {}
 
                 return count
               }
@@ -74,21 +70,25 @@ export function useGithubStars() {
 
     fetchStars()
 
-    /** Cleanup function to prevent setting state if the component unmounts before the promise resolves. */
     return () => {
       isMounted = false
     }
   }, [])
 
-  /** Preformat string variants so the UI components can remain strictly presentational. */
-  const shortCount =
-    stars !== null
-      ? new Intl.NumberFormat('en-US', { notation: 'compact', maximumFractionDigits: 1 })
-          .format(stars)
-          .toLowerCase()
-      : null
+  const shortCount = useMemo(
+    () =>
+      stars !== null
+        ? new Intl.NumberFormat('en-US', { notation: 'compact', maximumFractionDigits: 1 })
+            .format(stars)
+            .toLowerCase()
+        : null,
+    [stars],
+  )
 
-  const fullCount = stars !== null ? new Intl.NumberFormat('en-US').format(stars) : null
+  const fullCount = useMemo(
+    () => (stars !== null ? new Intl.NumberFormat('en-US').format(stars) : null),
+    [stars],
+  )
 
   return { count: stars, shortCount, fullCount }
 }

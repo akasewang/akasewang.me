@@ -11,10 +11,6 @@ import { useSoundEffects } from '@/hooks/use-sound-effects'
 const { license, licenseHref, ownerName, changelogLabel, changelogHref } = footerContent
 const currentYear = new Date().getFullYear()
 
-/**
- * Global site footer.
- * Displays licensing, copyright and global site visitor metrics.
- */
 export function Footer() {
   const { hoverLink, navigate: navigateSound } = useSoundEffects()
   useKeyboardShortcut(
@@ -38,38 +34,36 @@ export function Footer() {
 
   return (
     <footer className="py-6">
-      <div className="mx-auto flex max-w-[800px] flex-col items-center justify-between gap-2 px-8 sm:flex-row">
-        <p className="text-sm text-muted-foreground/50">
-          &copy; {currentYear} {ownerName}
-          {license && (
-            <>
-              <span className="mx-1.5">•</span>
-              {licenseHref ? (
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Link
-                      href={licenseHref}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      onMouseEnter={hoverLink}
-                      onClick={navigateSound}
-                      className="transition-colors duration-300 hover:text-foreground"
-                    >
-                      {license}
-                    </Link>
-                  </TooltipTrigger>
-                  <TooltipContent side="top" shortcut={['Shift', 'L']}>
-                    View License
-                  </TooltipContent>
-                </Tooltip>
-              ) : (
-                license
-              )}
-            </>
-          )}
-        </p>
+      <div className="mx-auto flex max-w-[800px] flex-col items-center justify-between gap-2 px-8 sm:flex-row text-sm text-muted-foreground/50">
+        <div className="flex items-center gap-1.5">
+          {license &&
+            (licenseHref ? (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Link
+                    href={licenseHref}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onMouseEnter={hoverLink}
+                    onClick={navigateSound}
+                    className="transition-colors duration-300 hover:text-foreground"
+                  >
+                    {license}
+                  </Link>
+                </TooltipTrigger>
+                <TooltipContent side="top" shortcut={['Shift', 'L']}>
+                  View License
+                </TooltipContent>
+              </Tooltip>
+            ) : (
+              <span>{license}</span>
+            ))}
+          <span>
+            &copy; {currentYear} {ownerName}
+          </span>
+        </div>
 
-        <div className="flex items-center gap-3 text-sm tracking-wide text-muted-foreground/50">
+        <div className="flex items-center gap-3 tracking-wide">
           <ViewCounter type="visitors" />
 
           {changelogLabel && changelogHref && (

@@ -1,6 +1,6 @@
 # akasewang.me
 
-Source code for the personal portfolio, blog and digital footprint of Akash Dewangan. Built with a strict focus on performance, type safety and minimal latency.
+Source code for the personal site of Akash Dewangan. A personal archive of what I'm building and consuming, featuring software projects, interactive coding experiments, a media catalog and personal essays. Built with a strict focus on performance, type safety and minimal latency.
 
 [![Next.js](https://img.shields.io/badge/Next.js_16-000000?style=for-the-badge&logo=nextdotjs&logoColor=white)](#)
 [![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)](#)
@@ -49,7 +49,6 @@ This portfolio is built to be fast, secure and easy to maintain.
 
 - **Fast Animations**: We use Framer Motion for smooth physics based animations and load the animation code lazily so the page doesn't feel heavy.
 - **Tailwind v4**: The design system uses Tailwind CSS v4 and native CSS variables, including a custom mouse cursor that runs purely on fast CSS.
-- **Clean Code Docs**: Our internal code comments strictly explain _how_ things work and never mention styling or colors. This keeps the documentation relevant even if the design changes later.
 - **Formatter**: We use Biome instead of Prettier/ESLint because it is incredibly fast. A pre-commit hook (`.githooks/pre-commit`, enabled automatically on `npm install`) formats staged files before every commit.
 
 ---
@@ -94,9 +93,3 @@ Requirements: Node.js >= 20, npm.
 ## License
 
 This project is licensed under the CC-BY-NC-SA-4.0 License. You are free to explore and learn from this source code, but commercial use is prohibited and you must heavily modify the branding, content and personal assets before deploying your own iteration.
-
----
-
-## A Note on the Docs
-
-The documentation comments across this codebase were generated with AI so some may be inaccurate. If you spot an error feel free to mail me at [hi@akasewang.me](mailto:hi@akasewang.me).

@@ -11,16 +11,10 @@ import { useSoundEffects } from '@/hooks/use-sound-effects'
 import type { ProjectPostData } from '@/types/project'
 import { formatDateString, isNew } from '@/utils/utils'
 
-/** Props for {@link ProjectCard}. */
 interface ProjectCardProps {
   project: ProjectPostData
 }
 
-/**
- * Project card for the projects grid. Shows a video or image preview with a hover revealed
- * title, date and view count and automatically plays/pauses the background video based on
- * scroll intersection to save battery and bandwidth.
- */
 export const ProjectCard = memo(function ProjectCard({ project }: ProjectCardProps) {
   const { title, slug, video, image, date, period, external } = project
   const { hoverCard, navigate: navigateSound } = useSoundEffects()

@@ -1,23 +1,28 @@
 import type { TimelineItemProps } from '@/types/site'
 
-/**
- * Professional Experience Data Model.
- * Represents chronological work history, roles and technical responsibilities.
- * Passed into the Timeline/ExpandableList components for rendering on the landing page.
- */
 export const experiences: TimelineItemProps[] = [
   {
     id: 'noddy-studio-founder',
     title: 'Independent Web Developer & Designer',
     startDate: '08.2025',
     description: [
-      'Partnered with 8+ clients to deliver custom solutions ranging from dedicated UI/UX design to end to end full stack development.',
-      'Designed interfaces in Figma and built reusable frontend components, helping clients launch faster and reducing future development effort by 30%.',
-      'Built secure backend systems using Next.js, PostgreSQL and AWS capable of handling thousands of daily requests without downtime.',
-      'Managed domain deployments, SEO optimization and landing page redesigns, increasing client lead conversion rates by up to 25%.',
+      'Delivered end to end web solutions for 8+ clients across the full SDLC, owning UI/UX design in Figma through full stack development, deployment and post launch maintenance.',
+      'Architected secure REST APIs and backend services on Next.js, PostgreSQL and AWS, sustaining thousands of daily requests at 99.9% uptime with sub 200ms median response times.',
+      'Optimized bundle size, caching and image delivery, cutting page load times by ~40% and lowering client hosting costs.',
+      'Integrated third party services like Stripe payments, authentication and headless CMS tooling, giving clients self serve control over content and payments.',
+      'Owned CI/CD deployments, technical SEO and landing page redesigns, lifting organic traffic and improving client lead conversion rates by up to 25%.',
     ],
     defaultExpanded: true,
-    tech: ['TypeScript', 'Next.js', 'PostgreSQL', 'AWS', 'Figma', 'Framer'],
+    tech: [
+      'TypeScript',
+      'React',
+      'Next.js',
+      'Tailwind CSS',
+      'PostgreSQL',
+      'AWS',
+      'Figma',
+      'Framer',
+    ],
     links: [{ text: 'Noddy Studio', url: 'https://noddy.studio', prefix: 'at' }],
   },
   {
@@ -25,13 +30,22 @@ export const experiences: TimelineItemProps[] = [
     title: 'Software Engineer Trainee',
     startDate: '05.2026',
     description: [
-      'Provide ongoing technical consulting for SKEI Bangalore, troubleshooting system workflows, advising on software integrations and resolving technical queries.',
-      "Designed and developed a separate, dedicated website for [SKEI Bengaluru's admission season](https://skeischool.vercel.app/) (independent of their main site), including custom role based dashboards to track leads.",
-      'Built an automated lead tracking system by integrating Ajax controllers with Google Apps Script to securely log admission data directly into Google Sheets.',
-      'Assisted in the final development phases of an enterprise level CRM system, helping the team successfully deploy the completed product.',
+      'Provide ongoing technical consulting for SKEI Bangalore, troubleshooting system workflows, advising on third party integrations and resolving production issues to keep operations running smoothly.',
+      'Built a dedicated [admissions microsite](https://skeischool.vercel.app/) on Next.js with Drizzle ORM and Neon PostgreSQL, adding role based dashboards and analytics charts for real time visibility into the lead pipeline.',
+      'Engineered an automated lead capture pipeline integrating Ajax controllers with Google Apps Script, securely logging admission enquiries to Google Sheets in real time and eliminating manual data entry.',
+      'Contributed to the final development and deployment of an enterprise grade CRM, collaborating in an Agile team to ship the product to production on schedule.',
     ],
     defaultExpanded: true,
-    tech: ['TypeScript', 'Next.js', 'Prisma', 'Google Apps Script', 'PostgreSQL', 'AWS'],
+    tech: [
+      'TypeScript',
+      'React',
+      'Next.js',
+      'Drizzle ORM',
+      'Neon',
+      'PostgreSQL',
+      'Google Apps Script',
+      'Vercel',
+    ],
     links: [
       {
         text: 'Innovun Global',

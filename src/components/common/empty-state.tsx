@@ -1,9 +1,8 @@
 'use client'
 
-import { type ReactNode } from 'react'
+import type { ReactNode } from 'react'
 import { cn } from '@/utils/utils'
 
-/** Props for {@link EmptyState}. */
 interface EmptyStateProps {
   title?: string
   message: string
@@ -11,16 +10,6 @@ interface EmptyStateProps {
   className?: string
 }
 
-/**
- * A standard UI component used to display a visually appealing message when no data is available.
- * Note: This component is intentionally purely functional (no framer-motion) so that parent
- * components (like filtered lists) can cleanly handle `AnimatePresence` and `layout` shifts.
- *
- * @param title - Optional heading to display above the message.
- * @param message - The primary text explaining the empty state.
- * @param children - Optional interactive elements (like a "Clear filters" button) to render below the message.
- * @param className - Optional CSS classes for custom container styling.
- */
 export function EmptyState({ title, message, children, className }: EmptyStateProps) {
   return (
     <div

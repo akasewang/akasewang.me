@@ -1,16 +1,14 @@
 'use client'
 
-import { useEffect, useState, type ReactNode } from 'react'
+import { type ReactNode, useSyncExternalStore } from 'react'
 import { createPortal } from 'react-dom'
 
-/**
- * A utility component that safely mounts its children into `document.body` using React Portals.
- * Delays rendering until after the component has mounted on the client to prevent hydration mismatches.
- */
-export function Portal({ children }: { children: ReactNode }) {
-  const [mounted, setMounted] = useState(false)
+const subscribe = () => () => {}
+const getClientSnapshot = () => true
+const getServerSnapshot = () => false
 
-  useEffect(() => setMounted(true), [])
+export function Portal({ children }: { children: ReactNode }) {
+  const mounted = useSyncExternalStore(subscribe, getClientSnapshot, getServerSnapshot)
 
   return mounted ? createPortal(children, document.body) : null
 }

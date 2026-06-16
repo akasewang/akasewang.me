@@ -1,9 +1,9 @@
 'use client'
 
-import { Children, useEffect, useState, type ElementType, type ReactNode } from 'react'
-import { m, AnimatePresence, type Transition, type Variants } from 'framer-motion'
-import { cn } from '@/utils/utils'
+import { AnimatePresence, m, type Transition, type Variants } from 'framer-motion'
+import { Children, type ElementType, type ReactNode, useEffect, useState } from 'react'
 import { SMOOTH_SPRING_TRANSITION } from '@/constants/ui'
+import { cn } from '@/utils/utils'
 
 const defaultVariants: Variants = {
   initial: { y: 20, opacity: 0, filter: 'blur(4px)' },
@@ -11,7 +11,6 @@ const defaultVariants: Variants = {
   exit: { y: -20, opacity: 0, filter: 'blur(4px)' },
 }
 
-/** Props for {@link TextFlip}. */
 interface TextFlipProps {
   as?: ElementType
   className?: string
@@ -21,15 +20,6 @@ interface TextFlipProps {
   variants?: Variants
 }
 
-/**
- * Cycles through its children one at a time on a timer, animating each out and the next in
- * (e.g. the rotating role titles in the hero).
- *
- * @param as - The HTML element or Framer Motion component to render as (defaults to `m.span`).
- * @param interval - Time in seconds between each flip.
- * @param transition - Custom Framer Motion transition config.
- * @param variants - Custom Framer Motion variants for the entrance/exit animations.
- */
 export function TextFlip({
   as: Component = m.span,
   className,

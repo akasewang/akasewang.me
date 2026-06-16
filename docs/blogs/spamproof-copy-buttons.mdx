@@ -26,15 +26,8 @@ To make this work, wrap your application (or component tree) in a `LazyMotion` p
 
 ```tsx title="src/components/providers/motion-provider.tsx"
 'use client'
-
 import { LazyMotion, domMax } from 'framer-motion'
 import { ReactNode } from 'react'
-
-/**
- * Global provider for Framer Motion's LazyMotion feature.
- * Injects the `domMax` animation engine into the app at the root level, allowing all child
- * components to use the lightweight `m` component (e.g. `m.div`) instead of `motion.div`.
- */
 export function MotionProvider({ children }: { children: ReactNode }) {
   return (
     <LazyMotion features={domMax} strict>
@@ -58,7 +51,6 @@ This allows the incoming icon to slide into the exact same spatial coordinate wi
   <Tab title=" Naive Icon Swap">
 
     ```tsx title="src/components/ui/copy-button.tsx"
-    // The incoming check icon is pushed down by the outgoing copy icon
     return (
       <button className="flex items-center">
         {copied ? <CheckIcon /> : <CopyIcon />}
@@ -101,14 +93,6 @@ To solve this, we can design a simple click guard: if the state is already `copi
 Let's examine how the [CopyButton](https://github.com/akasewang/akasewang.me/blob/main/src/components/ui/copy-button.tsx) component handles this:
 
 ```tsx title="src/components/ui/copy-button.tsx"
-/**
- * A button that copies `value` to the clipboard, swapping the copy icon for a check on success.
- * Works uncontrolled (manages its own brief "copied" state) or controlled (via the `copied` prop).
- *
- * @param value - The text string to copy to the clipboard.
- * @param iconSize - The pixel size of the rendered icon.
- * @param copied - If provided, the button acts as a controlled component reacting to this external state.
- */
 export function CopyButton({
   value,
   iconSize = 14,
@@ -119,26 +103,17 @@ export function CopyButton({
 }: CopyButtonProps) {
   const [internalCopied, setInternalCopied] = useState(false)
   const isCopied = controlledCopied ?? internalCopied
-
   const handleCopy = async (e: React.MouseEvent<HTMLButtonElement>) => {
     onClick?.(e as any)
-    
-    // 1. Guard check: If controlled state is passed, let parent handle it
     if (controlledCopied !== undefined) return
-
     try {
-      // 2. Perform modern Clipboard Write
       await navigator.clipboard.writeText(value)
       setInternalCopied(true)
-      
-      // 3. Revert back to original state after 1.5 seconds
       setTimeout(() => setInternalCopied(false), 1500)
     } catch (err) {
       console.error(err)
     }
   }
-  
-  // ...
 }
 ```
 
@@ -186,7 +161,6 @@ To handle both cases seamlessly, we support both **uncontrolled** internal state
 
 ```tsx title="src/components/ui/copy-button.tsx"
 const [internalCopied, setInternalCopied] = useState(false)
-// If the parent passes 'copied', use it. Otherwise, fallback to local state.
 const isCopied = controlledCopied ?? internalCopied
 ```
 

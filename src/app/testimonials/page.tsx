@@ -1,13 +1,12 @@
-import { Metadata } from 'next'
-import { testimonialsPageContent } from '@/data/content/testimonials-content'
-import { testimonialsSeoContent } from '@/data/content/seo-content'
+import type { Metadata } from 'next'
+import { PageLayout } from '@/components/layout/page-layout'
 import { TestimonialsGrid } from '@/components/testimonials/testimonials-grid'
 import { SITE_URL } from '@/constants/constants'
+import { testimonialsSeoContent } from '@/data/content/seo-content'
+import { testimonialsPageContent } from '@/data/content/testimonials-content'
 import { getBreadcrumbSchema } from '@/lib/json-ld'
 import { constructMetadata, getOgImageUrl } from '@/lib/metadata'
-import { PageLayout } from '@/components/layout/page-layout'
 
-/** Statically generated metadata for the Testimonials page. */
 export async function generateMetadata(): Promise<Metadata> {
   return constructMetadata({
     title: testimonialsSeoContent.title,
@@ -18,7 +17,6 @@ export async function generateMetadata(): Promise<Metadata> {
   })
 }
 
-/** Main Testimonials Route. */
 export default function TestimonialsPage() {
   const breadcrumbJsonLd = getBreadcrumbSchema([
     { name: 'Home', url: SITE_URL },

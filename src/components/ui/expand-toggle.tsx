@@ -4,7 +4,6 @@ import { m } from 'framer-motion'
 import { Icons } from '@/components/ui/icons'
 import { cn } from '@/utils/utils'
 
-/** Props for {@link ExpandToggle}. */
 interface ExpandToggleProps {
   isExpanded: boolean
   className?: string
@@ -12,13 +11,6 @@ interface ExpandToggleProps {
 
 const FLUID_SPRING = { type: 'spring', bounce: 0, duration: 0.4 } as const
 
-/**
- * A purely visual expand/collapse chevron indicator driven by `isExpanded`. Controlled, it
- * manages no state or click handlers of its own.
- *
- * @param isExpanded - The external state controlling whether the toggle shows as open or closed.
- * @param className - Optional CSS classes for custom sizing or positioning.
- */
 export function ExpandToggle({ isExpanded, className }: ExpandToggleProps) {
   return (
     <div

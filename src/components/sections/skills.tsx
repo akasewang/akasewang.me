@@ -24,10 +24,6 @@ const SHARED_CAROUSEL_PROPS = {
   renderItem: (skill: Skill) => <SkillCard skill={skill} />,
 }
 
-/**
- * Renders a dual row infinite scrolling carousel of tech stack icons.
- * Includes a global keyboard shortcut ('S') to navigate to the full skills directory.
- */
 export function Skills() {
   const router = useRouter()
   const { navigate: navigateSound } = useSoundEffects()

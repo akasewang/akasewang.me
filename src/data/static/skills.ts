@@ -1,9 +1,5 @@
 import type { SkillRows } from '@/types/home'
 
-/**
- * Static Skills Data Directory.
- * Also used to populate the main `/skills` directory page.
- */
 export const skillRows: SkillRows = {
   firstRow: [
     {

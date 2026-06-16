@@ -14,7 +14,6 @@ const contentWidthClass = 'max-w-[85%] sm:max-w-[70%]'
 const bubbleBaseClass = 'min-w-[150px] px-4 py-3 rounded-2xl ring-1 ring-inset'
 const actionBtnClass = 'text-[11px] font-medium transition-colors duration-300 active:duration-200'
 
-/** Props for {@link MessageBubbles}: one entry, its date and admin action callbacks. */
 type MessageBubblesProps = {
   msg: MessageBoardEntry
   msgDate: Date
@@ -24,11 +23,6 @@ type MessageBubblesProps = {
   onReply: (id: number, text: string) => Promise<boolean>
 }
 
-/**
- * Renders individual message bubbles (both user message and admin reply).
- * Memoized to prevent rerenders when the parent list updates during infinite scroll.
- * Handles the inline reply editing UI when an admin is authenticated.
- */
 export const MessageBubbles = memo(
   ({ msg, msgDate, showDayHeader, adminKey, onDelete, onReply }: MessageBubblesProps) => {
     const { tap, clickPop, hoverTick } = useSoundEffects()
@@ -62,7 +56,7 @@ export const MessageBubbles = memo(
       <div className="flex flex-col gap-4">
         {showDayHeader && (
           <div className="flex items-center justify-center py-2">
-            <span className="rounded-full bg-muted/40 px-3 py-1 text-xs font-medium text-muted-foreground ring-1 ring-inset ring-ring/40 backdrop-blur-md">
+            <span className="rounded-full bg-surface-40 px-3 py-1 text-xs font-medium text-muted-foreground ring-1 ring-inset ring-ring/40">
               {formatDayLabel(msgDate)}
             </span>
           </div>
@@ -71,12 +65,7 @@ export const MessageBubbles = memo(
         <div className="flex items-start gap-2.5">
           <GradientAvatar name={msg.name} size={32} className="mt-0.5 shrink-0" />
           <div className={cn('flex flex-col items-start', contentWidthClass)}>
-            <div
-              className={cn(
-                bubbleBaseClass,
-                'bg-muted/40 rounded-tl-sm ring-ring/40 backdrop-blur-md',
-              )}
-            >
+            <div className={cn(bubbleBaseClass, 'bg-surface-40 rounded-tl-sm ring-ring/40')}>
               <p className="mb-1 text-xs font-semibold text-muted-foreground">
                 {capitalizeName(msg.name)}
               </p>
@@ -171,7 +160,7 @@ export const MessageBubbles = memo(
                   }}
                   onMouseEnter={hoverTick}
                   disabled={isSubmitting}
-                  className="rounded-md bg-muted/20 ring-1 ring-inset ring-ring/80 retina:ring-[0.5px] px-4 py-1.5 text-xs font-medium text-muted-foreground transition-[color,background-color,box-shadow,transform,scale] duration-300 hover:bg-muted/50 hover:ring-ring active:scale-[0.98] active:duration-200 disabled:pointer-events-none disabled:opacity-50"
+                  className="rounded-md bg-surface-20 ring-1 ring-inset ring-ring/80 retina:ring-[0.5px] px-4 py-1.5 text-xs font-medium text-muted-foreground transition-[color,background-color,box-shadow,transform,scale] duration-300 hover:bg-surface-50 hover:ring-ring active:scale-[0.98] active:duration-200 disabled:pointer-events-none disabled:opacity-50"
                 >
                   {t.cancel}
                 </button>

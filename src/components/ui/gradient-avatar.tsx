@@ -3,23 +3,14 @@
 import { memo } from 'react'
 import { cn, generateGradientFromName } from '@/utils/utils'
 
-/** Inline SVG fractal noise texture overlaid on the avatar for a subtle grain. */
 const NOISE_BG = `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`
 
-/** Props for {@link GradientAvatar}. */
 interface GradientAvatarProps {
   name: string
   size?: number
   className?: string
 }
 
-/**
- * Generates a gradient background based on the provided string (e.g., a username).
- *
- * @param name - The seed string used to generate the deterministic colors and angle.
- * @param size - The pixel width and height of the circular avatar.
- * @param className - Optional CSS classes for custom spacing or overrides.
- */
 export const GradientAvatar = memo(function GradientAvatar({
   name,
   size = 30,

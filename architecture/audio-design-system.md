@@ -46,7 +46,7 @@ Every interactive element still makes a sound on hover (consistency), but the *t
 
 | Element type | Sound | Examples |
 |---|---|---|
-| Navigation link | `hoverLink` | Navbar items, home logo, GitHub/RSS, footer license, `LinkText`, View All, Back, Carousel, prev/next arrows, announcement-banner link |
+| Navigation link | `hoverLink` | Navbar items, home logo, GitHub/RSS, footer license, `LinkText`, View All, Back, Carousel, prev/next arrows |
 | Large content / media card | `hoverCard` | Blog/Project cards, photo tiles, the project demo video, MDX zoomable images, timeline rows |
 | Spotlight card | `spotlightSweep(state)` | Skill cards, Testimonial cards (matches their velocity-reactive spotlight reveal) |
 | Discrete control | `hoverTick` | CTA `Button`, icon buttons, Select/Dropdown items + triggers, Tabs, Category filters, TOC headings, Copy, Back-to-Top, banner dismiss, message-board actions, photos view toggle |
@@ -58,13 +58,13 @@ Every interactive element still makes a sound on hover (consistency), but the *t
 
 ## 2. Navigation (`navigate`)
 **Trigger:** Clicking something that routes to a new page/section or scrolls.
-**Do use on:** Internal links (Navbar items, home logo, Blog/Project cards), external links (Social/Skill/Testimonial links, GitHub/RSS, announcement-banner inline links route via `clickPop`, see §3), Back/Forward arrows, "View All", inline text links (`LinkText`), Back-to-Top / scroll-to-section.
+**Do use on:** Internal links (Navbar items, home logo, Blog/Project cards), external links (Social/Skill/Testimonial links, GitHub/RSS), Back/Forward arrows, "View All", inline text links (`LinkText`), Back-to-Top / scroll-to-section.
 **Keyboard parity:** Shortcuts that navigate (`g` GitHub, `r` RSS, `l` License, arrow keys for prev/next) also fire `navigate`, so keyboard and pointer feel identical.
 **Do NOT use on:** State changes that stay on the current view.
 
 ## 3. Primary Action (`clickPop`)
 **Trigger:** Pressing a primary button.
-**Do use on:** All `Button`-component presses (Message Board Send/Reply, Newsletter, Admin broadcast, CTAs), announcement-banner link.
+**Do use on:** All `Button`-component presses (Message Board Send/Reply, Newsletter, Admin broadcast, CTAs).
 **Do NOT use on:** Navigation links, toggles, or opening menus/dropdowns. The Social Share trigger gets `hoverTick` + `toggle` (it is a dropdown), never `clickPop`.
 **Note:** `clickPop` is just the *press*. The result of a form submit is signalled separately by `success` or `error` (§7, §8). The `Button` component fires those automatically from its `isSuccess` / rate-limit state, so individual forms only need to add `error` on their own failure branches.
 

@@ -1,18 +1,14 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { cn } from '@/utils/utils'
 
 export * from './verified-icon'
 export * from './volume'
 
-/** Shared props for the inline SVG icons, adding an optional `size` shorthand. */
-export interface IconProps extends React.SVGProps<SVGSVGElement> {
+interface IconProps extends React.SVGProps<SVGSVGElement> {
   size?: string | number
 }
 
-/** Central registry of inline SVG icon components used throughout the app. */
 export const Icons = {
-  /** CUSTOM & BRAND ICONS */
-
   initials: ({ size = 32, className, ...props }: IconProps) => (
     <svg
       viewBox="0 2 32 32"
@@ -32,10 +28,6 @@ export const Icons = {
       />
     </svg>
   ),
-
-  /** GENERAL USAGE */
-
-  /** Category: Material Symbols */
   arrowDownward: ({ size = 24, ...props }: IconProps) => (
     <svg viewBox="0 0 24 24" fill="currentColor" width={size} height={size} {...props}>
       <path d="M11 4v12.175l-5.6-5.6L4 12l8 8l8-8l-1.4-1.425l-5.6 5.6V4z" />
@@ -64,13 +56,6 @@ export const Icons = {
   dataTable: ({ size = 24, ...props }: IconProps) => (
     <svg viewBox="0 0 24 24" fill="currentColor" width={size} height={size} {...props}>
       <path d="M3 21V3h18v18zM5 8.325h14V5H5zm0 5.35h14v-3.35H5zM5 19h14v-3.325H5zM6 7.65v-2h2v2zM6 13v-2h2v2zm0 5.35v-2h2v2z" />
-    </svg>
-  ),
-
-  /** Category: Remix Icons */
-  circle: ({ size = 24, ...props }: IconProps) => (
-    <svg viewBox="0 0 24 24" fill="currentColor" width={size} height={size} {...props}>
-      <path d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10s-4.477 10-10 10m0-2a8 8 0 1 0 0-16a8 8 0 0 0 0 16" />
     </svg>
   ),
   chevronRight: ({ size = 24, ...props }: IconProps) => (
@@ -173,19 +158,9 @@ export const Icons = {
       <path d="M21 3a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1zM11 13H4v6h7zm9 0h-7v6h7zm-9-8H4v6h7zm9 0h-7v6h7z" />
     </svg>
   ),
-  catalog: ({ size = 24, ...props }: IconProps) => (
-    <svg viewBox="0 0 24 24" fill="currentColor" width={size} height={size} {...props}>
-      <path d="M13 4h8v2h-8zm0 7h8v2h-8zm0 7h8v2h-8zm-6.5 1a2 2 0 1 1 0-4a2 2 0 0 1 0 4m0 2a4 4 0 1 0 0-8a4 4 0 0 0 0 8M5 6v3h3V6zM3 4h7v7H3z" />
-    </svg>
-  ),
   layoutPanel: ({ size = 24, ...props }: IconProps) => (
     <svg viewBox="0 0 24 24" fill="currentColor" width={size} height={size} {...props}>
       <path d="M22 20a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h18a1 1 0 0 1 1 1zm-11-5H4v4h7zm9-4h-7v8h7zm-9-6H4v8h7zm9 0h-7v4h7z" />
-    </svg>
-  ),
-  terminal: ({ size = 24, ...props }: IconProps) => (
-    <svg viewBox="0 0 24 24" fill="currentColor" width={size} height={size} {...props}>
-      <path d="M11 19h8v-2h-8v2zm-7.6-6.1L2 11.5l5.5-5.5l1.42 1.4L4.82 11.5L8.92 15.6l-1.42 1.4z" />
     </svg>
   ),
   experiments: ({ size = 24, ...props }: IconProps) => (
@@ -198,11 +173,6 @@ export const Icons = {
       <path d="M15.874 13a4.002 4.002 0 0 1-7.748 0H3v-2h5.126a4.002 4.002 0 0 1 7.748 0H21v2zM12 14a2 2 0 1 0 0-4a2 2 0 0 0 0 4" />
     </svg>
   ),
-  gitRepository: ({ size = 24, ...props }: IconProps) => (
-    <svg viewBox="0 0 24 24" fill="currentColor" width={size} height={size} {...props}>
-      <path d="M18 16v-2h1V4H6v10.035Q6.245 14 6.5 14H8v2H6.5a1.5 1.5 0 0 0 0 3H10v2H6.5A3.5 3.5 0 0 1 3 17.5V5a3 3 0 0 1 3-3h14a1 1 0 0 1 1 1v17a1 1 0 0 1-1 1h-4v-2h3v-3zM7 5h2v2H7zm0 3h2v2H7zm7 9v6h-2v-6H9l4-5l4 5z" />
-    </svg>
-  ),
   volumeUp: ({ size = 24, ...props }: IconProps) => (
     <svg viewBox="0 0 24 24" fill="currentColor" width={size} height={size} {...props}>
       <path d="M6.603 10L10 7.22v9.56L6.603 14H3v-4zM2 16h3.889l5.294 4.332a.5.5 0 0 0 .817-.387V4.055a.5.5 0 0 0-.817-.387L5.89 8H2a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1m21-4c0 3.292-1.446 6.246-3.738 8.262l-1.418-1.418A8.98 8.98 0 0 0 21 12a8.98 8.98 0 0 0-3.155-6.844l1.417-1.418A10.97 10.97 0 0 1 23 12m-5 0a5.99 5.99 0 0 0-2.287-4.713l-1.429 1.429A4 4 0 0 1 16 12c0 1.36-.679 2.561-1.716 3.284l1.43 1.43A5.99 5.99 0 0 0 18 12" />
@@ -213,8 +183,6 @@ export const Icons = {
       <path d="M10 7.22L6.603 10H3v4h3.603L10 16.78zM5.889 16H2a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1h3.889l5.294-4.332a.5.5 0 0 1 .817.387v15.89a.5.5 0 0 1-.817.387zm14.525-4l3.536 3.536l-1.415 1.414L19 13.414l-3.536 3.536l-1.414-1.414L17.586 12L14.05 8.465l1.414-1.415L19 10.586l3.535-3.536l1.415 1.415z" />
     </svg>
   ),
-
-  /** Category: TDesign Icons */
   wifiOff: ({ size = 24, ...props }: IconProps) => (
     <svg
       viewBox="0 0 24 24"
@@ -229,8 +197,6 @@ export const Icons = {
       <path d="M2.1 9.1A13.94 13.94 0 0 1 8 5.582m8 0a13.94 13.94 0 0 1 5.9 3.52M6.697 13.697q.607-.604 1.303-1.043m8 0q.697.438 1.303 1.043M12 3v11m-.707 4.293a1 1 0 0 1 1.414 0L12 19z" />
     </svg>
   ),
-
-  /** Category: Tabler Icons */
   users: ({ size = 24, ...props }: IconProps) => (
     <svg
       viewBox="0 0 24 24"
@@ -246,17 +212,11 @@ export const Icons = {
       <path d="M5 7a4 4 0 1 0 8 0a4 4 0 1 0-8 0M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2m1-17.87a4 4 0 0 1 0 7.75M21 21v-2a4 4 0 0 0-3-3.85" />
     </svg>
   ),
-
-  /** SOCIAL MEDIA & SHARING ICONS */
-
-  /** Category: Material Symbols */
   mail: ({ size = 24, ...props }: IconProps) => (
     <svg viewBox="0 0 24 24" fill="currentColor" width={size} height={size} {...props}>
       <path d="M4 20q-.825 0-1.412-.587T2 18V6q0-.825.588-1.412T4 4h16q.825 0 1.413.588T22 6v12q0 .825-.587 1.413T20 20zm8-7L4 8v10h16V8zm0-2l8-5H4zM4 8V6v12z" />
     </svg>
   ),
-
-  /** Category: Remix Icons */
   share: ({ size = 24, ...props }: IconProps) => (
     <svg viewBox="0 0 24 24" fill="currentColor" width={size} height={size} {...props}>
       <path d="m12 2.586l6.207 6.207l-1.414 1.414L13 6.414V16h-2V6.414l-3.793 3.793l-1.414-1.414zM3 18v-4h2v4a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-4h2v4a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3" />
@@ -284,6 +244,11 @@ export const Icons = {
       </g>
     </svg>
   ),
+  close: ({ size = 24, ...props }: IconProps) => (
+    <svg viewBox="0 0 24 24" fill="currentColor" width={size} height={size} {...props}>
+      <path d="m12 10.587l4.95-4.95l1.414 1.414l-4.95 4.95l4.95 4.95l-1.415 1.414l-4.95-4.95l-4.949 4.95l-1.414-1.415l4.95-4.95l-4.95-4.95L7.05 5.638z" />
+    </svg>
+  ),
   linkedin: ({ size = 24, ...props }: IconProps) => (
     <svg viewBox="0 0 24 24" fill="currentColor" width={size} height={size} {...props}>
       <g transform="translate(-0.24, -0.24) scale(1.02)">
@@ -296,27 +261,14 @@ export const Icons = {
       <path d="M5.884 18.653c-.3-.2-.558-.455-.86-.816a51 51 0 0 1-.466-.579c-.463-.575-.755-.841-1.056-.95a1 1 0 1 1 .675-1.882c.752.27 1.261.735 1.947 1.588c-.094-.117.34.427.433.539c.19.227.33.365.44.438c.204.137.588.196 1.15.14c.024-.382.094-.753.202-1.095c-2.968-.726-4.648-2.64-4.648-6.396c0-1.24.37-2.356 1.058-3.292c-.218-.894-.185-1.975.302-3.192a1 1 0 0 1 .63-.582c.081-.024.127-.035.208-.047c.803-.124 1.937.17 3.415 1.096a11.7 11.7 0 0 1 2.687-.308c.912 0 1.819.104 2.684.308c1.477-.933 2.614-1.227 3.422-1.096q.128.02.218.05a1 1 0 0 1 .616.58c.487 1.216.52 2.296.302 3.19c.691.936 1.058 2.045 1.058 3.293c0 3.757-1.674 5.665-4.642 6.392c.125.415.19.878.19 1.38c0 .665-.002 1.299-.007 2.01c0 .19-.002.394-.005.706a1 1 0 0 1-.018 1.958c-1.14.227-1.984-.532-1.984-1.525l.002-.447l.005-.705c.005-.707.008-1.337.008-1.997c0-.697-.184-1.152-.426-1.361c-.661-.57-.326-1.654.541-1.751c2.966-.333 4.336-1.482 4.336-4.66c0-.955-.312-1.744-.913-2.404A1 1 0 0 1 17.2 6.19c.166-.414.236-.957.095-1.614l-.01.003c-.491.139-1.11.44-1.858.949a1 1 0 0 1-.833.135a9.6 9.6 0 0 0-2.592-.349c-.89 0-1.772.118-2.592.35a1 1 0 0 1-.829-.134c-.753-.507-1.374-.807-1.87-.947c-.143.653-.072 1.194.093 1.607a1 1 0 0 1-.189 1.045c-.597.655-.913 1.458-.913 2.404c0 3.172 1.371 4.328 4.322 4.66c.865.097 1.202 1.177.545 1.748c-.193.168-.43.732-.43 1.364v3.15c0 .985-.834 1.725-1.96 1.528a1 1 0 0 1-.04-1.962v-.99c-.91.061-1.661-.088-2.254-.485" />
     </svg>
   ),
-
-  /** Category: Line Awesome Icons */
   rss: ({ size = 24, ...props }: IconProps) => (
     <svg viewBox="0 0 32 32" fill="currentColor" width={size} height={size} {...props}>
       <path d="M5 5v22h22V5zm2 2h18v18H7zm5 3a10 10 0 0 0-2 .188v2.062a8 8 0 0 1 2-.25c4.41 0 8 3.59 8 8a8 8 0 0 1-.25 2h2.063A10 10 0 0 0 22 20c0-5.516-4.484-10-10-10m0 4a6 6 0 0 0-2 .344v2.219A3.97 3.97 0 0 1 12 16c2.207 0 4 1.793 4 4c0 .73-.219 1.41-.563 2h2.22A6 6 0 0 0 18 20c0-3.309-2.691-6-6-6m0 4a1.999 1.999 0 1 0 0 4a1.999 1.999 0 1 0 0-4" />
     </svg>
   ),
-
-  /** MDX COMPONENTS & SONNER TOASTS */
-
-  /** Category: Material Symbols */
   cancelCircle: ({ size = 24, ...props }: IconProps) => (
     <svg viewBox="0 0 24 24" fill="currentColor" width={size} height={size} {...props}>
       <path d="m8.4 17l3.6-3.6l3.6 3.6l1.4-1.4l-3.6-3.6L17 8.4L15.6 7L12 10.6L8.4 7L7 8.4l3.6 3.6L7 15.6zm3.6 5q-2.075 0-3.9-.788t-3.175-2.137T2.788 15.9T2 12t.788-3.9t2.137-3.175T8.1 2.788T12 2t3.9.788t3.175 2.137T21.213 8.1T22 12t-.788 3.9t-2.137 3.175t-3.175 2.138T12 22m0-2q3.35 0 5.675-2.325T20 12t-2.325-5.675T12 4T6.325 6.325T4 12t2.325 5.675T12 20m0-8" />
-    </svg>
-  ),
-
-  /** Category: Remix Icons */
-  close: ({ size = 24, ...props }: IconProps) => (
-    <svg viewBox="0 0 24 24" fill="currentColor" width={size} height={size} {...props}>
-      <path d="m12 10.587l4.95-4.95l1.414 1.414l-4.95 4.95l4.95 4.95l-1.415 1.414l-4.95-4.95l-4.949 4.95l-1.414-1.415l4.95-4.95l-4.95-4.95L7.05 5.638z" />
     </svg>
   ),
   link: ({ size = 24, ...props }: IconProps) => (
@@ -364,8 +316,6 @@ export const Icons = {
       <path d="m7.784 14l.42-4H4V8h4.415l.525-5h2.011l-.525 5h3.989l.525-5h2.011l-.525 5H20v2h-3.784l-.42 4H20v2h-4.415l-.525 5h-2.011l.525-5H9.585l-.525 5H7.049l.525-5H4v-2zm2.011 0h3.99l.42-4h-3.99z" />
     </svg>
   ),
-
-  /** Category: Famicons */
   hackerNews: ({ size = 24, ...props }: IconProps) => (
     <svg viewBox="0 0 512 512" fill="currentColor" width={size} height={size} {...props}>
       <g transform="translate(25.6, 25.6) scale(0.90)">

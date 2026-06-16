@@ -1,10 +1,9 @@
+import { SITE_URL } from '@/constants/constants'
+import { photos } from '@/data/static/photos'
 import { getAllBlogPosts } from '@/lib/managers/blog-manager'
 import { getAllProjects } from '@/lib/managers/project-manager'
-import { photos } from '@/data/static/photos'
 import { parseDate } from '@/utils/utils'
-import { SITE_URL } from '@/constants/constants'
 
-/** A single sitemap URL entry that may carry image children for Google Images. */
 interface SitemapUrl {
   url: string
   lastModified: string
@@ -13,30 +12,19 @@ interface SitemapUrl {
   images?: string[]
 }
 
-/**
- * Generates an XML Sitemap for search engine crawlers (Googlebot, Bingbot, etc.).
- * Dynamically aggregates all static routes, blog posts and projects so the
- * site's content stays accurately and freshly indexed. The photos page also lists its gallery
- * images via the image sitemap extension so they can surface in Google Images.
- *
- * @returns An XML Response containing the full URL set.
- */
 export async function GET(): Promise<Response> {
   const [blogPosts, projectPosts] = await Promise.all([getAllBlogPosts(), getAllProjects()])
 
   const currentDate = new Date().toISOString()
 
-  /** Newest content date, a stable `lastmod` for static pages instead of the per request time. */
   const newestContentDate =
     [...blogPosts, ...projectPosts]
       .map((item) => parseDate(item.date))
       .sort((a, b) => +new Date(a) - +new Date(b))
       .at(-1) ?? currentDate
 
-  /** Clamp to now so a future dated post never emits a `lastmod` in the future. */
   const lastContentUpdate = newestContentDate > currentDate ? currentDate : newestContentDate
 
-  /** Absolute URLs of every gallery image surfaced on the `/photos` entry. */
   const photoImages = photos.map((photo) => `${SITE_URL}${photo.url}`)
 
   const staticPages = [

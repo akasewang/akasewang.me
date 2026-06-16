@@ -13,21 +13,12 @@ import {
 import { Icons } from '@/components/ui/icons'
 import { useSoundEffects } from '@/hooks/use-sound-effects'
 
-/** Props for {@link ProjectDemo}. */
 interface ProjectDemoProps {
   image?: string
   video?: string
   title: string
 }
 
-/**
- * A project media viewer: plays a looping video with custom controls (play/pause, seek,
- * buffering state) or shows a static image fallback.
- *
- * @param image - Optional URL to a static fallback image or video poster.
- * @param video - Optional URL to the video file to be played.
- * @param title - Accessibility title for the media content.
- */
 export function ProjectDemo({ image, video, title }: ProjectDemoProps) {
   const { hoverCard, media } = useSoundEffects()
   const [state, setState] = useState({
@@ -40,7 +31,7 @@ export function ProjectDemo({ image, video, title }: ProjectDemoProps) {
 
   const videoRef = useRef<HTMLVideoElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
-  const hideTimerRef = useRef<NodeJS.Timeout | null>(null)
+  const hideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const fallbackImage = image || '/default-image-project.webp'
 
   const updateState = useCallback((updates: Partial<typeof state>) => {
@@ -51,7 +42,7 @@ export function ProjectDemo({ image, video, title }: ProjectDemoProps) {
     (isPlayingOverride = state.isPlaying) => {
       if (hideTimerRef.current) clearTimeout(hideTimerRef.current)
       updateState({ showControls: true })
-      if (!isPlayingOverride)
+      if (isPlayingOverride)
         hideTimerRef.current = setTimeout(() => updateState({ showControls: false }), 5000)
     },
     [state.isPlaying, updateState],
@@ -61,7 +52,14 @@ export function ProjectDemo({ image, video, title }: ProjectDemoProps) {
     if (!videoRef.current) return
     const isPlaying = !state.isPlaying
     media(isPlaying)
-    isPlaying ? videoRef.current.play() : videoRef.current.pause()
+    if (isPlaying) {
+      videoRef.current.play().catch(() => {
+        if (hideTimerRef.current) clearTimeout(hideTimerRef.current)
+        updateState({ isPlaying: false, showControls: true })
+      })
+    } else {
+      videoRef.current.pause()
+    }
     updateState({ isPlaying })
     resetHideTimer(isPlaying)
   }
@@ -98,17 +96,17 @@ export function ProjectDemo({ image, video, title }: ProjectDemoProps) {
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [updateState])
 
-  useEffect(() => {
-    resetHideTimer()
-    return () => {
+  useEffect(
+    () => () => {
       if (hideTimerRef.current) clearTimeout(hideTimerRef.current)
-    }
-  }, [resetHideTimer])
+    },
+    [],
+  )
 
   return (
     <div className="my-8 w-full not-prose" ref={containerRef}>
       <figure
-        className="group/demo relative isolate m-0 select-none overflow-hidden rounded-xl border border-border/60 bg-muted/40 motion-safe:animate-in motion-safe:fade-in-0 motion-safe:duration-500"
+        className="group/demo relative isolate m-0 select-none overflow-hidden rounded-xl border border-border/60 bg-surface-40 motion-safe:animate-in motion-safe:fade-in-0 motion-safe:duration-500"
         onMouseEnter={() => {
           if (video) hoverCard()
           updateState({ isHovered: true })
@@ -144,7 +142,10 @@ export function ProjectDemo({ image, video, title }: ProjectDemoProps) {
                   videoRef.current && setTime({ current: 0, duration: videoRef.current.duration })
                 }
                 onWaiting={() => updateState({ isBuffering: true })}
-                onPlaying={() => updateState({ isBuffering: false })}
+                onPlaying={() => {
+                  updateState({ isBuffering: false })
+                  resetHideTimer(true)
+                }}
                 className="size-full object-cover"
                 poster={fallbackImage}
               />

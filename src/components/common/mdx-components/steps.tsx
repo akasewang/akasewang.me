@@ -1,33 +1,20 @@
 import type { ReactNode } from 'react'
 import { cn } from '@/utils/utils'
 
-/** Props for {@link Steps}. */
 interface StepsProps {
   children: ReactNode
   className?: string
 }
 
-/**
- * Wrapper component for rendering a sequential list of steps.
- *
- * @param className - Optional CSS classes for custom container styling.
- */
 export const Steps = ({ children, className }: StepsProps) => {
   return <div className={cn('my-8 ml-4 [counter-reset:step]', className)}>{children}</div>
 }
 
-/** Props for {@link Step}. */
 interface StepProps {
   title?: string
   children: ReactNode
 }
 
-/**
- * Individual step within a `<Steps>` container; renders an auto incrementing number marker
- * and a dashed line connecting it to the next step.
- *
- * @param title - Optional heading for the step.
- */
 export const Step = ({ title, children }: StepProps) => {
   return (
     <div className="group relative pb-6 pl-8 last:pb-2">

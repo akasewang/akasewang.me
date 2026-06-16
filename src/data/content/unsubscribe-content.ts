@@ -1,19 +1,16 @@
 import type { UnsubscribePageContent } from '@/types/newsletter'
 
-/**
- * Unsubscribe Content Data Dictionary.
- * Centralized static configuration and text definitions.
- */
 export const unsubscribeContent: UnsubscribePageContent = {
-  confirmTitle: 'Confirm Unsubscribe',
+  confirmTitle: 'unsubscribe.',
   confirmDescription:
-    'Click below to stop receiving the newsletter. You can resubscribe whenever you like.',
-  confirmButton: 'Unsubscribe',
-  confirmPending: 'Removing you...',
-  successTitle: 'Unsubscribed Successfully',
-  successDescription: "You've been removed from our list. We're sorry to see you go!",
-  invalidTitle: 'Invalid Link',
+    'One click and the newsletter stops landing in your inbox. You can resubscribe whenever you change your mind.',
+  confirmButton: 'unsubscribe',
+  confirmPending: 'removing you',
+  successTitle: 'unsubscribed.',
+  successDescription: "You're off the list. No spam and no hard feelings, the door is always open.",
+  invalidTitle: 'invalid link.',
   invalidDescription: 'This unsubscribe link is invalid or has already been used.',
-  errorTitle: 'Something Went Wrong',
-  errorDescription: 'An error occurred while processing your request. Please try again later.',
+  errorTitle: 'something went wrong.',
+  errorDescription:
+    'Something broke on my end while processing your request. Please try again in a bit.',
 }

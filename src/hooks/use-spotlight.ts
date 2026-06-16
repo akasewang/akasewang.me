@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
 
-/** Cursor movement payload emitted by {@link useSpotlight} when the spotlight position changes. */
 export interface SpotlightMoveState {
   phase: 'enter' | 'move'
   intensity: number
@@ -14,20 +13,16 @@ interface UseSpotlightOptions {
   onMove?: (state: SpotlightMoveState) => void
 }
 
-/**
- * Drives a velocity reactive spotlight effect. Tracks the cursor inside the container and
- * writes its position (`--mx`/`--my`) and an ease-out-cubic intensity (`--spotlight-intensity`)
- * as CSS custom properties, flaring brighter on faster movement and settling as it slows.
- * Updates are batched into `requestAnimationFrame` to avoid layout thrashing.
- *
- * @returns ref - Attach this to the container element being spotlit.
- * @returns isHovering - Whether the cursor is currently inside the container.
- */
 export function useSpotlight<T extends HTMLElement = HTMLElement>({
   onMove,
 }: UseSpotlightOptions = {}) {
   const ref = useRef<T>(null)
+  const onMoveRef = useRef(onMove)
   const [isHovering, setIsHovering] = useState(false)
+
+  useEffect(() => {
+    onMoveRef.current = onMove
+  }, [onMove])
 
   useEffect(() => {
     const el = ref.current
@@ -39,7 +34,6 @@ export function useSpotlight<T extends HTMLElement = HTMLElement>({
     let lastTime = 0
 
     const handleMouseMove = (e: MouseEvent, phase: SpotlightMoveState['phase'] = 'move') => {
-      /** Debounce layout thrashing by syncing DOM updates with the browser's native repaint cycle */
       cancelAnimationFrame(animationFrameId)
 
       animationFrameId = requestAnimationFrame(() => {
@@ -55,11 +49,6 @@ export function useSpotlight<T extends HTMLElement = HTMLElement>({
           const dy = e.clientY - lastY
           const velocity = Math.sqrt(dx * dx + dy * dy) / Math.max(now - lastTime, 1)
 
-          /**
-           * Clamp the velocity and apply an ease-out cubic curve.
-           * This causes the spotlight intensity to flare up dramatically on fast mouse movements
-           * Fades out smoothly as the mouse slows down.
-           */
           const raw = Math.min(velocity / 2.5, 1)
           intensity = 0.4 + 0.6 * (1 - (1 - raw) ** 3)
         }
@@ -71,7 +60,7 @@ export function useSpotlight<T extends HTMLElement = HTMLElement>({
         el.style.setProperty('--mx', `${x}px`)
         el.style.setProperty('--my', `${y}px`)
         el.style.setProperty('--spotlight-intensity', intensity.toString())
-        onMove?.({
+        onMoveRef.current?.({
           phase,
           intensity,
           x,
@@ -104,7 +93,7 @@ export function useSpotlight<T extends HTMLElement = HTMLElement>({
       el.removeEventListener('mouseleave', handleMouseLeave)
       cancelAnimationFrame(animationFrameId)
     }
-  }, [onMove])
+  }, [])
 
   return { ref, isHovering }
 }

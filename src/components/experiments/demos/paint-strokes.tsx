@@ -3,7 +3,6 @@
 import { useRef } from 'react'
 import { type CanvasFrame, useAnimatedCanvas } from '@/hooks/use-animated-canvas'
 
-/** Lays down one bristled brush mark: elongated dabs fanned across the stroke normal. */
 function brushDab(
   ctx: CanvasRenderingContext2D,
   x: number,
@@ -16,7 +15,7 @@ function brushDab(
   const normal = angle + Math.PI / 2
   for (let i = 0; i < bristles; i++) {
     const offset = (i / (bristles - 1) - 0.5) * size
-    /** Random gaps let the paper tooth break through, like a half dry brush. */
+
     if (Math.random() < 0.12) continue
     const px = x + Math.cos(normal) * offset
     const py = y + Math.sin(normal) * offset
@@ -24,7 +23,6 @@ function brushDab(
     const light = 52 + Math.random() * 16
     const alpha = 0.05 + Math.random() * 0.08
 
-    /** Each bristle is an elongated ellipse aligned to the stroke direction. */
     ctx.fillStyle = `hsla(${hue}, 70%, ${light}%, ${alpha})`
     ctx.beginPath()
     ctx.ellipse(px, py, r * 1.7, r * 0.55, angle, 0, Math.PI * 2)
@@ -32,7 +30,6 @@ function brushDab(
   }
 }
 
-/** Paints a smooth ribbon of brush marks along a quadratic curve, used to pre seed the canvas. */
 function brushCurve(
   ctx: CanvasRenderingContext2D,
   x0: number,
@@ -59,7 +56,6 @@ function brushCurve(
   }
 }
 
-/** Paints the textured paper ground: warm base, fibre grain, a few stains and a soft vignette. */
 function paintPaper(ctx: CanvasRenderingContext2D, width: number, height: number) {
   ctx.globalCompositeOperation = 'source-over'
   ctx.fillStyle = '#efe6d4'
@@ -76,7 +72,6 @@ function paintPaper(ctx: CanvasRenderingContext2D, width: number, height: number
   }
   ctx.putImageData(img, 0, 0)
 
-  /** Faint fibres for a handmade tooth. */
   for (let i = 0; i < 220; i++) {
     const x = Math.random() * width
     const y = Math.random() * height
@@ -90,7 +85,6 @@ function paintPaper(ctx: CanvasRenderingContext2D, width: number, height: number
     ctx.stroke()
   }
 
-  /** A couple of soft tea like stains. */
   for (let i = 0; i < 3; i++) {
     const x = Math.random() * width
     const y = Math.random() * height
@@ -116,17 +110,9 @@ function paintPaper(ctx: CanvasRenderingContext2D, width: number, height: number
   ctx.fillRect(0, 0, width, height)
 }
 
-/**
- * Interactive brush on handmade paper. The ground is a procedurally grained, fibre flecked sheet
- * and the cursor is a bristled brush: every move fans elongated dabs across the stroke, dropping
- * random bristles so the paper tooth breaks through like a half dry stroke. Colour eases through a
- * warm pigment wheel as you travel and `multiply` blending lets each pass stain and deepen the one
- * beneath, the way real watercolour layers. A few opening strokes are laid down so the sheet already
- * looks painted, inviting more.
- */
 export function PaintStrokes() {
   const prev = useRef<{ x: number; y: number; has: boolean }>({ x: 0, y: 0, has: false })
-  const hue = useRef(Math.random() * 360)
+  const hue = useRef(210)
 
   const frame = ({ ctx, pointer }: CanvasFrame) => {
     if (!pointer.active) {
@@ -148,7 +134,7 @@ export function PaintStrokes() {
     if (dist < 0.5) return
 
     const angle = Math.atan2(dy, dx)
-    /** Faster strokes thin out, slower ones bloom, like real brush pressure. */
+
     const size = Math.max(10, 30 - dist * 0.6)
     const spacing = Math.max(1.5, size * 0.18)
     const steps = Math.max(1, Math.floor(dist / spacing))

@@ -1,5 +1,5 @@
-import { useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
+import { useEffect, useRef } from 'react'
 
 interface ShortcutOptions {
   ctrlKey?: boolean
@@ -9,7 +9,6 @@ interface ShortcutOptions {
   preventDefault?: boolean
 }
 
-/** Binds global keyboard shortcuts to actions or routes, ignoring inputs in form elements. */
 export function useKeyboardShortcut(
   key: string,
   action: string | (() => void),
@@ -25,11 +24,6 @@ export function useKeyboardShortcut(
   const actionRef = useRef(action)
 
   useEffect(() => {
-    /**
-     * Storing the action in a ref ensures the keydown listener always executes the most
-     * current version of the callback or route string, avoiding stale closures while
-     * preventing the `useEffect` from unnecessarily reattaching the listener on every render.
-     */
     actionRef.current = action
   }, [action])
 
@@ -39,7 +33,6 @@ export function useKeyboardShortcut(
     const handleKeyDown = (e: KeyboardEvent) => {
       const target = e.target as HTMLElement
 
-      /** Silently ignore keyboard shortcuts if the user is typing inside an input, textarea, or content editable field */
       if (['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName) || target.isContentEditable) {
         return
       }

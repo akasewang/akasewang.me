@@ -1,59 +1,25 @@
-import rehypeHighlight from 'rehype-highlight'
-import remarkGfm from 'remark-gfm'
-import { mdxElements } from './mdx-elements'
-import { SocialShare } from './social-share'
-import { Callout } from './callout'
-import { Tabs, Tab } from './tabs'
-import { Steps, Step } from './steps'
-import { ProjectDemo } from './project-demo'
-import { AsideTOC } from './aside-toc'
+import type { AnchorHTMLAttributes, ReactNode } from 'react'
 import { LinkText } from '@/components/ui/link-text'
-import { ZoomableImage } from './zoomable-image'
+import { AsideTOC } from './aside-toc'
+import { Callout } from './callout'
+import { mdxElements } from './mdx-elements'
+import { ProjectDemo } from './project-demo'
 import { ComponentPreview } from './showcase/component-preview'
 import { ComponentSource } from './showcase/component-source'
+import { SocialShare } from './social-share'
+import { Step, Steps } from './steps'
+import { Tab, Tabs } from './tabs'
+import { ZoomableImage } from './zoomable-image'
 
-/**
- * Global MDX configuration and component mapping.
- * Serves as the central registry linking raw Markdown elements and custom React components
- * to the `next-mdx-remote` parser used across blogs, projects and component documentation.
- */
+export { MDX_OPTIONS } from './mdx-options'
 
-/**
- * Remark plugin to extract the `title="path"` meta string from code blocks
- * and pass it down as a standard property to the `<pre>` element via hProperties.
- */
-const remarkCodeMeta = () => (tree: any) => {
-  const visit = (node: any) => {
-    if (node.type === 'code' && node.meta) {
-      const match = /title="([^"]+)"/.exec(node.meta) || /title='([^']+)'/.exec(node.meta)
-      if (match) {
-        node.data = node.data || {}
-        node.data.hProperties = node.data.hProperties || {}
-        node.data.hProperties.title = match[1]
-      }
-    }
-    if (node.children) {
-      node.children.forEach(visit)
-    }
-  }
-  visit(tree)
+type MdxAnchorProps = AnchorHTMLAttributes<HTMLAnchorElement> & {
+  children?: ReactNode
 }
 
-/** Configure server side syntax highlighting (rehypeHighlight) and GitHub Flavored Markdown (remarkGfm) */
-export const MDX_OPTIONS = {
-  mdxOptions: {
-    rehypePlugins: [rehypeHighlight as any],
-    remarkPlugins: [remarkCodeMeta, remarkGfm],
-  },
-}
-
-/**
- * Map standard HTML elements to custom UI components (e.g., overriding `<a>` with `<LinkText>`)
- * and register custom React components (like `<ComponentPreview>`) for direct use inside .mdx files.
- */
 export const MDX_COMPONENTS = {
   ...mdxElements,
-  a: ({ href, children, ...props }: any) => (
+  a: ({ href, children, ...props }: MdxAnchorProps) => (
     <LinkText href={href || '#'} {...props}>
       {children}
     </LinkText>

@@ -1,4 +1,3 @@
-/** Tailwind Config & Imports */
 @import 'tailwindcss';
 @import './cursor.css';
 
@@ -11,121 +10,56 @@
 }
 
 @layer base {
-  /**
-   * Root Color Tokens & Shadows
-   * Core design system variables specifically tuned for the dark mode theme.
-   */
   :root {
-
-    /** neutral-950 */
-    --background: oklch(0.145 0 0);
-
-    /** neutral-350 */
+    --background: oklch(0.10 0 0);
     --foreground: oklch(0.789 0 0);
-
-    /** neutral-950 */
-    --card: oklch(0.145 0 0);
-
-    /** neutral-910 */
+    --card: oklch(0.10 0 0);
     --toast: oklch(0.193 0 0);
-
-    /** neutral-910 */
     --floating: oklch(0.193 0 0);
-
-    /** neutral-925 */
     --code-block: oklch(0.175 0 0);
-
-    /** neutral-915 */
     --code-tab: oklch(0.205 0 0);
-
-    /** neutral-870 - unselected tabs sitting a touch lighter than the selected tab and panel */
     --code-tab-bar: oklch(0.245 0 0);
-
-    /** neutral-100 */
     --primary: oklch(0.97 0 0);
-
-    /** neutral-925 */
     --primary-foreground: oklch(0.175 0 0);
-
-    /** neutral-450 */
     --secondary: oklch(0.632 0 0);
-
-    /** neutral-850 */
     --muted: oklch(0.237 0 0);
-
-    /** neutral-500 */
     --muted-foreground: oklch(0.556 0 0);
-
-    /** neutral-950 */
-    --dropdown-background: oklch(0.145 0 0);
-
-    /** neutral-825 */
+    --dropdown-background: oklch(0.10 0 0);
     --border: oklch(0.253 0 0);
-
-    /** neutral-825 */
     --ring: oklch(0.253 0 0);
-
-    /** red-500 */
     --destructive: oklch(58.03% 0.21468 27.177);
-
-    /** blue-500 */
     --verified: oklch(0.623 0.214 259.815);
-
-    /** blue-600 */
     --verified-deep: oklch(0.546 0.245 262.881);
-
-    /** green-500 */
     --success: oklch(0.696 0.170 162.000);
-
-    /** yellow-500 */
     --warning: oklch(0.800 0.160 85.000);
+    --dot-color: oklch(0.32 0 0);
 
-    /** 30% neutral-800 */
-    --accent: color-mix(in oklab, var(--muted) 30%, transparent);
-
-    /** 30% neutral-800 */
-    --overlay-accent: color-mix(in oklab, var(--muted) 30%, transparent);
-
-    /** 60% neutral-825 */
+    --accent: color-mix(in oklab, var(--muted) 40%, transparent);
+    --overlay-accent: color-mix(in oklab, var(--muted) 40%, transparent);
     --accent-border: color-mix(in oklab, var(--ring) 60%, transparent);
-
-    /** 60% neutral-825 */
     --overlay-accent-border: color-mix(in oklab, var(--ring) 60%, transparent);
 
-    /** shadows: soft diffused glow */
-    --shadow-xs: 0 1px 2px oklch(0% 0 0 / 0.08);
+    --surface-20: color-mix(in oklab, var(--muted) 20%, var(--background));
+    --surface-30: color-mix(in oklab, var(--muted) 30%, var(--background));
+    --surface-40: color-mix(in oklab, var(--muted) 40%, var(--background));
+    --surface-50: color-mix(in oklab, var(--muted) 50%, var(--background));
+
     --shadow-sm: 0 1px 3px oklch(0% 0 0 / 0.06), 0 2px 8px oklch(0% 0 0 / 0.06);
-    --shadow: 0 2px 6px oklch(0% 0 0 / 0.06), 0 4px 16px oklch(0% 0 0 / 0.06);
     --shadow-md: 0 2px 8px oklch(0% 0 0 / 0.07), 0 6px 24px oklch(0% 0 0 / 0.07);
     --shadow-lg: 0 4px 12px oklch(0% 0 0 / 0.08), 0 12px 32px oklch(0% 0 0 / 0.08);
     --shadow-xl: 0 6px 16px oklch(0% 0 0 / 0.1), 0 20px 48px oklch(0% 0 0 / 0.1);
     --shadow-2xl: 0 8px 24px oklch(0% 0 0 / 0.12), 0 32px 64px oklch(0% 0 0 / 0.12);
-    
-    /** inner shadows */
+
     --shadow-inner: inset 0 2px 8px oklch(0% 0 0 / 0.6);
     --shadow-inner-sm: inset 0 1px 4px oklch(0% 0 0 / 0.4);
 
-    /** directional shadows */
-    --shadow-l-md: -4px 0 12px -2px oklch(0% 0 0 / 0.6);
     --shadow-l-lg: -8px 0 16px -4px oklch(0% 0 0 / 0.8);
-    --shadow-l-xl: -12px 0 24px -4px oklch(0% 0 0 / 0.9);
-    /** upward shadow lifting a tabbed surface above the tab connected behind it */
     --shadow-t-sm: 0 -2px 4px 0 oklch(0% 0 0 / 0.3);
 
-    /** border radius */
     --radius: 0.35rem;
-
-    /** spacing */
     --spacing: 0.25rem;
-
-    /** announcement banner height, reserved from first paint and toggled to 0 once dismissed */
-    --banner-offset: 2.5rem;
   }
 
-  /**
-   * Base Element Overrides
-   * Global typography, selection styling and form element resets.
-   */
   ::selection {
     background: var(--primary);
     color: var(--primary-foreground);
@@ -143,11 +77,14 @@
     scrollbar-color: var(--border) transparent;
   }
 
-  body, html {
+  html {
     background-color: var(--background);
+  }
+
+  html,
+  body {
     color: var(--foreground);
     font-feature-settings: 'rlig' 1, 'calt' 1;
-    font-display: swap;
     scrollbar-gutter: stable;
   }
 
@@ -157,30 +94,36 @@
     margin-right: 0px !important;
   }
 
-  /**
-   * Prevent default dragging on interactive elements
-   * to ensure a clean interaction experience across the site.
-   */
-  img, a, svg {
+  img,
+  a,
+  svg {
     -webkit-user-drag: none;
-    user-drag: none;
   }
 
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     width: fit-content;
   }
 
-  pre, code {
+  pre,
+  code {
     font-variant-ligatures: none;
     font-feature-settings: 'liga' 0, 'calt' 0;
   }
 
-  strong, b {
+  strong,
+  b {
     font-weight: 400;
     color: var(--primary);
   }
 
-  input, textarea, [contenteditable='true'] {
+  input,
+  textarea,
+  [contenteditable='true'] {
     caret-color: var(--primary);
     caret-shape: bar;
   }
@@ -193,10 +136,6 @@
   }
 }
 
-/**
- * Theme Variables Injection
- * Mapping CSS variables to Tailwind V4's inline theme to support dynamic styling.
- */
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -216,6 +155,10 @@
   --color-overlay-accent: var(--overlay-accent);
   --color-accent-border: var(--accent-border);
   --color-overlay-accent-border: var(--overlay-accent-border);
+  --color-surface-20: var(--surface-20);
+  --color-surface-30: var(--surface-30);
+  --color-surface-40: var(--surface-40);
+  --color-surface-50: var(--surface-50);
   --color-destructive: var(--destructive);
   --color-border: var(--border);
   --color-ring: var(--ring);
@@ -223,7 +166,6 @@
   --color-verified-deep: var(--verified-deep);
   --color-success: var(--success);
   --color-warning: var(--warning);
-
   --radius-xs: calc(var(--radius) - 6px);
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
@@ -231,21 +173,15 @@
   --radius-xl: calc(var(--radius) + 4px);
   --radius-2xl: calc(var(--radius) + 8px);
   --radius-3xl: calc(var(--radius) + 12px);
-
-  --shadow-xs: var(--shadow-xs);
   --shadow-sm: var(--shadow-sm);
-  --shadow: var(--shadow);
   --shadow-md: var(--shadow-md);
   --shadow-lg: var(--shadow-lg);
   --shadow-xl: var(--shadow-xl);
   --shadow-2xl: var(--shadow-2xl);
-  --shadow-l-md: var(--shadow-l-md);
   --shadow-l-lg: var(--shadow-l-lg);
-  --shadow-l-xl: var(--shadow-l-xl);
   --shadow-t-sm: var(--shadow-t-sm);
   --shadow-inner: var(--shadow-inner);
   --shadow-inner-sm: var(--shadow-inner-sm);
-
   --cursor-auto: var(--custom-cursor-auto);
   --cursor-not-allowed: var(--custom-cursor-not-allowed);
   --cursor-wait: var(--custom-cursor-wait);
@@ -258,43 +194,103 @@
 }
 
 @layer utilities {
-  /**
-   * Staggered Animations
-   * Utilities for delaying entrance animations across sibling elements.
-   */
   .stagger-sections {
-    & > * { animation-delay: var(--stagger-delay, 0ms) !important; }
-    & > *:nth-child(1) { --stagger-delay: 0ms; }
-    & > *:nth-child(2) { --stagger-delay: 150ms; }
-    & > *:nth-child(3) { --stagger-delay: 300ms; }
-    & > *:nth-child(4) { --stagger-delay: 450ms; }
-    & > *:nth-child(5) { --stagger-delay: 600ms; }
-    & > *:nth-child(6) { --stagger-delay: 750ms; }
-    & > *:nth-child(7) { --stagger-delay: 900ms; }
-    & > *:nth-child(8) { --stagger-delay: 1050ms; }
-    & > *:nth-child(9) { --stagger-delay: 1200ms; }
-    & > *:nth-child(10) { --stagger-delay: 1350ms; }
-    & > *:nth-child(11) { --stagger-delay: 1500ms; }
-    & > *:nth-child(12) { --stagger-delay: 1650ms; }
+    & > * {
+      animation-delay: var(--stagger-delay, 0ms) !important;
+    }
+
+    & > *:nth-child(1) {
+      --stagger-delay: 0ms;
+    }
+
+    & > *:nth-child(2) {
+      --stagger-delay: 150ms;
+    }
+
+    & > *:nth-child(3) {
+      --stagger-delay: 300ms;
+    }
+
+    & > *:nth-child(4) {
+      --stagger-delay: 450ms;
+    }
+
+    & > *:nth-child(5) {
+      --stagger-delay: 600ms;
+    }
+
+    & > *:nth-child(6) {
+      --stagger-delay: 750ms;
+    }
+
+    & > *:nth-child(7) {
+      --stagger-delay: 900ms;
+    }
+
+    & > *:nth-child(8) {
+      --stagger-delay: 1050ms;
+    }
+
+    & > *:nth-child(9) {
+      --stagger-delay: 1200ms;
+    }
+
+    & > *:nth-child(10) {
+      --stagger-delay: 1350ms;
+    }
+
+    & > *:nth-child(11) {
+      --stagger-delay: 1500ms;
+    }
+
+    & > *:nth-child(12) {
+      --stagger-delay: 1650ms;
+    }
   }
 
-  /**
-   * Syntax Highlighting
-   * Custom OKLCH color palette for code blocks to match the dark theme aesthetic.
-   */
-  .hljs-keyword, .hljs-selector-tag, .hljs-built_in, .hljs-name { color: oklch(0.78 0.13 310) !important; }
-  .hljs-string, .hljs-attr { color: oklch(0.82 0.11 160) !important; }
-  .hljs-number, .hljs-literal { color: oklch(0.80 0.13 50) !important; }
-  .hljs-comment { color: oklch(0.55 0.03 260) !important; font-style: italic; }
-  .hljs-function, .hljs-title { color: oklch(0.82 0.12 245) !important; }
-  .hljs-variable, .hljs-params { color: oklch(0.90 0.02 260) !important; }
-  .hljs-type, .hljs-class { color: oklch(0.84 0.12 95) !important; }
-  .hljs-meta, .hljs-operator, .hljs-punctuation { color: oklch(0.70 0.05 260) !important; }
+  .hljs-keyword,
+  .hljs-selector-tag,
+  .hljs-built_in,
+  .hljs-name {
+    color: oklch(0.78 0.13 310) !important;
+  }
 
-  /**
-   * MDX Document Styling
-   * Prose formatting specifically scoped to compiled markdown content.
-   */
+  .hljs-string,
+  .hljs-attr {
+    color: oklch(0.82 0.11 160) !important;
+  }
+
+  .hljs-number,
+  .hljs-literal {
+    color: oklch(0.80 0.13 50) !important;
+  }
+
+  .hljs-comment {
+    color: oklch(0.55 0.03 260) !important;
+    font-style: italic;
+  }
+
+  .hljs-function,
+  .hljs-title {
+    color: oklch(0.82 0.12 245) !important;
+  }
+
+  .hljs-variable,
+  .hljs-params {
+    color: oklch(0.90 0.02 260) !important;
+  }
+
+  .hljs-type,
+  .hljs-class {
+    color: oklch(0.84 0.12 95) !important;
+  }
+
+  .hljs-meta,
+  .hljs-operator,
+  .hljs-punctuation {
+    color: oklch(0.70 0.05 260) !important;
+  }
+
   .mdx-content {
     blockquote {
       border-left: 2px solid var(--primary);
@@ -311,10 +307,6 @@
     }
   }
 
-  /**
-   * Custom Utilities & Patterns
-   * Reusable visual effects and component-specific masks.
-   */
   .mask-fade-l {
     -webkit-mask-image: linear-gradient(to right, transparent, black 10%);
     mask-image: linear-gradient(to right, transparent, black 10%);
@@ -332,54 +324,64 @@
     transform-origin: center;
   }
 
-  /**
-   * UI Component Animations
-   * Smooth entrance/exit transitions for popovers, tooltips and dropdowns.
-   */
-  :is(.tooltip-elegant, .select-content-elegant) {
+  :is(.tooltip-elegant, .select-content-elegant, .dropdown-elegant) {
     will-change: opacity, transform;
-    &[data-side='top'] { transform-origin: bottom center; }
-    &[data-side='bottom'] { transform-origin: top center; }
-    &[data-side='left'] { transform-origin: center right; }
-    &[data-side='right'] { transform-origin: center left; }
-  }
 
-  .tooltip-elegant {
-    &:is([data-state='delayed-open'], [data-state='instant-open']) {
-      &[data-side='top'] { animation: tooltip-in-top 400ms cubic-bezier(0.175, 0.885, 0.32, 1.15) both; }
-      &[data-side='bottom'] { animation: tooltip-in-bottom 400ms cubic-bezier(0.175, 0.885, 0.32, 1.15) both; }
-      &[data-side='left'] { animation: tooltip-in-left 400ms cubic-bezier(0.175, 0.885, 0.32, 1.15) both; }
-      &[data-side='right'] { animation: tooltip-in-right 400ms cubic-bezier(0.175, 0.885, 0.32, 1.15) both; }
+    &[data-side='top'] {
+      transform-origin: bottom center;
     }
-    &[data-state='closed'] { animation: fade-scale-out 200ms cubic-bezier(0.4, 0, 1, 1) both; }
-  }
 
-
-  .dropdown-elegant {
-    will-change: opacity, transform;
-    transform-origin: top center;
-    &[data-state='open'] { animation: dropdown-in 400ms cubic-bezier(0.175, 0.885, 0.32, 1.15) both; }
-    &[data-state='closed'] { animation: fade-scale-out 200ms cubic-bezier(0.4, 0, 1, 1) both; }
-  }
-
-  .select-content-elegant {
-    &[data-state='open'] {
-      &[data-side='bottom'] { animation: select-content-in-bottom 400ms cubic-bezier(0.175, 0.885, 0.32, 1.15) both; }
-      &[data-side='top'] { animation: select-content-in-top 400ms cubic-bezier(0.175, 0.885, 0.32, 1.15) both; }
-      &[data-side='left'] { animation: select-content-in-left 400ms cubic-bezier(0.175, 0.885, 0.32, 1.15) both; }
-      &[data-side='right'] { animation: select-content-in-right 400ms cubic-bezier(0.175, 0.885, 0.32, 1.15) both; }
+    &[data-side='bottom'] {
+      transform-origin: top center;
     }
-    &[data-state='closed'] { animation: fade-scale-out 200ms cubic-bezier(0.4, 0, 0.2, 1) both; }
+
+    &[data-side='left'] {
+      transform-origin: center right;
+    }
+
+    &[data-side='right'] {
+      transform-origin: center left;
+    }
+  }
+
+  :is(
+    .tooltip-elegant:is([data-state='delayed-open'], [data-state='instant-open']),
+    .select-content-elegant[data-state='open'],
+    .dropdown-elegant[data-state='open']
+  ) {
+    &[data-side='top'] {
+      animation: popover-in-top 400ms cubic-bezier(0.175, 0.885, 0.32, 1.15) both;
+    }
+
+    &[data-side='bottom'] {
+      animation: popover-in-bottom 400ms cubic-bezier(0.175, 0.885, 0.32, 1.15) both;
+    }
+
+    &[data-side='left'] {
+      animation: popover-in-left 400ms cubic-bezier(0.175, 0.885, 0.32, 1.15) both;
+    }
+
+    &[data-side='right'] {
+      animation: popover-in-right 400ms cubic-bezier(0.175, 0.885, 0.32, 1.15) both;
+    }
+  }
+
+  .tooltip-elegant[data-state='closed'] {
+    animation: fade-scale-out 200ms cubic-bezier(0.4, 0, 1, 1) both;
+  }
+
+  :is(.select-content-elegant, .dropdown-elegant)[data-state='closed'] {
+    animation: fade-scale-out 200ms cubic-bezier(0.4, 0, 0.2, 1) both;
   }
 
   .select-check-elegant {
     animation: select-check-in 300ms cubic-bezier(0.16, 1, 0.3, 1) both;
   }
 
-  /**
-   * Layout Effects
-   * Fixed bottom background gradient fade and blur mask overlay.
-   */
+  .animate-page-simple {
+    animation: page-simple-in 0.6s ease-out both;
+  }
+
   .bottom-blur-fade {
     position: fixed;
     bottom: 0;
@@ -415,56 +417,138 @@
   }
 }
 
-/**
- * Keyframe Definitions
- * Reusable animation keyframes for micro-interactions and layout transitions.
- */
 @keyframes grow {
-  0% { stroke-dashoffset: 1px; stroke-dasharray: 0 350px; opacity: 0; }
-  10% { opacity: 1; }
-  40%, 85% { stroke-dasharray: 350px 0; }
-  95%, to { stroke-dasharray: 0 350px; }
-}
-
-@keyframes tooltip-in-top { from { opacity: 0; transform: translateY(15px) scale(0); } to { opacity: 1; transform: translateY(0) scale(1); } }
-@keyframes tooltip-in-bottom { from { opacity: 0; transform: translateY(-15px) scale(0); } to { opacity: 1; transform: translateY(0) scale(1); } }
-@keyframes tooltip-in-left { from { opacity: 0; transform: translateX(15px) scale(0); } to { opacity: 1; transform: translateX(0) scale(1); } }
-@keyframes tooltip-in-right { from { opacity: 0; transform: translateX(-15px) scale(0); } to { opacity: 1; transform: translateX(0) scale(1); } }
-@keyframes dropdown-in { from { opacity: 0; transform: translateY(-15px) scale(0); } to { opacity: 1; transform: translateY(0) scale(1); } }
-
-@keyframes select-content-in-bottom { from { opacity: 0; transform: translateY(-15px) scale(0); } to { opacity: 1; transform: translateY(0) scale(1); } }
-@keyframes select-content-in-top { from { opacity: 0; transform: translateY(15px) scale(0); } to { opacity: 1; transform: translateY(0) scale(1); } }
-@keyframes select-content-in-left { from { opacity: 0; transform: translateX(15px) scale(0); } to { opacity: 1; transform: translateX(0) scale(1); } }
-@keyframes select-content-in-right { from { opacity: 0; transform: translateX(-15px) scale(0); } to { opacity: 1; transform: translateX(0) scale(1); } }
-
-@keyframes fade-scale-out { from { opacity: 1; transform: scale(1); } to { opacity: 0; transform: scale(0); } }
-
-@keyframes select-check-in { from { opacity: 0; transform: scale(0.3) translateY(2px); } to { opacity: 1; transform: scale(1) translateY(0); } }
-
-@keyframes page-simple-in {
-  0% { opacity: 0; transform: translateY(12px); }
-  100% { opacity: 1; transform: translateY(0); }
-}
-
-/** Diagonal light sweep used by the "New" badge and Announcement Banner. */
-@keyframes shimmer {
-  0% { transform: translateX(-100%) skewX(-20deg); }
-  100% { transform: translateX(300%) skewX(-20deg); }
-}
-
-/** Page entry sliding fade-in entrance animation utility. */
-.animate-page-simple {
-    animation: page-simple-in 0.6s ease-out both;
+  0% {
+    stroke-dashoffset: 1px;
+    stroke-dasharray: 0 350px;
+    opacity: 0;
   }
 
-/**
- * Accessibility
- * Honors system reduced-motion preferences by gracefully disabling animations.
- */
+  10% {
+    opacity: 1;
+  }
+
+  40%,
+  85% {
+    stroke-dasharray: 350px 0;
+  }
+
+  95%,
+  to {
+    stroke-dasharray: 0 350px;
+  }
+}
+
+@keyframes popover-in-top {
+  from {
+    opacity: 0;
+    transform: translateY(15px) scale(0);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes popover-in-bottom {
+  from {
+    opacity: 0;
+    transform: translateY(-15px) scale(0);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes popover-in-left {
+  from {
+    opacity: 0;
+    transform: translateX(15px) scale(0);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+@keyframes popover-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(-15px) scale(0);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+@keyframes fade-scale-out {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  to {
+    opacity: 0;
+    transform: scale(0);
+  }
+}
+
+@keyframes select-check-in {
+  from {
+    opacity: 0;
+    transform: scale(0.3) translateY(2px);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes page-simple-in {
+  0% {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%) skewX(-20deg);
+  }
+
+  100% {
+    transform: translateX(300%) skewX(-20deg);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .animate-page-simple { animation: none !important; }
-  .animate-\[shimmer_5s_linear_infinite\] { animation: none !important; }
-  .animate-\[shimmer_2s_linear_infinite\] { animation: none !important; }
-  .initials-path { animation: none !important; stroke-dasharray: unset !important; opacity: 1 !important; }
-  :is(.tooltip-elegant, .select-content-elegant, .dropdown-elegant)[data-state], .select-check-elegant, .tooltip-elegant, .dropdown-elegant { animation: none !important; transition: opacity 120ms linear; }
+  .animate-page-simple {
+    animation: none !important;
+  }
+
+  .initials-path {
+    animation: none !important;
+    stroke-dasharray: unset !important;
+    opacity: 1 !important;
+  }
+
+  .tooltip-elegant,
+  .select-content-elegant,
+  .dropdown-elegant,
+  .select-check-elegant {
+    animation: none !important;
+    transition: opacity 120ms linear;
+  }
 }

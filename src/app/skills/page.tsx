@@ -1,14 +1,13 @@
+import type { Metadata } from 'next'
 import { Suspense } from 'react'
-import { Metadata } from 'next'
-import { skillsSeoContent } from '@/data/content/seo-content'
-import { skillsPageContent } from '@/data/content/skills-content'
+import { PageLayout } from '@/components/layout/page-layout'
 import { SkillsGrid } from '@/components/skills/skills-grid'
 import { SITE_URL } from '@/constants/constants'
+import { skillsSeoContent } from '@/data/content/seo-content'
+import { skillsPageContent } from '@/data/content/skills-content'
 import { getBreadcrumbSchema } from '@/lib/json-ld'
 import { constructMetadata, getOgImageUrl } from '@/lib/metadata'
-import { PageLayout } from '@/components/layout/page-layout'
 
-/** Statically generated metadata for the Skills/Tech Stack page. */
 export async function generateMetadata(): Promise<Metadata> {
   return constructMetadata({
     title: skillsSeoContent.title,
@@ -19,11 +18,6 @@ export async function generateMetadata(): Promise<Metadata> {
   })
 }
 
-/**
- * Main Skills Route.
- * Renders an interactive grid of technologies and skills, utilizing Suspense to
- * lazy load the grid while preserving a static skeleton layout during initial paint.
- */
 export default function SkillsPage() {
   const breadcrumbJsonLd = getBreadcrumbSchema([
     { name: 'Home', url: SITE_URL },

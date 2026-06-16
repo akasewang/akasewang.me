@@ -5,7 +5,6 @@ import { BackButton } from '@/components/ui/back-button'
 import { SMOOTH_SPRING_TRANSITION } from '@/constants/ui'
 import { cn } from '@/utils/utils'
 
-/** Props for {@link MdxFooter}. */
 interface MdxFooterProps {
   url: string
   title: string
@@ -15,10 +14,6 @@ interface MdxFooterProps {
   className?: string
 }
 
-/**
- * MDX Post Footer Component.
- * A layout wrapper for the bottom of individual blog posts and project case studies.
- */
 export function MdxFooter({ quote, backHref = '/', backLabel, className }: MdxFooterProps) {
   return (
     <m.footer

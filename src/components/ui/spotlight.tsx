@@ -4,27 +4,13 @@ import type { SpotlightMoveState } from '@/hooks/use-spotlight'
 import { useSpotlight } from '@/hooks/use-spotlight'
 import { cn } from '@/utils/utils'
 
-/** Props for {@link Spotlight}. */
 interface SpotlightProps {
   isHovering: boolean
   outerSize?: number
   children?: React.ReactNode
-  /**
-   * If true, automatically renders a faintly visible background layer of the children.
-   * Perfect for text reveal effects where the text should remain barely visible when not hovered.
-   */
   withBaseReveal?: boolean
 }
 
-/**
- * Renders a cursor following spotlight from layered radial gradients positioned by the
- * `--mx` / `--my` / `--spotlight-intensity` CSS variables (typically set by `useSpotlight`),
- * fading in while `isHovering`. Optionally reveals masked `children` under the light.
- *
- * @param isHovering - Whether the spotlight layers are currently visible.
- * @param outerSize - Base pixel radius for the spotlight gradients. Defaults to 140.
- * @param children - Optional content masked to reveal only directly under the cursor.
- */
 function Spotlight({
   isHovering,
   outerSize = 140,
@@ -85,8 +71,7 @@ function Spotlight({
   )
 }
 
-/** Props for {@link SpotlightCard}; `as` selects the rendered element type. */
-export interface SpotlightCardProps<T extends React.ElementType = 'div'> {
+interface SpotlightCardProps<T extends React.ElementType = 'div'> {
   as?: T
   outerSize?: number
   withBaseReveal?: boolean
@@ -96,12 +81,6 @@ export interface SpotlightCardProps<T extends React.ElementType = 'div'> {
   children?: React.ReactNode
 }
 
-/**
- * A highly optimized container that automatically tracks cursor velocity and applies the Spotlight effect.
- * Completely abstracts away the boilerplate of hooks and refs for the developer.
- * Use `as` to render as a different semantic element (e.g., `as="a"`).
- * Use `revealLayer` to supply completely custom content for the spotlight mask.
- */
 export function SpotlightCard<T extends React.ElementType = 'div'>({
   as,
   children,

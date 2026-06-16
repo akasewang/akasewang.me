@@ -12,12 +12,6 @@ import { SectionTitle } from '../layout/section-title'
 import { Button } from '../ui/button'
 import { Input } from '../ui/input'
 
-/**
- * A form for subscribing to the newsletter, with a postsubmit cooldown (via `useStatusTimer`)
- * to prevent rapid resubmissions.
- *
- * @param hideHeader - If true, hides the title and description, rendering only the input and button.
- */
 export function NewsletterSubscription({ hideHeader = false }: { hideHeader?: boolean }) {
   const [email, setEmail] = useState('')
   const [loading, setLoading] = useState(false)

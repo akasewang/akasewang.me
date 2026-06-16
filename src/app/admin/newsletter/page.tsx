@@ -1,13 +1,9 @@
-import { getAllBlogPosts } from '@/lib/managers/blog-manager'
+import type { Metadata } from 'next'
 import { AdminNewsletterForm } from '@/components/admin/admin-newsletter-form'
 import { PageLayout } from '@/components/layout/page-layout'
 import { adminNewsletterContent } from '@/data/content/admin-content'
-import { Metadata } from 'next'
+import { getAllBlogPosts } from '@/lib/managers/blog-manager'
 
-/**
- * Statically defined metadata for the Admin Newsletter page.
- * Strictly prevents search engine indexing and crawling to keep this route private.
- */
 export const metadata: Metadata = {
   robots: {
     index: false,
@@ -15,11 +11,6 @@ export const metadata: Metadata = {
   },
 }
 
-/**
- * Admin Newsletter Route.
- * Provides a UI to manually trigger newsletter dispatches for specific blog posts.
- * Note: Authentication is enforced inside the `broadcastNewsletter` server action via the admin password.
- */
 export default async function AdminNewsletterPage() {
   const blogs = await getAllBlogPosts()
 

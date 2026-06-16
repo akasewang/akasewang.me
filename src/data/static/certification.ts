@@ -1,9 +1,5 @@
 import type { TimelineItemProps } from '@/types/site'
 
-/**
- * Certifications Data Dictionary.
- * Centralized static configuration and text definitions.
- */
 export const certifications: TimelineItemProps[] = [
   {
     id: 'rust-programming-specialization',

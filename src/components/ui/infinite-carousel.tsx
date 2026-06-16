@@ -1,13 +1,12 @@
 'use client'
 
-import { useMemo, type ReactNode } from 'react'
-import useEmblaCarousel from 'embla-carousel-react'
-import AutoScroll from 'embla-carousel-auto-scroll'
 import type { EmblaOptionsType } from 'embla-carousel'
 import type { AutoScrollOptionsType } from 'embla-carousel-auto-scroll'
+import AutoScroll from 'embla-carousel-auto-scroll'
+import useEmblaCarousel from 'embla-carousel-react'
+import { type ReactNode, useMemo } from 'react'
 import { cn } from '@/utils/utils'
 
-/** Props for {@link InfiniteCarousel}. */
 interface InfiniteCarouselProps<T> {
   items: T[]
   renderItem: (item: T, index: number) => ReactNode
@@ -23,16 +22,6 @@ interface InfiniteCarouselProps<T> {
   loopMultiplier?: number
 }
 
-/**
- * An auto scrolling, infinitely looping carousel (Embla + auto-scroll plugin). Duplicates
- * `items` enough times to fill wide screens and pauses while hovered.
- *
- * @param items - The generic array of data items to map over.
- * @param renderItem - A render prop function returning the ReactNode for a single slide.
- * @param direction - Scrolling direction ('forward' | 'backward').
- * @param speed - The speed of the auto-scroll animation.
- * @param loopMultiplier - Forces the array to duplicate X times to fill large screens.
- */
 export function InfiniteCarousel<T>({
   items,
   renderItem,

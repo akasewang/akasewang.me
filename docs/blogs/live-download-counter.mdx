@@ -26,18 +26,12 @@ It simply accepts a `value` prop, pads it with leading zeros to maintain a consi
 
 ```tsx title="src/components/ui/download-counter.tsx"
 'use client'
-
 import * as React from 'react'
 import { cn } from '@/utils/utils'
-
 export interface DownloadCounterProps extends React.HTMLAttributes<HTMLDivElement> {
   value: number
   padLength?: number
 }
-
-/**
- * Renders a stylized digital counter, padding the provided value with leading zeros.
- */
 export function DownloadCounter({ 
   value, 
   padLength = 5,
@@ -45,7 +39,6 @@ export function DownloadCounter({
   ...props 
 }: DownloadCounterProps) {
   const displayCount = (value ?? 0).toString().padStart(padLength, '0')
-
   return (
     <div 
       className={cn('flex items-center gap-1 sm:gap-1.5', className)}
@@ -73,7 +66,6 @@ To make the counter live, we need a place to store the metrics. We create a mini
 
 ```typescript title="src/lib/db/schema.ts"
 import { pgTable, varchar, integer } from 'drizzle-orm/pg-core'
-
 export const component_metrics = pgTable('component_metrics', {
   slug: varchar('slug', { length: 255 }).primaryKey(),
   installs: integer('installs').default(0).notNull(),
@@ -90,12 +82,9 @@ To solve this, we rely on Drizzle's `onConflictDoUpdate` to perform an **Atomic 
 
 ```typescript title="src/lib/actions/views.ts"
 'use server'
-
 import { db } from '@/lib/db/drizzle'
 import { component_metrics } from '@/lib/db/schema'
 import { eq, sql } from 'drizzle-orm'
-
-// Fetches the live count for the UI
 export async function getInstallsAction(slug: string) {
   if (!slug) return { installs: null }
   try {
@@ -108,8 +97,6 @@ export async function getInstallsAction(slug: string) {
     return { installs: null }
   }
 }
-
-// Atomically increments the count during an installation
 export async function incrementInstallAction(slug: string) {
   if (!slug) return { installs: null }
   try {
@@ -118,7 +105,7 @@ export async function incrementInstallAction(slug: string) {
       .values({ slug, installs: 1 })
       .onConflictDoUpdate({
         target: component_metrics.slug,
-        set: { installs: sql`${component_metrics.installs} + 1` }, // Atomic increment
+        set: { installs: sql`${component_metrics.installs} + 1` }, 
       })
       .returning({ installs: component_metrics.installs })
     return { installs: result?.installs ?? 0 }
@@ -136,24 +123,19 @@ While waiting for the network response, we return a smooth `animate-pulse` skele
 
 ```tsx title="src/components/live-counter.tsx"
 'use client'
-
 import { useEffect, useState } from 'react'
 import { DownloadCounter } from '@/components/ui/download-counter'
 import { getInstallsAction } from '@/lib/actions/views'
-
 export function LiveCounter({ slug }: { slug: string }) {
   const [installs, setInstalls] = useState<number | undefined>(undefined)
-
   useEffect(() => {
     getInstallsAction(slug).then(res => {
       if (res.installs !== null) setInstalls(res.installs)
     })
   }, [slug])
-
   if (installs === undefined) {
     return <div className="h-10 w-48 animate-pulse rounded-md bg-muted" />
   }
-
   return <DownloadCounter value={installs} />
 }
 ```
@@ -167,15 +149,11 @@ In our Next.js API route that serves the component JSON payload, we invoke the s
 ```typescript title="src/app/r/[slug]/route.ts"
 import { incrementInstallAction } from '@/lib/actions/views'
 import { NextResponse } from 'next/server'
-
 export async function GET(
   request: Request,
   { params }: { params: { slug: string } }
 ) {
-  // Fire and forget the telemetry tracker (non-blocking)
   incrementInstallAction(params.slug).catch(console.error)
-
-  // Return the component JSON payload instantly
   return NextResponse.json({ ...registryPayload })
 }
 ```

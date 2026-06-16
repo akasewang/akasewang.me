@@ -7,22 +7,13 @@ import { commonContent } from '@/data/content/layout-content'
 import { useKeyboardShortcut } from '@/hooks/use-keyboard-shortcut'
 import { useSoundLazy } from '@/hooks/use-sound'
 import { useSoundEffects } from '@/hooks/use-sound-effects'
-import { trackEvent } from '@/lib/events'
 import { cn } from '@/utils/utils'
 
-/** Props for {@link PronounceMyName}. */
 interface PronounceMyNameProps {
   className?: string
   namePronunciationUrl: string
 }
 
-/**
- * A button (and `P` keyboard shortcut) that plays a name pronunciation audio clip and
- * animates the speaker icon while it plays. Preloads the audio on hover.
- *
- * @param className - Optional CSS classes for custom container styling.
- * @param namePronunciationUrl - The URL path to the audio file to be played.
- */
 export function PronounceMyName({ className, namePronunciationUrl }: PronounceMyNameProps) {
   const { play, preload } = useSoundLazy(namePronunciationUrl)
   const { hoverTick } = useSoundEffects()
@@ -36,7 +27,6 @@ export function PronounceMyName({ className, namePronunciationUrl }: PronounceMy
   const handlePlayClick = useCallback(() => {
     volumeIconRef.current?.startAnimation()
     play(1, true)
-    trackEvent({ name: 'play_name_pronunciation' })
   }, [play])
 
   useKeyboardShortcut('P', handlePlayClick)

@@ -2,23 +2,21 @@
 
 import {
   createContext,
-  useContext,
-  useState,
-  useCallback,
-  useEffect,
-  useRef,
-  useMemo,
   type ReactNode,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
 } from 'react'
-import { incrementViewAction, getViewsBatchAction } from '@/lib/actions/views'
+import { getViewsBatchAction, incrementViewAction } from '@/lib/actions/views'
 
-/** Shape of the views snapshot persisted to localStorage. */
 type ViewsCache = {
   views: Record<string, number>
   timestamp: number
 }
 
-/** Defines the public API for the view counting system. */
 type ViewsContextType = {
   getViews: (slug: string) => number | null | undefined
   requestView: (slug: string) => void
@@ -29,12 +27,11 @@ type ViewsContextType = {
 const ViewsContext = createContext<ViewsContextType | null>(null)
 
 const CACHE_KEY = 'views-cache-all'
-/** How long a persisted cache stays valid (5 minutes). */
+
 const CACHE_DURATION = 5 * 60 * 1000
-/** Window for coalescing prefetch requests into a single batched API call (ms). */
+
 const BATCH_DELAY = 50
 
-/** Persists the current view counts to localStorage, stripping unresolved (null) entries. */
 function syncCache(views: Record<string, number | null>) {
   if (typeof window === 'undefined') return
   try {
@@ -54,21 +51,13 @@ function syncCache(views: Record<string, number | null>) {
   } catch {}
 }
 
-/**
- * Context provider that manages view counts across the application.
- * Implements a batching strategy to group multiple view requests into a single API call.
- * preventing network spam when rendering large lists of items (e.g., the blog list).
- * Also caches view counts locally to optimize navigation.
- *
- * @param children - The React tree to wrap with the provider.
- */
 export function ViewsProvider({ children }: { children: ReactNode }) {
   const [viewsMap, setViewsMap] = useState<Record<string, number | null>>({})
   const viewsMapRef = useRef<Record<string, number | null>>({})
 
   const pendingSlugsRef = useRef<Set<string>>(new Set())
   const fetchingRef = useRef<Set<string>>(new Set())
-  const batchTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const batchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useEffect(() => {
     try {
@@ -82,10 +71,14 @@ export function ViewsProvider({ children }: { children: ReactNode }) {
           return viewsMapRef.current
         })
       } else {
-        localStorage.removeItem(CACHE_KEY)
+        try {
+          localStorage.removeItem(CACHE_KEY)
+        } catch {}
       }
     } catch {
-      localStorage.removeItem(CACHE_KEY)
+      try {
+        localStorage.removeItem(CACHE_KEY)
+      } catch {}
     }
   }, [])
 
@@ -98,7 +91,9 @@ export function ViewsProvider({ children }: { children: ReactNode }) {
   const fetchBatch = useCallback(async (slugs: string[]) => {
     if (!slugs.length) return
 
-    slugs.forEach((slug) => fetchingRef.current.add(slug))
+    slugs.forEach((slug) => {
+      fetchingRef.current.add(slug)
+    })
 
     const updateMap = (fetchedViews?: Record<string, number> | null) => {
       const newViews = Object.fromEntries(slugs.map((s) => [s, fetchedViews?.[s] ?? null]))
@@ -117,7 +112,9 @@ export function ViewsProvider({ children }: { children: ReactNode }) {
       console.error('Error fetching views:', error)
       updateMap(null)
     } finally {
-      slugs.forEach((slug) => fetchingRef.current.delete(slug))
+      slugs.forEach((slug) => {
+        fetchingRef.current.delete(slug)
+      })
     }
   }, [])
 
@@ -162,9 +159,14 @@ export function ViewsProvider({ children }: { children: ReactNode }) {
 
   const incrementViews = useCallback(
     async (slug: string) => {
-      const sessionKey = `viewed-${slug}`
+      const sessionKey = `viewed-${encodeURIComponent(slug)}`
 
-      if (typeof window !== 'undefined' && sessionStorage.getItem(sessionKey)) {
+      try {
+        if (typeof window !== 'undefined' && sessionStorage.getItem(sessionKey)) {
+          requestView(slug)
+          return
+        }
+      } catch {
         requestView(slug)
         return
       }
@@ -178,7 +180,9 @@ export function ViewsProvider({ children }: { children: ReactNode }) {
         })
 
         if (data.views !== null && typeof window !== 'undefined') {
-          sessionStorage.setItem(sessionKey, 'true')
+          try {
+            sessionStorage.setItem(sessionKey, 'true')
+          } catch {}
         }
       } catch (error) {
         console.error('Error incrementing views:', error)
@@ -195,13 +199,6 @@ export function ViewsProvider({ children }: { children: ReactNode }) {
   return <ViewsContext.Provider value={contextValue}>{children}</ViewsContext.Provider>
 }
 
-/**
- * Hook to access the views context.
- * Provides methods for fetching, incrementing and batching view count updates.
- * Must be used within a `<ViewsProvider>`.
- *
- * @returns The context containing view management methods.
- */
 export function useViews() {
   const context = useContext(ViewsContext)
   if (!context) {

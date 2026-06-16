@@ -1,22 +1,17 @@
 'use client'
 
-import { type ReactNode } from 'react'
 import { m } from 'framer-motion'
+import type { ReactNode } from 'react'
 import { BackButton } from '@/components/ui/back-button'
-import { cn } from '@/utils/utils'
 import { SMOOTH_SPRING_TRANSITION } from '@/constants/ui'
+import { cn } from '@/utils/utils'
 
-/** Props for {@link PageFooter}. */
 interface PageFooterProps {
   text?: ReactNode
   backButtonHref?: string
   className?: string
 }
 
-/**
- * Page Footer Component.
- * A consistent layout wrapper used at the bottom of main listing pages.
- */
 export function PageFooter({ text, backButtonHref = '/', className }: PageFooterProps) {
   return (
     <m.footer

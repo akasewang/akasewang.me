@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 
 import { toast } from 'sonner'
 import {
@@ -15,21 +15,18 @@ import { USERNAME } from '@/constants/constants'
 import { useSoundEffects } from '@/hooks/use-sound-effects'
 import { cn } from '@/utils/utils'
 
-/** Props for {@link SocialShare}. */
 interface SocialShareProps {
   url: string
   title: string
   className?: string
 }
 
-/** A shareable network entry: its name, icon and optional action verb ("share via"). */
 type ShareOption = {
   name: string
   icon: typeof Icons.x
   actionText?: string
 }
 
-/** Networks offered in the share menu, in display order. */
 const SHARE_NETWORKS: ShareOption[] = [
   { name: 'X', icon: Icons.x },
   { name: 'LinkedIn', icon: Icons.linkedin },
@@ -40,7 +37,6 @@ const SHARE_NETWORKS: ShareOption[] = [
   { name: 'Email', icon: Icons.mail, actionText: 'share via' },
 ]
 
-/** Builds the share intent URL for a given network, page URL and title. */
 const getShareUrl = (network: string, url: string, title: string) => {
   const encodedUrl = encodeURIComponent(url)
   const encodedTitle = encodeURIComponent(title)
@@ -65,18 +61,17 @@ const getShareUrl = (network: string, url: string, title: string) => {
   }
 }
 
-/**
- * A share button that opens a dropdown with a copy link action and direct share links to
- * several social networks.
- *
- * @param url - The absolute URL of the page to be shared.
- * @param title - The title of the page to be included in social previews.
- * @param className - Optional CSS classes for custom container styling.
- */
 export function SocialShare({ url, title, className }: SocialShareProps) {
   const { hoverTick, error: errorSound } = useSoundEffects()
   const [isOpen, setIsOpen] = useState(false)
   const [copied, setCopied] = useState(false)
+  const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  useEffect(() => {
+    return () => {
+      if (closeTimerRef.current) clearTimeout(closeTimerRef.current)
+    }
+  }, [])
 
   const shareLinks = useMemo(
     () =>
@@ -89,7 +84,9 @@ export function SocialShare({ url, title, className }: SocialShareProps) {
       await navigator.clipboard.writeText(url)
       setCopied(true)
       toast.success('Link copied to clipboard')
-      setTimeout(() => {
+
+      if (closeTimerRef.current) clearTimeout(closeTimerRef.current)
+      closeTimerRef.current = setTimeout(() => {
         setCopied(false)
         setIsOpen(false)
       }, 1000)
@@ -105,8 +102,8 @@ export function SocialShare({ url, title, className }: SocialShareProps) {
       type="button"
       onMouseEnter={hoverTick}
       className={cn(
-        'relative flex size-8 items-center justify-center rounded-lg bg-transparent text-secondary ring-1 ring-transparent retina:ring-[0.5px] transition-[color,background-color,transform,scale,box-shadow] duration-300 ease-in-out hover:bg-accent hover:ring-accent-border hover:text-primary active:scale-[0.95] active:duration-200',
-        isOpen && 'bg-accent ring-accent-border text-primary scale-[0.95]',
+        'relative flex size-8 items-center justify-center rounded-lg bg-background text-secondary ring-1 ring-transparent retina:ring-[0.5px] transition-[color,background-color,transform,scale,box-shadow] duration-300 ease-in-out hover:bg-surface-40 hover:ring-accent-border hover:text-primary active:bg-surface-30 active:scale-[0.95] active:duration-200',
+        isOpen && 'bg-surface-40 ring-accent-border text-primary scale-[0.95]',
       )}
       aria-label="Share post"
       aria-expanded={isOpen}
@@ -128,34 +125,32 @@ export function SocialShare({ url, title, className }: SocialShareProps) {
         </Tooltip>
 
         <DropdownMenuContent align="center" sideOffset={6}>
-          <div className="flex flex-col gap-0.5">
-            <DropdownMenuItem
-              onSelect={(e) => {
-                e.preventDefault()
-                handleCopyLink()
-              }}
-              className={copied ? 'text-success data-[highlighted]:text-success' : ''}
-            >
-              {copied ? <Icons.check className="text-success" /> : <Icons.link />}
-              <span>{copied ? 'copied!' : 'copy link'}</span>
-            </DropdownMenuItem>
+          <DropdownMenuItem
+            onSelect={(e) => {
+              e.preventDefault()
+              handleCopyLink()
+            }}
+            className={copied ? 'text-success data-[highlighted]:text-success' : ''}
+          >
+            {copied ? <Icons.check className="text-success" /> : <Icons.link />}
+            <span>{copied ? 'copied!' : 'copy link'}</span>
+          </DropdownMenuItem>
 
-            {shareLinks.map((option) => {
-              const Icon = option.icon
-              const actionText = option.actionText || 'share on'
+          {shareLinks.map((option) => {
+            const Icon = option.icon
+            const actionText = option.actionText || 'share on'
 
-              return (
-                <DropdownMenuItem key={option.name} asChild>
-                  <a href={option.href} target="_blank" rel="noopener noreferrer">
-                    <Icon />
-                    <span>
-                      {actionText} {option.name.toLowerCase()}
-                    </span>
-                  </a>
-                </DropdownMenuItem>
-              )
-            })}
-          </div>
+            return (
+              <DropdownMenuItem key={option.name} asChild>
+                <a href={option.href} target="_blank" rel="noopener noreferrer">
+                  <Icon />
+                  <span>
+                    {actionText} {option.name.toLowerCase()}
+                  </span>
+                </a>
+              </DropdownMenuItem>
+            )
+          })}
         </DropdownMenuContent>
       </DropdownMenu>
     </div>

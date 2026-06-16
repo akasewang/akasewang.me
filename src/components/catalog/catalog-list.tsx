@@ -1,20 +1,15 @@
 'use client'
 
+import { AnimatePresence, m } from 'framer-motion'
+import { usePathname, useSearchParams } from 'next/navigation'
 import { useCallback, useMemo } from 'react'
-import { useSearchParams, usePathname } from 'next/navigation'
-import { m, AnimatePresence } from 'framer-motion'
 import { CategoryFilter } from '@/components/common/category-filter'
 import { EmptyState } from '@/components/common/empty-state'
 import { CATALOG_CATEGORIES } from '@/constants/categories'
-import { catalog } from '@/data/static/catalog'
 import { SPRING_TRANSITION } from '@/constants/ui'
+import { catalog } from '@/data/static/catalog'
 import type { FilterCategory } from '@/types/catalog'
 
-/**
- * Catalog List Component.
- * The primary interface for the bookmarks/reading list page.
- * Manages category state via URL search parameters, allowing deep linking to specific filters.
- */
 export function CatalogList() {
   const searchParams = useSearchParams()
   const pathname = usePathname()
@@ -38,7 +33,6 @@ export function CatalogList() {
       const query = params.toString()
       const newUrl = query ? `${pathname}?${query}` : pathname
 
-      /** Shallow URL update that syncs with `useSearchParams` without triggering a navigation. */
       window.history.replaceState(null, '', newUrl)
     },
     [searchParams, pathname],

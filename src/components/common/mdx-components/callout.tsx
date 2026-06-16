@@ -1,13 +1,10 @@
 'use client'
 
-import { useId, type CSSProperties, type ReactNode } from 'react'
+import { type CSSProperties, type ReactNode, useId } from 'react'
 import { Icons } from '@/components/ui/icons'
 import { cn } from '@/utils/utils'
 
-/** The available visual variants for a callout. */
 type CalloutType = 'info' | 'tip' | 'warn' | 'error' | 'success'
-
-/** Props for {@link Callout}. */
 interface CalloutProps {
   type?: CalloutType
   title?: ReactNode
@@ -15,7 +12,6 @@ interface CalloutProps {
   className?: string
 }
 
-/** Per variant config: icon, label, text accent color and base hue. */
 const VARIANTS: Record<
   CalloutType,
   { icon: keyof typeof Icons; label: string; accent: string; hue: string }
@@ -52,14 +48,6 @@ const VARIANTS: Record<
   },
 }
 
-/**
- * A styled MDX admonition (note, tip, warning, error, success): the icon and label sit in a
- * small tab that connects to the variant tinted content container below it.
- *
- * @param type - The semantic variant of the callout (info, tip, warn, error, success).
- * @param title - Optional custom title to display instead of the default type label.
- * @param className - Optional CSS classes for custom container styling.
- */
 export const Callout = ({ type = 'info', title, children, className }: CalloutProps) => {
   const { icon, label, accent, hue } = VARIANTS[type]
   const Icon = Icons[icon] as React.ComponentType<{ className?: string }>
@@ -73,8 +61,8 @@ export const Callout = ({ type = 'info', title, children, className }: CalloutPr
         {
           '--callout-hue': hue,
           '--callout-border': 'color-mix(in oklab, var(--callout-hue) 18%, transparent)',
-          '--callout-surface': 'color-mix(in oklab, var(--callout-hue) 6%, oklch(0.23 0 0 / 0.3))',
-          '--callout-tab': 'color-mix(in oklab, var(--callout-hue) 12%, oklch(0.26 0 0 / 0.45))',
+          '--callout-surface': 'color-mix(in oklab, var(--callout-hue) 6%, var(--surface-30))',
+          '--callout-tab': 'color-mix(in oklab, var(--callout-hue) 12%, var(--surface-50))',
         } as CSSProperties
       }
       className={cn(

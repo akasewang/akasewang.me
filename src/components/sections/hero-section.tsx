@@ -1,32 +1,31 @@
 'use client'
 
-import { LinkText } from '@/components/ui/link-text'
-import { Icons, VerifiedIcon } from '@/components/ui/icons'
 import { useRouter } from 'next/navigation'
 import { PronounceMyName } from '@/components/common/pronounce-my-name'
-import { renderWithLinks } from '@/utils/content-utils'
+import { SectionTitle } from '@/components/layout/section-title'
+import { Button } from '@/components/ui/button'
+import { Icons, VerifiedIcon } from '@/components/ui/icons'
+import { LinkText } from '@/components/ui/link-text'
+import { ProfilePicture } from '@/components/ui/profile-picture'
+import { TextFlip } from '@/components/ui/text-flip'
+import { EMAIL, FULL_NAME } from '@/constants/constants'
 import { landingPageContent } from '@/data/content/landing-content'
 import { activeSocials, inactiveSocials } from '@/data/static/social'
-import { FULL_NAME, EMAIL } from '@/constants/constants'
-import { TextFlip } from '@/components/ui/text-flip'
-import { Button } from '@/components/ui/button'
-import { SectionTitle } from '@/components/layout/section-title'
-import { ProfilePicture } from '@/components/ui/profile-picture'
+import { renderWithLinks } from '@/utils/content-utils'
 
-/**
- * Hero Section Component.
- * The primary introduction area on the landing page. Renders the user's avatar, name,
- * rotating roles (via TextFlip) and active/inactive social links.
- * Includes the PronounceMyName audio trigger and integrates content from static data models.
- */
 export function HeroSection() {
   const { hero } = landingPageContent
   const router = useRouter()
 
   return (
     <section id="hero" className="animate-page-simple space-y-8">
-      <div className="flex items-center gap-4 pb-2">
-        <ProfilePicture src="/profpic.png" alt={FULL_NAME} />
+      <div className="flex items-center gap-6 pb-2">
+        <ProfilePicture
+          src="/profpic.png"
+          alt={FULL_NAME}
+          href={hero.designsUrl}
+          label={hero.designsLabel}
+        />
 
         <div className="flex flex-col">
           <h1 className="text-balance text-2xl font-semibold leading-snug tracking-tighter text-primary">
@@ -41,7 +40,7 @@ export function HeroSection() {
             </span>
           </h1>
 
-          <div className="h-6 overflow-visible" aria-label={hero.role}>
+          <div className="h-6 overflow-visible" role="group" aria-label={hero.role}>
             <TextFlip className="font-mono text-sm leading-snug text-secondary">
               {hero.roles.map((role: string) => (
                 <span key={role}>{role}</span>

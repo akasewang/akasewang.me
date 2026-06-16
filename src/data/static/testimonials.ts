@@ -1,14 +1,5 @@
 import type { TestimonialRows } from '@/types/home'
 
-/**
- * NOTE: The following optional fields are supported by the Testimonial type
- * but are currently omitted as they are not needed for the current design:
- * role: string (e.g., 'Position, Company Name')
- * url: string (e.g., 'https://example.com/username')
- * image: string (e.g., '/testimonial-avatar/example.jpg')
- */
-
-/** Testimonials shown on the testimonials wall, split into two scrolling marquee rows. */
 export const testimonials: TestimonialRows = {
   topRow: [
     {

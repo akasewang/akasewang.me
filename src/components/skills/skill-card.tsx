@@ -6,7 +6,6 @@ import { useSoundEffects } from '@/hooks/use-sound-effects'
 import type { Skill } from '@/types/home'
 import { cn } from '@/utils/utils'
 
-/** Props for {@link SkillCard}. */
 interface SkillCardProps {
   skill: Skill
   className?: string
@@ -17,10 +16,6 @@ const SKILL_CARD_BASE_CLASSES =
 
 const SKILL_NAME_BASE_CLASSES = 'whitespace-nowrap font-mono text-xs font-medium leading-none'
 
-/**
- * A compact skill chip showing the technology's icon and name, with a velocity reactive
- * spotlight on hover. Renders as an external link when the skill has a `url`, else a static chip.
- */
 export function SkillCard({ skill: { url, icon, name }, className }: SkillCardProps) {
   const isLink = !!url
   const { spotlightSweep, navigate: navigateSound } = useSoundEffects()

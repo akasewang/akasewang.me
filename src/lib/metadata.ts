@@ -1,7 +1,6 @@
-import { Metadata } from 'next'
-import { SITE_URL, SITE_NAME, USERNAME, FULL_NAME } from '@/constants/constants'
+import type { Metadata } from 'next'
+import { FULL_NAME, SITE_NAME, SITE_URL, USERNAME } from '@/constants/constants'
 
-/** Page specific inputs for {@link constructMetadata}. */
 interface MetadataProps {
   title: string
   description: string
@@ -12,14 +11,6 @@ interface MetadataProps {
   publishedTime?: string
 }
 
-/**
- * Helper function to dynamically generate absolute Open Graph Image URLs.
- * Constructs query parameters for the `/api/og` route based on the provided title and type.
- *
- * @param title - The text to display on the generated image.
- * @param type - An optional category or type to display above the title.
- * @returns The fully qualified absolute URL to the generated OG image.
- */
 export function getOgImageUrl(title?: string, type?: string): string {
   const params = new URLSearchParams()
   if (title) params.set('title', title)
@@ -28,14 +19,6 @@ export function getOgImageUrl(title?: string, type?: string): string {
   return `${SITE_URL}/api/og${queryString ? `?${queryString}` : ''}`
 }
 
-/**
- * Generates a standardized Next.js Metadata object (SEO tags, Open Graph, Twitter cards) for any page.
- * Applies canonical URLs, a dynamic OG image and base SEO tags consistently, so pages don't repeat
- * this boilerplate.
- *
- * @param props - Page specific SEO metadata such as title, description and path.
- * @returns A Next.js `Metadata` object ready to be exported from a page.
- */
 export function constructMetadata({
   title,
   description,
@@ -72,7 +55,7 @@ export function constructMetadata({
         authors: [FULL_NAME],
       }),
     },
-    /** Both are @handles not domains despite the `site` name: `site` the publisher, `creator` the author. */
+
     twitter: {
       card: 'summary_large_image',
       title,

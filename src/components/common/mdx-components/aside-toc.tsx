@@ -7,20 +7,11 @@ import { cn } from '@/utils/utils'
 import { scrollToHeading, useActiveHeading } from './hooks/use-active-heading'
 import { parseTocFromContent } from './utils/parse-toc'
 
-/** Props for {@link AsideTOC}. */
 interface AsideTOCProps {
   content?: string
   className?: string
 }
 
-/**
- * Sidebar navigation component that dynamically generates and displays a Table of Contents (TOC).
- * Uses an IntersectionObserver hook to highlight the currently active heading as the user scrolls.
- * Only visible on large screens (xl breakpoint).
- *
- * @param content - The raw Markdown/MDX string content to parse for headings.
- * @param className - Optional CSS classes for custom container styling.
- */
 export const AsideTOC = ({ content, className }: AsideTOCProps) => {
   const { select, hoverTick } = useSoundEffects()
   const items = useMemo(() => (content ? parseTocFromContent(content) : []), [content])
@@ -31,7 +22,7 @@ export const AsideTOC = ({ content, className }: AsideTOCProps) => {
   return (
     <nav
       className={cn(
-        'not-prose hidden xl:block fixed left-8 top-[calc(6rem_+_var(--banner-offset,0px))] z-50 h-[calc(100vh-6rem)] w-56 transition-[top] duration-300 ease-out',
+        'not-prose hidden xl:block fixed left-8 top-24 z-50 h-[calc(100vh-6rem)] w-56',
         className,
       )}
     >

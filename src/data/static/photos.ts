@@ -1,9 +1,5 @@
 import type { Photo } from '@/types/photos'
 
-/**
- * Photos Data Dictionary.
- * Centralized static configuration and text definitions.
- */
 export const photos: Photo[] = [
   {
     id: 'c1',

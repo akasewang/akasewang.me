@@ -8,7 +8,6 @@ import { sharedContent } from '@/data/content/landing-content'
 import { useSoundEffects } from '@/hooks/use-sound-effects'
 import { cn } from '@/utils/utils'
 
-/** Props for {@link ExpandableList}. */
 interface ExpandableListProps<T> {
   items: T[]
   renderItem: (item: T, index: number) => ReactNode
@@ -17,13 +16,6 @@ interface ExpandableListProps<T> {
 
 const smoothTransition: Transition = { duration: 0.3, ease: 'easeInOut' }
 
-/**
- * A generic list component that initially displays a subset of items.
- *
- * @param items - The full array of data items to render.
- * @param renderItem - A render prop function that returns the ReactNode for a single item.
- * @param initialCount - The number of items to show before truncating the list (defaults to 3).
- */
 export function ExpandableList<T>({ items, renderItem, initialCount = 3 }: ExpandableListProps<T>) {
   const { toggle, hoverTick } = useSoundEffects()
   const [showAll, setShowAll] = useState(false)
