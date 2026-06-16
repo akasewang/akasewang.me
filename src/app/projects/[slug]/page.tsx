@@ -9,7 +9,7 @@ import { ProjectDemo } from '@/components/common/mdx-components/project-demo'
 import { LinkText } from '@/components/ui/link-text'
 import { SeparatorSlash } from '@/components/ui/separator-slash'
 import { FULL_NAME, SITE_URL } from '@/constants/constants'
-import { getBreadcrumbSchema, getProjectSchema } from '@/lib/json-ld'
+import { getBreadcrumbSchema, getProjectSchema, serializeJsonLd } from '@/lib/json-ld'
 import { getAllProjects, getProject, getProjectSlugs } from '@/lib/managers/project-manager'
 import { constructMetadata, getOgImageUrl } from '@/lib/metadata'
 
@@ -66,7 +66,7 @@ export default async function ProjectPost({ params }: { params: PageParams }) {
       <div className="relative space-y-6 animate-page-simple">
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify([projectJsonLd, breadcrumbJsonLd]) }}
+          dangerouslySetInnerHTML={{ __html: serializeJsonLd([projectJsonLd, breadcrumbJsonLd]) }}
         />
 
         <MdxPostHeader

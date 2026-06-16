@@ -12,7 +12,12 @@ import { TooltipProvider } from '@/components/ui/tooltip'
 import { ALL_KEYWORDS, FULL_NAME, SITE_NAME, SITE_URL, USERNAME } from '@/constants/constants'
 import { homeSeoContent } from '@/data/content/seo-content'
 import { fontMono, fontSans, fontSerif } from '@/lib/fonts'
-import { getPersonSchema, getProfilePageSchema, getWebsiteSchema } from '@/lib/json-ld'
+import {
+  getPersonSchema,
+  getProfilePageSchema,
+  getWebsiteSchema,
+  serializeJsonLd,
+} from '@/lib/json-ld'
 import { getOgImageUrl } from '@/lib/metadata'
 
 import './globals.css'
@@ -90,7 +95,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <link rel="preload" href="/profpic.png" as="image" />
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+          dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
         />
       </head>
       <body className="font-sans text-foreground antialiased">

@@ -8,7 +8,7 @@ import { MdxPostHeader } from '@/components/common/mdx-components/mdx-post-heade
 import { LinkText } from '@/components/ui/link-text'
 import { SeparatorSlash } from '@/components/ui/separator-slash'
 import { FULL_NAME, SITE_URL } from '@/constants/constants'
-import { getBlogPostingSchema, getBreadcrumbSchema } from '@/lib/json-ld'
+import { getBlogPostingSchema, getBreadcrumbSchema, serializeJsonLd } from '@/lib/json-ld'
 import { getAllBlogPosts, getBlogPost, getBlogSlugs } from '@/lib/managers/blog-manager'
 import { constructMetadata, getOgImageUrl } from '@/lib/metadata'
 
@@ -67,11 +67,11 @@ export default async function BlogPost({ params }: { params: PageParams }) {
       <div className="relative space-y-6 animate-page-simple">
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(blogPostJsonLd) }}
+          dangerouslySetInnerHTML={{ __html: serializeJsonLd(blogPostJsonLd) }}
         />
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+          dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbJsonLd) }}
         />
 
         <MdxPostHeader

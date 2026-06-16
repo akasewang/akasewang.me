@@ -104,7 +104,7 @@ export function HeroSection() {
           <Button
             defaultText={hero.scheduleMeet}
             defaultIcon={Icons.calendar}
-            onClick={() => window.open(hero.scheduleMeetUrl, '_blank')}
+            onClick={() => window.open(hero.scheduleMeetUrl, '_blank', 'noopener,noreferrer')}
           />
           <Button
             variant="minimal"

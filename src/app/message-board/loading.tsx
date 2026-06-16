@@ -1,9 +1,8 @@
 import { PageLayout } from '@/components/layout/page-layout'
-import { messageBoardContent } from '@/data/content/message-board-content'
 
 export default function Loading() {
   return (
-    <PageLayout title={messageBoardContent.title} subtitle={messageBoardContent.subtitle}>
+    <PageLayout>
       <div className="space-y-14">
         <div className="h-40 animate-pulse rounded-2xl bg-surface-30" />
 

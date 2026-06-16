@@ -4,6 +4,7 @@ import { m, useInView } from 'framer-motion'
 import Image from 'next/image'
 import Link from 'next/link'
 import { memo, useEffect, useRef } from 'react'
+import { ProjectMediaFallback } from '@/components/common/project-media-fallback'
 import { ViewCounter } from '@/components/common/view-counter'
 import { NewTag } from '@/components/ui/new-tag'
 import { SPRING_TRANSITION } from '@/constants/ui'
@@ -69,14 +70,16 @@ export const ProjectCard = memo(function ProjectCard({ project }: ProjectCardPro
               preload="none"
               className="absolute inset-0 h-full w-full object-cover transition-[transform,scale] duration-500 ease-out md:group-hover:scale-[1.03]"
             />
-          ) : (
+          ) : image ? (
             <Image
-              src={image || '/default-image-project.webp'}
+              src={image}
               alt={title}
               fill
               sizes="(max-width: 640px) 100vw, 400px"
               className="object-cover transition-[transform,scale] duration-500 ease-out md:group-hover:scale-[1.03]"
             />
+          ) : (
+            <ProjectMediaFallback title={title} />
           )}
 
           <div className="pointer-events-none absolute inset-0 hidden bg-black/0 transition-colors duration-300 ease-out group-hover:bg-black/40 md:block" />

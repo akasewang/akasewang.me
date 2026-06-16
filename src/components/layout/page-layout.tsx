@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { serializeJsonLd } from '@/lib/json-ld'
 import { cn } from '@/utils/utils'
 import { PageFooter } from './page-footer'
 import { PageHeader } from './page-header'
@@ -26,7 +27,7 @@ export function PageLayout({
   className,
   animate = true,
 }: PageLayoutProps) {
-  const breadcrumbJson = breadcrumb ? JSON.stringify(breadcrumb).replace(/</g, '\\u003c') : null
+  const breadcrumbJson = breadcrumb ? serializeJsonLd(breadcrumb) : null
 
   return (
     <main className={cn('space-y-8', animate && 'animate-page-simple', className)}>

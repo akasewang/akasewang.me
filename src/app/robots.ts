@@ -20,35 +20,16 @@ const BLOCKED_AI_BOTS = [
   'FacebookBot',
 ]
 
-const AI_SEARCH_BOTS = ['OAI-SearchBot', 'ChatGPT-User', 'PerplexityBot', 'YouBot']
-
-const SEARCH_ENGINE_BOTS = [
-  'Googlebot',
-  'Bingbot',
-  'Slurp',
-  'DuckDuckBot',
-  'Baiduspider',
-  'YandexBot',
-]
-
-const SOCIAL_CRAWLERS = [
-  'facebookexternalhit',
-  'Twitterbot',
-  'LinkedInBot',
-  'WhatsApp',
-  'TelegramBot',
-  'SlackBot',
-  'DiscordBot',
-]
-
 export default function robots(): MetadataRoute.Robots {
   return {
     rules: [
       { userAgent: BLOCKED_AI_BOTS, disallow: '/' },
-      { userAgent: '*', allow: '/', disallow: '/api/', crawlDelay: 0 },
-      { userAgent: SEARCH_ENGINE_BOTS, allow: '/' },
-      { userAgent: AI_SEARCH_BOTS, allow: '/' },
-      { userAgent: SOCIAL_CRAWLERS, allow: '/' },
+      {
+        userAgent: '*',
+        allow: ['/', '/api/og'],
+        disallow: '/api/',
+        crawlDelay: 0,
+      },
     ],
     sitemap: `${SITE_URL}/sitemap.xml`,
     host: new URL(SITE_URL).host,

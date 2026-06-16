@@ -42,6 +42,7 @@ export function constructMetadata({
       url,
       siteName: SITE_NAME,
       type,
+      locale: 'en_US',
       images: [
         {
           url: image,
@@ -60,7 +61,12 @@ export function constructMetadata({
       card: 'summary_large_image',
       title,
       description,
-      images: [image],
+      images: [
+        {
+          url: image,
+          alt: imageAlt || title,
+        },
+      ],
       site: `@${USERNAME}`,
       creator: `@${USERNAME}`,
     },

@@ -1,5 +1,16 @@
 import type { NextConfig } from 'next'
 
+const canonicalHost = 'www.akasewang.me'
+const canonicalOrigin = `https://${canonicalHost}`
+
+const redirectHosts = [
+  'akasewang.me',
+  'akasewang.com',
+  'www.akasewang.com',
+  'akashdewangan.com',
+  'www.akashdewangan.com',
+]
+
 const securityHeaders = [
   { key: 'X-Content-Type-Options', value: 'nosniff' },
   { key: 'X-Frame-Options', value: 'DENY' },
@@ -19,14 +30,7 @@ const nextConfig: NextConfig = {
   },
   experimental: {
     serverActions: {
-      allowedOrigins: [
-        'akasewang.me',
-        'www.akasewang.me',
-        'akasewang.com',
-        'www.akasewang.com',
-        'akashdewangan.com',
-        'www.akashdewangan.com',
-      ],
+      allowedOrigins: [canonicalHost],
     },
   },
   images: {
@@ -52,6 +56,14 @@ const nextConfig: NextConfig = {
         headers: securityHeaders,
       },
     ]
+  },
+  async redirects() {
+    return redirectHosts.map((host) => ({
+      source: '/:path*',
+      has: [{ type: 'host' as const, value: host }],
+      destination: `${canonicalOrigin}/:path*`,
+      permanent: true,
+    }))
   },
 }
 

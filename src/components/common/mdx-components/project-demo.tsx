@@ -10,6 +10,7 @@ import {
   useRef,
   useState,
 } from 'react'
+import { ProjectMediaFallback } from '@/components/common/project-media-fallback'
 import { Icons } from '@/components/ui/icons'
 import { useSoundEffects } from '@/hooks/use-sound-effects'
 
@@ -32,7 +33,6 @@ export function ProjectDemo({ image, video, title }: ProjectDemoProps) {
   const videoRef = useRef<HTMLVideoElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const hideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const fallbackImage = image || '/default-image-project.webp'
 
   const updateState = useCallback((updates: Partial<typeof state>) => {
     setState((prev) => ({ ...prev, ...updates }))
@@ -147,7 +147,7 @@ export function ProjectDemo({ image, video, title }: ProjectDemoProps) {
                   resetHideTimer(true)
                 }}
                 className="size-full object-cover"
-                poster={fallbackImage}
+                poster={image}
               />
               <AnimatePresence>
                 {state.isBuffering && (
@@ -244,15 +244,17 @@ export function ProjectDemo({ image, video, title }: ProjectDemoProps) {
                 )}
               </AnimatePresence>
             </>
-          ) : (
+          ) : image ? (
             <Image
-              src={fallbackImage}
+              src={image}
               alt={title}
               fill
               sizes="(max-width: 800px) 100vw, 800px"
               className="object-cover"
               priority
             />
+          ) : (
+            <ProjectMediaFallback title={title} />
           )}
         </div>
       </figure>

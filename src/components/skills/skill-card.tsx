@@ -1,7 +1,7 @@
 'use client'
 
 import Image from 'next/image'
-import { SpotlightCard } from '@/components/ui/spotlight'
+import { LinkableSpotlightCard } from '@/components/ui/linkable-spotlight-card'
 import { useSoundEffects } from '@/hooks/use-sound-effects'
 import type { Skill } from '@/types/home'
 import { cn } from '@/utils/utils'
@@ -53,25 +53,16 @@ export function SkillCard({ skill: { url, icon, name }, className }: SkillCardPr
     return inner
   }
 
-  const commonProps = {
-    revealLayer: isLink ? renderContent(true) : undefined,
-    outerSize: 120,
-    className: cn(SKILL_CARD_BASE_CLASSES, isLink && 'active:scale-[0.97]', className),
-    onSpotlightMove: spotlightSweep,
-    onClick: isLink ? navigateSound : undefined,
-  }
-
-  if (isLink) {
-    return (
-      <SpotlightCard as="a" href={url} target="_blank" rel="noopener noreferrer" {...commonProps}>
-        {renderContent()}
-      </SpotlightCard>
-    )
-  }
-
   return (
-    <SpotlightCard as="div" {...commonProps}>
+    <LinkableSpotlightCard
+      href={url}
+      revealLayer={renderContent(true)}
+      outerSize={120}
+      className={cn(SKILL_CARD_BASE_CLASSES, isLink && 'active:scale-[0.97]', className)}
+      onSpotlightMove={spotlightSweep}
+      onActivate={navigateSound}
+    >
       {renderContent()}
-    </SpotlightCard>
+    </LinkableSpotlightCard>
   )
 }
