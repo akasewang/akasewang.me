@@ -2,11 +2,21 @@ version: 2
 updates:
   - package-ecosystem: npm
     directory: /
+    target-branch: main
     schedule:
       interval: weekly
+      day: monday
+      time: "09:00"
+      timezone: Asia/Kolkata
     open-pull-requests-limit: 1
+    labels:
+      - dependencies
+    commit-message:
+      prefix: chore
+      include: scope
     groups:
       npm-minor-and-patch:
+        applies-to: version-updates
         patterns:
           - "*"
         update-types:
