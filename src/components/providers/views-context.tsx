@@ -32,6 +32,11 @@ const CACHE_DURATION = 5 * 60 * 1000
 
 const BATCH_DELAY = 50
 
+function normalizeClientSlug(slug: string): string | null {
+  const normalizedSlug = slug.trim()
+  return normalizedSlug || null
+}
+
 function syncCache(views: Record<string, number | null>) {
   if (typeof window === 'undefined') return
   try {
@@ -57,6 +62,8 @@ export function ViewsProvider({ children }: { children: ReactNode }) {
 
   const pendingSlugsRef = useRef<Set<string>>(new Set())
   const fetchingRef = useRef<Set<string>>(new Set())
+  const incrementingRef = useRef<Set<string>>(new Set())
+  const countedThisSessionRef = useRef<Set<string>>(new Set())
   const batchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useEffect(() => {
@@ -121,8 +128,10 @@ export function ViewsProvider({ children }: { children: ReactNode }) {
   const prefetchViews = useCallback(
     async (slugs: string[]) => {
       let hasNew = false
-      for (const slug of slugs) {
+      for (const rawSlug of slugs) {
+        const slug = normalizeClientSlug(rawSlug)
         if (
+          slug &&
           !(slug in viewsMapRef.current) &&
           !fetchingRef.current.has(slug) &&
           !pendingSlugsRef.current.has(slug)
@@ -153,23 +162,34 @@ export function ViewsProvider({ children }: { children: ReactNode }) {
   )
 
   const getViews = useCallback(
-    (slug: string): number | null | undefined => viewsMap[slug],
+    (slug: string): number | null | undefined => {
+      const normalizedSlug = normalizeClientSlug(slug)
+      return normalizedSlug ? viewsMap[normalizedSlug] : undefined
+    },
     [viewsMap],
   )
 
   const incrementViews = useCallback(
-    async (slug: string) => {
+    async (rawSlug: string) => {
+      const slug = normalizeClientSlug(rawSlug)
+      if (!slug) return
+
       const sessionKey = `viewed-${encodeURIComponent(slug)}`
+      let alreadyCounted = countedThisSessionRef.current.has(slug)
 
       try {
-        if (typeof window !== 'undefined' && sessionStorage.getItem(sessionKey)) {
-          requestView(slug)
-          return
-        }
-      } catch {
+        alreadyCounted =
+          alreadyCounted ||
+          (typeof window !== 'undefined' && sessionStorage.getItem(sessionKey) === 'true')
+      } catch {}
+
+      if (alreadyCounted) {
         requestView(slug)
         return
       }
+
+      if (incrementingRef.current.has(slug)) return
+      incrementingRef.current.add(slug)
 
       try {
         const data = await incrementViewAction(slug)
@@ -180,12 +200,20 @@ export function ViewsProvider({ children }: { children: ReactNode }) {
         })
 
         if (data.views !== null && typeof window !== 'undefined') {
+          countedThisSessionRef.current.add(slug)
           try {
             sessionStorage.setItem(sessionKey, 'true')
           } catch {}
         }
       } catch (error) {
         console.error('Error incrementing views:', error)
+        setViewsMap((prev) => {
+          viewsMapRef.current = { ...prev, [slug]: null }
+          syncCache(viewsMapRef.current)
+          return viewsMapRef.current
+        })
+      } finally {
+        incrementingRef.current.delete(slug)
       }
     },
     [requestView],

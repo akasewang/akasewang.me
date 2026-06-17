@@ -64,7 +64,7 @@ export function Footer() {
         </div>
 
         <div className="flex items-center gap-3 tracking-wide">
-          <ViewCounter type="visitors" />
+          <ViewCounter type="sessions" />
 
           {changelogLabel && changelogHref && (
             <Tooltip>

@@ -8,13 +8,13 @@ import { viewsContent } from '@/data/content/views-content'
 type ViewCounterProps = {
   slug?: string
   readOnly?: boolean
-  type?: 'views' | 'visitors'
+  type?: 'views' | 'sessions'
 }
 
 export function ViewCounter({ slug, readOnly = false, type = 'views' }: ViewCounterProps) {
   const { getViews, requestView, incrementViews } = useViews()
 
-  const effectiveSlug = type === 'visitors' ? '_site_visitors' : (slug ?? '')
+  const effectiveSlug = type === 'sessions' ? '_sessions' : (slug ?? '')
   const count = getViews(effectiveSlug)
 
   const processedSlug = useRef<string | null>(null)
@@ -47,12 +47,12 @@ export function ViewCounter({ slug, readOnly = false, type = 'views' }: ViewCoun
     )
   }
 
-  if (type === 'visitors') {
+  if (type === 'sessions') {
     return (
       <span className="inline-flex items-center gap-1.5">
-        <Icons.users className="size-3.5" />
+        <Icons.eye className="size-3.5" />
         <span>
-          {count.toLocaleString()} {viewsContent.visitors}
+          {count.toLocaleString()} {viewsContent.sessions}
         </span>
       </span>
     )

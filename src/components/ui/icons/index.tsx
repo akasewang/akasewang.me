@@ -197,19 +197,9 @@ export const Icons = {
       <path d="M2.1 9.1A13.94 13.94 0 0 1 8 5.582m8 0a13.94 13.94 0 0 1 5.9 3.52M6.697 13.697q.607-.604 1.303-1.043m8 0q.697.438 1.303 1.043M12 3v11m-.707 4.293a1 1 0 0 1 1.414 0L12 19z" />
     </svg>
   ),
-  users: ({ size = 24, ...props }: IconProps) => (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      width={size}
-      height={size}
-      {...props}
-    >
-      <path d="M5 7a4 4 0 1 0 8 0a4 4 0 1 0-8 0M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2m1-17.87a4 4 0 0 1 0 7.75M21 21v-2a4 4 0 0 0-3-3.85" />
+  eye: ({ size = 24, ...props }: IconProps) => (
+    <svg viewBox="0 0 24 24" fill="currentColor" width={size} height={size} {...props}>
+      <path d="M12 3c5.392 0 9.878 3.88 10.819 9c-.94 5.12-5.427 9-10.819 9s-9.878-3.88-10.818-9C2.122 6.88 6.608 3 12 3m0 16a9.005 9.005 0 0 0 8.778-7a9.005 9.005 0 0 0-17.555 0A9.005 9.005 0 0 0 12 19m0-2.5a4.5 4.5 0 1 1 0-9a4.5 4.5 0 0 1 0 9m0-2a2.5 2.5 0 1 0 0-5a2.5 2.5 0 0 0 0 5" />
     </svg>
   ),
   mail: ({ size = 24, ...props }: IconProps) => (

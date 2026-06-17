@@ -49,7 +49,7 @@ export interface SharedContent {
 
 export interface ViewsContent {
   offline: string
-  visitors: string
+  sessions: string
   views: string
   title: string
 }
