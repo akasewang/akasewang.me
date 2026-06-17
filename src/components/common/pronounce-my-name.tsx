@@ -1,12 +1,13 @@
 'use client'
 
-import { useCallback, useRef } from 'react'
+import { type PointerEvent, useCallback, useRef } from 'react'
 import { VolumeIcon, type VolumeIconHandle } from '@/components/ui/icons'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { commonContent } from '@/data/content/layout-content'
 import { useKeyboardShortcut } from '@/hooks/use-keyboard-shortcut'
 import { useSoundLazy } from '@/hooks/use-sound'
 import { useSoundEffects } from '@/hooks/use-sound-effects'
+import { canUseHoverPointer } from '@/utils/pointer'
 import { cn } from '@/utils/utils'
 
 interface PronounceMyNameProps {
@@ -19,10 +20,13 @@ export function PronounceMyName({ className, namePronunciationUrl }: PronounceMy
   const { hoverTick } = useSoundEffects()
   const volumeIconRef = useRef<VolumeIconHandle>(null)
 
-  const handlePointerEnter = useCallback(() => {
-    hoverTick()
-    preload()
-  }, [hoverTick, preload])
+  const handlePointerEnter = useCallback(
+    (event: PointerEvent<HTMLButtonElement>) => {
+      if (canUseHoverPointer(event.pointerType)) hoverTick()
+      preload()
+    },
+    [hoverTick, preload],
+  )
 
   const handlePlayClick = useCallback(() => {
     volumeIconRef.current?.startAnimation()

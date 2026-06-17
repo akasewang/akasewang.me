@@ -46,7 +46,7 @@ const TableHeader = styled(
 )
 const TableBody = styled(
   'tbody',
-  '[&_tr]:transition-colors [&_tr]:duration-200 [&_tr:hover]:bg-[color-mix(in_oklab,var(--muted)_20%,var(--code-block))] [&_tr:last-child]:border-0',
+  '[&_tr]:transition-colors [&_tr]:duration-200 supports-hover:[&_tr:hover]:bg-[color-mix(in_oklab,var(--muted)_20%,var(--code-block))] [&_tr:last-child]:border-0',
   'TableBody',
 )
 const TableRow = styled('tr', 'border-b border-border/30', 'TableRow')

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { canUseHoverPointer } from '@/utils/pointer'
 
 export interface SpotlightMoveState {
   phase: 'enter' | 'move'
@@ -28,12 +29,14 @@ export function useSpotlight<T extends HTMLElement = HTMLElement>({
     const el = ref.current
     if (!el) return
 
-    let animationFrameId: number
+    let animationFrameId = 0
     let lastX = 0
     let lastY = 0
     let lastTime = 0
 
-    const handleMouseMove = (e: MouseEvent, phase: SpotlightMoveState['phase'] = 'move') => {
+    const handlePointerMove = (e: PointerEvent, phase: SpotlightMoveState['phase'] = 'move') => {
+      if (!canUseHoverPointer(e.pointerType)) return
+
       cancelAnimationFrame(animationFrameId)
 
       animationFrameId = requestAnimationFrame(() => {
@@ -71,26 +74,28 @@ export function useSpotlight<T extends HTMLElement = HTMLElement>({
       })
     }
 
-    const handleMouseEnter = (e: MouseEvent) => {
+    const handlePointerEnter = (e: PointerEvent) => {
+      if (!canUseHoverPointer(e.pointerType)) return
+
       lastTime = 0
       setIsHovering(true)
-      handleMouseMove(e, 'enter')
+      handlePointerMove(e, 'enter')
     }
 
-    const handleMouseLeave = () => {
+    const handlePointerLeave = () => {
       setIsHovering(false)
       lastTime = 0
       cancelAnimationFrame(animationFrameId)
     }
 
-    el.addEventListener('mousemove', handleMouseMove)
-    el.addEventListener('mouseenter', handleMouseEnter)
-    el.addEventListener('mouseleave', handleMouseLeave)
+    el.addEventListener('pointermove', handlePointerMove)
+    el.addEventListener('pointerenter', handlePointerEnter)
+    el.addEventListener('pointerleave', handlePointerLeave)
 
     return () => {
-      el.removeEventListener('mousemove', handleMouseMove)
-      el.removeEventListener('mouseenter', handleMouseEnter)
-      el.removeEventListener('mouseleave', handleMouseLeave)
+      el.removeEventListener('pointermove', handlePointerMove)
+      el.removeEventListener('pointerenter', handlePointerEnter)
+      el.removeEventListener('pointerleave', handlePointerLeave)
       cancelAnimationFrame(animationFrameId)
     }
   }, [])

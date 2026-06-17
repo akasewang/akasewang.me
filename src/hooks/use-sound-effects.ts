@@ -2,6 +2,7 @@
 
 import { useCallback } from 'react'
 import { isAudioEnabled } from '@/hooks/use-audio-preference'
+import { canUseHover } from '@/utils/pointer'
 
 const MIN_GAIN = 0.0001
 const ATTACK_TIME = 0.012
@@ -449,7 +450,7 @@ function playMedia(ctx: AudioContext, playing: boolean) {
 
 export function useSoundEffects() {
   const throttledHover = useCallback((play: (ctx: AudioContext) => void) => {
-    if (!isAudioEnabled()) return
+    if (!canUseHover() || !isAudioEnabled()) return
 
     const now = Date.now()
     if (now - lastHoverAt < 60) return

@@ -12,6 +12,7 @@ import { ZOOM_EASE } from '@/constants/ui'
 import { photos } from '@/data/static/photos'
 import { useSoundEffects } from '@/hooks/use-sound-effects'
 import type { Category, Photo } from '@/types/photos'
+import { canUseHoverPointer } from '@/utils/pointer'
 import { cn } from '@/utils/utils'
 import { PhotoOverlay } from './photo-overlay'
 
@@ -168,8 +169,8 @@ const PhotoCard = memo(function PhotoCard({
           zoom(true)
           onZoom(photo.id)
         }}
-        onPointerEnter={() => {
-          hoverCard()
+        onPointerEnter={(event) => {
+          if (canUseHoverPointer(event.pointerType)) hoverCard()
           onPreload(photo.id)
         }}
         onPointerDown={() => onPreload(photo.id)}

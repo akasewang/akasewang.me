@@ -1,4 +1,4 @@
-import { Column, Img, Link, Row, Section, Text } from '@react-email/components'
+import { Column, Link, Row, Section, Text } from '@react-email/components'
 import { FULL_NAME, SITE_URL, USERNAME } from '@/constants/constants'
 
 export type EmailDateInput = string | number | Date
@@ -12,7 +12,6 @@ export const emailTheme = {
   bg: '#ffffff',
   bodyBg: '#f5f5f7',
   border: '#e5e5ea',
-  borderStrong: '#d1d1d6',
   text: '#1c1c1e',
   muted: '#6e6e73',
   dim: '#8e8e93',
@@ -36,14 +35,8 @@ export const emailStyles = {
     padding: '20px 32px',
     borderBottom: `1px solid ${emailTheme.border}`,
   },
-  headerAvatarCol: { width: '32px', verticalAlign: 'middle' as const },
-  headerNameCol: { paddingLeft: '12px', verticalAlign: 'middle' as const },
+  headerNameCol: { verticalAlign: 'middle' as const },
   headerDateCol: { verticalAlign: 'middle' as const },
-  profileImg: {
-    display: 'block',
-    border: `1px solid ${emailTheme.borderStrong}`,
-    borderRadius: '9999px',
-  },
   headerName: {
     margin: 0,
     fontFamily: emailFonts.sans,
@@ -110,15 +103,6 @@ export function EmailHeader({ date }: { date?: EmailDateInput }) {
   return (
     <Section style={emailStyles.headerSection}>
       <Row>
-        <Column style={emailStyles.headerAvatarCol}>
-          <Img
-            src={`${SITE_URL}/profpic.png`}
-            width="32"
-            height="32"
-            alt={FULL_NAME}
-            style={emailStyles.profileImg}
-          />
-        </Column>
         <Column style={emailStyles.headerNameCol}>
           <Text style={emailStyles.headerName}>{FULL_NAME}</Text>
           <Link href={SITE_URL} style={emailStyles.headerHandle}>

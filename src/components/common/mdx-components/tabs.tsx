@@ -21,6 +21,7 @@ import {
 } from '@/constants/ui'
 import { useMeasuredHeight } from '@/hooks/use-measured-height'
 import { useSoundEffects } from '@/hooks/use-sound-effects'
+import { canUseHoverPointer } from '@/utils/pointer'
 import { cn } from '@/utils/utils'
 import { TabPanelContext } from './contexts/tab-panel-context'
 
@@ -148,14 +149,19 @@ export const Tabs = ({ items, defaultIndex = 0, className, children }: TabsProps
             <RadixTabs.Trigger key={value} value={value} asChild>
               <m.button
                 type="button"
-                onMouseEnter={(event) => {
+                onPointerEnter={(event) => {
+                  if (!canUseHoverPointer(event.pointerType)) return
+
                   hoverTick()
                   setHover({
                     index: i,
                     shift: hoverShift(event.currentTarget, listRef.current, i, safeIndex),
                   })
                 }}
-                onMouseLeave={() => setHover(null)}
+                onPointerLeave={() => setHover(null)}
+                onPointerDown={(event) => {
+                  if (!canUseHoverPointer(event.pointerType)) setHover(null)
+                }}
                 style={{ zIndex, marginLeft: i === 0 ? 0 : -overlap, boxShadow }}
                 animate={{ x: xShift }}
                 transition={SMOOTH_SPRING_TRANSITION}

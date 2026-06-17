@@ -9,6 +9,12 @@
   }
 }
 
+@custom-variant supports-hover {
+  @media (hover: hover) and (pointer: fine) {
+    @slot;
+  }
+}
+
 @layer base {
   :root {
     --background: oklch(0.10 0 0);

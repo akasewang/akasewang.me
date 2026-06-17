@@ -13,6 +13,7 @@ import {
 import { ProjectMediaFallback } from '@/components/common/project-media-fallback'
 import { Icons } from '@/components/ui/icons'
 import { useSoundEffects } from '@/hooks/use-sound-effects'
+import { canUseHoverPointer } from '@/utils/pointer'
 
 interface ProjectDemoProps {
   image?: string
@@ -107,13 +108,17 @@ export function ProjectDemo({ image, video, title }: ProjectDemoProps) {
     <div className="my-8 w-full not-prose" ref={containerRef}>
       <figure
         className="group/demo relative isolate m-0 select-none overflow-hidden rounded-xl border border-border/60 bg-surface-40 motion-safe:animate-in motion-safe:fade-in-0 motion-safe:duration-500"
-        onMouseEnter={() => {
+        onPointerEnter={(event) => {
+          if (!canUseHoverPointer(event.pointerType)) return
+
           if (video) hoverCard()
           updateState({ isHovered: true })
           resetHideTimer()
         }}
-        onMouseLeave={() => updateState({ isHovered: false })}
-        onMouseMove={() => resetHideTimer()}
+        onPointerLeave={() => updateState({ isHovered: false })}
+        onPointerMove={(event) => {
+          if (canUseHoverPointer(event.pointerType)) resetHideTimer()
+        }}
         onClick={video ? handleToggleClick : undefined}
         onKeyDown={video ? handleToggleKeyDown : undefined}
         role={video ? 'button' : undefined}
