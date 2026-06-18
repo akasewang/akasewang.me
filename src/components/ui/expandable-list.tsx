@@ -58,13 +58,13 @@ export function ExpandableList<T>({ items, renderItem, initialCount = 3 }: Expan
               setShowAll((prev) => !prev)
             }}
             onMouseEnter={hoverTick}
-            className="group mt-6 inline-flex self-start items-center gap-1.5 text-sm text-muted-foreground transition-colors duration-300 hover:text-primary"
+            className="group mt-6 inline-flex self-start items-center gap-1.5 text-sm text-muted-foreground transition-colors duration-300 supports-hover:hover:text-primary active:text-primary"
             aria-expanded={showAll}
           >
             <m.span
               layout
               transition={smoothTransition}
-              className="relative flex items-center after:absolute after:-bottom-0.5 after:left-0 after:h-px after:w-0 after:bg-primary after:transition-[width] after:duration-300 group-hover:after:w-full"
+              className="relative flex items-center after:absolute after:-bottom-0.5 after:left-0 after:h-px after:w-0 after:bg-primary after:transition-[width] after:duration-300 supports-hover:group-hover:after:w-full group-active:after:w-full"
             >
               <AnimatePresence mode="popLayout" initial={false}>
                 <m.span
@@ -84,7 +84,9 @@ export function ExpandableList<T>({ items, renderItem, initialCount = 3 }: Expan
               aria-hidden="true"
               className={cn(
                 'size-3.5 transition-transform duration-300',
-                showAll ? 'group-hover:-rotate-90' : 'group-hover:rotate-90',
+                showAll
+                  ? 'supports-hover:group-hover:-rotate-90 group-active:-rotate-90'
+                  : 'supports-hover:group-hover:rotate-90 group-active:rotate-90',
               )}
             />
           </m.button>

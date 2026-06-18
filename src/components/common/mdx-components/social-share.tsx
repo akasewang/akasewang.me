@@ -102,7 +102,7 @@ export function SocialShare({ url, title, className }: SocialShareProps) {
       type="button"
       onMouseEnter={hoverTick}
       className={cn(
-        'relative flex size-8 items-center justify-center rounded-lg bg-background text-secondary ring-1 ring-transparent retina:ring-[0.5px] transition-[color,background-color,transform,scale,box-shadow] duration-300 ease-in-out hover:bg-surface-40 hover:ring-accent-border hover:text-primary active:bg-surface-30 active:scale-[0.95] active:duration-200',
+        'relative flex size-8 items-center justify-center rounded-lg bg-background text-secondary ring-1 ring-transparent retina:ring-[0.5px] transition-[color,background-color,transform,scale,box-shadow] duration-300 ease-in-out supports-hover:hover:bg-surface-40 supports-hover:hover:ring-accent-border supports-hover:hover:text-primary active:bg-surface-30 active:ring-accent-border active:text-primary active:scale-[0.95] active:duration-200',
         isOpen && 'bg-surface-40 ring-accent-border text-primary scale-[0.95]',
       )}
       aria-label="Share post"

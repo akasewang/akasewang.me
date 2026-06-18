@@ -89,7 +89,7 @@ export function PhotosContent() {
           type="button"
           onClick={handleToggleView}
           onMouseEnter={hoverTick}
-          className="relative flex h-8 shrink-0 items-center justify-center text-sm font-medium text-muted-foreground transition-colors duration-300 hover:text-primary"
+          className="relative flex h-8 shrink-0 items-center justify-center text-sm font-medium text-muted-foreground transition-[color,transform,scale] duration-300 supports-hover:hover:text-primary active:text-primary active:scale-[0.95] active:duration-200"
           aria-label="Toggle layout mode"
           title="Toggle layout mode"
         >
@@ -181,7 +181,7 @@ const PhotoCard = memo(function PhotoCard({
           'block border-0 p-0 text-left',
         )}
       >
-        <div className="absolute inset-0 z-10 bg-muted/10 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+        <div className="absolute inset-0 z-10 bg-muted/10 opacity-0 transition-opacity duration-300 supports-hover:group-hover:opacity-100 group-active:opacity-100" />
 
         <m.div
           layoutId={`photo-${photo.id}`}

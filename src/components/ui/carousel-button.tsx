@@ -32,7 +32,7 @@ export function CarouselButton({
           onMouseEnter={hoverLink}
           onClick={navigateSound}
           className={cn(
-            'absolute -inset-y-1 -right-2 z-10 flex w-8 items-center justify-center rounded-lg ring-1 ring-ring retina:ring-[0.5px] bg-card text-muted-foreground shadow-l-lg transition-[color,transform,scale,box-shadow] duration-300 ease-out hover:text-primary active:scale-[0.98] active:duration-200',
+            'absolute -inset-y-1 -right-2 z-10 flex w-8 items-center justify-center rounded-lg ring-1 ring-ring retina:ring-[0.5px] bg-card text-muted-foreground shadow-l-lg transition-[color,transform,scale,box-shadow] duration-300 ease-out supports-hover:hover:text-primary active:text-primary active:scale-[0.98] active:duration-200',
             className,
           )}
         >

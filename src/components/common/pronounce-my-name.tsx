@@ -44,7 +44,7 @@ export function PronounceMyName({ className, namePronunciationUrl }: PronounceMy
           onClick={handlePlayClick}
           aria-label={commonContent.pronounceName}
           className={cn(
-            'relative select-none text-secondary transition-[color,scale] duration-300 after:absolute after:-inset-1 hover:text-primary active:scale-[0.95] active:duration-200',
+            'relative select-none text-secondary transition-[color,scale] duration-300 after:absolute after:-inset-1 supports-hover:hover:text-primary active:text-primary active:scale-[0.95] active:duration-200',
             className,
           )}
         >

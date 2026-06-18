@@ -28,10 +28,10 @@ export function ExperimentTile({ experiment, index }: ExperimentTileProps) {
         <Component />
       </div>
 
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/55 via-black/15 to-transparent opacity-0 transition-opacity duration-300 ease-out group-hover:opacity-100" />
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/55 via-black/15 to-transparent opacity-0 transition-opacity duration-300 ease-out supports-hover:group-hover:opacity-100 [@media(hover:none)]:opacity-100" />
 
       <div className="pointer-events-none absolute inset-x-0 bottom-0 flex items-end px-4 py-3">
-        <span className="translate-y-1 text-balance text-base font-medium leading-tight tracking-tight text-white opacity-0 drop-shadow-md transition-[translate,opacity] duration-300 ease-out group-hover:translate-y-0 group-hover:opacity-100">
+        <span className="translate-y-1 text-balance text-base font-medium leading-tight tracking-tight text-white opacity-0 drop-shadow-md transition-[translate,opacity] duration-300 ease-out supports-hover:group-hover:translate-y-0 supports-hover:group-hover:opacity-100 [@media(hover:none)]:translate-y-0 [@media(hover:none)]:opacity-100">
           {name}
         </span>
       </div>

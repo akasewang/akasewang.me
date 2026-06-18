@@ -89,7 +89,7 @@ export function HeroSection() {
               <LinkText
                 key={link.label}
                 href={link.href}
-                className="text-muted-foreground hover:text-muted-foreground"
+                className="text-muted-foreground supports-hover:hover:text-muted-foreground active:text-muted-foreground"
               >
                 {link.label}
               </LinkText>

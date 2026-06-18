@@ -29,7 +29,7 @@ interface SlugNavigationProps {
 const BUTTON_BASE_STYLES =
   'relative flex size-8 items-center justify-center rounded-lg bg-transparent text-secondary ring-1 ring-transparent retina:ring-[0.5px] transition-[background-color,color,transform,scale,box-shadow] duration-300'
 const BUTTON_ACTIVE_STYLES =
-  'hover:bg-accent hover:ring-accent-border hover:text-primary active:scale-[0.95] active:duration-200'
+  'supports-hover:hover:bg-accent supports-hover:hover:ring-accent-border supports-hover:hover:text-primary active:bg-accent active:ring-accent-border active:text-primary active:scale-[0.95] active:duration-200'
 const BUTTON_DISABLED_STYLES = 'cursor-not-allowed opacity-20'
 
 export function SlugNavigation({ prev, next, basePath, content, url, title }: SlugNavigationProps) {

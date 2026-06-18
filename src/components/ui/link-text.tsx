@@ -31,7 +31,7 @@ export function LinkText({ href, children, className, target, showIcon = true }:
         'from-muted-foreground/50 bg-[image:repeating-linear-gradient(to_right,currentColor_0_3px,transparent_3px_6px),repeating-linear-gradient(to_right,var(--tw-gradient-from)_0_3px,transparent_3px_6px)]',
         'bg-[length:0%_1px,100%_1px] bg-left-bottom bg-no-repeat',
         'transition-[color,background-size] duration-300 ease-out',
-        'hover:bg-[length:100%_1px,100%_1px] hover:text-primary',
+        'supports-hover:hover:bg-[length:100%_1px,100%_1px] active:bg-[length:100%_1px,100%_1px] supports-hover:hover:text-primary active:text-primary',
         className,
       )}
     >

@@ -66,7 +66,7 @@ export function ProfilePicture({ src, alt, href, label, className }: ProfilePict
         />
       </div>
 
-      <span className="relative size-full overflow-hidden rounded-full shadow-lg transition-transform duration-300 group-hover:scale-105 group-active:scale-105">
+      <span className="relative size-full overflow-hidden rounded-full shadow-lg transition-transform duration-300 supports-hover:group-hover:scale-105 group-active:scale-105">
         <Image
           src={src}
           alt={alt}

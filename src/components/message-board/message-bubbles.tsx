@@ -82,7 +82,10 @@ export const MessageBubbles = memo(
                     onDelete(msg.id)
                   }}
                   onMouseEnter={hoverTick}
-                  className={cn(actionBtnClass, 'text-destructive hover:text-destructive/80')}
+                  className={cn(
+                    actionBtnClass,
+                    'text-destructive supports-hover:hover:text-destructive/80 active:text-destructive/80',
+                  )}
                 >
                   {t.delete}
                 </button>
@@ -94,7 +97,10 @@ export const MessageBubbles = memo(
                       toggleReply(true)
                     }}
                     onMouseEnter={hoverTick}
-                    className={cn(actionBtnClass, 'text-foreground hover:text-foreground/80')}
+                    className={cn(
+                      actionBtnClass,
+                      'text-foreground supports-hover:hover:text-foreground/80 active:text-foreground/80',
+                    )}
                   >
                     {t.reply}
                   </button>
@@ -129,7 +135,7 @@ export const MessageBubbles = memo(
                   onMouseEnter={hoverTick}
                   className={cn(
                     actionBtnClass,
-                    'mr-2 mt-1.5 text-foreground hover:text-foreground/80',
+                    'mr-2 mt-1.5 text-foreground supports-hover:hover:text-foreground/80 active:text-foreground/80',
                   )}
                 >
                   {t.editReply}
@@ -160,7 +166,7 @@ export const MessageBubbles = memo(
                   }}
                   onMouseEnter={hoverTick}
                   disabled={isSubmitting}
-                  className="rounded-md bg-surface-20 ring-1 ring-inset ring-ring/80 retina:ring-[0.5px] px-4 py-1.5 text-xs font-medium text-muted-foreground transition-[color,background-color,box-shadow,transform,scale] duration-300 hover:bg-surface-50 hover:ring-ring active:scale-[0.98] active:duration-200 disabled:pointer-events-none disabled:opacity-50"
+                  className="rounded-md bg-surface-20 ring-1 ring-inset ring-ring/80 retina:ring-[0.5px] px-4 py-1.5 text-xs font-medium text-muted-foreground transition-[color,background-color,box-shadow,transform,scale] duration-300 supports-hover:hover:bg-surface-50 supports-hover:hover:ring-ring active:bg-surface-50 active:ring-ring active:scale-[0.98] active:duration-200 disabled:pointer-events-none disabled:opacity-50"
                 >
                   {t.cancel}
                 </button>
@@ -172,7 +178,7 @@ export const MessageBubbles = memo(
                   }}
                   onMouseEnter={hoverTick}
                   disabled={!isReplyValid || isSubmitting}
-                  className="flex items-center gap-2 rounded-md bg-primary px-4 py-1.5 text-xs font-medium text-primary-foreground transition-[opacity,transform,scale] duration-300 hover:opacity-90 active:scale-[0.98] active:duration-200 disabled:pointer-events-none disabled:opacity-50"
+                  className="flex items-center gap-2 rounded-md bg-primary px-4 py-1.5 text-xs font-medium text-primary-foreground transition-[opacity,transform,scale] duration-300 supports-hover:hover:opacity-90 active:opacity-90 active:scale-[0.98] active:duration-200 disabled:pointer-events-none disabled:opacity-50"
                 >
                   {isSubmitting ? t.sending : t.send}
                 </button>

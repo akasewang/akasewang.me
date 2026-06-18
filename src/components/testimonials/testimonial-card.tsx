@@ -95,7 +95,7 @@ function AuthorAvatar({
 }) {
   const ringClasses = cn(
     'rounded-full ring-1 ring-ring/80 transition-shadow duration-300 retina:ring-[0.5px]',
-    isLink && 'group-hover:ring-ring',
+    isLink && 'supports-hover:group-hover:ring-ring group-active:ring-ring',
   )
 
   return image ? (

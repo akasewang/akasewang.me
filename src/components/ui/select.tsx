@@ -61,7 +61,7 @@ const SelectTrigger = forwardRef<
       {...props}
       className={cn(
         'group flex h-10 w-full items-center justify-between gap-2 rounded-xl ring-1 ring-inset ring-ring retina:ring-[0.5px] bg-card px-4 text-sm font-medium lowercase text-secondary outline-none transition-[color,transform] duration-300 ease-out disabled:pointer-events-none disabled:opacity-50 [&>span]:line-clamp-1',
-        'hover:text-primary',
+        'supports-hover:hover:text-primary',
         'active:scale-[0.99] active:text-primary',
         'data-[state=open]:scale-[0.99] data-[state=open]:text-primary',
         className,

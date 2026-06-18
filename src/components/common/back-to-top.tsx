@@ -146,7 +146,6 @@ export function BackToTop() {
           exit="exit"
           transition={SMOOTH_SPRING_TRANSITION}
           whileTap={{ scale: 0.95 }}
-          whileHover={{ scale: 1.05 }}
           className="group fixed bottom-8 right-8 z-50 flex size-[58px] items-center justify-center rounded-full bg-floating ring-1 ring-inset ring-ring retina:ring-[0.5px] shadow-md md:bottom-10"
         >
           <svg
@@ -187,7 +186,7 @@ export function BackToTop() {
                 animate="animate"
                 exit="exit"
                 transition={SPRING_TRANSITION}
-                className="absolute flex items-center justify-center text-muted-foreground transition-colors duration-500 group-hover:text-primary"
+                className="absolute flex items-center justify-center text-muted-foreground transition-colors duration-500 supports-hover:group-hover:text-primary group-active:text-primary"
               >
                 <Icon className="size-6.5" strokeWidth={2} />
               </m.div>

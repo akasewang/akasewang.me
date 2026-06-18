@@ -49,13 +49,13 @@ function CommitRow({ commit }: { commit: ChangelogCommit }) {
             aria-label={`View commit ${commit.shortSha} on GitHub`}
             onMouseEnter={hoverLink}
             onClick={navigateSound}
-            className="transition-colors duration-300 hover:text-primary"
+            className="transition-colors duration-300 supports-hover:hover:text-primary active:text-primary"
           >
             {commit.shortSha}
           </a>
           <ExpandToggle
             isExpanded={isExpanded}
-            className="absolute right-2 top-2 text-muted-foreground transition-colors duration-300 group-hover/card:text-primary sm:static"
+            className="absolute right-2 top-2 text-muted-foreground transition-colors duration-300 supports-hover:group-hover/card:text-primary group-active/card:text-primary sm:static"
           />
         </div>
       </div>
@@ -102,7 +102,7 @@ function CommitRow({ commit }: { commit: ChangelogCommit }) {
                   rel="noopener noreferrer"
                   onMouseEnter={hoverLink}
                   onClick={navigateSound}
-                  className="font-medium text-secondary transition-colors duration-300 hover:text-primary"
+                  className="font-medium text-secondary transition-colors duration-300 supports-hover:hover:text-primary active:text-primary"
                 >
                   {commit.authorName}
                 </a>

@@ -46,7 +46,7 @@ export function Footer() {
                     rel="noopener noreferrer"
                     onMouseEnter={hoverLink}
                     onClick={navigateSound}
-                    className="transition-colors duration-300 hover:text-foreground"
+                    className="transition-colors duration-300 supports-hover:hover:text-foreground active:text-foreground"
                   >
                     {license}
                   </Link>
@@ -73,7 +73,7 @@ export function Footer() {
                   href={changelogHref}
                   onMouseEnter={hoverLink}
                   onClick={navigateSound}
-                  className="transition-colors duration-300 hover:text-foreground font-mono"
+                  className="transition-colors duration-300 supports-hover:hover:text-foreground active:text-foreground font-mono"
                 >
                   {changelogLabel}
                 </Link>

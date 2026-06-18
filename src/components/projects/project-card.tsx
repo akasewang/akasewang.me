@@ -57,7 +57,7 @@ export const ProjectCard = memo(function ProjectCard({ project }: ProjectCardPro
       >
         <div
           ref={containerRef}
-          className="relative aspect-[16/10] w-full overflow-hidden rounded-xl bg-card ring-1 ring-inset ring-ring/80 retina:ring-[0.5px] transition-[box-shadow,transform,scale] duration-300 ease-out md:group-hover:ring-ring md:group-hover:shadow-2xl md:active:scale-[0.98] md:active:duration-200 md:active:shadow-none"
+          className="relative aspect-[16/10] w-full overflow-hidden rounded-xl bg-card ring-1 ring-inset ring-ring/80 retina:ring-[0.5px] transition-[box-shadow,transform,scale] duration-300 ease-out md:supports-hover:group-hover:ring-ring md:supports-hover:group-hover:shadow-2xl md:active:ring-ring md:active:scale-[0.98] md:active:duration-200 md:active:shadow-none"
         >
           {video ? (
             <video
@@ -68,7 +68,7 @@ export const ProjectCard = memo(function ProjectCard({ project }: ProjectCardPro
               playsInline
               disablePictureInPicture
               preload="none"
-              className="absolute inset-0 h-full w-full object-cover transition-[transform,scale] duration-500 ease-out md:group-hover:scale-[1.03]"
+              className="absolute inset-0 h-full w-full object-cover transition-[transform,scale] duration-500 ease-out md:supports-hover:group-hover:scale-[1.03]"
             />
           ) : image ? (
             <Image
@@ -76,13 +76,13 @@ export const ProjectCard = memo(function ProjectCard({ project }: ProjectCardPro
               alt={title}
               fill
               sizes="(max-width: 640px) 100vw, 400px"
-              className="object-cover transition-[transform,scale] duration-500 ease-out md:group-hover:scale-[1.03]"
+              className="object-cover transition-[transform,scale] duration-500 ease-out md:supports-hover:group-hover:scale-[1.03]"
             />
           ) : (
             <ProjectMediaFallback title={title} />
           )}
 
-          <div className="pointer-events-none absolute inset-0 hidden bg-black/0 transition-colors duration-300 ease-out group-hover:bg-black/40 md:block" />
+          <div className="pointer-events-none absolute inset-0 hidden bg-black/0 transition-colors duration-300 ease-out md:block md:supports-hover:group-hover:bg-black/40" />
 
           {isNew(date) && (
             <div className="absolute left-3 top-3 z-20">
@@ -91,13 +91,13 @@ export const ProjectCard = memo(function ProjectCard({ project }: ProjectCardPro
           )}
 
           {displayDate && (
-            <div className="absolute right-4 top-3 z-20 hidden -translate-y-0.5 opacity-0 transition-[translate,opacity] duration-300 ease-out group-hover:translate-y-0 group-hover:opacity-100 md:block">
+            <div className="absolute right-4 top-3 z-20 hidden -translate-y-0.5 opacity-0 transition-[translate,opacity] duration-300 ease-out md:block md:supports-hover:group-hover:translate-y-0 md:supports-hover:group-hover:opacity-100">
               <span className="font-mono text-[13px] text-white/40">{displayDate}</span>
             </div>
           )}
 
           <div className="absolute inset-0 hidden flex-col justify-end px-4 py-3 text-white md:flex">
-            <div className="flex translate-y-1 items-end justify-between opacity-0 transition-[translate,opacity] duration-300 ease-out group-hover:translate-y-0 group-hover:opacity-100">
+            <div className="flex translate-y-1 items-end justify-between opacity-0 transition-[translate,opacity] duration-300 ease-out md:supports-hover:group-hover:translate-y-0 md:supports-hover:group-hover:opacity-100">
               <h3 className="text-balance text-base font-medium leading-tight tracking-tight text-white drop-shadow-md">
                 {title}
               </h3>

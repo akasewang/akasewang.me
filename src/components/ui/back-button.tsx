@@ -31,20 +31,20 @@ export function BackButton({ href = '/', label, className }: BackButtonProps) {
       onMouseEnter={hoverLink}
       onClick={navigateSound}
       className={cn(
-        'group flex w-fit items-center text-sm text-muted-foreground transition-colors duration-300 hover:text-primary',
+        'group flex w-fit items-center text-sm text-muted-foreground transition-colors duration-300 supports-hover:hover:text-primary active:text-primary',
         className,
       )}
     >
-      <Icons.chevronRight className="mr-1 size-4 shrink-0 transition-transform duration-300 ease-out group-hover:translate-x-px" />
+      <Icons.chevronRight className="mr-1 size-4 shrink-0 transition-transform duration-300 ease-out supports-hover:group-hover:translate-x-px group-active:translate-x-px" />
 
-      <div className="grid grid-cols-[0fr] opacity-0 transition-[grid-template-columns,opacity] duration-500 ease-[cubic-bezier(0.25,1,0.5,1)] group-hover:grid-cols-[1fr] group-hover:opacity-100">
+      <div className="grid grid-cols-[0fr] opacity-0 transition-[grid-template-columns,opacity] duration-500 ease-[cubic-bezier(0.25,1,0.5,1)] supports-hover:group-hover:grid-cols-[1fr] group-active:grid-cols-[1fr] supports-hover:group-hover:opacity-100 group-active:opacity-100">
         <div className="flex items-center overflow-hidden whitespace-nowrap">
           <span className="font-medium tracking-tight">{resolvedLabel}</span>
           <SeparatorSlash />
         </div>
       </div>
 
-      <span className="font-mono text-sm font-medium tracking-tight text-muted-foreground transition-colors duration-300 group-hover:text-primary">
+      <span className="font-mono text-sm font-medium tracking-tight text-muted-foreground transition-colors duration-300 supports-hover:group-hover:text-primary group-active:text-primary">
         cd ..
       </span>
     </Link>

@@ -145,7 +145,7 @@ export function MessageBoardList({ messages: initialMessages }: MessageBoardList
               logoutAdmin()
             }}
             onMouseEnter={hoverTick}
-            className="rounded-md bg-destructive/10 px-4 py-2 text-xs font-medium text-destructive transition duration-300 hover:bg-destructive/20 active:scale-[0.98] active:duration-200"
+            className="rounded-md bg-destructive/10 px-4 py-2 text-xs font-medium text-destructive transition duration-300 supports-hover:hover:bg-destructive/20 active:bg-destructive/20 active:scale-[0.98] active:duration-200"
           >
             Leave Admin Mode
           </button>
@@ -179,7 +179,7 @@ export function MessageBoardList({ messages: initialMessages }: MessageBoardList
                 loadMore()
               }}
               onMouseEnter={hoverTick}
-              className="relative underline underline-offset-4 transition-colors duration-300 hover:text-foreground active:duration-200"
+              className="relative underline underline-offset-4 transition-colors duration-300 supports-hover:hover:text-foreground active:text-foreground active:duration-200"
             >
               {t.retry}
             </button>

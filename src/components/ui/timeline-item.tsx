@@ -95,7 +95,7 @@ export const TimelineItem = memo(function TimelineItem({
         {hasContent && (
           <ExpandToggle
             isExpanded={isExpanded}
-            className="absolute right-2 top-2.5 text-muted-foreground transition-colors duration-300 group-hover/card:text-primary sm:static sm:-mr-1"
+            className="absolute right-2 top-2.5 text-muted-foreground transition-colors duration-300 supports-hover:group-hover/card:text-primary group-active/card:text-primary sm:static sm:-mr-1"
           />
         )}
       </div>

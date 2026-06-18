@@ -35,7 +35,7 @@ const createHeading = (level: 1 | 2 | 3 | 4 | 5 | 6) => {
       >
         <a
           href={`#${headingId}`}
-          className="absolute -left-8 top-1/2 flex -translate-y-1/2 items-center justify-center text-muted-foreground opacity-0 transition-[color,opacity] duration-300 hover:text-primary group-hover:opacity-100"
+          className="absolute -left-8 top-1/2 flex -translate-y-1/2 items-center justify-center text-muted-foreground opacity-0 transition-[color,opacity] duration-300 supports-hover:hover:text-primary active:text-primary supports-hover:group-hover:opacity-100 focus-visible:opacity-100"
           aria-label={`Link to ${text}`}
         >
           <Icons.hash size={ICON_SIZES[level]} />

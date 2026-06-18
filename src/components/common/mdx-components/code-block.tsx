@@ -91,8 +91,8 @@ export const Pre = ({
               'pointer-events-auto flex size-6 items-center justify-center rounded-md',
               'transition-[color,background-color,opacity,transform,scale] duration-200 ease-out',
               'scale-[0.95] bg-transparent text-secondary opacity-0 backdrop-blur-sm',
-              'hover:bg-background/80 hover:text-primary',
-              'group-hover/pre:scale-100 group-hover/pre:opacity-100',
+              'supports-hover:hover:bg-background/80 supports-hover:hover:text-primary active:bg-background/80 active:text-primary',
+              'supports-hover:group-hover/pre:scale-100 supports-hover:group-hover/pre:opacity-100',
               'data-[copied=true]:scale-100 data-[copied=true]:text-primary data-[copied=true]:opacity-100',
               '[@media(hover:none)]:scale-100 [@media(hover:none)]:opacity-100',
             )}

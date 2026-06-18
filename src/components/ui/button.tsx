@@ -140,7 +140,8 @@ export function Button({
           hasRightBox ? 'rounded-r-md' : 'rounded-r-xl',
           isActionActive
             ? 'translate-x-px'
-            : hasRightBox && 'group-hover:translate-x-px group-active:translate-x-px',
+            : hasRightBox &&
+                'supports-hover:group-hover:translate-x-px group-active:translate-x-px',
         )}
       >
         {renderContent()}
@@ -153,7 +154,7 @@ export function Button({
             'aspect-square w-10 overflow-hidden rounded-l-md rounded-r-xl',
             isActionActive
               ? '-translate-x-px'
-              : 'group-hover:-translate-x-px group-active:-translate-x-px',
+              : 'supports-hover:group-hover:-translate-x-px group-active:-translate-x-px',
           )}
         >
           {renderRightContent()}

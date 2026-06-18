@@ -19,7 +19,7 @@ const NAV_ITEMS = [
 ]
 
 const ICON_BUTTON_STYLES =
-  'relative flex size-8 items-center justify-center rounded-lg bg-transparent text-secondary ring-1 ring-transparent transition-[background-color,color,transform,scale,opacity,box-shadow] duration-300 hover:bg-accent hover:text-primary hover:ring-accent-border active:scale-[0.95] active:duration-200 retina:ring-[0.5px]'
+  'relative flex size-8 items-center justify-center rounded-lg bg-transparent text-secondary ring-1 ring-transparent transition-[background-color,color,transform,scale,opacity,box-shadow] duration-300 supports-hover:hover:bg-accent supports-hover:hover:text-primary supports-hover:hover:ring-accent-border active:bg-accent active:text-primary active:ring-accent-border active:scale-[0.95] active:duration-200 retina:ring-[0.5px]'
 
 export function Navbar() {
   const router = useRouter()
@@ -89,7 +89,9 @@ export function Navbar() {
                 onClick={navigateSound}
                 className={cn(
                   'relative flex h-8 shrink-0 items-center justify-center text-sm font-medium transition-colors duration-300',
-                  pathname === href ? 'text-primary' : 'text-secondary hover:text-primary',
+                  pathname === href
+                    ? 'text-primary'
+                    : 'text-secondary supports-hover:hover:text-primary active:text-primary',
                 )}
               >
                 <span className="hidden md:block">{label}</span>

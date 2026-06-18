@@ -235,7 +235,7 @@ export function ProjectDemo({ image, video, title }: ProjectDemoProps) {
                     <m.div
                       initial={{ opacity: 0, y: 5 }}
                       animate={{ opacity: 1, y: 0 }}
-                      className="absolute bottom-0 left-0 h-1.5 w-full bg-black/20 transition-[height] duration-200 hover:h-2.5"
+                      className="absolute bottom-0 left-0 h-1.5 w-full bg-black/20 transition-[height] duration-200 supports-hover:hover:h-2.5 active:h-2.5"
                       onClick={handleSeek}
                     >
                       <m.div

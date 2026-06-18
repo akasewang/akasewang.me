@@ -67,7 +67,7 @@ export function SearchBar({
                 tap()
                 onSearchChange('')
               }}
-              className="flex size-6 shrink-0 items-center justify-center text-muted-foreground/50 transition-colors duration-200 hover:text-primary"
+              className="flex size-6 shrink-0 items-center justify-center text-muted-foreground/50 transition-colors duration-200 supports-hover:hover:text-primary active:text-primary"
             >
               <Icons.close className="size-4.5" />
             </m.button>

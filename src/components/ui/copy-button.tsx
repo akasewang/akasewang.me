@@ -65,7 +65,7 @@ export function CopyButton({
       data-copied={isCopied}
       className={cn(
         'group/copy inline-flex items-center justify-center',
-        isCopied ? 'text-primary' : 'hover:text-primary',
+        isCopied ? 'text-primary' : 'supports-hover:hover:text-primary active:text-primary',
         className,
       )}
       {...props}

@@ -38,6 +38,12 @@ interface TabProps {
   className?: string
 }
 
+interface TabInteraction {
+  index: number
+  shift: number
+  source: 'hover' | 'press'
+}
+
 const PANEL_RADIUS = 10
 
 const EDGE_PADDING = PANEL_RADIUS + 4
@@ -67,7 +73,7 @@ const hoverShift = (
 export const Tabs = ({ items, defaultIndex = 0, className, children }: TabsProps) => {
   const { select, hoverTick } = useSoundEffects()
   const [activeIndex, setActiveIndex] = useState(defaultIndex)
-  const [hover, setHover] = useState<{ index: number; shift: number } | null>(null)
+  const [interaction, setInteraction] = useState<TabInteraction | null>(null)
   const [direction, setDirection] = useState(1)
   const [overlap, setOverlap] = useState(() => baseOverlap(2))
   const listRef = useRef<HTMLDivElement | null>(null)
@@ -83,6 +89,7 @@ export const Tabs = ({ items, defaultIndex = 0, className, children }: TabsProps
       const newIndex = parseInt(val, 10)
       setDirection(newIndex > activeIndex ? 1 : -1)
       setActiveIndex(newIndex)
+      setInteraction((current) => (current?.index === newIndex ? null : current))
     },
     [select, activeIndex],
   )
@@ -134,13 +141,13 @@ export const Tabs = ({ items, defaultIndex = 0, className, children }: TabsProps
         {validChildren.map((child, i) => {
           const value = i.toString()
           const isSelected = safeIndex === i
-          const isHovered = hover?.index === i
+          const isInteracting = interaction?.index === i && !isSelected
           const label = items?.[i] ?? child.props.title ?? `Tab ${i + 1}`
 
           const distance = Math.abs(i - safeIndex)
-          const zIndex = isSelected ? 300 : isHovered ? 150 : 100 - distance
+          const zIndex = isSelected ? 300 : isInteracting ? 150 : 100 - distance
 
-          const xShift = isHovered ? hover.shift : 0
+          const xShift = isInteracting ? interaction.shift : 0
 
           const shadowAlpha = Math.max(0.1, 0.38 - distance * 0.1)
           const boxShadow = `4px 0 3px -3px rgba(0,0,0,${shadowAlpha}), -4px 0 3px -3px rgba(0,0,0,${shadowAlpha})`
@@ -153,23 +160,36 @@ export const Tabs = ({ items, defaultIndex = 0, className, children }: TabsProps
                   if (!canUseHoverPointer(event.pointerType)) return
 
                   hoverTick()
-                  setHover({
+                  setInteraction({
                     index: i,
                     shift: hoverShift(event.currentTarget, listRef.current, i, safeIndex),
+                    source: 'hover',
                   })
                 }}
-                onPointerLeave={() => setHover(null)}
+                onPointerLeave={() => setInteraction(null)}
                 onPointerDown={(event) => {
-                  if (!canUseHoverPointer(event.pointerType)) setHover(null)
+                  if (canUseHoverPointer(event.pointerType) || isSelected) return
+
+                  setInteraction({
+                    index: i,
+                    shift: hoverShift(event.currentTarget, listRef.current, i, safeIndex),
+                    source: 'press',
+                  })
                 }}
+                onPointerUp={(event) => {
+                  if (!canUseHoverPointer(event.pointerType)) setInteraction(null)
+                }}
+                onPointerCancel={() => setInteraction(null)}
                 style={{ zIndex, marginLeft: i === 0 ? 0 : -overlap, boxShadow }}
                 animate={{ x: xShift }}
-                transition={SMOOTH_SPRING_TRANSITION}
+                transition={
+                  interaction?.source === 'press' ? SPRING_TRANSITION : SMOOTH_SPRING_TRANSITION
+                }
                 className={cn(
                   'relative flex shrink-0 items-center justify-center whitespace-nowrap rounded-t-lg border border-b-0 border-border/60 px-5 pt-1.5 pb-2 font-mono text-xs font-medium lowercase transition-[color,background-color,box-shadow] duration-300',
                   isSelected
                     ? 'bg-code-tab text-primary'
-                    : 'bg-code-tab-bar text-muted-foreground hover:text-foreground',
+                    : 'bg-code-tab-bar text-muted-foreground supports-hover:hover:text-foreground active:text-foreground',
                 )}
               >
                 <m.span

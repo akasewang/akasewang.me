@@ -39,7 +39,9 @@ export function CategoryFilter<T extends string>({
             onMouseEnter={hoverTick}
             className={cn(
               'relative flex min-w-12 items-center justify-center rounded-none px-3 py-1 font-mono text-[13px] font-medium lowercase transition-colors duration-300',
-              isActive ? 'text-primary-foreground' : 'text-secondary hover:text-primary',
+              isActive
+                ? 'text-primary-foreground'
+                : 'text-secondary supports-hover:hover:text-primary active:text-primary',
             )}
           >
             <span className="relative z-10">{label}</span>

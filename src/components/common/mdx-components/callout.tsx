@@ -83,7 +83,7 @@ export const Callout = ({ type = 'info', title, children, className }: CalloutPr
           '[&>ol]:ml-0 [&>ol]:my-0 [&>ol]:list-decimal [&>ol]:pl-5',
           '[&>ul]:ml-0 [&>ul]:my-0 [&>ul]:list-disc [&>ul]:pl-5',
           '[&_li:first-child]:mt-0 [&_li]:mb-0 [&_li]:mt-1 [&_li]:text-xs',
-          '[&_a]:font-medium [&_a]:text-foreground [&_a]:underline [&_a]:decoration-1 [&_a]:underline-offset-[3px] [&_a]:[text-decoration-color:color-mix(in_oklab,var(--callout-hue)_45%,transparent)] hover:[&_a]:[text-decoration-color:var(--callout-hue)]',
+          '[&_a]:font-medium [&_a]:text-foreground [&_a]:underline [&_a]:decoration-1 [&_a]:underline-offset-[3px] [&_a]:[text-decoration-color:color-mix(in_oklab,var(--callout-hue)_45%,transparent)] supports-hover:hover:[&_a]:[text-decoration-color:var(--callout-hue)] active:[&_a]:[text-decoration-color:var(--callout-hue)]',
           '[&_code]:rounded [&_code]:bg-[color-mix(in_oklab,var(--callout-hue)_12%,transparent)] [&_code]:px-[0.35em] [&_code]:py-[0.1em] [&_code]:font-mono [&_code]:text-[0.875em]',
         )}
       >

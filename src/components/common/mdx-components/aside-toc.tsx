@@ -27,8 +27,8 @@ export const AsideTOC = ({ content, className }: AsideTOCProps) => {
       )}
     >
       <div className="flex flex-col gap-4">
-        <Icons.menu className="size-[18px] text-muted-foreground transition-colors duration-300 hover:text-primary group-hover/blog:text-primary" />
-        <div className="flex flex-col gap-2.5 opacity-0 transition-opacity duration-300 ease-in-out hover:opacity-100 group-hover/blog:opacity-100">
+        <Icons.menu className="size-[18px] text-muted-foreground transition-colors duration-300 supports-hover:hover:text-primary supports-hover:group-hover/blog:text-primary [@media(hover:none)]:text-primary" />
+        <div className="flex flex-col gap-2.5 opacity-0 transition-opacity duration-300 ease-in-out supports-hover:hover:opacity-100 supports-hover:group-hover/blog:opacity-100 focus-within:opacity-100 [@media(hover:none)]:opacity-100">
           {items.map(({ id, level, text }) => (
             <button
               key={id}
@@ -45,7 +45,7 @@ export const AsideTOC = ({ content, className }: AsideTOCProps) => {
                   'block truncate text-xs leading-tight tracking-tight transition-colors duration-200 ease-out',
                   activeId === id
                     ? 'text-primary font-medium'
-                    : 'text-muted-foreground group-hover:text-primary/90',
+                    : 'text-muted-foreground supports-hover:group-hover:text-primary/90 group-active:text-primary/90',
                 )}
               >
                 {text}
