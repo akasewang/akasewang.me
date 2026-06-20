@@ -26,6 +26,7 @@ export interface Testimonial {
   role?: string
   url?: string
   image?: string
+  verified?: boolean
 }
 
 export interface TestimonialRows {

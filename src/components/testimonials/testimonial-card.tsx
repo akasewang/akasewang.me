@@ -24,7 +24,7 @@ const TESTIMONIAL_QUOTE_CLASSES =
 const TESTIMONIAL_ROLE_CLASSES = 'truncate font-mono text-xs font-medium tracking-tight'
 
 export function TestimonialCard({
-  testimonial: { url, quote, author, role, image },
+  testimonial: { url, quote, author, role, image, verified },
   className,
 }: TestimonialCardProps) {
   const isLink = !!url
@@ -48,7 +48,7 @@ export function TestimonialCard({
         <div className="flex min-w-0 flex-col">
           <div className="flex items-center gap-1.5 text-[13px] font-semibold leading-relaxed tracking-tight text-primary">
             <span className="truncate">{author}</span>
-            <VerifiedIcon className="size-3 -mt-[1px] shrink-0 text-verified" />
+            {verified && <VerifiedIcon className="size-3 -mt-[1px] shrink-0 text-verified" />}
           </div>
 
           {role && (

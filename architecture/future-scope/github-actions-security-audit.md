@@ -1,7 +1,8 @@
-# GitHub Actions Security Audit
+# Future GitHub Actions Security Audit
 
 This future-scope note describes how to restore the automated GitHub Actions security audit
-when GitHub Actions can run reliably for the repository.
+when GitHub Actions can run reliably for the repository. It is documentation only, not active
+repository configuration.
 
 The repository currently keeps security auditing as a local script:
 
@@ -39,7 +40,8 @@ a weekly schedule.
 - The workflow should use the same major Node version as local development and Vercel. This repo
   currently targets Node 24 for dependency tooling.
 - Re-check the latest stable major versions of `actions/checkout` and `actions/setup-node` before
-  restoring the workflow. As of this note, both have stable `v6` tags.
+  restoring the workflow. As of this note, `actions/checkout` has a stable `v7` tag and
+  `actions/setup-node` has a stable `v6` tag.
 
 ### Workflow File
 
@@ -62,8 +64,7 @@ on:
       - package-lock.json
       - .github/workflows/security-audit.yml
   schedule:
-    - cron: '0 9 * * 1'
-      timezone: Asia/Kolkata
+    - cron: '30 3 * * 1'
   workflow_dispatch:
 
 permissions:
@@ -76,7 +77,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Setup Node
         uses: actions/setup-node@v6
@@ -92,8 +93,9 @@ jobs:
 ```
 
 The `workflow_dispatch` trigger is included so the audit can be run manually from the GitHub UI
-after setup changes. The scheduled run uses an IANA timezone string, so `0 9 * * 1` means Monday
-at 09:00 in Asia/Kolkata instead of UTC.
+after setup changes. GitHub Actions schedules run in UTC and do not support a `timezone` field.
+The example cron, `30 3 * * 1`, runs on Monday at 03:30 UTC, which matches Monday at 09:00 in
+Asia/Kolkata.
 
 ### Optional Full CI Workflow
 
@@ -120,7 +122,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Setup Node
         uses: actions/setup-node@v6

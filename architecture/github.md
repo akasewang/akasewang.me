@@ -24,6 +24,12 @@ That script runs:
 npm audit --audit-level=moderate
 ```
 
+Current repository state:
+
+- The active audit is local-only.
+- `.github/workflows/` should not exist on `main`.
+- `.github/dependabot.yml` is the only tracked GitHub automation config.
+
 The GitHub Actions audit workflow was removed because GitHub refused to start Actions while
 the account was locked for billing/payment setup. The local script stays useful and does not
 require a GitHub payment method.
@@ -160,4 +166,5 @@ For major upgrades:
 - Dependabot-created branches are normal; they are generated automatically for update PRs.
 - Existing Dependabot branches can be deleted after closing their PRs.
 - The repository intentionally keeps `npm run security:audit` even without a GitHub Actions workflow.
+- `architecture/future-scope/github-actions-security-audit.md` is planning documentation only; it does not create or schedule any workflow.
 - Re-add CI only when GitHub Actions can run reliably, or when another status provider is available.

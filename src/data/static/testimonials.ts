@@ -9,6 +9,7 @@ export const testimonials: TestimonialRows = {
       role: 'Co-Founder & CEO, TechStart',
       url: 'https://www.linkedin.com/posts/aditi-sharma-6793b495_it-was-a-great-pleasure-to-work-with-activity-7212345678901234567-jYx1?utm_source=share&utm_medium=android_app',
       author: 'Aditi Sharma',
+      verified: true,
     },
     {
       id: 'toprow-testimonial-2',
@@ -17,6 +18,7 @@ export const testimonials: TestimonialRows = {
       role: 'Product Manager, Innovate Corp',
       url: 'https://www.linkedin.com/in/rohan-desai-example',
       author: 'Rohan Desai',
+      verified: true,
     },
   ],
   bottomRow: [
@@ -27,6 +29,7 @@ export const testimonials: TestimonialRows = {
       role: 'Lead UX Designer, CreativeFlow',
       url: 'https://www.linkedin.com/in/kavya-iyer-example',
       author: 'Kavya Iyer',
+      verified: true,
     },
     {
       id: 'bottomrow-testimonial-2',
@@ -35,6 +38,7 @@ export const testimonials: TestimonialRows = {
       role: 'Senior Engineering Manager, CloudScale',
       url: 'https://www.linkedin.com/in/vikram-patel-example',
       author: 'Vikram Patel',
+      verified: true,
     },
   ],
 }

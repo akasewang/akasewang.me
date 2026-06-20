@@ -21,6 +21,8 @@ For a simple breakdown of how the systems in this portfolio work, check out the 
 - [**UI & Animations**](./architecture/ui.md) - Tailwind v4, custom cursors and Framer Motion effects.
 - [**Audio Feedback Design System**](./architecture/audio-design-system.md) - Global audio preference, keyboard shortcuts and procedural UI sounds.
 - [**Message Board**](./architecture/message-board.md) - Spam protection, rate limiting and admin commands.
+- [**GitHub Repository Governance**](./architecture/github.md) - Local audit policy, billing guardrails, Dependabot and branch protection.
+- [**Future Scope**](./architecture/future-scope/) - Parked ideas and inactive implementation notes for later work.
 
 ---
 
