@@ -32,7 +32,7 @@ export async function generateMetadata(): Promise<Metadata> {
     metadataBase: new URL(SITE_URL),
     manifest: '/manifest.json',
     icons: {
-      apple: '/profpic.png',
+      apple: '/profpic.jpg',
     },
     robots: {
       index: true,
@@ -92,7 +92,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       suppressHydrationWarning
     >
       <head>
-        <link rel="preload" href="/profpic.png" as="image" />
+        <link rel="preload" href="/profpic.jpg" as="image" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}

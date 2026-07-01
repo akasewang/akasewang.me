@@ -10,7 +10,7 @@ export const landingPageContent: LandingPageContent = {
     roles: ROLES,
     aboutTitle: 'about me.',
     about: [
-      "Hey there! I'm a software engineer who likes to [build applications](/projects) that make everyday things a little easier for me and the people around me and design [reusable components](https://ui.noddy.studio/) for the joy of making things.",
+      "Hey there! I'm a software engineer who likes to [build applications](/projects) that make everyday things a little easier for me and the people around me and design [reusable components](https://library.noddy.studio/) for the joy of making things.",
       "When I'm not building, I [write about](/blogs) what I'm working on or figuring out along the way and send the occasional email update to [subscribers](/newsletter) who like to follow along.",
       'Away from the keyboard, I enjoy [taking photos](/photos), playing games and keeping a [catalog](/catalog) of the anime and movies I watch.',
     ],

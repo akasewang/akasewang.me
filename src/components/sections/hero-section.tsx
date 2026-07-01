@@ -21,7 +21,7 @@ export function HeroSection() {
     <section id="hero" className="animate-page-simple space-y-8">
       <div className="flex items-center gap-6 pb-2">
         <ProfilePicture
-          src="/profpic.png"
+          src="/profpic.jpg"
           alt={FULL_NAME}
           href={hero.designsUrl}
           label={hero.designsLabel}
