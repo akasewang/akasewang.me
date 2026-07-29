@@ -1,6 +1,6 @@
 'use client'
 
-import * as RadixTabs from '@radix-ui/react-tabs'
+import { Tabs as BaseTabs } from '@base-ui/react/tabs'
 import { AnimatePresence, m } from 'framer-motion'
 import {
   Children,
@@ -127,12 +127,12 @@ export const Tabs = ({ items, defaultIndex = 0, className, children }: TabsProps
   }, [])
 
   return (
-    <RadixTabs.Root
+    <BaseTabs.Root
       value={safeIndex.toString()}
       onValueChange={handleValueChange}
       className={cn('relative isolate my-6 flex flex-col not-prose', className)}
     >
-      <RadixTabs.List
+      <BaseTabs.List
         ref={listRef}
         aria-label="Tabs"
         className="relative flex items-end overflow-x-auto pt-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
@@ -153,83 +153,93 @@ export const Tabs = ({ items, defaultIndex = 0, className, children }: TabsProps
           const boxShadow = `4px 0 3px -3px rgba(0,0,0,${shadowAlpha}), -4px 0 3px -3px rgba(0,0,0,${shadowAlpha})`
 
           return (
-            <RadixTabs.Trigger key={value} value={value} asChild>
-              <m.button
-                type="button"
-                onPointerEnter={(event) => {
-                  if (!canUseHoverPointer(event.pointerType)) return
+            <BaseTabs.Tab
+              key={value}
+              value={value}
+              render={
+                <m.button
+                  type="button"
+                  onPointerEnter={(event) => {
+                    if (!canUseHoverPointer(event.pointerType)) return
 
-                  hoverTick()
-                  setInteraction({
-                    index: i,
-                    shift: hoverShift(event.currentTarget, listRef.current, i, safeIndex),
-                    source: 'hover',
-                  })
-                }}
-                onPointerLeave={() => setInteraction(null)}
-                onPointerDown={(event) => {
-                  if (canUseHoverPointer(event.pointerType) || isSelected) return
+                    hoverTick()
+                    setInteraction({
+                      index: i,
+                      shift: hoverShift(event.currentTarget, listRef.current, i, safeIndex),
+                      source: 'hover',
+                    })
+                  }}
+                  onPointerLeave={() => setInteraction(null)}
+                  onPointerDown={(event) => {
+                    if (canUseHoverPointer(event.pointerType) || isSelected) return
 
-                  setInteraction({
-                    index: i,
-                    shift: hoverShift(event.currentTarget, listRef.current, i, safeIndex),
-                    source: 'press',
-                  })
-                }}
-                onPointerUp={(event) => {
-                  if (!canUseHoverPointer(event.pointerType)) setInteraction(null)
-                }}
-                onPointerCancel={() => setInteraction(null)}
-                style={{ zIndex, marginLeft: i === 0 ? 0 : -overlap, boxShadow }}
-                animate={{ x: xShift }}
-                transition={
-                  interaction?.source === 'press' ? SPRING_TRANSITION : SMOOTH_SPRING_TRANSITION
-                }
-                className={cn(
-                  'relative flex shrink-0 items-center justify-center whitespace-nowrap rounded-t-lg border border-b-0 border-border/60 px-5 pt-1.5 pb-2 font-mono text-xs font-medium lowercase transition-[color,background-color,box-shadow] duration-300',
-                  isSelected
-                    ? 'bg-code-tab text-primary'
-                    : 'bg-code-tab-bar text-muted-foreground supports-hover:hover:text-foreground active:text-foreground',
-                )}
-              >
-                <m.span
-                  whileTap={{ scale: 0.97 }}
-                  transition={SPRING_TRANSITION}
-                  className="relative z-10"
+                    setInteraction({
+                      index: i,
+                      shift: hoverShift(event.currentTarget, listRef.current, i, safeIndex),
+                      source: 'press',
+                    })
+                  }}
+                  onPointerUp={(event) => {
+                    if (!canUseHoverPointer(event.pointerType)) setInteraction(null)
+                  }}
+                  onPointerCancel={() => setInteraction(null)}
+                  style={{ zIndex, marginLeft: i === 0 ? 0 : -overlap, boxShadow }}
+                  animate={{ x: xShift }}
+                  transition={
+                    interaction?.source === 'press' ? SPRING_TRANSITION : SMOOTH_SPRING_TRANSITION
+                  }
+                  className={cn(
+                    'relative flex shrink-0 items-center justify-center whitespace-nowrap rounded-t-lg border border-b-0 border-border/60 px-5 pt-1.5 pb-2 font-mono text-xs font-medium lowercase transition-[color,background-color,box-shadow] duration-300',
+                    isSelected
+                      ? 'bg-code-tab text-primary'
+                      : 'bg-code-tab-bar text-muted-foreground supports-hover:hover:text-foreground active:text-foreground',
+                  )}
                 >
-                  {label}
-                </m.span>
-              </m.button>
-            </RadixTabs.Trigger>
+                  <m.span
+                    whileTap={{ scale: 0.97 }}
+                    transition={SPRING_TRANSITION}
+                    className="relative z-10"
+                  >
+                    {label}
+                  </m.span>
+                </m.button>
+              }
+            />
           )
         })}
-      </RadixTabs.List>
+      </BaseTabs.List>
       <m.div
         animate={{ height: panelHeight }}
         transition={SWIPE_TRANSITION}
         className="relative z-[200] -mt-px overflow-hidden rounded-xl border border-border/60 bg-code-tab shadow-t-sm"
       >
         <AnimatePresence mode="popLayout" initial={false} custom={direction}>
-          <RadixTabs.Content key={safeIndex} value={safeIndex.toString()} asChild forceMount>
-            <m.div
-              ref={panelRef}
-              custom={direction}
-              variants={SWIPE_VARIANTS}
-              initial="enter"
-              animate="center"
-              exit="exit"
-              transition={SWIPE_TRANSITION}
-              className={cn(
-                'w-full p-2 focus:outline-none flex flex-col gap-1.5 [&>*]:!my-0 [&>[role=paragraph]]:px-2 [&>p]:px-2 [&>ul]:px-2 [&>ol]:px-2 [&>h1]:px-2 [&>h2]:px-2 [&>h3]:px-2',
-                activeNode?.props.className,
-              )}
-            >
-              <TabPanelContext.Provider value={true}>{activeNode}</TabPanelContext.Provider>
-            </m.div>
-          </RadixTabs.Content>
+          <BaseTabs.Panel
+            key={safeIndex}
+            value={safeIndex.toString()}
+            keepMounted
+            hidden={false}
+            render={
+              <m.div
+                ref={panelRef}
+                custom={direction}
+                variants={SWIPE_VARIANTS}
+                initial="enter"
+                animate="center"
+                exit="exit"
+                transition={SWIPE_TRANSITION}
+                className={cn(
+                  'w-full p-2 focus:outline-none flex flex-col gap-1.5 [&>*]:!my-0 [&>[role=paragraph]]:px-2 [&>p]:px-2 [&>ul]:px-2 [&>ol]:px-2 [&>h1]:px-2 [&>h2]:px-2 [&>h3]:px-2',
+                  activeNode?.props.className,
+                )}
+              >
+                <TabPanelContext.Provider value={true}>{activeNode}</TabPanelContext.Provider>
+              </m.div>
+            }
+          />
         </AnimatePresence>
       </m.div>
-    </RadixTabs.Root>
+    </BaseTabs.Root>
   )
 }
 

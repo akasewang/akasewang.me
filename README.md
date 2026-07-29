@@ -1,97 +1,328 @@
-# akasewang.me
+<h1 align="center">akasewang.me</h1>
 
-Source code for the personal site of Akash Dewangan. A personal archive of what I'm building and consuming, featuring software projects, interactive coding experiments, a media catalog and personal essays. Built with a strict focus on performance, type safety and minimal latency.
+<p align="center">
+  The source for Akash Dewangan's personal site: software projects, technical writing,
+  experiments, photography, a message board and a small newsletter system.
+</p>
 
-[![Next.js](https://img.shields.io/badge/Next.js_16-000000?style=for-the-badge&logo=nextdotjs&logoColor=white)](#)
-[![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)](#)
-[![Tailwind CSS v4](https://img.shields.io/badge/Tailwind_v4-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](#)
-[![Biome](https://img.shields.io/badge/Biome-FFBD2E?style=for-the-badge&logo=biome&logoColor=black)](#)
-[![Neon](https://img.shields.io/badge/Neon_Serverless-00E599?style=for-the-badge&logo=neon&logoColor=black)](#)
-[![Drizzle ORM](https://img.shields.io/badge/Drizzle_ORM-C5F74F?style=for-the-badge&logo=drizzle&logoColor=black)](#)
+<p align="center">
+  <a href="https://www.akasewang.me">Live site</a> ·
+  <a href="#architecture">Architecture</a> ·
+  <a href="#features">Features</a> ·
+  <a href="#getting-started">Getting started</a> ·
+  <a href="#commands">Commands</a> ·
+  <a href="#documentation">Documentation</a>
+</p>
 
----
-
-## Deep Dive Documentation
-
-For a simple breakdown of how the systems in this portfolio work, check out the documentation:
-
-- [**System Overview**](./architecture/overview.md) - Hosting, database and SEO.
-- [**MDX & Content Parsing**](./architecture/mdx.md) - Reading local markdown files and swapping HTML for React.
-- [**State & Hooks**](./architecture/state.md) - URL based filtering and custom React hooks.
-- [**UI & Animations**](./architecture/ui.md) - Tailwind v4, custom cursors and Framer Motion effects.
-- [**Audio Feedback Design System**](./architecture/audio-design-system.md) - Global audio preference, keyboard shortcuts and procedural UI sounds.
-- [**Message Board**](./architecture/message-board.md) - Spam protection, rate limiting and admin commands.
-- [**GitHub Repository Governance**](./architecture/github.md) - Local audit policy, billing guardrails, Dependabot and branch protection.
-- [**Future Scope**](./architecture/future-scope/) - Parked ideas and inactive implementation notes for later work.
-
----
-
-## Features & How It Works
-
-This portfolio is built to be fast, secure and easy to maintain.
-
-### Hosting & SEO
-
-- **Dynamic Images**: Social media preview images are generated from code automatically, so we don't need to manually create images for every new blog post.
-- **Structured Data**: The site automatically adds data tags to help Google and other search engines understand the content.
-- **Shareable Links**: When you filter or sort a list (like the blog), the URL updates. If you send that link to a friend, they see exactly what you see.
-
-### Database & Tracking
-
-- **Serverless Database**: Powered by Neon Postgres and queried safely using Drizzle ORM.
-- **View Counter**: We track page views in batches. This keeps the site running fast because we don't hit the database for every single click.
-- **Message Board**: A public guestbook with built in spam protection and rate limiting to block bots.
-
-### Content & Components
-
-- **Markdown (MDX)**: All blogs and projects are written in Markdown. We read these files locally and swap standard HTML for custom React components: styled links, tables, callouts, steps, tabs and zoomable images all render through our own components.
-- **Weekly Emails**: An automated cron job sends the site admin a weekly summary of new newsletter subscribers.
-
-### Styling & Standards
-
-- **Fast Animations**: We use Framer Motion for smooth physics based animations and load the animation code lazily so the page doesn't feel heavy.
-- **Tailwind v4**: The design system uses Tailwind CSS v4 and native CSS variables, including a custom mouse cursor that runs purely on fast CSS.
-- **Formatter**: We use Biome instead of Prettier/ESLint because it is incredibly fast. A pre-commit hook (`.githooks/pre-commit`, enabled automatically on `npm install`) formats staged files before every commit.
+<p align="center">
+  <img alt="Next.js 16" src="https://img.shields.io/badge/Next.js-16-334155?logo=nextdotjs&logoColor=white">
+  <img alt="React 19" src="https://img.shields.io/badge/React-19-334155?logo=react&logoColor=white">
+  <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-strict-334155?logo=typescript&logoColor=white">
+  <img alt="Tailwind CSS 4" src="https://img.shields.io/badge/Tailwind_CSS-4-334155?logo=tailwindcss&logoColor=white">
+  <img alt="Neon Postgres" src="https://img.shields.io/badge/Neon-Postgres-334155?logo=postgresql&logoColor=white">
+  <img alt="Vercel" src="https://img.shields.io/badge/deployed_on-Vercel-334155?logo=vercel&logoColor=white">
+</p>
 
 ---
 
-## Technology Stack
+## Architecture
 
-- **Framework**: Next.js 16 (App Router)
-- **Language**: TypeScript (strict mode)
-- **Styling**: Tailwind CSS v4
-- **Database**: Neon Postgres
-- **ORM**: Drizzle ORM
-- **Email Service**: Resend + React Email
-- **Tooling**: Biome
+The site uses the Next.js App Router on Vercel. Content-heavy routes are prerendered from local
+MDX, live features cross Server Actions or route handlers, and browser-only state stays in React,
+the URL or short-lived web storage.
 
-## Local Setup
+### System at a glance
 
-Requirements: Node.js >= 20, npm.
+```mermaid
+flowchart TB
+  subgraph sources["Repository sources"]
+    direction LR
+    MDX[("Blog and project MDX<br/>docs/")]
+    DATA[("Typed site data<br/>src/data/")]
+    ASSETS[("Static assets<br/>public/")]
+  end
 
-1. **Clone and Install**
+  subgraph app["Vercel · Next.js App Router"]
+    direction TB
+    BUILD["Build-time content managers"]
+    STATIC["Static and SSG pages"]
+    SERVER["React Server Components and ISR"]
+    HANDLERS["Route handlers"]
+    ACTIONS["Server Actions"]
+    CLIENT["Client components and providers"]
+  end
 
-   ```bash
-   git clone https://github.com/akasewang/akasewang.me.git
-   cd akasewang.me
-   npm install
-   ```
+  subgraph services["Managed services"]
+    direction LR
+    NEON[("Neon Postgres")]
+    GITHUB["GitHub API"]
+    RESEND["Resend"]
+  end
 
-2. **Environment Variables**
-   Rename `.env.example` to `.env` and provide your Neon connection string and Resend API keys.
+  VISITOR["Browser"] --> STATIC
+  VISITOR --> SERVER
+  STATIC --> CLIENT
+  SERVER --> CLIENT
+  CLIENT --> ACTIONS
+  CLIENT --> HANDLERS
 
-3. **Database Migration**
-   Synchronize the Drizzle schema with your Neon instance.
+  MDX --> BUILD
+  DATA --> BUILD
+  ASSETS --> STATIC
+  BUILD --> STATIC
 
-   ```bash
-   npm run db:push
-   ```
+  ACTIONS <--> NEON
+  HANDLERS <--> NEON
+  SERVER --> GITHUB
+  HANDLERS --> GITHUB
+  ACTIONS --> RESEND
 
-4. **Development Server**
-   ```bash
-   npm run dev
-   ```
+  CRON["Vercel Cron<br/>Sunday 09:00 UTC"] --> SUMMARY["Weekly summary route"]
+  SUMMARY --> NEON
+  SUMMARY --> RESEND
+
+  HANDLERS --> SEO["OG images · RSS · sitemap"]
+```
+
+### Content publishing pipeline
+
+Blogs and projects share one typed MDX pipeline. The same source metadata also feeds navigation,
+structured data and discovery endpoints, so publishing does not require maintaining parallel
+indexes.
+
+```mermaid
+flowchart LR
+  AUTHOR["Write an MDX file"] --> FRONTMATTER["Read and validate frontmatter"]
+  FRONTMATTER --> MANAGER["Shared MDX manager<br/>cache, sort and resolve slugs"]
+  MANAGER --> PARAMS["generateStaticParams"]
+  MANAGER --> COMPILE["next-mdx-remote"]
+
+  subgraph transforms["Markdown transforms"]
+    direction TB
+    GFM["remark-gfm"] --> META["Code-title metadata"]
+    META --> HIGHLIGHT["Server-side syntax highlighting"]
+  end
+
+  COMPILE --> GFM
+  HIGHLIGHT --> COMPONENTS["Custom React mapping<br/>links · tables · callouts · tabs · media"]
+  PARAMS --> PAGE["Prerendered blog or project page"]
+  COMPONENTS --> PAGE
+
+  MANAGER --> LISTS["Blog and project indexes"]
+  MANAGER --> DISCOVERY["RSS feed and sitemap"]
+  PAGE --> SEO["Metadata · JSON-LD · dynamic OG image"]
+```
+
+### View-count data flow
+
+List pages do not make one database request per card. The client provider coalesces missing slugs
+for 50 ms, performs one bounded batch read, and keeps the result locally for five minutes. A detail
+page increments once per browser session with an atomic database upsert.
+
+```mermaid
+sequenceDiagram
+  autonumber
+  participant UI as Page or content card
+  participant VP as ViewsProvider
+  participant LS as Browser storage
+  participant SA as Server Actions
+  participant DB as Neon Postgres
+
+  UI->>VP: requestView(slug)
+  VP->>LS: read five-minute cache
+  alt cached
+    LS-->>VP: cached count
+    VP-->>UI: render immediately
+  else missing or stale
+    VP->>VP: collect requested slugs for 50 ms
+    VP->>SA: getViewsBatchAction(unique slugs)
+    SA->>DB: SELECT WHERE slug IN (...)
+    DB-->>SA: counts
+    SA-->>VP: slug-to-count map
+    VP->>LS: update localStorage cache
+    VP-->>UI: render counts
+  end
+
+  UI->>VP: incrementViews(slug)
+  VP->>LS: check sessionStorage
+  alt not counted this session
+    VP->>SA: incrementViewAction(slug)
+    SA->>DB: atomic INSERT ... ON CONFLICT + 1
+    DB-->>VP: new count
+    VP->>LS: mark slug as counted
+  else already counted
+    VP->>VP: reuse or refresh the count
+  end
+```
+
+### Module ownership
+
+| Path | Responsibility |
+| --- | --- |
+| `src/app/` | App Router pages, layouts, route handlers, metadata and generated endpoints |
+| `docs/` | Blog and project MDX source files |
+| `src/lib/managers/` | Typed MDX discovery, parsing, caching and sorting |
+| `src/lib/actions/` | View, message-board and newsletter Server Actions |
+| `src/lib/db/` | Drizzle schema and Neon database client |
+| `src/components/common/mdx-components/` | MDX element mapping and interactive content components |
+| `src/components/ui/` | Base UI primitives, Phosphor icons and reusable interaction patterns |
+| `src/components/providers/` | Shared client-side motion and view-count state |
+| `architecture/` | Focused design and implementation notes |
+
+---
+
+## Features
+
+### Content and discovery
+
+- Blogs and project case studies are authored in MDX with typed frontmatter.
+- Custom MDX components provide callouts, steps, tabs, tables, code blocks, demos and zoomable
+  images.
+- Blog and project detail routes are statically generated from the files under `docs/`.
+- RSS, XML sitemap, canonical metadata, JSON-LD and dynamic Open Graph images come from the same
+  content sources.
+- URL-backed filters and sorting keep list views shareable without introducing a global state
+  manager.
+
+### Live features
+
+- Neon Postgres stores view counts, newsletter subscribers and message-board entries.
+- View reads are batched and cached; increments use an atomic upsert and count once per session.
+- The public message board includes a honeypot, IP-based cooldown, cursor pagination and protected
+  admin replies/deletion.
+- Resend and React Email power welcome emails, admin broadcasts and the weekly subscriber summary.
+  The summary is sent even when the weekly count is zero.
+- GitHub stars and changelog data are fetched server-side; an optional token raises the API limit
+  without exposing credentials to the browser.
+
+### Interface
+
+- Tailwind CSS v4 and OKLCH custom properties define the visual system.
+- Base UI supplies accessible tooltip, menu, select and tab foundations.
+- Framer Motion is loaded through `LazyMotion`; layout, gesture and transition behavior remains
+  component-owned.
+- Phosphor duotone icons provide the shared icon language.
+- Procedural Web Audio feedback follows one global preference and a documented interaction
+  palette.
+- `npm run dev` binds to the local network and prints a QR code for testing from a phone on the
+  same Wi-Fi network.
+
+### Repository safeguards
+
+- ESLint checks TypeScript and React rules; Biome handles formatting.
+- The pre-commit hook formats staged files after `npm install` configures the repository hook path.
+- GitHub Actions runs `npm audit` for dependency changes, weekly on Monday, and on demand.
+- Dependabot groups routine minor and patch dependency updates.
+
+---
+
+## Technology
+
+| Layer | Choice |
+| --- | --- |
+| Framework | Next.js 16 App Router, React 19 |
+| Language | TypeScript in strict mode |
+| UI | Base UI, Tailwind CSS v4, Framer Motion |
+| Icons | Phosphor Icons, duotone weight |
+| Content | MDX, `next-mdx-remote`, Remark GFM, Rehype Highlight |
+| Data | Neon Postgres, Drizzle ORM |
+| Email | Resend, React Email |
+| Hosting and telemetry | Vercel, Vercel Analytics, Speed Insights |
+| Quality | ESLint, Biome, TypeScript, npm audit |
+
+---
+
+## Getting started
+
+Prerequisites: Node.js 20.9 or newer, npm, a Neon Postgres database and a Resend account for email
+features.
+
+```powershell
+git clone https://github.com/akasewang/akasewang.me.git
+cd akasewang.me
+npm install
+Copy-Item .env.example .env
+```
+
+Configure `.env`, then synchronize the database schema and start development:
+
+```powershell
+npm run db:push
+npm run dev
+```
+
+The terminal prints both the local URL and a mobile-preview QR code. The phone and development
+machine must be connected to the same local network. If Windows, a VPN or a virtual adapter causes
+the wrong address to be selected, override it explicitly:
+
+```powershell
+npm run dev -- --mobile-host 192.168.0.9
+```
+
+The wrapper verifies the selected URL before printing the QR code and automatically permits that
+exact host for Next.js development resources. The override affects development only.
+
+### Environment variables
+
+| Variable | Required | Purpose |
+| --- | --- | --- |
+| `NEON_DATABASE_URL` | Yes | Neon Postgres connection string |
+| `ADMIN_PASSWORD` | Yes for admin tools | Message-board and newsletter administration |
+| `ADMIN_EMAIL` | Yes for weekly summaries | Recipient for the scheduled subscriber report |
+| `RESEND_API_KEY` | Yes for email | Resend API authentication |
+| `RESEND_FROM_EMAIL` | Production email | Verified sender address |
+| `CRON_SECRET` | Yes in production | Bearer secret protecting the cron endpoint |
+| `GITHUB_TOKEN` | No | Raises GitHub API limits; public requests remain the fallback |
+| `NEXT_PUBLIC_ADMIN_LOGIN_PREFIX` | No | Custom browser-side admin login command |
+| `NEXT_PUBLIC_ADMIN_LOGOUT_COMMAND` | No | Custom browser-side admin logout command |
+
+Keep server secrets out of `NEXT_PUBLIC_*` variables. For Vercel, configure the same values in the
+project's environment-variable settings; the weekly schedule itself is declared in `vercel.json`.
+
+Vercel does not generate `CRON_SECRET`; it automatically sends the value you configure as a bearer
+token when invoking the cron route. Generate a secure value with:
+
+```bash
+node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+```
+
+Add the generated value as `CRON_SECRET` in the Vercel Production environment, then redeploy the
+application so the scheduled route can authenticate successfully.
+
+---
+
+## Commands
+
+| Command | Purpose |
+| --- | --- |
+| `npm run dev` | Start Next.js on the LAN and print the mobile QR code |
+| `npm run build` | Create and validate the production build |
+| `npm run start` | Serve the completed production build |
+| `npm run lint` | Run ESLint across TypeScript and TSX source files |
+| `npm run format` | Format the repository with Biome |
+| `npm run security:audit` | Run the dependency vulnerability audit |
+| `npm run email` | Preview React Email templates on port 3001 |
+| `npm run db:push` | Push the Drizzle schema to Neon |
+
+---
+
+## Documentation
+
+- [System overview](./architecture/overview.md) — hosting, rendering, data and SEO
+- [MDX and content parsing](./architecture/mdx.md) — typed files, compilation and component mapping
+- [State and hooks](./architecture/state.md) — URL state, caches and reusable client hooks
+- [UI and animations](./architecture/ui.md) — visual tokens, motion and canvas effects
+- [Audio feedback design system](./architecture/audio-design-system.md) — global preference and
+  interaction sounds
+- [Message board](./architecture/message-board.md) — validation, rate limiting and admin behavior
+- [GitHub repository governance](./architecture/github.md) — automated audits, Dependabot and
+  branch protection
+
+---
 
 ## License
 
-This project is licensed under the CC-BY-NC-SA-4.0 License. You are free to explore and learn from this source code, but commercial use is prohibited and you must heavily modify the branding, content and personal assets before deploying your own iteration.
+This project is licensed under
+[CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/). You may study and adapt the
+source for non-commercial work with attribution and share-alike terms. Personal branding, written
+content and assets should be replaced before publishing a derivative.

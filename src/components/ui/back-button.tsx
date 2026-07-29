@@ -35,7 +35,7 @@ export function BackButton({ href = '/', label, className }: BackButtonProps) {
         className,
       )}
     >
-      <Icons.chevronRight className="mr-1 size-4 shrink-0 transition-transform duration-300 ease-out supports-hover:group-hover:translate-x-px group-active:translate-x-px" />
+      <Icons.doubleChevronRight className="mr-1 size-4 shrink-0 transition-transform duration-300 ease-out supports-hover:group-hover:translate-x-px group-active:translate-x-px" />
 
       <div className="grid grid-cols-[0fr] opacity-0 transition-[grid-template-columns,opacity] duration-500 ease-[cubic-bezier(0.25,1,0.5,1)] supports-hover:group-hover:grid-cols-[1fr] group-active:grid-cols-[1fr] supports-hover:group-hover:opacity-100 group-active:opacity-100">
         <div className="flex items-center overflow-hidden whitespace-nowrap">

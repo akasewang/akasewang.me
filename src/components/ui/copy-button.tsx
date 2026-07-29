@@ -49,7 +49,7 @@ export function CopyButton({
     }
   }
 
-  const ActiveIcon = (isCopied ? Icons.check : Icons.copy) as React.ElementType
+  const ActiveIcon = isCopied ? Icons.check : Icons.copy
 
   return (
     <m.button
@@ -80,7 +80,7 @@ export function CopyButton({
             transition={{ duration: 0.2, ease: [0.23, 1, 0.32, 1] }}
             className="absolute inset-0 flex items-center justify-center"
           >
-            <ActiveIcon size={iconSize} />
+            <ActiveIcon size={iconSize} weight={isCopied ? 'regular' : 'duotone'} />
           </m.span>
         </AnimatePresence>
       </span>

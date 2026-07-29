@@ -62,6 +62,7 @@ export function AdminNewsletterForm({ blogs }: { blogs: BlogPost[] }) {
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
       <div className="space-y-3">
         <Select
+          items={blogs.map((blog) => ({ label: blog.title, value: blog.slug }))}
           value={selectedBlogSlug}
           onValueChange={setSelectedBlogSlug}
           disabled={loading || countdown > 0}

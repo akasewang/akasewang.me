@@ -25,15 +25,15 @@ interface ButtonProps extends HTMLMotionProps<'button'> {
 
 const VARIANT_STYLES = {
   primary:
-    'ring-1 ring-inset ring-primary/20 retina:ring-[0.5px] bg-primary text-primary-foreground shadow-[0_2px_4px_oklch(0%_0_0/0.2),inset_0_1px_1px_oklch(100%_0_0/1),inset_0_-1px_1px_oklch(0%_0_0/0.2)] supports-hover:group-[:hover:not(:active)]:bg-primary/95 supports-hover:group-[:hover:not(:active)]:shadow-[0_4px_8px_oklch(0%_0_0/0.3),inset_0_1px_1px_oklch(100%_0_0/1),inset_0_-1px_1px_oklch(0%_0_0/0.2)] group-active:bg-primary/85 group-active:shadow-inner',
+    'ring-1 ring-inset ring-primary/20 retina:ring-[0.5px] bg-primary text-primary-foreground shadow-[0_2px_4px_rgb(0_0_0/0.2),inset_0_1px_1px_rgb(255_255_255/1),inset_0_-1px_1px_rgb(0_0_0/0.2)] supports-hover:group-[:hover:not(:active)]:bg-primary/95 supports-hover:group-[:hover:not(:active)]:shadow-[0_4px_8px_rgb(0_0_0/0.3),inset_0_1px_1px_rgb(255_255_255/1),inset_0_-1px_1px_rgb(0_0_0/0.2)] group-active:bg-primary/85 group-active:shadow-inner',
   secondary:
-    'ring-1 ring-inset ring-ring retina:ring-[0.5px] bg-gradient-to-b from-muted/60 to-muted/20 text-foreground shadow-[0_2px_4px_oklch(0%_0_0/0.2),inset_0_1px_1px_oklch(100%_0_0/0.1),inset_0_-1px_1px_oklch(0%_0_0/0.4)] backdrop-blur-md supports-hover:group-[:hover:not(:active)]:from-muted/80 supports-hover:group-[:hover:not(:active)]:to-muted/40 supports-hover:group-[:hover:not(:active)]:shadow-[0_4px_8px_oklch(0%_0_0/0.3),inset_0_1px_1px_oklch(100%_0_0/0.15),inset_0_-1px_1px_oklch(0%_0_0/0.4)] group-active:bg-muted/80 group-active:shadow-inner',
+    'ring-1 ring-inset ring-ring retina:ring-[0.5px] bg-gradient-to-b from-muted/60 to-muted/20 text-foreground shadow-[0_2px_4px_rgb(0_0_0/0.2),inset_0_1px_1px_rgb(255_255_255/0.1),inset_0_-1px_1px_rgb(0_0_0/0.4)] backdrop-blur-md supports-hover:group-[:hover:not(:active)]:from-muted/80 supports-hover:group-[:hover:not(:active)]:to-muted/40 supports-hover:group-[:hover:not(:active)]:shadow-[0_4px_8px_rgb(0_0_0/0.3),inset_0_1px_1px_rgb(255_255_255/0.15),inset_0_-1px_1px_rgb(0_0_0/0.4)] group-active:bg-muted/80 group-active:shadow-inner',
   minimal:
     'ring-1 ring-inset ring-ring retina:ring-[0.5px] bg-background text-secondary supports-hover:group-[:hover:not(:active)]:bg-surface-40 supports-hover:group-[:hover:not(:active)]:text-primary supports-hover:group-[:hover:not(:active)]:shadow-sm group-active:bg-surface-30 group-active:text-primary group-active:shadow-inner-sm',
 }
 
 const SUCCESS_STYLES =
-  'ring-1 ring-inset ring-success/30 retina:ring-[0.5px] bg-success/10 text-success shadow-[0_2px_4px_oklch(0%_0_0/0.2),inset_0_1px_1px_oklch(100%_0_0/0.1)]'
+  'ring-1 ring-inset ring-success/30 retina:ring-[0.5px] bg-success/10 text-success shadow-[0_2px_4px_rgb(0_0_0/0.2),inset_0_1px_1px_rgb(255_255_255/0.1)]'
 
 export function Button({
   isPending = false,

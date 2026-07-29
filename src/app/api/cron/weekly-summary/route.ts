@@ -34,14 +34,6 @@ export async function GET(request: Request) {
 
     const count = recentSubscribers.length
 
-    if (count === 0) {
-      return NextResponse.json({
-        success: true,
-        count: 0,
-        message: 'No new subscribers this week.',
-      })
-    }
-
     const emails = recentSubscribers.map((s) => s.email)
 
     const htmlContent = await render(

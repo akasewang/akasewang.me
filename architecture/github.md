@@ -6,13 +6,13 @@ security checks and protecting `main`.
 ## Goals
 
 - Keep dependency updates visible without letting Dependabot create noisy major-version PRs.
-- Keep vulnerability checks available without relying on GitHub Actions while the account has no billing method.
+- Run dependency vulnerability checks locally and automatically in GitHub Actions.
 - Protect `main` from accidental direct pushes, force pushes and branch deletion.
 - Keep the local workflow lightweight for a solo-maintained portfolio.
 
-## Local Security Audit
+## Security Audit
 
-Security auditing is kept as a local npm script:
+Security auditing is available locally through:
 
 ```bash
 npm run security:audit
@@ -24,15 +24,15 @@ That script runs:
 npm audit --audit-level=moderate
 ```
 
-Current repository state:
+The same check is automated by `.github/workflows/security-audit.yml`:
 
-- The active audit is local-only.
-- `.github/workflows/` should not exist on `main`.
-- `.github/dependabot.yml` is the only tracked GitHub automation config.
+- Pull requests that change `package.json`, `package-lock.json` or the workflow itself
+- Pushes to `main` that change one of those files
+- Every Monday at `09:00` Asia/Kolkata (`03:30` UTC)
+- Manual runs through `workflow_dispatch`
 
-The GitHub Actions audit workflow was removed because GitHub refused to start Actions while
-the account was locked for billing/payment setup. The local script stays useful and does not
-require a GitHub payment method.
+The workflow installs the locked dependency tree with Node 24 and runs the local audit script.
+It has read-only repository permissions and a ten-minute timeout.
 
 ## Dependabot
 
@@ -99,9 +99,11 @@ recover quickly, while non-admins still go through pull requests. The cost is th
 below is therefore self-enforced for admins. To make the protection apply to everyone, empty
 the bypass list.
 
+Enable `Require status checks to pass` only after the automated `npm audit` check has completed
+successfully on a pull request. Requiring a check that has never run can block merges.
+
 Do not enable yet:
 
-- Require status checks to pass
 - Require deployments to succeed
 - Require code scanning results
 - Require code quality results
@@ -111,9 +113,7 @@ Do not enable yet:
 - Require approval of the most recent reviewable push
 - Dismiss stale pull request approvals
 
-Required status checks and code scanning rules should wait until GitHub Actions or another
-reliable hosted check is available. Enabling them while Actions are blocked can make PRs hard
-or impossible to merge.
+Code scanning rules should wait until a code-scanning workflow is added and proven reliable.
 
 For a solo-maintained repo, required approvals usually add friction without much safety. The
 important protections are PR-only changes, no deletion of `main`, no force pushes and resolved
@@ -165,6 +165,7 @@ For major upgrades:
 
 - Dependabot-created branches are normal; they are generated automatically for update PRs.
 - Existing Dependabot branches can be deleted after closing their PRs.
-- The repository intentionally keeps `npm run security:audit` even without a GitHub Actions workflow.
-- `architecture/future-scope/github-actions-security-audit.md` is planning documentation only; it does not create or schedule any workflow.
-- Re-add CI only when GitHub Actions can run reliably, or when another status provider is available.
+- The repository intentionally keeps `npm run security:audit` for local verification and uses
+  the same command in GitHub Actions.
+- Add broader CI checks separately so audit failures remain easy to distinguish from lint,
+  type-check or build failures.

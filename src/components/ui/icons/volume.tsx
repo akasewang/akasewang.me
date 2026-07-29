@@ -4,7 +4,7 @@ import { m } from 'framer-motion'
 import { type ComponentProps, forwardRef, useImperativeHandle, useState } from 'react'
 
 const VOLUME_SPEAKER_PATH =
-  'M6.603 10L10 7.22v9.56L6.603 14H3v-4zM2 16h3.889l5.294 4.332a.5.5 0 0 0 .817-.387V4.055a.5.5 0 0 0-.817-.387L5.89 8H2a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1'
+  'M155.51 24.81a8 8 0 0 0-8.42.88L77.25 80H32a16 16 0 0 0-16 16v64a16 16 0 0 0 16 16h45.25l69.84 54.31A8 8 0 0 0 160 224V32a8 8 0 0 0-4.49-7.19M32 96h40v64H32Zm112 111.64l-56-43.55V91.91l56-43.55Z'
 
 export interface VolumeIconHandle {
   startAnimation: () => void
@@ -22,15 +22,16 @@ export const VolumeIcon = forwardRef<VolumeIconHandle, ComponentProps<'svg'>>((p
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 24 24"
+      viewBox="0 0 256 256"
       fill="currentColor"
       aria-hidden="true"
       {...props}
     >
+      <path d="M80 88v80H32a8 8 0 0 1-8-8V96a8 8 0 0 1 8-8Z" opacity=".2" />
       <path d={VOLUME_SPEAKER_PATH} />
 
       <m.path
-        d="M18 12a5.99 5.99 0 0 0-2.287-4.713l-1.429 1.429A4 4 0 0 1 16 12c0 1.36-.679 2.561-1.716 3.284l1.43 1.43A5.99 5.99 0 0 0 18 12"
+        d="M198 101.56a40 40 0 0 1 0 52.88a8 8 0 0 1-12-10.58a24 24 0 0 0 0-31.72a8 8 0 0 1 12-10.58"
         initial={false}
         animate={{ opacity: isPlaying ? [0, 1] : 1 }}
         transition={{
@@ -39,7 +40,7 @@ export const VolumeIcon = forwardRef<VolumeIconHandle, ComponentProps<'svg'>>((p
         }}
       />
       <m.path
-        d="M23 12c0 3.292-1.446 6.246-3.738 8.262l-1.418-1.418A8.98 8.98 0 0 0 21 12a8.98 8.98 0 0 0-3.155-6.844l1.417-1.418A10.97 10.97 0 0 1 23 12"
+        d="M248 128a79.9 79.9 0 0 1-20.37 53.34a8 8 0 0 1-11.92-10.67a64 64 0 0 0 0-85.33a8 8 0 1 1 11.92-10.67A79.83 79.83 0 0 1 248 128"
         initial={false}
         animate={{ opacity: isPlaying ? [0, 1] : 1 }}
         transition={{
