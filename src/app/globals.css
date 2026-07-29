@@ -50,17 +50,17 @@
     --surface-40: color-mix(in oklab, var(--muted) 40%, var(--background));
     --surface-50: color-mix(in oklab, var(--muted) 50%, var(--background));
 
-    --shadow-sm: 0 1px 3px oklch(0% 0 0 / 0.06), 0 2px 8px oklch(0% 0 0 / 0.06);
-    --shadow-md: 0 2px 8px oklch(0% 0 0 / 0.07), 0 6px 24px oklch(0% 0 0 / 0.07);
-    --shadow-lg: 0 4px 12px oklch(0% 0 0 / 0.08), 0 12px 32px oklch(0% 0 0 / 0.08);
-    --shadow-xl: 0 6px 16px oklch(0% 0 0 / 0.1), 0 20px 48px oklch(0% 0 0 / 0.1);
-    --shadow-2xl: 0 8px 24px oklch(0% 0 0 / 0.12), 0 32px 64px oklch(0% 0 0 / 0.12);
+    --shadow-sm: 0 1px 3px rgb(0 0 0 / 0.06), 0 2px 8px rgb(0 0 0 / 0.06);
+    --shadow-md: 0 2px 8px rgb(0 0 0 / 0.07), 0 6px 24px rgb(0 0 0 / 0.07);
+    --shadow-lg: 0 4px 12px rgb(0 0 0 / 0.08), 0 12px 32px rgb(0 0 0 / 0.08);
+    --shadow-xl: 0 6px 16px rgb(0 0 0 / 0.1), 0 20px 48px rgb(0 0 0 / 0.1);
+    --shadow-2xl: 0 8px 24px rgb(0 0 0 / 0.12), 0 32px 64px rgb(0 0 0 / 0.12);
 
-    --shadow-inner: inset 0 2px 8px oklch(0% 0 0 / 0.6);
-    --shadow-inner-sm: inset 0 1px 4px oklch(0% 0 0 / 0.4);
+    --shadow-inner: inset 0 2px 8px rgb(0 0 0 / 0.6);
+    --shadow-inner-sm: inset 0 1px 4px rgb(0 0 0 / 0.4);
 
-    --shadow-l-lg: -8px 0 16px -4px oklch(0% 0 0 / 0.8);
-    --shadow-t-sm: 0 -2px 4px 0 oklch(0% 0 0 / 0.3);
+    --shadow-l-lg: -8px 0 16px -4px rgb(0 0 0 / 0.8);
+    --shadow-t-sm: 0 -2px 4px 0 rgb(0 0 0 / 0.3);
 
     --radius: 0.35rem;
     --spacing: 0.25rem;
@@ -71,8 +71,8 @@
     color: var(--primary-foreground);
   }
 
-  :is(.bg-primary, [data-state='active'])::selection,
-  :is(.bg-primary, [data-state='active']) *::selection {
+  :is(.bg-primary, [data-active])::selection,
+  :is(.bg-primary, [data-active]) *::selection {
     background: var(--primary-foreground);
     color: var(--primary);
   }
@@ -94,10 +94,10 @@
     scrollbar-gutter: stable;
   }
 
-  body[data-scroll-locked] {
-    overflow-y: auto !important;
-    padding-right: 0px !important;
-    margin-right: 0px !important;
+  body {
+    min-height: 100%;
+    background-color: var(--background);
+    isolation: isolate;
   }
 
   img,
@@ -351,9 +351,9 @@
   }
 
   :is(
-    .tooltip-elegant:is([data-state='delayed-open'], [data-state='instant-open']),
-    .select-content-elegant[data-state='open'],
-    .dropdown-elegant[data-state='open']
+    .tooltip-elegant[data-open],
+    .select-content-elegant[data-open],
+    .dropdown-elegant[data-open]
   ) {
     &[data-side='top'] {
       animation: popover-in-top 400ms cubic-bezier(0.175, 0.885, 0.32, 1.15) both;
@@ -372,11 +372,11 @@
     }
   }
 
-  .tooltip-elegant[data-state='closed'] {
+  .tooltip-elegant[data-closed] {
     animation: fade-scale-out 200ms cubic-bezier(0.4, 0, 1, 1) both;
   }
 
-  :is(.select-content-elegant, .dropdown-elegant)[data-state='closed'] {
+  :is(.select-content-elegant, .dropdown-elegant)[data-closed] {
     animation: fade-scale-out 200ms cubic-bezier(0.4, 0, 0.2, 1) both;
   }
 
@@ -407,7 +407,20 @@
       color-mix(in oklab, var(--background) 4%, transparent) 87.5%,
       transparent 100%
     );
+    -webkit-backdrop-filter: blur(8px);
     backdrop-filter: blur(8px);
+    -webkit-mask-image: linear-gradient(
+      to top,
+      rgba(0, 0, 0, 1) 0%,
+      rgba(0, 0, 0, 0.95) 12.5%,
+      rgba(0, 0, 0, 0.82) 25%,
+      rgba(0, 0, 0, 0.65) 37.5%,
+      rgba(0, 0, 0, 0.46) 50%,
+      rgba(0, 0, 0, 0.28) 62.5%,
+      rgba(0, 0, 0, 0.13) 75%,
+      rgba(0, 0, 0, 0.04) 87.5%,
+      transparent 100%
+    );
     mask-image: linear-gradient(
       to top,
       rgba(0, 0, 0, 1) 0%,
@@ -420,6 +433,24 @@
       rgba(0, 0, 0, 0.04) 87.5%,
       transparent 100%
     );
+  }
+
+  @media (max-width: 767px) {
+    .bottom-blur-fade {
+      height: 5rem;
+      background: linear-gradient(
+        to top,
+        rgb(10 10 10) 0%,
+        rgb(10 10 10 / 0.95) 20%,
+        rgb(10 10 10 / 0.72) 45%,
+        rgb(10 10 10 / 0.35) 70%,
+        transparent 100%
+      );
+      -webkit-backdrop-filter: none;
+      backdrop-filter: none;
+      -webkit-mask-image: none;
+      mask-image: none;
+    }
   }
 }
 

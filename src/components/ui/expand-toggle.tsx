@@ -19,7 +19,7 @@ export function ExpandToggle({ isExpanded, className }: ExpandToggleProps) {
     >
       <m.div
         initial={false}
-        animate={{ y: isExpanded ? 3 : -3 }}
+        animate={{ y: isExpanded ? 4 : -3 }}
         transition={FLUID_SPRING}
         className="absolute flex items-center justify-center"
       >
@@ -28,7 +28,7 @@ export function ExpandToggle({ isExpanded, className }: ExpandToggleProps) {
 
       <m.div
         initial={false}
-        animate={{ y: isExpanded ? -3 : 3 }}
+        animate={{ y: isExpanded ? -4 : 3 }}
         transition={FLUID_SPRING}
         className="absolute flex items-center justify-center"
       >

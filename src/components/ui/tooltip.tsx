@@ -1,64 +1,103 @@
 'use client'
 
-import { Arrow, Content, Portal, Provider, Root, Trigger } from '@radix-ui/react-tooltip'
+import { Tooltip as TooltipPrimitive } from '@base-ui/react/tooltip'
 import {
   type ComponentProps,
   type ComponentPropsWithoutRef,
-  type ComponentRef,
   forwardRef,
+  isValidElement,
   type ReactNode,
 } from 'react'
 import { cn } from '@/utils/utils'
 import { Kbd } from './kbd'
 
-export const TooltipProvider = ({
-  delayDuration = 0,
-  ...props
-}: ComponentProps<typeof Provider>) => <Provider delayDuration={delayDuration} {...props} />
+type TooltipProviderProps = ComponentProps<typeof TooltipPrimitive.Provider> & {
+  delayDuration?: number
+}
 
-export const Tooltip = Root
+export const TooltipProvider = ({ delayDuration = 0, delay, ...props }: TooltipProviderProps) => (
+  <TooltipPrimitive.Provider delay={delay ?? delayDuration} {...props} />
+)
 
-export const TooltipTrigger = forwardRef<
-  ComponentRef<typeof Trigger>,
-  ComponentPropsWithoutRef<typeof Trigger>
->(({ onFocus, ...props }, ref) => (
-  <Trigger
-    ref={ref}
-    {...props}
-    onFocus={(event) => {
-      onFocus?.(event)
-      if (!event.currentTarget.matches(':focus-visible')) event.preventDefault()
-    }}
-  />
-))
-TooltipTrigger.displayName = Trigger.displayName
+export const Tooltip = TooltipPrimitive.Root
 
-export const TooltipContent = forwardRef<
-  ComponentRef<typeof Content>,
-  ComponentPropsWithoutRef<typeof Content> & { shortcut?: ReactNode | string[] }
->(({ className, sideOffset = 6, children, shortcut, ...props }, ref) => (
-  <Portal>
-    <Content
+type TooltipTriggerProps = Omit<
+  ComponentPropsWithoutRef<typeof TooltipPrimitive.Trigger>,
+  'ref' | 'render'
+> & {
+  asChild?: boolean
+}
+
+export const TooltipTrigger = forwardRef<HTMLButtonElement, TooltipTriggerProps>(
+  ({ asChild, children, onFocus, ...props }, ref) => (
+    <TooltipPrimitive.Trigger
       ref={ref}
-      sideOffset={sideOffset}
-      className={cn(
-        'z-50 flex items-center gap-2 rounded-lg bg-primary px-3 py-1.5 shadow-xl font-mono text-xs text-balance [word-spacing:-0.05em] text-primary-foreground tooltip-elegant',
-        className,
-      )}
       {...props}
+      render={asChild && isValidElement(children) ? children : undefined}
+      onFocus={(event) => {
+        onFocus?.(event)
+        if (!event.currentTarget.matches(':focus-visible')) event.preventDefault()
+      }}
     >
-      {children}
-      {shortcut && (
-        <div className="flex items-center gap-1">
-          {Array.isArray(shortcut) ? (
-            shortcut.map((key, i) => <Kbd key={i}>{key}</Kbd>)
-          ) : (
-            <Kbd>{shortcut}</Kbd>
+      {asChild ? undefined : children}
+    </TooltipPrimitive.Trigger>
+  ),
+)
+TooltipTrigger.displayName = 'TooltipTrigger'
+
+type TooltipPositionerProps = ComponentPropsWithoutRef<typeof TooltipPrimitive.Positioner>
+
+type TooltipContentProps = ComponentPropsWithoutRef<typeof TooltipPrimitive.Popup> &
+  Pick<TooltipPositionerProps, 'align' | 'alignOffset' | 'side' | 'sideOffset'> & {
+    shortcut?: ReactNode | string[]
+  }
+
+const ARROW_CLASS = cn(
+  'fill-primary',
+  'data-[side=bottom]:top-[-5px]',
+  'data-[side=top]:bottom-[-5px] data-[side=top]:rotate-180',
+  'data-[side=left]:right-[-7.5px] data-[side=left]:rotate-90',
+  'data-[side=right]:left-[-7.5px] data-[side=right]:-rotate-90',
+)
+
+export const TooltipContent = forwardRef<HTMLDivElement, TooltipContentProps>(
+  ({ align, alignOffset, className, side, sideOffset = 6, children, shortcut, ...props }, ref) => (
+    <TooltipPrimitive.Portal>
+      <TooltipPrimitive.Positioner
+        align={align}
+        alignOffset={alignOffset}
+        side={side}
+        sideOffset={sideOffset}
+      >
+        <TooltipPrimitive.Popup
+          ref={ref}
+          className={cn(
+            'tooltip-elegant relative z-50 flex items-center gap-1.5 rounded-md bg-primary px-2 py-1 font-mono text-[11px] leading-tight text-primary-foreground shadow-lg [word-spacing:-0.05em]',
+            className,
           )}
-        </div>
-      )}
-      <Arrow className="fill-primary" />
-    </Content>
-  </Portal>
-))
-TooltipContent.displayName = Content.displayName
+          {...props}
+        >
+          {children}
+          {shortcut && (
+            <div className="flex items-center gap-0.5">
+              {Array.isArray(shortcut) ? (
+                shortcut.map((key, i) => <Kbd key={i}>{key}</Kbd>)
+              ) : (
+                <Kbd>{shortcut}</Kbd>
+              )}
+            </div>
+          )}
+          <TooltipPrimitive.Arrow
+            className={ARROW_CLASS}
+            render={
+              <svg width="10" height="5" viewBox="0 0 10 5" aria-hidden="true">
+                <polygon points="5,0 10,5 0,5" />
+              </svg>
+            }
+          />
+        </TooltipPrimitive.Popup>
+      </TooltipPrimitive.Positioner>
+    </TooltipPrimitive.Portal>
+  ),
+)
+TooltipContent.displayName = 'TooltipContent'

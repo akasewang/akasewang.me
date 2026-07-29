@@ -132,7 +132,7 @@ export function SocialShare({ url, title, className }: SocialShareProps) {
             }}
             className={copied ? 'text-success data-[highlighted]:text-success' : ''}
           >
-            {copied ? <Icons.check className="text-success" /> : <Icons.link />}
+            {copied ? <Icons.check weight="regular" className="text-success" /> : <Icons.link />}
             <span>{copied ? 'copied!' : 'copy link'}</span>
           </DropdownMenuItem>
 

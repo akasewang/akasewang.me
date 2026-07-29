@@ -5,7 +5,7 @@ import { useEffect } from 'react'
 import { type HighlightBox, useHighlightBox } from '@/hooks/use-highlight-box'
 
 const HIGHLIGHTED_ITEM_SELECTOR = '[data-menu-highlight-item][data-highlighted]'
-const CHECKED_ITEM_SELECTOR = '[data-menu-highlight-item][data-state=checked]'
+const CHECKED_ITEM_SELECTOR = '[data-menu-highlight-item][data-selected]'
 const MAX_ZERO_BOX_RETRIES = 10
 
 export const MENU_HIGHLIGHT_VIEWPORT_CLASS = 'relative flex flex-col gap-0.5 p-1.5'
@@ -77,7 +77,7 @@ export function MenuHighlight({
     observer.observe(root, {
       subtree: true,
       attributes: true,
-      attributeFilter: ['data-highlighted', 'data-state'],
+      attributeFilter: ['data-highlighted', 'data-selected'],
     })
 
     measure()

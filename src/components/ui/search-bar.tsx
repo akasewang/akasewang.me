@@ -14,7 +14,7 @@ import { useSoundEffects } from '@/hooks/use-sound-effects'
 
 export type SortOption = 'date-desc' | 'date-asc' | 'views-desc' | 'views-asc'
 
-const SORT_OPTIONS: readonly { value: SortOption; label: string }[] = [
+const SORT_OPTIONS: { value: SortOption; label: string }[] = [
   { value: 'date-desc', label: 'Newest First' },
   { value: 'date-asc', label: 'Oldest First' },
   { value: 'views-desc', label: 'Most Viewed' },
@@ -41,7 +41,7 @@ export function SearchBar({
 
   return (
     <div className="group relative flex h-9 items-center gap-3">
-      <Icons.search className="size-4 shrink-0 text-muted-foreground/50 transition-colors duration-300 group-has-[input:focus]:text-secondary group-has-[[data-state=open]]:text-secondary" />
+      <Icons.search className="size-4 shrink-0 text-muted-foreground/50 transition-colors duration-300 group-has-[input:focus]:text-secondary group-has-[[data-popup-open]]:text-secondary" />
 
       <input
         type="text"
@@ -74,8 +74,12 @@ export function SearchBar({
           )}
         </AnimatePresence>
 
-        <Select value={sortBy} onValueChange={(val) => onSortChange(val as SortOption)}>
-          <SelectTrigger className="h-9 w-36 bg-transparent p-0 text-xs ring-0 retina:ring-0 active:scale-100 data-[state=open]:scale-100">
+        <Select
+          items={SORT_OPTIONS}
+          value={sortBy}
+          onValueChange={(val) => onSortChange(val as SortOption)}
+        >
+          <SelectTrigger className="h-9 w-36 bg-transparent p-0 text-xs ring-0 retina:ring-0 active:scale-100 data-[popup-open]:scale-100">
             <SelectValue />
           </SelectTrigger>
           <SelectContent align="end" sideOffset={10} className="shadow-md ring-ring/80">
@@ -90,7 +94,7 @@ export function SearchBar({
 
       <span className="absolute inset-x-0 bottom-0 h-px bg-border" aria-hidden="true" />
       <span
-        className="absolute inset-x-0 bottom-0 h-px origin-left scale-x-0 bg-primary transition-transform duration-300 ease-out group-has-[input:focus]:scale-x-100 group-has-[[data-state=open]]:scale-x-100"
+        className="absolute inset-x-0 bottom-0 h-px origin-left scale-x-0 bg-primary transition-transform duration-300 ease-out group-has-[input:focus]:scale-x-100 group-has-[[data-popup-open]]:scale-x-100"
         aria-hidden="true"
       />
     </div>

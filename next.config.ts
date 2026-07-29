@@ -2,6 +2,7 @@ import type { NextConfig } from 'next'
 
 const canonicalHost = 'www.akasewang.me'
 const canonicalOrigin = `https://${canonicalHost}`
+const devAllowedOrigin = process.env.NEXT_DEV_ALLOWED_ORIGIN
 
 const redirectHosts = [
   'akasewang.me',
@@ -23,6 +24,7 @@ const securityHeaders = [
 ]
 
 const nextConfig: NextConfig = {
+  ...(devAllowedOrigin && { allowedDevOrigins: [devAllowedOrigin] }),
   pageExtensions: ['ts', 'tsx', 'js', 'jsx'],
   outputFileTracingIncludes: {
     '/feed.xml': ['./docs/blogs/**/*'],
