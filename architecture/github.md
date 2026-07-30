@@ -21,24 +21,26 @@ npm run security:audit
 That script runs:
 
 ```bash
-npm audit --audit-level=moderate
+npm audit --package-lock-only --audit-level=info
 ```
 
-The same check is automated by `.github/workflows/security-audit.yml`:
+The equivalent check is automated by `.github/workflows/security-audit.yml`:
 
-- Pull requests that change `package.json`, `package-lock.json` or the workflow itself
-- Pushes to `main` that change one of those files
-- Every Monday at `09:00` Asia/Kolkata (`03:30` UTC)
+- Every pull request
+- Every push to `main`
+- Daily at `09:00` Asia/Kolkata (`03:30` UTC)
 - Manual runs through `workflow_dispatch`
 
-The workflow installs the locked dependency tree with Node 24 and runs the local audit script.
-It has read-only repository permissions and a ten-minute timeout.
+The workflow installs the locked dependency tree with Node 24 while disabling lifecycle scripts,
+verifies npm registry signatures and audits the committed lockfile at the `info` threshold. It has
+read-only repository permissions, does not persist checkout credentials and has a ten-minute
+timeout.
 
 ## Dependabot
 
 Dependabot version updates are configured in `.github/dependabot.yml`.
 
-Current policy:
+Current npm policy:
 
 - Ecosystem: `npm`
 - Target branch: `main`
@@ -48,10 +50,20 @@ Current policy:
 - Commit prefix: `chore`
 - Grouping: all minor and patch npm updates are grouped into one version-update PR
 - Major version updates are ignored
-- GitHub Actions updates are not configured
 
-This keeps routine update PRs quiet. Major upgrades, such as ESLint 10 or Node type major
-bumps, should be reviewed manually because they can break framework/tooling compatibility.
+Current GitHub Actions policy:
+
+- Ecosystem: `github-actions`
+- Target branch: `main`
+- Schedule: weekly, Monday at `09:15` Asia/Kolkata
+- Open PR limit: `1`
+- Labels: `dependencies`
+- Commit prefix: `chore`
+- Grouping: all GitHub Actions updates are grouped into one version-update PR
+
+This keeps routine update PRs quiet while maintaining the workflow's immutable action references.
+Major npm upgrades, such as ESLint 10 or Node type major bumps, should be reviewed manually because
+they can break framework/tooling compatibility.
 
 Security updates are separate from routine version updates. GitHub Dependabot security updates
 are triggered by vulnerability alerts against the default branch, not by the weekly version
@@ -137,6 +149,7 @@ Before merging a dependency or security PR, run:
 ```bash
 npm run security:audit
 npm run lint
+npm run typecheck
 npm run build
 ```
 
@@ -166,6 +179,6 @@ For major upgrades:
 - Dependabot-created branches are normal; they are generated automatically for update PRs.
 - Existing Dependabot branches can be deleted after closing their PRs.
 - The repository intentionally keeps `npm run security:audit` for local verification and uses
-  the same command in GitHub Actions.
+  the equivalent audit command in GitHub Actions after registry-signature verification.
 - Add broader CI checks separately so audit failures remain easy to distinguish from lint,
   type-check or build failures.

@@ -1,20 +1,33 @@
 # MDX & Content Parsing
 
-All blogs and projects are authored in MDX (Markdown with embedded React components). Files live under `docs/`, grouped by type (`docs/blogs`, `docs/projects`).
+Blogs and projects are authored as Markdown or MDX. Files live under `docs/`, grouped by type
+(`docs/blogs` and `docs/projects`).
 
 ## Reading Content
 
-- `mdx-manager.ts` exposes a `createMdxManager` factory, generic over the frontmatter type, that builds a strongly typed manager for each content type. Blogs and projects reuse the same read, parse and sort logic and each get `getSlugs`, `getPost` and `getAll` (sorted newest first).
-- Files are read asynchronously with `fs.readFile` and each read is wrapped in React's `cache()`. If several components request the same post during a single server render, the disk is only touched once.
-- Frontmatter (title, date and so on) is validated on read, so typos and missing fields fail fast instead of rendering a broken page.
+- `src/lib/managers/mdx-manager.ts` exposes a `createMdxManager` factory, generic over the
+  frontmatter type. Blog and project managers share slug discovery, file reading and newest-first
+  date sorting through `getSlugs`, `getPost` and `getAll`.
+- Slugs are restricted to letters, numbers, underscores and hyphens, and resolved paths are checked
+  to remain inside their configured content directory. Both `.md` and `.mdx` files are supported.
+- Files are read asynchronously with `fs.readFile`. React's `cache()` wraps post and collection
+  lookups so repeated requests during the same server render reuse their result.
+- YAML frontmatter is parsed with `js-yaml`. A missing date falls back to the current timestamp;
+  other fields are represented by TypeScript types but are not runtime-schema validated. Malformed
+  files are omitted or return `null` through the manager's error handling.
 
 ## React in Markdown
 
-- We use `next-mdx-remote` to compile Markdown into React elements, with `remark-gfm` for GitHub Flavored Markdown and `rehype-highlight` for server side syntax highlighting. Plugin configuration lives in `mdx-options.ts`, which also defines `remarkCodeMeta`, a custom remark plugin that extracts `title="..."` from fenced code block meta strings and passes it as a prop to the rendered code block component.
-- In `mdx-config.tsx`, standard HTML tags are swapped for custom Tailwind components. For example `<a>` renders as our `LinkText` and Markdown tables (`<table>`, `<thead>`, `<tr>`, `<th>`, `<td>`) render through our own `Table` components.
-- The same mapping lets us drop richer components (`Callout`, `Steps`, `Tabs`, `ZoomableImage` and code blocks) directly into a `.mdx` file.
+- `next-mdx-remote` compiles content into React elements, with `remark-gfm` for GitHub Flavored
+  Markdown and `rehype-highlight` for server-side syntax highlighting. `mdx-options.ts` also defines
+  `remarkCodeMeta`, which extracts `title="..."` metadata from fenced code blocks.
+- `mdx-config.tsx` maps standard elements to site components. Links render through `LinkText`,
+  images through `ZoomableImage`, and Markdown tables through the shared table primitives.
+- The component mapping also exposes `Callout`, `Steps`, `Tabs`, `ProjectDemo`, `AsideTOC`,
+  `SocialShare`, component showcases and code blocks to MDX content.
 
 ## Table of Contents
 
 - While parsing, every heading (`<h1>` through `<h6>`) is given a generated id and a clickable anchor link.
-- The sidebar reads those headings and highlights whichever section is currently in view as you scroll.
+- The sidebar table of contents extracts levels 2 through 4 and highlights the active section while
+  the reader scrolls.

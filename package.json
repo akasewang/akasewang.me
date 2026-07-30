@@ -4,10 +4,11 @@
   "license": "CC-BY-NC-SA-4.0",
   "private": true,
   "scripts": {
-    "dev": "node tools/dev-server.mjs",
+    "dev": "tsx tools/dev-server.ts",
     "build": "next build",
     "start": "next start",
     "lint": "eslint \"src/**/*.{ts,tsx}\"",
+    "typecheck": "tsc --noEmit",
     "format": "biome format --write .",
     "security:audit": "npm audit --package-lock-only --audit-level=info",
     "email": "tsx tools/email-preview.ts -p 3001",
