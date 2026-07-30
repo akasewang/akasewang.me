@@ -2,46 +2,45 @@ name: Security Audit
 
 on:
   pull_request:
-    paths:
-      - package.json
-      - package-lock.json
-      - .github/workflows/security-audit.yml
   push:
     branches:
       - main
-    paths:
-      - package.json
-      - package-lock.json
-      - .github/workflows/security-audit.yml
   schedule:
-    - cron: '30 3 * * 1'
+    - cron: '30 3 * * *'
   workflow_dispatch:
 
 permissions:
   contents: read
 
 concurrency:
-  group: security-audit-${{ github.ref }}
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 jobs:
   npm-audit:
     name: npm audit
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
+    env:
+      NPM_CONFIG_REGISTRY: https://registry.npmjs.org
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Setup Node
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: 24
-          cache: npm
+          package-manager-cache: false
 
-      - name: Install dependencies
-        run: npm ci
+      - name: Install dependencies without lifecycle scripts
+        run: npm ci --ignore-scripts --no-audit --fund=false
+
+      - name: Verify registry signatures
+        run: npm audit signatures
 
       - name: Audit dependencies
-        run: npm run security:audit
+        run: npm audit --package-lock-only --audit-level=info
