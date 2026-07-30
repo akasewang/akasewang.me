@@ -1,4 +1,16 @@
-import { Column, Link, Row, Section, Text } from '@react-email/components'
+import {
+  Body,
+  Column,
+  Container,
+  Head,
+  Html,
+  Link,
+  Preview,
+  Row,
+  Section,
+  Text,
+} from '@react-email/components'
+import type { ReactNode } from 'react'
 import { FULL_NAME, SITE_URL, USERNAME } from '@/constants/constants'
 
 export type EmailDateInput = string | number | Date
@@ -76,6 +88,17 @@ export const emailStyles = {
     letterSpacing: '-0.022em',
     color: emailTheme.text,
   },
+  ctaLink: {
+    display: 'inline-block',
+    fontFamily: emailFonts.mono,
+    fontSize: '12px',
+    color: '#ffffff',
+    textDecoration: 'none',
+    padding: '8px 14px',
+    backgroundColor: emailTheme.link,
+    border: `1px solid ${emailTheme.link}`,
+    lineHeight: '16px',
+  },
   footerSection: {
     borderTop: `1px dashed ${emailTheme.border}`,
     padding: '18px 32px 22px',
@@ -113,6 +136,36 @@ export function EmailHeader({ date }: { date?: EmailDateInput }) {
           <Text style={emailStyles.dateText}>{formatEmailDate(date)}</Text>
         </Column>
       </Row>
+    </Section>
+  )
+}
+
+export function EmailShell({ preview, children }: { preview: string; children: ReactNode }) {
+  return (
+    <Html>
+      <Head>
+        <meta name="color-scheme" content="light" />
+        <meta name="supported-color-schemes" content="light" />
+      </Head>
+      <Preview>
+        {preview} {'​'.repeat(150)}
+      </Preview>
+      <Body style={emailStyles.body}>
+        <Container style={emailStyles.container}>{children}</Container>
+      </Body>
+    </Html>
+  )
+}
+
+export function EmailUnsubscribeFooter({ unsubscribeUrl }: { unsubscribeUrl: string }) {
+  return (
+    <Section style={emailStyles.footerSection}>
+      <Text style={emailStyles.footerSecondary}>
+        Don&apos;t want these?{' '}
+        <Link href={unsubscribeUrl} style={emailStyles.footerLinkDim}>
+          unsubscribe
+        </Link>
+      </Text>
     </Section>
   )
 }

@@ -11,6 +11,7 @@ interface MetadataProps {
   publishedTime?: string
 }
 
+/** Points at the OG route, which renders the card on demand rather than storing an image per page */
 export function getOgImageUrl(title?: string, type?: string): string {
   const params = new URLSearchParams()
   if (title) params.set('title', title)
@@ -19,6 +20,10 @@ export function getOgImageUrl(title?: string, type?: string): string {
   return `${SITE_URL}/api/og${queryString ? `?${queryString}` : ''}`
 }
 
+/**
+ * One place for the tags every page needs, so a new route only supplies what is actually its own.
+ * Paths are given relative to the site URL and absolutised here.
+ */
 export function constructMetadata({
   title,
   description,

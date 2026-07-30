@@ -4,6 +4,7 @@ import { Select as SelectPrimitive } from '@base-ui/react/select'
 import { forwardRef, type ReactNode, useRef } from 'react'
 import { Icons } from '@/components/ui/icons'
 import { MENU_HIGHLIGHT_VIEWPORT_CLASS, MenuHighlight } from '@/components/ui/menu-highlight'
+import { usePopupToggleSound } from '@/hooks/use-popup-toggle-sound'
 import { useSoundEffects } from '@/hooks/use-sound-effects'
 import { cn } from '@/utils/utils'
 
@@ -13,26 +14,19 @@ type SelectProps = Omit<SelectPrimitive.Root.Props<string>, 'onValueChange'> & {
 
 const Select = ({ onOpenChange, onValueChange, ...props }: SelectProps) => {
   const { toggle, select } = useSoundEffects()
-  const skipNextCloseSoundRef = useRef(false)
+  const { markSelectionClose, playOpenChange } = usePopupToggleSound(toggle)
 
   return (
     <SelectPrimitive.Root
       {...props}
       onOpenChange={(open, eventDetails) => {
-        if (open) {
-          toggle(true)
-        } else if (skipNextCloseSoundRef.current) {
-          skipNextCloseSoundRef.current = false
-        } else {
-          toggle(false)
-        }
-
+        playOpenChange(open)
         onOpenChange?.(open, eventDetails)
       }}
       onValueChange={(value) => {
         if (value === null) return
 
-        skipNextCloseSoundRef.current = true
+        markSelectionClose()
         select()
         onValueChange?.(value)
       }}

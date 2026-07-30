@@ -22,26 +22,28 @@ const MOBILE_STUB_CLASS =
   'absolute left-1/2 h-3 w-px -translate-x-1/2 border-l border-dashed border-border'
 
 function CommitRow({ commit }: { commit: ChangelogCommit }) {
-  const { isExpanded, handleClick, handleKeyDown } = useExpandableRow()
+  const { isExpanded, handleToggle } = useExpandableRow()
   const { hoverCard, hoverLink, navigate: navigateSound } = useSoundEffects()
 
   return (
     <div>
       <div
-        role="button"
-        tabIndex={0}
-        aria-expanded={isExpanded}
-        onClick={handleClick}
-        onKeyDown={handleKeyDown}
-        onMouseEnter={hoverCard}
         data-highlight-item
         className="group/card relative z-10 flex flex-col gap-1.5 rounded-xl px-2 py-1.5 transition-[transform,scale] duration-300 ease-out active:scale-[0.99] active:duration-200 sm:flex-row sm:items-start sm:justify-between sm:gap-4 sm:px-3 sm:py-2"
       >
-        <h3 className="min-w-0 flex-1 text-balance pr-8 text-sm font-normal text-primary sm:pr-0">
+        <button
+          type="button"
+          aria-expanded={isExpanded}
+          aria-label={`${isExpanded ? 'Collapse' : 'Expand'} details for ${commit.subject}`}
+          onClick={handleToggle}
+          onMouseEnter={hoverCard}
+          className="absolute inset-0 rounded-xl text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        />
+        <h3 className="pointer-events-none relative z-10 min-w-0 flex-1 text-balance pr-8 text-sm font-normal text-primary sm:pr-0">
           {commit.subject}
         </h3>
 
-        <div className="flex items-center gap-3 font-mono text-[13px] text-muted-foreground sm:shrink-0 sm:pt-px">
+        <div className="pointer-events-none relative z-10 flex items-center gap-3 font-mono text-[13px] text-muted-foreground sm:shrink-0 sm:pt-px">
           <a
             href={commit.url}
             target="_blank"
@@ -49,7 +51,7 @@ function CommitRow({ commit }: { commit: ChangelogCommit }) {
             aria-label={`View commit ${commit.shortSha} on GitHub`}
             onMouseEnter={hoverLink}
             onClick={navigateSound}
-            className="transition-colors duration-300 supports-hover:hover:text-primary active:text-primary"
+            className="pointer-events-auto transition-colors duration-300 supports-hover:hover:text-primary active:text-primary"
           >
             {commit.shortSha}
           </a>

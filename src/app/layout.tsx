@@ -2,6 +2,7 @@ import { Analytics } from '@vercel/analytics/react'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 import type { Metadata, Viewport } from 'next'
 import { BackToTop } from '@/components/common/back-to-top'
+import { RouteScrollReset } from '@/components/common/route-scroll-reset'
 import { DotGridBackground } from '@/components/layout/dot-grid-background'
 import { Footer } from '@/components/layout/footer'
 import { Navbar } from '@/components/layout/navbar'
@@ -22,55 +23,52 @@ import { getOgImageUrl } from '@/lib/metadata'
 
 import './globals.css'
 
-export async function generateMetadata(): Promise<Metadata> {
-  return {
-    title: homeSeoContent.title,
-    description: homeSeoContent.description,
-    keywords: ALL_KEYWORDS,
-    authors: [{ name: FULL_NAME }],
-    creator: FULL_NAME,
-    metadataBase: new URL(SITE_URL),
-    manifest: '/manifest.json',
-    icons: {
-      apple: '/profpic.jpg',
-    },
-    robots: {
+export const metadata: Metadata = {
+  title: homeSeoContent.title,
+  description: homeSeoContent.description,
+  keywords: ALL_KEYWORDS,
+  authors: [{ name: FULL_NAME }],
+  creator: FULL_NAME,
+  metadataBase: new URL(SITE_URL),
+  manifest: '/manifest.json',
+  icons: {
+    apple: '/profpic.jpg',
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
       index: true,
       follow: true,
-      googleBot: {
-        index: true,
-        follow: true,
-        'max-image-preview': 'large',
-        'max-snippet': -1,
-        'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+      'max-video-preview': -1,
+    },
+  },
+  alternates: {
+    canonical: SITE_URL,
+    types: {
+      'application/rss+xml': `${SITE_URL}/feed.xml`,
+    },
+  },
+  openGraph: {
+    type: 'website',
+    locale: 'en_US',
+    url: SITE_URL,
+    siteName: SITE_NAME,
+    images: [
+      {
+        url: getOgImageUrl(homeSeoContent.ogTitle),
+        width: 1200,
+        height: 630,
       },
-    },
-    alternates: {
-      canonical: SITE_URL,
-      types: {
-        'application/rss+xml': `${SITE_URL}/feed.xml`,
-      },
-    },
-    openGraph: {
-      type: 'website',
-      locale: 'en_US',
-      url: SITE_URL,
-      siteName: SITE_NAME,
-      images: [
-        {
-          url: getOgImageUrl(homeSeoContent.ogTitle),
-          width: 1200,
-          height: 630,
-        },
-      ],
-    },
-
-    twitter: {
-      card: 'summary_large_image',
-      site: `@${USERNAME}`,
-      creator: `@${USERNAME}`,
-    },
-  }
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    site: `@${USERNAME}`,
+    creator: `@${USERNAME}`,
+  },
 }
 
 export const viewport: Viewport = {
@@ -83,7 +81,7 @@ const jsonLd = [
   getProfilePageSchema(),
 ]
 
-export default async function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html
       lang="en"
@@ -109,6 +107,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                 <Footer />
               </div>
             </ViewsProvider>
+            <RouteScrollReset />
             <BackToTop />
             <Toaster position="bottom-center" />
             <div className="bottom-blur-fade" />

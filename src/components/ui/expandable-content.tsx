@@ -10,10 +10,11 @@ export function ExpandableContent({ isExpanded, children }: ExpandableContentPro
   return (
     <div
       className={cn(
-        'grid transition-[grid-template-rows,opacity] duration-300 ease-in-out',
+        'grid transition-[grid-template-rows,opacity] duration-300 ease-in-out motion-reduce:transition-none',
         isExpanded ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0',
       )}
       aria-hidden={!isExpanded}
+      inert={!isExpanded}
     >
       <div className="overflow-hidden">{children}</div>
     </div>

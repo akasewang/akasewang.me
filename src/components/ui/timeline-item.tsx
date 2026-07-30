@@ -24,14 +24,17 @@ export const TimelineItem = memo(function TimelineItem({
   tech,
   defaultExpanded = false,
 }: TimelineItemProps) {
-  const { isExpanded, handleClick, handleKeyDown } = useExpandableRow(defaultExpanded)
+  const { isExpanded, handleToggle } = useExpandableRow(defaultExpanded)
   const hasContent = !!description?.length
   const { hoverCard } = useSoundEffects()
 
   const parsedLines = useMemo(() => {
     if (!hasContent) return null
 
-    const validLines = description.map((line) => line.trim()).filter(Boolean)
+    const validLines = description.flatMap((line) => {
+      const trimmed = line.trim()
+      return trimmed ? [trimmed] : []
+    })
     if (!validLines.length) return null
 
     const lineKeyCounts = new Map<string, number>()
@@ -62,11 +65,16 @@ export const TimelineItem = memo(function TimelineItem({
 
   const itemSummary = (
     <>
-      <div className="flex-1 pr-8 sm:pr-0">
+      <div className={cn('flex-1 pr-8 sm:pr-0', hasContent && 'pointer-events-none relative z-10')}>
         <h3 className="text-balance font-normal text-primary">{title}</h3>
 
         {!!links?.length && (
-          <div className="relative z-10 mt-0.5 flex w-fit flex-wrap items-center gap-y-1 text-sm text-muted-foreground">
+          <div
+            className={cn(
+              'relative z-10 mt-0.5 flex w-fit flex-wrap items-center gap-y-1 text-sm text-muted-foreground',
+              hasContent && 'pointer-events-auto',
+            )}
+          >
             {links.map((link, i) => (
               <div key={`${link.url}-${link.text}`} className="flex items-center">
                 {i > 0 && <SeparatorSlash />}
@@ -81,7 +89,12 @@ export const TimelineItem = memo(function TimelineItem({
         )}
       </div>
 
-      <div className="flex items-center justify-between sm:mt-0.5 sm:flex-col sm:items-end sm:gap-2">
+      <div
+        className={cn(
+          'flex items-center justify-between sm:mt-0.5 sm:flex-col sm:items-end sm:gap-2',
+          hasContent && 'pointer-events-none relative z-10',
+        )}
+      >
         <div className="whitespace-nowrap font-mono text-[13px] text-muted-foreground">
           {formatDateString(startDate)}
           {endDate && (
@@ -110,16 +123,15 @@ export const TimelineItem = memo(function TimelineItem({
   return (
     <div id={id} className="scroll-mt-24">
       {hasContent ? (
-        <div
-          role="button"
-          tabIndex={0}
-          aria-expanded={isExpanded}
-          onClick={handleClick}
-          onKeyDown={handleKeyDown}
-          onMouseEnter={hoverCard}
-          data-highlight-item
-          className={itemSummaryClassName}
-        >
+        <div data-highlight-item className={itemSummaryClassName}>
+          <button
+            type="button"
+            aria-expanded={isExpanded}
+            aria-label={`${isExpanded ? 'Collapse' : 'Expand'} details for ${title}`}
+            onClick={handleToggle}
+            onMouseEnter={hoverCard}
+            className="absolute inset-0 rounded-xl text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          />
           {itemSummary}
         </div>
       ) : (

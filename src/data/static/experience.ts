@@ -2,7 +2,7 @@ import type { TimelineItemProps } from '@/types/site'
 
 export const experiences: TimelineItemProps[] = [
   {
-    id: 'noddy-studio-founder',
+    id: 'noddy-studio-developer-designer',
     title: 'Independent Web Developer & Designer',
     startDate: '08.2025',
     description: [
@@ -29,7 +29,7 @@ export const experiences: TimelineItemProps[] = [
     title: 'Software Engineer Trainee',
     startDate: '05.2026',
     description: [
-      'Developed a [school admissions platform](https://skeischool.vercel.app/) with Next.js, Drizzle ORM and Neon PostgreSQL to centralize enquiries, lead tracking and admissions data.',
+      'Developed a school admissions platform with Next.js, Drizzle ORM and Neon PostgreSQL to centralize enquiries, lead tracking and admissions data.',
       'Implemented role based dashboards, analytics charts and protected admin workflows for real time visibility into the admissions pipeline.',
       'Automated lead capture by connecting AJAX controllers with Google Apps Script and Google Sheets, reducing manual data entry for admission enquiries.',
       'Contributed to CRM delivery in an Agile team, supporting feature development, production deployment, third party integrations and issue resolution.',

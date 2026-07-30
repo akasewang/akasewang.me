@@ -7,17 +7,15 @@ import { newsletterSeoContent } from '@/data/content/seo-content'
 import { getBreadcrumbSchema } from '@/lib/json-ld'
 import { constructMetadata, getOgImageUrl } from '@/lib/metadata'
 
-export async function generateMetadata(): Promise<Metadata> {
-  return constructMetadata({
-    title: newsletterSeoContent.title,
-    description: newsletterSeoContent.description,
-    path: '/newsletter',
-    image: getOgImageUrl(newsletterSeoContent.ogTitle, 'Newsletter'),
-    imageAlt: newsletterSeoContent.imageAlt,
-  })
-}
+export const metadata: Metadata = constructMetadata({
+  title: newsletterSeoContent.title,
+  description: newsletterSeoContent.description,
+  path: '/newsletter',
+  image: getOgImageUrl(newsletterSeoContent.ogTitle, 'Newsletter'),
+  imageAlt: newsletterSeoContent.imageAlt,
+})
 
-export default async function NewsletterPage() {
+export default function NewsletterPage() {
   const breadcrumbJsonLd = getBreadcrumbSchema([
     { name: 'Home', url: SITE_URL },
     { name: 'Newsletter', url: `${SITE_URL}/newsletter` },

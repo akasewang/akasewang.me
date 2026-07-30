@@ -30,7 +30,7 @@ const readProjectFile = (src: string): string | null => {
   }
 }
 
-export async function ComponentSource({ src, title, className }: ComponentSourceProps) {
+export function ComponentSource({ src, title, className }: ComponentSourceProps) {
   const codeString = readProjectFile(src)
 
   if (codeString === null) {

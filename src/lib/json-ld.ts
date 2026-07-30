@@ -20,6 +20,10 @@ const PERSON_SCHEMA = {
   sameAs: activeSocials.map((social) => social.href),
 }
 
+/**
+ * Structured data for search engines, kept beside the metadata so the two cannot drift. Each helper
+ * returns a plain object that a page embeds through serializeJsonLd.
+ */
 export function getPersonSchema() {
   return PERSON_SCHEMA
 }
@@ -134,6 +138,10 @@ export function getBreadcrumbSchema(items: { name: string; url: string }[]) {
   }
 }
 
+/**
+ * Escapes the angle bracket, which is what stops a value ending the script tag it is embedded in.
+ * Everything on the way to a page's JSON-LD has to go through here.
+ */
 export function serializeJsonLd(value: unknown): string {
   return JSON.stringify(value).replace(/</g, '\\u003c')
 }

@@ -1,3 +1,11 @@
+/**
+ * A local preview server for the transactional email templates, so a change can be seen without
+ * sending anything. Templates are discovered from disk, rendered with their own PreviewProps and
+ * served in a shell that reloads on save.
+ *
+ * Run with npm run email.
+ */
+
 import { watch } from 'node:fs'
 import fs from 'node:fs/promises'
 import http from 'node:http'
@@ -42,6 +50,7 @@ function toExportName(slug: string): string {
     .join('')
 }
 
+/** Reads the templates off disk each time, so a new file needs no registration here */
 async function discoverTemplates(): Promise<TemplateDefinition[]> {
   const entries = await fs.readdir(templatesDir)
   return entries
@@ -66,6 +75,7 @@ function broadcastReload() {
   }
 }
 
+/** Server sent events drive the reload, which avoids a socket library for a dev only tool */
 function watchTemplates() {
   let debounce: NodeJS.Timeout | undefined
 
@@ -105,6 +115,10 @@ function escapeHtml(value: string) {
 const globalsCssPath = path.join(rootDir, 'src', 'app', 'globals.css')
 let themeTokensCache: string | null = null
 
+/**
+ * Lifts the :root custom properties out of the app's stylesheet so the shell around the preview
+ * matches the site. Cached because it cannot change without restarting this server.
+ */
 async function getThemeTokens(): Promise<string> {
   if (themeTokensCache === null) {
     const css = await fs.readFile(globalsCssPath, 'utf8')
@@ -114,6 +128,10 @@ async function getThemeTokens(): Promise<string> {
   return themeTokensCache
 }
 
+/**
+ * Imports a template, keyed by its modification time. ES module imports are cached permanently by
+ * the runtime, so the timestamp in the URL is what makes a saved edit load at all.
+ */
 async function importTemplateModule(filePath: string): Promise<EmailTemplateExports> {
   const { mtimeMs } = await fs.stat(filePath)
   const cachedModule = moduleCache.get(filePath)
@@ -140,9 +158,10 @@ async function renderTemplate(template: TemplateDefinition): Promise<string> {
   const TemplateComponent = Template as EmailTemplateComponent
   const html = await render(createElement(TemplateComponent, TemplateComponent.PreviewProps ?? {}))
 
-  // The email renders as its own document inside the iframe, so the preview
-  // shell's scrollbar styling can't reach it. Inject a thin scrollbar (matching
-  // the site's `scrollbar-width: thin` look) tuned for the light email.
+  /**
+   * The email is its own document inside the iframe, so the shell's scrollbar styling cannot reach
+   * it. This injects the site's thin scrollbar, toned for the light email background.
+   */
   return html.replace(
     '</head>',
     '<style>*{scrollbar-width:thin;scrollbar-color:#c7c7cc transparent}</style></head>',

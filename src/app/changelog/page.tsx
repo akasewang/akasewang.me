@@ -10,15 +10,13 @@ import { constructMetadata, getOgImageUrl } from '@/lib/metadata'
 
 export const revalidate = 3600
 
-export async function generateMetadata(): Promise<Metadata> {
-  return constructMetadata({
-    title: changelogSeoContent.title,
-    description: changelogSeoContent.description,
-    path: '/changelog',
-    image: getOgImageUrl(changelogSeoContent.ogTitle, 'Changelog'),
-    imageAlt: changelogSeoContent.imageAlt,
-  })
-}
+export const metadata: Metadata = constructMetadata({
+  title: changelogSeoContent.title,
+  description: changelogSeoContent.description,
+  path: '/changelog',
+  image: getOgImageUrl(changelogSeoContent.ogTitle, 'Changelog'),
+  imageAlt: changelogSeoContent.imageAlt,
+})
 
 export default async function ChangelogPage() {
   const days = await getChangelog()

@@ -3,6 +3,10 @@ import { fetchGithub, GITHUB_REPO_URL } from '@/lib/github'
 
 export const revalidate = 3600
 
+/**
+ * Proxies the repository's star count, so the token stays on the server and the browser is not
+ * rate limited per visitor. Revalidated hourly, which is often enough for a badge.
+ */
 export async function GET() {
   try {
     const response = await fetchGithub(GITHUB_REPO_URL)

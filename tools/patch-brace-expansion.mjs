@@ -1,3 +1,11 @@
+/**
+ * Runs from postinstall. brace-expansion 5 moved to named exports, but the copy of minimatch that
+ * older tooling still pulls in expects the function itself on module.exports, so a callable export
+ * is appended back on. Kept as a patch rather than an override because the fix is one line.
+ *
+ * The version is asserted first: a bump has to be reviewed here rather than silently patched.
+ */
+
 import { readFile, writeFile } from 'node:fs/promises'
 import { createRequire } from 'node:module'
 import { dirname, resolve } from 'node:path'
@@ -14,6 +22,7 @@ if (packageJson.version !== '5.0.8') {
 
 const commonJsPath = resolve(dirname(packagePath), packageJson.main)
 const source = await readFile(commonJsPath, 'utf8')
+/** Marks our own addition, so reinstalling over an already patched copy is a no op */
 const marker = '// Legacy minimatch compatibility'
 
 if (!source.includes(marker)) {

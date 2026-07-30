@@ -1,5 +1,5 @@
 import { useRouter } from 'next/navigation'
-import { useEffect, useRef } from 'react'
+import { useEffect, useEffectEvent } from 'react'
 
 interface ShortcutOptions {
   ctrlKey?: boolean
@@ -9,6 +9,10 @@ interface ShortcutOptions {
   preventDefault?: boolean
 }
 
+/**
+ * Binds a document wide shortcut to either a route to push or a callback. Modifiers must match
+ * exactly, so a plain key never fires while a combination is held.
+ */
 export function useKeyboardShortcut(
   key: string,
   action: string | (() => void),
@@ -21,11 +25,13 @@ export function useKeyboardShortcut(
   }: ShortcutOptions = {},
 ) {
   const router = useRouter()
-  const actionRef = useRef(action)
-
-  useEffect(() => {
-    actionRef.current = action
-  }, [action])
+  const runAction = useEffectEvent(() => {
+    if (typeof action === 'string') {
+      router.push(action)
+    } else {
+      action()
+    }
+  })
 
   useEffect(() => {
     const targetKey = key.toLowerCase()
@@ -33,6 +39,7 @@ export function useKeyboardShortcut(
     const handleKeyDown = (e: KeyboardEvent) => {
       const target = e.target as HTMLElement
 
+      /** Someone typing owns the keystroke, however the shortcut is configured */
       if (['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName) || target.isContentEditable) {
         return
       }
@@ -48,16 +55,11 @@ export function useKeyboardShortcut(
           e.preventDefault()
         }
 
-        const currentAction = actionRef.current
-        if (typeof currentAction === 'string') {
-          router.push(currentAction)
-        } else {
-          currentAction()
-        }
+        runAction()
       }
     }
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [key, ctrlKey, metaKey, altKey, shiftKey, preventDefault, router])
+  }, [key, ctrlKey, metaKey, altKey, shiftKey, preventDefault])
 }

@@ -6,11 +6,11 @@ URL search parameters, context providers or short-lived browser storage.
 ## URL State
 
 Blog and project filters store category, search text and sort order in URL search parameters (for
-example, `?category=react&q=audio&sort=views-desc`). The catalog uses the same approach for its
-category filter.
+example, `?category=react&q=audio&sort=views-desc`). Catalog, skills and photos use the same
+approach for category-only filters.
 
 - Client list components read with `useSearchParams` inside `Suspense` boundaries. They update the
-  address with `window.history.replaceState`, avoiding a navigation, history entry or scroll jump.
+address with `window.history.replaceState`, avoiding a navigation, history entry or scroll jump.
 - Default category and sort values are omitted from the query string. Unknown values fall back to
   the configured defaults.
 - Shared URLs preserve the selected filters when opened in another browser.
@@ -27,5 +27,6 @@ category filter.
 - **`useAdmin`:** Stores the supplied admin credential in `localStorage` and synchronizes it across
   components and tabs. Server Actions still validate the credential for every privileged mutation.
 - **`useContentListState`:** Provides category, search and view/date sorting for blog and project
-  lists. It synchronizes URL parameters and prefetches view counts. The catalog owns a smaller
-  category-only implementation.
+  lists. It synchronizes URL parameters and prefetches view counts.
+- **`useCategoryParam`:** Shares category-only URL state across catalog, skills and photos. The
+  first configured category is the default and is omitted from the URL.

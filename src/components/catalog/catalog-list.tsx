@@ -1,42 +1,16 @@
 'use client'
 
 import { AnimatePresence, m } from 'framer-motion'
-import { usePathname, useSearchParams } from 'next/navigation'
-import { useCallback, useMemo } from 'react'
+import { useMemo } from 'react'
 import { CategoryFilter } from '@/components/common/category-filter'
 import { EmptyState } from '@/components/common/empty-state'
+import { AnimatedListItem } from '@/components/ui/animated-list-item'
 import { CATALOG_CATEGORIES } from '@/constants/categories'
-import { SPRING_TRANSITION } from '@/constants/ui'
 import { catalog } from '@/data/static/catalog'
-import type { FilterCategory } from '@/types/catalog'
+import { useCategoryParam } from '@/hooks/use-category-param'
 
 export function CatalogList() {
-  const searchParams = useSearchParams()
-  const pathname = usePathname()
-
-  const categoryParam = searchParams.get('category')
-
-  const activeCategory = useMemo(() => {
-    const isValid = categoryParam && CATALOG_CATEGORIES.some((c) => c.value === categoryParam)
-    return (isValid ? categoryParam : 'All') as FilterCategory
-  }, [categoryParam])
-
-  const handleCategoryChange = useCallback(
-    (val: string) => {
-      const params = new URLSearchParams(searchParams.toString())
-      if (val === 'All') {
-        params.delete('category')
-      } else {
-        params.set('category', val)
-      }
-
-      const query = params.toString()
-      const newUrl = query ? `${pathname}?${query}` : pathname
-
-      window.history.replaceState(null, '', newUrl)
-    },
-    [searchParams, pathname],
-  )
+  const [activeCategory, handleCategoryChange] = useCategoryParam(CATALOG_CATEGORIES)
 
   const filteredItems = useMemo(
     () =>
@@ -57,13 +31,8 @@ export function CatalogList() {
         {filteredItems.length > 0 ? (
           <m.div key="catalog-grid" layout className="flex flex-col">
             {filteredItems.map((item) => (
-              <m.div
+              <AnimatedListItem
                 key={`${item.category}-${item.title}`}
-                layout
-                initial={{ opacity: 0, scale: 0.98 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.96 }}
-                transition={SPRING_TRANSITION}
                 className="flex items-baseline justify-between gap-4 border-b border-border py-3 font-mono font-medium last:border-0"
               >
                 <h3 className="line-clamp-2 flex-1 text-balance text-sm font-normal text-foreground">
@@ -74,7 +43,7 @@ export function CatalogList() {
                     {item.author}
                   </span>
                 )}
-              </m.div>
+              </AnimatedListItem>
             ))}
           </m.div>
         ) : (

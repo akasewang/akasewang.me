@@ -7,15 +7,13 @@ import { testimonialsPageContent } from '@/data/content/testimonials-content'
 import { getBreadcrumbSchema } from '@/lib/json-ld'
 import { constructMetadata, getOgImageUrl } from '@/lib/metadata'
 
-export async function generateMetadata(): Promise<Metadata> {
-  return constructMetadata({
-    title: testimonialsSeoContent.title,
-    description: testimonialsSeoContent.description,
-    path: '/testimonials',
-    image: getOgImageUrl(testimonialsSeoContent.ogTitle, 'Testimonials'),
-    imageAlt: testimonialsSeoContent.imageAlt,
-  })
-}
+export const metadata: Metadata = constructMetadata({
+  title: testimonialsSeoContent.title,
+  description: testimonialsSeoContent.description,
+  path: '/testimonials',
+  image: getOgImageUrl(testimonialsSeoContent.ogTitle, 'Testimonials'),
+  imageAlt: testimonialsSeoContent.imageAlt,
+})
 
 export default function TestimonialsPage() {
   const breadcrumbJsonLd = getBreadcrumbSchema([

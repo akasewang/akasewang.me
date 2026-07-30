@@ -15,15 +15,23 @@ import {
   YEAR_REGEX,
 } from '../constants/constants'
 
+/** Merges class strings and lets later Tailwind utilities win over earlier conflicting ones */
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
+/** Rounded up minutes at the configured words per minute */
 export function getReadingTime(content: string): number {
   const trimmed = content.trim()
   return trimmed ? Math.ceil(trimmed.split(/\s+/).length / READING_SPEED) : 0
 }
 
+/**
+ * Accepts anything the content files might hold and gives back a real Date or null. The
+ * configured patterns are tried before the native parser so ambiguous forms land on the
+ * project's reading of them. An ongoing entry reads as present and is deliberately null,
+ * because there is no date to sort or format.
+ */
 export function parseAnyDate(dateStr?: string | Date): Date | null {
   if (!dateStr) return null
 
@@ -46,6 +54,10 @@ export function parseAnyDate(dateStr?: string | Date): Date | null {
   return isValid(nativeDate) ? nativeDate : null
 }
 
+/**
+ * ISO string for storage. Anything unparseable becomes now rather than throwing, so a typo in a
+ * content file cannot take a page down.
+ */
 export function parseDate(dateStr?: string | Date): string {
   return (parseAnyDate(dateStr) || new Date()).toISOString()
 }
@@ -58,12 +70,18 @@ export function formatTime(date: Date): string {
   return format(date, 'h:mm a').toLowerCase()
 }
 
+/** Today and Yesterday stay relative, everything older gets the long date */
 export function formatDayLabel(date: Date): string {
   if (isToday(date)) return 'Today'
   if (isYesterday(date)) return 'Yesterday'
   return format(date, LONG_DATE_DISPLAY_FORMAT)
 }
 
+/**
+ * Formats for display at the precision the source string was written in, so a year stays a year
+ * and a month stays a month instead of being padded with a day nobody supplied. Unrecognised
+ * strings are passed through as they are.
+ */
 export function formatDateString(dateStr?: string | Date): string {
   if (!dateStr) return ''
 
@@ -90,6 +108,11 @@ export function formatDateString(dateStr?: string | Date): string {
   return format(date, DATE_DISPLAY_FORMAT)
 }
 
+/**
+ * Builds a gradient from a hash of the name, so the same person always gets the same avatar
+ * without one being stored anywhere. The seeded values pick the pattern, angle and origin, and
+ * the narrow saturation and lightness ranges keep every result usable behind dark text.
+ */
 export function generateGradientFromName(name: string) {
   let hash = 0
   for (let i = 0; i < name.length; i++) {
@@ -137,6 +160,10 @@ export function generateGradientFromName(name: string) {
   }
 }
 
+/**
+ * Within the last two weeks. A day of slack on the future side absorbs clock skew between the
+ * visitor and whoever dated the entry.
+ */
 export function isNew(dateStr?: string | Date): boolean {
   const date = parseAnyDate(dateStr)
   if (!date) return false

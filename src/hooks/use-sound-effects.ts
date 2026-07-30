@@ -4,6 +4,14 @@ import { useCallback } from 'react'
 import { isAudioEnabled } from '@/hooks/use-audio-preference'
 import { canUseHover } from '@/utils/pointer'
 
+/**
+ * Every sound in the UI is synthesised here rather than loaded, so there are no audio files to ship
+ * and each cue can be shaped in code. The tuning lives in these constants: see the
+ * [audio design system](../../architecture/audio-design-system.md) for which cue belongs to which
+ * interaction.
+ */
+
+/** Never ramp gain to a true zero, since exponential ramps cannot reach it */
 const MIN_GAIN = 0.0001
 const ATTACK_TIME = 0.012
 const HOVER_DURATION = 0.1
@@ -44,6 +52,7 @@ type ToneOptions = {
   delay?: number
 }
 
+/** One context and one output chain for the whole page, reused by every cue */
 let sharedCtx: AudioContext | null = null
 let sharedOutput: SharedOutput | null = null
 let spotlightVoice: SpotlightVoice | null = null
@@ -64,6 +73,10 @@ function getCtx(): AudioContext | null {
   return sharedCtx
 }
 
+/**
+ * The shared master chain. A gentle compressor sits before the destination so overlapping cues,
+ * such as a hover landing under a click, cannot stack into something harsh.
+ */
 function getOutput(ctx: AudioContext) {
   if (sharedOutput) {
     sharedOutput.input.gain.value = MASTER_GAIN
@@ -98,6 +111,10 @@ function createNoiseBuffer(ctx: AudioContext) {
   return buffer
 }
 
+/**
+ * The spotlight sweep is one continuous filtered noise voice that is kept alive between pointer
+ * moves and re-aimed, because starting a fresh source per move would click.
+ */
 function getSpotlightVoice(ctx: AudioContext) {
   if (spotlightReleaseTimer !== null) {
     window.clearTimeout(spotlightReleaseTimer)
@@ -140,6 +157,10 @@ function getSpotlightVoice(ctx: AudioContext) {
   return spotlightVoice
 }
 
+/**
+ * Fades the sweep out once the pointer settles, then tears the nodes down. Both stages check that
+ * the voice is still the current one, so a pointer returning mid fade is not left silent.
+ */
 function releaseSpotlightVoice(ctx: AudioContext, idleDelay = 140) {
   const voice = spotlightVoice
   if (!voice || typeof window === 'undefined') return
@@ -173,6 +194,7 @@ function releaseSpotlightVoice(ctx: AudioContext, idleDelay = 140) {
   }, idleDelay)
 }
 
+/** Browsers suspend a context until a gesture, and again whenever the tab is backgrounded */
 function resumeIfNeeded(ctx: AudioContext) {
   if (ctx.state === 'suspended') ctx.resume().catch(() => {})
 }
@@ -181,6 +203,10 @@ function clamp01(value: number) {
   return Math.min(Math.max(value, 0), 1)
 }
 
+/**
+ * One shaped oscillator note, the building block for most cues. The short attack and exponential
+ * decay are what keep these reading as taps rather than beeps.
+ */
 function playTone(ctx: AudioContext, options: ToneOptions) {
   const start = ctx.currentTime + (options.delay ?? 0)
   const duration = options.duration ?? STANDARD_DURATION
@@ -448,6 +474,11 @@ function playMedia(ctx: AudioContext, playing: boolean) {
   })
 }
 
+/**
+ * The cue callbacks every interactive component uses. Each one checks the shared audio preference
+ * first, so nothing plays until sound is switched on, and the hover cues additionally require a real
+ * hovering pointer so a touch device is not given feedback it never asked for.
+ */
 export function useSoundEffects() {
   const throttledHover = useCallback((play: (ctx: AudioContext) => void) => {
     if (!canUseHover() || !isAudioEnabled()) return

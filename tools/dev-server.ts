@@ -1,3 +1,11 @@
+/**
+ * Wraps next dev so a phone on the same network can open the site straight from a QR code in the
+ * terminal. It picks the LAN address itself, waits until the server actually answers on it and only
+ * then prints the code, which is why this is a wrapper rather than a printed hint in the scripts.
+ *
+ * Pass --mobile-host to override the address it chooses.
+ */
+
 import { spawn } from 'node:child_process'
 import { createRequire } from 'node:module'
 import { networkInterfaces } from 'node:os'
@@ -25,6 +33,7 @@ type NetworkCandidate = {
   internal: boolean
 }
 
+/** Reads a flag in either form, --port 3000 or --port=3000, without pulling in a parser */
 function readOption(args: string[], longName: string, shortName?: string) {
   for (let index = 0; index < args.length; index += 1) {
     const argument = args[index]
@@ -41,6 +50,7 @@ function readOption(args: string[], longName: string, shortName?: string) {
   return undefined
 }
 
+/** Strips our own flag from the list, so next dev is never handed an argument it rejects */
 function removeOption(args: string[], longName: string) {
   const result: string[] = []
 
@@ -70,6 +80,7 @@ function normalizeHost(value: string | undefined) {
   }
 }
 
+/** The RFC 1918 ranges, the only addresses a phone on the same network can reach us on */
 function isPrivateIpv4(address: string) {
   if (address.startsWith('10.') || address.startsWith('192.168.')) return true
 
@@ -81,6 +92,11 @@ function isPrivateIpv4(address: string) {
   return false
 }
 
+/**
+ * Picks the address a phone is most likely to reach. Physical ethernet and wireless adapters are
+ * scored up and the virtual ones that Docker, WSL and VPN clients leave behind are scored down,
+ * since those answer locally but are unreachable from another device.
+ */
 function findLanAddress() {
   const virtualInterfacePattern =
     /docker|hyper-v|loopback|tailscale|veth|virtual|vmware|vpn|wsl|zerotier/i
@@ -154,6 +170,11 @@ function getErrorMessage(error: unknown) {
   return error instanceof Error ? error.message : String(error)
 }
 
+/**
+ * Next prints the port it settled on, which may not be the one requested if that was taken, so the
+ * URL is read back out of its output rather than assumed. The buffer is trimmed as it grows because
+ * a long dev session would otherwise keep every line in memory.
+ */
 function inspectServerOutput(chunk: Buffer) {
   recentOutput = `${recentOutput}${stripVTControlCharacters(chunk.toString())}`.slice(-12_000)
 
@@ -188,6 +209,10 @@ child.stderr.on('data', (chunk) => {
   inspectServerOutput(chunk)
 })
 
+/**
+ * Ready in the output only means Next has bound, not that the address is reachable, so the URL is
+ * polled before a code is shown. Anything under a 500 counts, since a 404 still proves it answered.
+ */
 async function waitForReachable(url: string) {
   const deadline = Date.now() + 30_000
 
@@ -207,6 +232,7 @@ async function waitForReachable(url: string) {
   return false
 }
 
+/** Prints the QR code once per run, with a specific reason whenever it cannot */
 async function showMobilePreview() {
   if (previewStarted) return
   previewStarted = true

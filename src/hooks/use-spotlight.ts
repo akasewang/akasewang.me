@@ -14,6 +14,11 @@ interface UseSpotlightOptions {
   onMove?: (state: SpotlightMoveState) => void
 }
 
+/**
+ * Tracks the pointer across an element and publishes its position as CSS custom properties, so the
+ * glow itself is drawn in CSS and no React state changes per move. Intensity rises with pointer
+ * speed, which makes a card brighten as it is swept across and settle once the pointer slows.
+ */
 export function useSpotlight<T extends HTMLElement = HTMLElement>({
   onMove,
 }: UseSpotlightOptions = {}) {
@@ -37,6 +42,7 @@ export function useSpotlight<T extends HTMLElement = HTMLElement>({
     const handlePointerMove = (e: PointerEvent, phase: SpotlightMoveState['phase'] = 'move') => {
       if (!canUseHoverPointer(e.pointerType)) return
 
+      /** Only the newest position matters, so a queued frame is replaced rather than added to */
       cancelAnimationFrame(animationFrameId)
 
       animationFrameId = requestAnimationFrame(() => {
@@ -47,6 +53,7 @@ export function useSpotlight<T extends HTMLElement = HTMLElement>({
 
         let intensity = 0.4
 
+        /** No previous sample on entry, so the first frame keeps the resting intensity */
         if (lastTime > 0) {
           const dx = e.clientX - lastX
           const dy = e.clientY - lastY

@@ -1,3 +1,7 @@
+/**
+ * The first entry of each list is the default. Category state resolves anything unrecognised back
+ * to it and leaves it out of the URL, so reordering these changes what a bare path shows.
+ */
 export const PROJECT_CATEGORIES = [
   { value: 'all', label: 'All' },
   { value: 'web', label: 'Web Application' },
@@ -28,6 +32,20 @@ export const CATALOG_CATEGORIES = [
   { value: 'Novel', label: 'Novels' },
   { value: 'Book', label: 'Books' },
   { value: 'Game', label: 'Games' },
+] as const
+
+/**
+ * Order here is the order the hero renders the groups in, so it reads as a priority list. Unlike the
+ * filter categories above there is no all entry, since every group is shown at once.
+ */
+export const SOCIAL_CATEGORIES = [
+  { value: 'code', label: 'code' },
+  { value: 'design', label: 'design' },
+  { value: 'practice', label: 'practice' },
+  { value: 'security', label: 'security' },
+  { value: 'network', label: 'network' },
+  { value: 'social', label: 'social' },
+  { value: 'media', label: 'media' },
 ] as const
 
 export const BLOG_CATEGORIES = [

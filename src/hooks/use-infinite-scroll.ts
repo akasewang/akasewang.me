@@ -1,5 +1,9 @@
 import { useEffect, useRef } from 'react'
 
+/**
+ * Returns a ref for a sentinel element and calls back when it comes into view. The margin means
+ * the next page starts loading before the visitor reaches the end.
+ */
 export function useInfiniteScroll<T extends HTMLElement>(
   onIntersect: () => void,
   enabled: boolean = true,
@@ -7,6 +11,7 @@ export function useInfiniteScroll<T extends HTMLElement>(
 ) {
   const targetRef = useRef<T>(null)
 
+  /** Held in a ref so a new callback each render does not tear down and rebuild the observer */
   const onIntersectRef = useRef(onIntersect)
 
   useEffect(() => {

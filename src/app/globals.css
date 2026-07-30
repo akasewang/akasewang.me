@@ -388,6 +388,11 @@
     animation: page-simple-in 0.6s ease-out both;
   }
 
+  /*
+   * The mask is what makes this read as a fade rather than a bar: it thins out the tint and the
+   * blur together towards the top. Mobile used to drop both and keep a flat tint, which is why the
+   * bottom of a phone screen looked like a grey smudge over still sharp text.
+   */
   .bottom-blur-fade {
     position: fixed;
     bottom: 0;
@@ -437,19 +442,9 @@
 
   @media (max-width: 767px) {
     .bottom-blur-fade {
-      height: 5rem;
-      background: linear-gradient(
-        to top,
-        rgb(10 10 10) 0%,
-        rgb(10 10 10 / 0.95) 20%,
-        rgb(10 10 10 / 0.72) 45%,
-        rgb(10 10 10 / 0.35) 70%,
-        transparent 100%
-      );
-      -webkit-backdrop-filter: none;
-      backdrop-filter: none;
-      -webkit-mask-image: none;
-      mask-image: none;
+      height: 6rem;
+      -webkit-backdrop-filter: blur(6px);
+      backdrop-filter: blur(6px);
     }
   }
 }

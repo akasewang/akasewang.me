@@ -1,6 +1,10 @@
 import 'server-only'
 import { Resend } from 'resend'
 
+/**
+ * Built on first use, so a build without a mail key still succeeds and only the paths that actually
+ * send fail.
+ */
 let resendInstance: Resend | null = null
 
 export function getResend(): Resend {

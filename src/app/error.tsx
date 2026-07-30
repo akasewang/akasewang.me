@@ -1,8 +1,6 @@
 'use client'
 
-import { useEffect } from 'react'
-import { PageLayout } from '@/components/layout/page-layout'
-import { Button } from '@/components/ui/button'
+import { ErrorState } from '@/components/common/error-state'
 
 export default function Error({
   error,
@@ -11,19 +9,12 @@ export default function Error({
   error: Error & { digest?: string }
   reset: () => void
 }) {
-  useEffect(() => {
-    console.error(error)
-  }, [error])
-
   return (
-    <PageLayout
+    <ErrorState
+      error={error}
+      reset={reset}
       title="something broke."
       subtitle="An unexpected error occurred. You can try again or head back home."
-      footerText="Even the best UIs have bad days."
-    >
-      <div className="pt-4">
-        <Button defaultText="try again" onClick={reset} />
-      </div>
-    </PageLayout>
+    />
   )
 }

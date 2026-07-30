@@ -15,7 +15,7 @@ interface InfiniteCarouselProps<T> {
   className?: string
   containerClassName?: string
   slideClassName?: string
-  keyExtractor?: (item: T, index: number) => string | number
+  keyExtractor: (item: T, index: number) => string | number
   emblaOptions?: Partial<EmblaOptionsType>
   autoScrollOptions?: Partial<AutoScrollOptionsType>
   ariaLabel?: string
@@ -76,7 +76,7 @@ export function InfiniteCarousel<T>({
         {displayItems.map((item, index) => {
           const originalIndex = index % items.length
           const loopIndex = Math.floor(index / items.length)
-          const key = keyExtractor ? `${keyExtractor(item, originalIndex)}-${loopIndex}` : index
+          const key = `${keyExtractor(item, originalIndex)}-${loopIndex}`
 
           return (
             <div

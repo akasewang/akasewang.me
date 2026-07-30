@@ -113,6 +113,7 @@ function paintPaper(ctx: CanvasRenderingContext2D, width: number, height: number
 export function PaintStrokes() {
   const prev = useRef<{ x: number; y: number; has: boolean }>({ x: 0, y: 0, has: false })
   const hue = useRef(210)
+  const width = useRef(0)
 
   const frame = ({ ctx, pointer }: CanvasFrame) => {
     if (!pointer.active) {
@@ -135,16 +136,22 @@ export function PaintStrokes() {
 
     const angle = Math.atan2(dy, dx)
 
-    const size = Math.max(10, 30 - dist * 0.6)
+    const speed = Math.min(1, dist / 26)
+    width.current += (speed - width.current) * 0.35
+    const load = 1 - width.current * 0.62
+
+    const size = Math.max(9, 32 * load)
     const spacing = Math.max(1.5, size * 0.18)
     const steps = Math.max(1, Math.floor(dist / spacing))
 
     ctx.globalCompositeOperation = 'multiply'
+    ctx.globalAlpha = 0.45 + load * 0.55
     for (let i = 1; i <= steps; i++) {
       const t = i / steps
       hue.current = (hue.current + 0.25) % 360
       brushDab(ctx, p.x + dx * t, p.y + dy * t, angle, size, hue.current)
     }
+    ctx.globalAlpha = 1
     ctx.globalCompositeOperation = 'source-over'
 
     p.x = pointer.x

@@ -8,13 +8,16 @@ import {
   sortMdxByDate,
 } from '@/utils/mdx-utils'
 
+/**
+ * Builds the read layer for one content directory, which blogs and projects each instantiate so the
+ * two stay identical. Reads are wrapped in React's cache, so a page rendering a post and its
+ * metadata hits the filesystem once per request.
+ */
 export function createMdxManager<T extends { date: string | Date; slug: string }>(
   directory: string,
   entityName: string,
 ) {
-  const getSlugs = async () => {
-    return getMdxSlugs(directory)
-  }
+  const getSlugs = () => getMdxSlugs(directory)
 
   const getPost = cache(async (slug: string) => {
     try {
@@ -33,6 +36,7 @@ export function createMdxManager<T extends { date: string | Date; slug: string }
           ? (error as { code?: unknown }).code
           : undefined
 
+      /** A missing file is a 404 the caller handles, not something worth logging */
       if (code !== 'ENOENT') {
         console.error(`Error fetching ${entityName} [${slug}]:`, error)
       }

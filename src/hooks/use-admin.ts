@@ -3,8 +3,14 @@
 import { useCallback, useEffect, useState } from 'react'
 
 const STORAGE_KEY = 'adminKey'
+/** storage only fires in other tabs, so same tab listeners need an event of their own */
 const TOGGLE_EVENT = 'adminModeToggled'
 
+/**
+ * Mirrors the stored admin credential across every component and tab. This only decides what the
+ * UI offers: Server Actions revalidate the credential on each privileged mutation, so a forged
+ * value here buys nothing.
+ */
 export function useAdmin() {
   const [adminKey, setAdminKey] = useState<string | null>(null)
 

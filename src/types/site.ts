@@ -1,3 +1,5 @@
+import type { SOCIAL_CATEGORIES } from '@/constants/categories'
+
 export interface NavbarContent {
   home: string
   blogs: string
@@ -36,10 +38,19 @@ export interface SeoContent {
   ogTitle: string
 }
 
+type SocialCategory = (typeof SOCIAL_CATEGORIES)[number]['value']
+
 export interface SocialLink {
   href: string
   label: string
   display: string
+  category: SocialCategory
+}
+
+export interface SocialGroup {
+  value: SocialCategory
+  label: string
+  links: SocialLink[]
 }
 
 export interface SharedContent {

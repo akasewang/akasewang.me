@@ -1,8 +1,15 @@
+/** Renders the social card for a page on demand, so no image is stored per route */
+
 import { ImageResponse } from 'next/og'
 import { SITE_URL } from '@/constants/constants'
 
 export const runtime = 'edge'
 
+/**
+ * ImageResponse needs real font bytes, which means resolving the woff2 URL out of the stylesheet
+ * first. Only the glyphs in the requested text are asked for, keeping the download small enough to
+ * fetch on every render.
+ */
 async function loadGoogleFont(family: string, weight: number, text: string, italic = false) {
   const axis = italic ? `ital,wght@1,${weight}` : `wght@${weight}`
   const url = `https://fonts.googleapis.com/css2?family=${family.replace(

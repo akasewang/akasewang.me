@@ -2,81 +2,107 @@
 
 import { useRef } from 'react'
 import { useAnimatedCanvas } from '@/hooks/use-animated-canvas'
+import { followPointer } from '@/utils/pointer'
 
 const GAP = 17
 const TAU = Math.PI * 2
+const SPRING = 0.055
+const DAMPING = 0.86
+const PUSH = 190
+const DRAG = 0.34
 
-const IDLE_FILL = 'rgb(166, 176, 224)'
+const IDLE_FILL = 'rgb(178, 188, 232)'
 
 export function MagneticGrid() {
-  const strength = useRef(0)
-
+  const field = useRef({
+    cols: 0,
+    rows: 0,
+    ox: new Float32Array(0),
+    oy: new Float32Array(0),
+    vx: new Float32Array(0),
+    vy: new Float32Array(0),
+  })
   const mouse = useRef({ x: 0, y: 0, primed: false })
 
-  const canvasRef = useAnimatedCanvas(({ ctx, width, height, time, pointer }) => {
+  const canvasRef = useAnimatedCanvas(({ ctx, width, height, dt, time, pointer }) => {
     ctx.clearRect(0, 0, width, height)
 
-    strength.current +=
-      ((pointer.active ? 1 : 0) - strength.current) * (pointer.active ? 0.2 : 0.06)
-    const s = strength.current
+    const cols = Math.max(1, Math.ceil(width / GAP))
+    const rows = Math.max(1, Math.ceil(height / GAP))
+    const f = field.current
 
-    const m = mouse.current
-    if (pointer.active) {
-      if (!m.primed) {
-        m.x = pointer.x
-        m.y = pointer.y
-        m.primed = true
+    if (f.cols !== cols || f.rows !== rows) {
+      const count = cols * rows
+      field.current = {
+        cols,
+        rows,
+        ox: new Float32Array(count),
+        oy: new Float32Array(count),
+        vx: new Float32Array(count),
+        vy: new Float32Array(count),
       }
-      m.x += (pointer.x - m.x) * 0.22
-      m.y += (pointer.y - m.y) * 0.22
-    } else if (s < 0.01) {
+    }
+
+    const { ox, oy, vx, vy } = field.current
+    const m = mouse.current
+
+    if (pointer.active) {
+      followPointer(m, pointer, 0.3)
+    } else {
       m.primed = false
     }
 
-    const interacting = s > 0.001
-    const mx = m.x
-    const my = m.y
+    const speed = Math.min(3.2, Math.hypot(pointer.vx, pointer.vy) * 0.08)
+    const force = PUSH * (1 + speed)
     const radius = Math.min(width, height) * 0.6
-    const invRadius = 1 / radius
+    const radius2 = radius * radius
+    const step = Math.min(dt, 1 / 40)
 
-    const hue = 212
+    for (let row = 0; row < rows; row++) {
+      const baseY = GAP / 2 + row * GAP
 
-    for (let y = GAP / 2; y < height; y += GAP) {
-      for (let x = GAP / 2; x < width; x += GAP) {
-        let dx = 0
-        let dy = 0
-        let prox = 0
+      for (let col = 0; col < cols; col++) {
+        const i = row * cols + col
+        const baseX = GAP / 2 + col * GAP
 
-        if (interacting) {
-          const ox = x - mx
-          const oy = y - my
-          const d2 = ox * ox + oy * oy
-          if (d2 < radius * radius) {
+        if (pointer.active) {
+          const dx = baseX + ox[i] - m.x
+          const dy = baseY + oy[i] - m.y
+          const d2 = dx * dx + dy * dy
+
+          if (d2 < radius2) {
             const d = Math.sqrt(d2) || 1
-            const f = 1 - d * invRadius
+            const falloff = (1 - d / radius) ** 2
+            const push = (falloff * force) / d
 
-            prox = f * f * s
-            const push = prox * 16
-            dx = (ox / d) * push
-            dy = (oy / d) * push
+            vx[i] += dx * push * step + pointer.vx * falloff * DRAG
+            vy[i] += dy * push * step + pointer.vy * falloff * DRAG
           }
         }
 
-        const breathe = Math.sin(time * 1.3 + x * 0.045 + y * 0.045) * 0.5 + 0.5
-        const r = (0.85 + prox * 2.8) * (0.7 + breathe * 0.3)
+        vx[i] = (vx[i] - ox[i] * SPRING) * DAMPING
+        vy[i] = (vy[i] - oy[i] * SPRING) * DAMPING
+        ox[i] += vx[i] * step * 60
+        oy[i] += vy[i] * step * 60
 
-        if (prox > 0.004) {
+        const displaced = Math.min(1, Math.hypot(ox[i], oy[i]) / 22)
+        const breathe = Math.sin(time * 1.3 + baseX * 0.045 + baseY * 0.045) * 0.5 + 0.5
+        const r = (0.95 + displaced * 2.6) * (0.72 + breathe * 0.3)
+
+        if (displaced > 0.02) {
           ctx.globalAlpha = 1
-          ctx.fillStyle = `hsla(${hue}, 95%, ${64 + prox * 28}%, ${Math.min(1, 0.3 + prox)})`
+          ctx.fillStyle = `hsla(${212 - displaced * 30}, 95%, ${64 + displaced * 26}%, ${Math.min(1, 0.34 + displaced)})`
         } else {
-          ctx.globalAlpha = 0.13 + breathe * 0.1
+          ctx.globalAlpha = 0.3 + breathe * 0.16
           ctx.fillStyle = IDLE_FILL
         }
+
         ctx.beginPath()
-        ctx.arc(x + dx, y + dy, r, 0, TAU)
+        ctx.arc(baseX + ox[i], baseY + oy[i], r, 0, TAU)
         ctx.fill()
       }
     }
+
     ctx.globalAlpha = 1
   })
 

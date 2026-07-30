@@ -17,6 +17,7 @@ export interface HighlightBox {
   bottom: number
 }
 
+/** Queried once and reused, since matchMedia is not free to call per pointer move */
 let reduceMotionQuery: MediaQueryList | null = null
 const prefersReducedMotion = () => {
   if (typeof window === 'undefined') return false
@@ -24,6 +25,10 @@ const prefersReducedMotion = () => {
   return reduceMotionQuery.matches
 }
 
+/**
+ * Drives the single box that slides between hovered rows. Position and size are motion values, so
+ * the box animates entirely outside React and hovering a list never re-renders it.
+ */
 export function useHighlightBox() {
   const left = useMotionValue(0)
   const top = useMotionValue(0)
@@ -39,6 +44,11 @@ export function useHighlightBox() {
       const nextWidth = Math.max(0, box.right - box.left)
       const nextHeight = Math.max(0, box.bottom - box.top)
 
+      /**
+       * Position leads and size trails, which is what gives the box its stretch as it travels. It only
+       * animates when already visible: appearing has to be a jump to the new row, or the box would be
+       * seen sweeping in from wherever it last sat.
+       */
       if (visibleRef.current && !prefersReducedMotion()) {
         animate(left, box.left, HIGHLIGHT_LEAD_SPRING)
         animate(top, box.top, HIGHLIGHT_LEAD_SPRING)

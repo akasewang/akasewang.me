@@ -3,7 +3,7 @@
 import type { CSSProperties, PointerEvent } from 'react'
 import { useEffect, useRef } from 'react'
 
-type OrbStyle = CSSProperties & { '--px': string; '--py': string }
+type OrbStyle = CSSProperties & { '--px': string; '--py': string; '--lit': string }
 
 const REST = { x: 0.5, y: 0.38 }
 
@@ -12,6 +12,9 @@ export function Orb() {
   const target = useRef({ ...REST })
   const current = useRef({ ...REST })
 
+  const vel = useRef({ x: 0, y: 0 })
+  const lit = useRef(0)
+  const held = useRef(false)
   const wake = useRef(() => {})
 
   const onMove = (e: PointerEvent<HTMLDivElement>) => {
@@ -20,10 +23,12 @@ export function Orb() {
     const rect = el.getBoundingClientRect()
     target.current.x = (e.clientX - rect.left) / rect.width
     target.current.y = (e.clientY - rect.top) / rect.height
+    held.current = true
     wake.current()
   }
 
   const onLeave = () => {
+    held.current = false
     target.current.x = REST.x
     target.current.y = REST.y
     wake.current()
@@ -42,18 +47,36 @@ export function Orb() {
       const dx = t.x - c.x
       const dy = t.y - c.y
 
-      if (Math.abs(dx) < 0.0004 && Math.abs(dy) < 0.0004) {
+      const settled =
+        Math.abs(dx) < 0.0004 &&
+        Math.abs(dy) < 0.0004 &&
+        Math.abs(vel.current.x) < 0.0002 &&
+        Math.abs(vel.current.y) < 0.0002 &&
+        Math.abs(lit.current - (held.current ? 1 : 0)) < 0.004
+
+      if (settled) {
         c.x = t.x
         c.y = t.y
+        vel.current.x = 0
+        vel.current.y = 0
+        lit.current = held.current ? 1 : 0
         el.style.setProperty('--px', c.x.toFixed(4))
         el.style.setProperty('--py', c.y.toFixed(4))
+        el.style.setProperty('--lit', lit.current.toFixed(4))
         running = false
         return
       }
-      c.x += dx * 0.12
-      c.y += dy * 0.12
+      vel.current.x = (vel.current.x + dx * 0.09) * 0.82
+      vel.current.y = (vel.current.y + dy * 0.09) * 0.82
+      c.x += vel.current.x
+      c.y += vel.current.y
+
+      const focus = held.current ? 1 : 0
+      lit.current += (focus - lit.current) * 0.08
+
       el.style.setProperty('--px', c.x.toFixed(4))
       el.style.setProperty('--py', c.y.toFixed(4))
+      el.style.setProperty('--lit', lit.current.toFixed(4))
       raf = requestAnimationFrame(tick)
     }
     const start = () => {
@@ -93,16 +116,18 @@ export function Orb() {
       ref={ref}
       onPointerMove={onMove}
       onPointerLeave={onLeave}
-      style={{ '--px': '0.5', '--py': '0.38' } as OrbStyle}
+      style={{ '--px': '0.5', '--py': '0.38', '--lit': '0' } as OrbStyle}
       className="relative flex size-full items-center justify-center overflow-hidden bg-[radial-gradient(circle_at_50%_120%,#191634,#06060e)]"
     >
       <div
         className="relative aspect-square w-[62%] rounded-full"
         style={{
           background:
-            'radial-gradient(circle at calc(var(--px) * 100%) calc(var(--py) * 100%), #ffffff, #c4b5fd 16%, #7c3aed 44%, #2e1065 72%, #110626 100%)',
-          boxShadow: '0 0 60px -8px rgba(124, 58, 237, 0.7), inset 0 0 42px rgba(0, 0, 0, 0.5)',
-          transform: 'translate(calc((var(--px) - 0.5) * 16px), calc((var(--py) - 0.5) * 16px))',
+            'radial-gradient(circle at calc(var(--px) * 100%) calc(var(--py) * 100%), #ffffff, #c4b5fd calc(16% - var(--lit) * 5%), #7c3aed 44%, #2e1065 72%, #110626 100%)',
+          boxShadow:
+            '0 0 calc(60px + var(--lit) * 34px) -8px rgba(124, 58, 237, calc(0.7 + var(--lit) * 0.25)), inset 0 0 42px rgba(0, 0, 0, 0.5)',
+          transform:
+            'translate(calc((var(--px) - 0.5) * 22px), calc((var(--py) - 0.5) * 22px)) scale(calc(1 + var(--lit) * 0.035))',
         }}
       >
         <div

@@ -5,14 +5,14 @@ import { AsideTOC } from '@/components/common/mdx-components/aside-toc'
 import { MDX_COMPONENTS, MDX_OPTIONS } from '@/components/common/mdx-components/mdx-config'
 import { MdxFooter } from '@/components/common/mdx-components/mdx-footer'
 import { MdxPostHeader } from '@/components/common/mdx-components/mdx-post-header'
-import { LinkText } from '@/components/ui/link-text'
-import { SeparatorSlash } from '@/components/ui/separator-slash'
+import { MdxPostSummary } from '@/components/common/mdx-components/mdx-post-summary'
 import { FULL_NAME, SITE_URL } from '@/constants/constants'
 import { getBlogPostingSchema, getBreadcrumbSchema, serializeJsonLd } from '@/lib/json-ld'
 import { getAllBlogPosts, getBlogPost, getBlogSlugs } from '@/lib/managers/blog-manager'
 import { constructMetadata, getOgImageUrl } from '@/lib/metadata'
+import { getAdjacentContent } from '@/utils/content-utils'
 
-export async function generateStaticParams() {
+export function generateStaticParams() {
   return getBlogSlugs()
 }
 
@@ -57,9 +57,7 @@ export default async function BlogPost({ params }: { params: PageParams }) {
   ])
 
   const allPosts = await getAllBlogPosts()
-  const currentIndex = allPosts.findIndex((p) => p.slug === postSlug)
-  const nextPost = currentIndex > 0 ? allPosts[currentIndex - 1] : undefined
-  const prevPost = currentIndex < allPosts.length - 1 ? allPosts[currentIndex + 1] : undefined
+  const { previous: prevPost, next: nextPost } = getAdjacentContent(allPosts, postSlug)
 
   return (
     <div className="group/blog">
@@ -67,11 +65,9 @@ export default async function BlogPost({ params }: { params: PageParams }) {
       <div className="relative space-y-6 animate-page-simple">
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: serializeJsonLd(blogPostJsonLd) }}
-        />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbJsonLd) }}
+          dangerouslySetInnerHTML={{
+            __html: serializeJsonLd([blogPostJsonLd, breadcrumbJsonLd]),
+          }}
         />
 
         <MdxPostHeader
@@ -85,30 +81,12 @@ export default async function BlogPost({ params }: { params: PageParams }) {
           url={`${SITE_URL}/blogs/${postSlug}`}
         />
 
-        <div className="space-y-2">
-          <p className="text-pretty text-sm leading-relaxed text-muted-foreground">{excerpt}</p>
-
-          {links && links.length > 0 && (
-            <div className="flex flex-wrap items-center text-sm leading-relaxed text-muted-foreground">
-              <span className="mr-1">You can also read this post on</span>
-              {links.map((link, i) => (
-                <span key={`${link.url}-${i}`} className="flex items-center">
-                  {i > 0 && <SeparatorSlash />}
-                  <LinkText href={link.url}>{link.label}</LinkText>
-                </span>
-              ))}
-              <span>.</span>
-            </div>
-          )}
-
-          {tags && tags.length > 0 && (
-            <div className="flex flex-wrap gap-2 pt-1">
-              {tags.map((tag, i) => (
-                <MDX_COMPONENTS.code key={`${tag}-${i}`}>{tag}</MDX_COMPONENTS.code>
-              ))}
-            </div>
-          )}
-        </div>
+        <MdxPostSummary
+          excerpt={excerpt}
+          linkLabel="You can also read this post on"
+          links={links}
+          keywords={tags}
+        />
 
         <hr className="border-t border-border" />
 
