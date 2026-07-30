@@ -211,8 +211,9 @@ sequenceDiagram
 
 - ESLint checks TypeScript and React rules; Biome handles formatting.
 - The pre-commit hook formats staged files after `npm install` configures the repository hook path.
-- GitHub Actions runs `npm audit` for dependency changes, weekly on Monday, and on demand.
-- Dependabot groups routine minor and patch dependency updates.
+- GitHub Actions verifies npm registry signatures and audits dependencies for every pull request,
+  every push to `main`, daily at `09:00` Asia/Kolkata, and on demand.
+- Dependabot groups routine minor and patch npm updates and maintains pinned GitHub Actions.
 
 ---
 
@@ -299,6 +300,7 @@ application so the scheduled route can authenticate successfully.
 | `npm run build` | Create and validate the production build |
 | `npm run start` | Serve the completed production build |
 | `npm run lint` | Run ESLint across TypeScript and TSX source files |
+| `npm run typecheck` | Type-check the application and repository tools |
 | `npm run format` | Format the repository with Biome |
 | `npm run security:audit` | Run the dependency vulnerability audit |
 | `npm run email` | Preview React Email templates on port 3001 |

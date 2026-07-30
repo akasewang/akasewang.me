@@ -5,10 +5,27 @@ import { stripVTControlCharacters } from 'node:util'
 
 const require = createRequire(import.meta.url)
 const nextCli = require.resolve('next/dist/bin/next')
-const QRCode = require('qrcode')
+const QRCode = require('qrcode') as {
+  toString(
+    text: string,
+    options: {
+      type: 'terminal'
+      errorCorrectionLevel: 'M'
+      margin: number
+      small: boolean
+    },
+  ): Promise<string>
+}
 const rawArgs = process.argv.slice(2)
 
-function readOption(args, longName, shortName) {
+type NetworkCandidate = {
+  name: string
+  address: string
+  family: string
+  internal: boolean
+}
+
+function readOption(args: string[], longName: string, shortName?: string) {
   for (let index = 0; index < args.length; index += 1) {
     const argument = args[index]
 
@@ -24,8 +41,8 @@ function readOption(args, longName, shortName) {
   return undefined
 }
 
-function removeOption(args, longName) {
-  const result = []
+function removeOption(args: string[], longName: string) {
+  const result: string[] = []
 
   for (let index = 0; index < args.length; index += 1) {
     const argument = args[index]
@@ -42,7 +59,7 @@ function removeOption(args, longName) {
   return result
 }
 
-function normalizeHost(value) {
+function normalizeHost(value: string | undefined) {
   if (!value) return undefined
 
   try {
@@ -53,7 +70,7 @@ function normalizeHost(value) {
   }
 }
 
-function isPrivateIpv4(address) {
+function isPrivateIpv4(address: string) {
   if (address.startsWith('10.') || address.startsWith('192.168.')) return true
 
   if (address.startsWith('172.')) {
@@ -79,11 +96,10 @@ function findLanAddress() {
       })),
     )
     .filter(
-      ({ address, family, internal }) =>
-        !internal && (family === 'IPv4' || family === 4) && isPrivateIpv4(address),
+      ({ address, family, internal }) => !internal && family === 'IPv4' && isPrivateIpv4(address),
     )
     .sort((left, right) => {
-      const score = ({ name }) =>
+      const score = ({ name }: NetworkCandidate) =>
         (preferredInterfacePattern.test(name) ? 2 : 0) -
         (virtualInterfacePattern.test(name) ? 4 : 0)
 
@@ -91,13 +107,13 @@ function findLanAddress() {
     })[0]?.address
 }
 
-function getRequestedPort(args) {
+function getRequestedPort(args: string[]) {
   const configuredPort = readOption(args, '--port', '-p') ?? process.env.PORT ?? '3000'
   const port = Number(configuredPort)
   return Number.isInteger(port) && port > 0 ? port : 3000
 }
 
-function formatUrlHost(host) {
+function formatUrlHost(host: string) {
   return host.includes(':') ? `[${host}]` : host
 }
 
@@ -134,7 +150,11 @@ let actualProtocol = 'http'
 let recentOutput = ''
 let previewStarted = false
 
-function inspectServerOutput(chunk) {
+function getErrorMessage(error: unknown) {
+  return error instanceof Error ? error.message : String(error)
+}
+
+function inspectServerOutput(chunk: Buffer) {
   recentOutput = `${recentOutput}${stripVTControlCharacters(chunk.toString())}`.slice(-12_000)
 
   const localUrl = recentOutput.match(/-\s+Local:\s+(https?:\/\/\S+)/)?.[1]
@@ -153,7 +173,7 @@ function inspectServerOutput(chunk) {
 
   if (/Ready in|✓\s+Ready/.test(recentOutput)) {
     showMobilePreview().catch((error) => {
-      console.warn(`Could not generate the mobile QR code: ${error.message}`)
+      console.warn(`Could not generate the mobile QR code: ${getErrorMessage(error)}`)
     })
   }
 }
@@ -168,7 +188,7 @@ child.stderr.on('data', (chunk) => {
   inspectServerOutput(chunk)
 })
 
-async function waitForReachable(url) {
+async function waitForReachable(url: string) {
   const deadline = Date.now() + 30_000
 
   while (Date.now() < deadline && child.exitCode === null) {

@@ -1,19 +1,31 @@
 # State & Hooks
 
-We avoid heavy state managers like Redux. Most state lives in React hooks, the URL, or short lived browser storage.
+The application avoids a global state-management library. State lives primarily in React hooks,
+URL search parameters, context providers or short-lived browser storage.
 
 ## URL State
 
-For pages with filtering or sorting (blogs, projects, catalog), the active state lives in the URL's search params (e.g. `?category=react&sort=newest`).
+Blog and project filters store category, search text and sort order in URL search parameters (for
+example, `?category=react&q=audio&sort=views-desc`). The catalog uses the same approach for its
+category filter.
 
-- Reads use `useSearchParams`. Updates that should not push a history entry use `window.history.replaceState`, so changing a filter syncs the URL without a navigation or a scroll jump.
-- Because the state is in the URL, a Server Component reads it on first load and renders the correct data immediately, with no client side flicker.
-- Copy the link, send it to someone and they see exactly what you see.
+- Client list components read with `useSearchParams` inside `Suspense` boundaries. They update the
+  address with `window.history.replaceState`, avoiding a navigation, history entry or scroll jump.
+- Default category and sort values are omitted from the query string. Unknown values fall back to
+  the configured defaults.
+- Shared URLs preserve the selected filters when opened in another browser.
 
 ## Custom Hooks
 
-- **useInfiniteScroll**: Wraps an `IntersectionObserver` on a sentinel element with a `400px` `rootMargin`, so the next page is requested before the trigger scrolls into view. The live `onIntersect` callback is held in a `useRef` and read inside the observer, so a changing callback never tears down and reattaches the observer.
-- **useViews / ViewsProvider**: Batches and caches view count reads. See the View Counter in the [overview](overview.md).
-- **useGithubStars**: Reads the star count from the internal `/api/github-stars` proxy, dedupes concurrent callers with a module level shared promise, and caches in `localStorage` for 15 minutes so repeat visits paint instantly.
-- **useAdmin**: Tracks admin auth and listens for the browser `storage` event, so logging out in one tab instantly logs you out in every other open tab.
-- **useContentListState**: A generic hook that wires up category filtering, text search and sort order for any content list page (blogs, projects, catalog). It reads the initial state from URL search params, syncs changes back with `replaceState` (no navigation), and prefetches view counts for the visible items.
+- **`useInfiniteScroll`:** Wraps an `IntersectionObserver` around a sentinel with a default `400px`
+  `rootMargin`. Its live callback is held in a ref, so callback changes do not recreate the
+  observer.
+- **`useViews` / `ViewsProvider`:** Batches and caches view-count reads. See the View Counter in the
+  [overview](overview.md).
+- **`useGithubStars`:** Reads from `/api/github-stars`, deduplicates concurrent callers with a
+  module-level promise and caches valid counts in `localStorage` for 15 minutes.
+- **`useAdmin`:** Stores the supplied admin credential in `localStorage` and synchronizes it across
+  components and tabs. Server Actions still validate the credential for every privileged mutation.
+- **`useContentListState`:** Provides category, search and view/date sorting for blog and project
+  lists. It synchronizes URL parameters and prefetches view counts. The catalog owns a smaller
+  category-only implementation.

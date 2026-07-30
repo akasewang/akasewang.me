@@ -14,8 +14,11 @@ A high level look at how the site runs, handles data and manages SEO.
 - Data lives in a serverless Postgres database from Neon, queried through Drizzle ORM for end to end type safety.
 - **View Counter** (`src/lib/actions/views.ts`, Server Actions):
   - Increments are a single atomic Postgres upsert (`INSERT ... ON CONFLICT DO UPDATE SET count = count + 1`), so concurrent views never race.
-  - A `sessionStorage` key (`viewed-<slug>`) caps it at one increment per visitor per session; later mounts only read.
-  - Lists batch their reads: `ViewsProvider` coalesces every `prefetchViews` call within a 50 ms window into one `getViewsBatchAction` (a single `WHERE slug IN (...)` query) and caches the result in `localStorage` for 5 minutes. The UI updates optimistically, before the write resolves.
+  - A `sessionStorage` key (`viewed-<slug>`) plus an in-memory guard caps it at one successful
+    increment per browser-tab session; later mounts request the stored count.
+  - Lists batch their reads: `ViewsProvider` coalesces `prefetchViews` calls within a 50 ms window
+    into one `getViewsBatchAction` (`WHERE slug IN (...)`) and caches the result in `localStorage`
+    for five minutes. Incremented counts update from the value returned by the database.
 
 ## GitHub Integration
 
