@@ -9,6 +9,10 @@ import { getResend, SENDER_EMAIL } from '@/lib/resend'
 
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL
 
+/**
+ * Mails the week's new subscribers to the owner. Reachable on the public internet, so the bearer
+ * secret is checked first and an unset secret refuses every caller rather than waving them through.
+ */
 export async function GET(request: Request) {
   const authHeader = request.headers.get('authorization')
 

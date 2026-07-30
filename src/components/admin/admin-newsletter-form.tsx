@@ -1,7 +1,7 @@
 'use client'
 
 import type React from 'react'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Icons } from '@/components/ui/icons'
@@ -24,6 +24,10 @@ export function AdminNewsletterForm({ blogs }: { blogs: BlogPost[] }) {
   const [adminSecret, setAdminSecret] = useState('')
   const [selectedBlogSlug, setSelectedBlogSlug] = useState(blogs[0]?.slug || '')
   const [loading, setLoading] = useState(false)
+  const blogOptions = useMemo(
+    () => blogs.map(({ title, slug }) => ({ label: title, value: slug })),
+    [blogs],
+  )
   const { success, countdown, startCountdown, resetStatus } = useStatusTimer('admin-newsletter')
   const { error: errorSound } = useSoundEffects()
 
@@ -62,7 +66,7 @@ export function AdminNewsletterForm({ blogs }: { blogs: BlogPost[] }) {
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
       <div className="space-y-3">
         <Select
-          items={blogs.map((blog) => ({ label: blog.title, value: blog.slug }))}
+          items={blogOptions}
           value={selectedBlogSlug}
           onValueChange={setSelectedBlogSlug}
           disabled={loading || countdown > 0}
@@ -71,9 +75,9 @@ export function AdminNewsletterForm({ blogs }: { blogs: BlogPost[] }) {
             <SelectValue placeholder={adminNewsletterContent.blogSelectPlaceholder} />
           </SelectTrigger>
           <SelectContent>
-            {blogs.map((blog) => (
-              <SelectItem key={blog.slug} value={blog.slug}>
-                <span className="text-balance">{blog.title}</span>
+            {blogOptions.map(({ label, value }) => (
+              <SelectItem key={value} value={value}>
+                <span className="text-balance">{label}</span>
               </SelectItem>
             ))}
           </SelectContent>

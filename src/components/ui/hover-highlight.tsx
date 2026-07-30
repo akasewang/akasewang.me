@@ -5,7 +5,11 @@ import { useEffect } from 'react'
 import { useHighlightBox } from '@/hooks/use-highlight-box'
 import { canUseHoverPointer } from '@/utils/pointer'
 
-export function HoverHighlight({ parentRef }: { parentRef: React.RefObject<HTMLElement | null> }) {
+interface HoverHighlightProps {
+  parentRef: React.RefObject<HTMLElement | null>
+}
+
+export function HoverHighlight({ parentRef }: HoverHighlightProps) {
   const { style, moveTo, hide } = useHighlightBox()
 
   useEffect(() => {
@@ -18,6 +22,8 @@ export function HoverHighlight({ parentRef }: { parentRef: React.RefObject<HTMLE
       if (!canUseHoverPointer(e.pointerType)) return
 
       const item = (e.target as HTMLElement | null)?.closest<HTMLElement>('[data-highlight-item]')
+
+      if (active && !active.isConnected) active = null
 
       if (!item || item === active || !parent.contains(item)) return
       active = item

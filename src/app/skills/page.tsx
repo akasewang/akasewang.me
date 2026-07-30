@@ -8,15 +8,13 @@ import { skillsPageContent } from '@/data/content/skills-content'
 import { getBreadcrumbSchema } from '@/lib/json-ld'
 import { constructMetadata, getOgImageUrl } from '@/lib/metadata'
 
-export async function generateMetadata(): Promise<Metadata> {
-  return constructMetadata({
-    title: skillsSeoContent.title,
-    description: skillsSeoContent.description,
-    path: '/skills',
-    image: getOgImageUrl(skillsSeoContent.ogTitle, 'Skills'),
-    imageAlt: skillsSeoContent.imageAlt,
-  })
-}
+export const metadata: Metadata = constructMetadata({
+  title: skillsSeoContent.title,
+  description: skillsSeoContent.description,
+  path: '/skills',
+  image: getOgImageUrl(skillsSeoContent.ogTitle, 'Skills'),
+  imageAlt: skillsSeoContent.imageAlt,
+})
 
 export default function SkillsPage() {
   const breadcrumbJsonLd = getBreadcrumbSchema([

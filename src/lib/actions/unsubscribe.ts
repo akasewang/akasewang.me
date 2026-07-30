@@ -4,6 +4,11 @@ import { eq } from 'drizzle-orm'
 import { db } from '@/lib/db/drizzle'
 import { newsletterSubscribers } from '@/lib/db/schema'
 
+/**
+ * Honours an unsubscribe link. The row is deactivated rather than deleted, so the same token keeps
+ * working if the address ever resubscribes. An unknown token is invalid rather than an error, since
+ * that is a stale link and not a fault.
+ */
 export type UnsubscribeResult = 'success' | 'invalid' | 'error'
 export async function unsubscribeAction(token: string): Promise<UnsubscribeResult> {
   if (typeof token !== 'string') return 'invalid'

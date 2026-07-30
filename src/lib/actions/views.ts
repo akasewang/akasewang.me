@@ -5,6 +5,7 @@ import { logContent } from '@/data/content/log-content'
 import { db } from '@/lib/db/drizzle'
 import { views } from '@/lib/db/schema'
 
+/** Slugs arrive from the client, so they are bounded before reaching a query */
 const MAX_VIEW_SLUG_LENGTH = 128
 const MAX_VIEW_BATCH_SIZE = 100
 
@@ -14,6 +15,11 @@ function normalizeViewSlug(slug: string): string | null {
   return normalizedSlug
 }
 
+/**
+ * Counts one view and returns the new total in the same round trip, as an upsert so a page's first
+ * ever view needs no separate insert. A failure returns null rather than throwing, which lets the
+ * counter simply not render instead of taking the page with it.
+ */
 export async function incrementViewAction(slug: string) {
   const normalizedSlug = normalizeViewSlug(slug)
   if (!normalizedSlug) return { views: null }
@@ -35,6 +41,10 @@ export async function incrementViewAction(slug: string) {
   }
 }
 
+/**
+ * Reads many counts in one query. Slugs the table has never seen come back as zero rather than
+ * missing, so a caller can tell an unread page apart from a failed read.
+ */
 export async function getViewsBatchAction(slugs: string[]) {
   if (!slugs?.length) return { views: {} }
   const uniqueSlugs = [

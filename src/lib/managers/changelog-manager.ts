@@ -4,6 +4,11 @@ import { fetchGithub, GITHUB_REPO_URL } from '@/lib/github'
 import type { ChangelogCommit, ChangelogDay } from '@/types/changelog'
 import { formatTime } from '@/utils/utils'
 
+/**
+ * Builds the changelog page from the repository's own commit history, so shipping is the only step
+ * needed to publish one. Paging is capped and the result is cached, since this is a public API read
+ * on a page that anyone can hit.
+ */
 const COMMITS_API_URL = `${GITHUB_REPO_URL}/commits`
 const COMMITS_PER_PAGE = 100
 
@@ -22,11 +27,16 @@ interface GithubCommitEntry {
   author: { login: string; avatar_url: string; html_url: string } | null
 }
 
+/** Committer date over author date, since a rebased commit keeps the original author date */
 function getCommitDate(entry: GithubCommitEntry): Date {
   const meta = entry.commit.committer ?? entry.commit.author
   return meta?.date ? new Date(meta.date) : new Date()
 }
 
+/**
+ * Splits a commit message into a subject and body blocks, keeping bullet lines as their own blocks
+ * and blank lines as separators, so a conventional message renders as written.
+ */
 function toChangelogCommit(entry: GithubCommitEntry, date: Date): ChangelogCommit {
   const [subject, ...rest] = entry.commit.message.split('\n')
   const blocks: string[] = []
@@ -65,6 +75,7 @@ function toChangelogCommit(entry: GithubCommitEntry, date: Date): ChangelogCommi
 
   const account = entry.author
 
+  /** Asks GitHub for a 48px avatar rather than shrinking the full size one in the browser */
   const authorAvatar = account
     ? `${account.avatar_url}${account.avatar_url.includes('?') ? '&' : '?'}s=48`
     : null
@@ -85,6 +96,10 @@ function toChangelogCommit(entry: GithubCommitEntry, date: Date): ChangelogCommi
   }
 }
 
+/**
+ * Walks the commit pages up to the cap, stopping early on a short page. Any failure returns
+ * whatever was already collected, so a rate limit shortens the changelog instead of emptying it.
+ */
 async function fetchCommits(): Promise<GithubCommitEntry[]> {
   const entries: GithubCommitEntry[] = []
 
@@ -109,6 +124,7 @@ async function fetchCommits(): Promise<GithubCommitEntry[]> {
   return entries
 }
 
+/** Commits grouped by calendar day, which is how the timeline is laid out */
 export async function getChangelog(): Promise<ChangelogDay[]> {
   const entries = await fetchCommits()
   const dayMap = new Map<string, ChangelogDay>()

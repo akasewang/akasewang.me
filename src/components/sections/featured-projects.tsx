@@ -8,7 +8,6 @@ import { SectionTitle } from '@/components/layout/section-title'
 import { ProjectCard } from '@/components/projects/project-card'
 import { useViews } from '@/components/providers/views-context'
 import { ViewAll } from '@/components/ui/view-all'
-import { SPRING_TRANSITION } from '@/constants/ui'
 import { landingPageContent } from '@/data/content/landing-content'
 import type { ProjectCategory, ProjectPostData } from '@/types/project'
 
@@ -61,16 +60,7 @@ export function FeaturedProjects({
             className="grid grid-cols-1 gap-2 sm:grid-cols-2 sm:gap-2.5"
           >
             {displayed.map((project) => (
-              <m.div
-                key={project.slug}
-                layout
-                initial={{ opacity: 0, scale: 0.98 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.96 }}
-                transition={SPRING_TRANSITION}
-              >
-                <ProjectCard project={project} />
-              </m.div>
+              <ProjectCard key={project.slug} project={project} />
             ))}
           </m.div>
         ) : (

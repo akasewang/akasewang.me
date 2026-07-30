@@ -6,6 +6,7 @@ import { getOgImageUrl } from '@/lib/metadata'
 import type { BlogPost } from '@/types/blog'
 import { parseDate } from '@/utils/utils'
 
+/** The blog as RSS. Built through the rss package, so escaping and the envelope are handled */
 export async function GET() {
   const feed = new RSS({
     title: `${FULL_NAME}'s Blog`,

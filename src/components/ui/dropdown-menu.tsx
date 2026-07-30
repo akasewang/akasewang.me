@@ -3,6 +3,7 @@
 import { Menu as DropdownMenuPrimitive } from '@base-ui/react/menu'
 import * as React from 'react'
 import { MENU_HIGHLIGHT_VIEWPORT_CLASS, MenuHighlight } from '@/components/ui/menu-highlight'
+import { usePopupToggleSound } from '@/hooks/use-popup-toggle-sound'
 import { useSoundEffects } from '@/hooks/use-sound-effects'
 import { cn } from '@/utils/utils'
 
@@ -23,23 +24,14 @@ const DropdownMenu: React.FC<React.ComponentProps<typeof DropdownMenuPrimitive.R
   ...props
 }) => {
   const { toggle } = useSoundEffects()
-  const skipNextCloseSoundRef = React.useRef(false)
-  const markSelectionClose = React.useCallback(() => {
-    skipNextCloseSoundRef.current = true
-  }, [])
+  const { markSelectionClose, playOpenChange } = usePopupToggleSound(toggle)
+  const soundContextValue = React.useMemo(() => ({ markSelectionClose }), [markSelectionClose])
 
   return (
-    <DropdownSoundContext.Provider value={{ markSelectionClose }}>
+    <DropdownSoundContext.Provider value={soundContextValue}>
       <DropdownMenuPrimitive.Root
         onOpenChange={(open, eventDetails) => {
-          if (open) {
-            toggle(true)
-          } else if (skipNextCloseSoundRef.current) {
-            skipNextCloseSoundRef.current = false
-          } else {
-            toggle(false)
-          }
-
+          playOpenChange(open)
           onOpenChange?.(open, eventDetails)
         }}
         {...props}

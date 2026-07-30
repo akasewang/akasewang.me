@@ -1,16 +1,11 @@
+import { Column, Heading, Row, Section, Text } from '@react-email/components'
 import {
-  Body,
-  Column,
-  Container,
-  Head,
-  Heading,
-  Html,
-  Preview,
-  Row,
-  Section,
-  Text,
-} from '@react-email/components'
-import { EmailHeader, emailFonts, emailStyles, emailTheme } from './email-template-shared'
+  EmailHeader,
+  EmailShell,
+  emailFonts,
+  emailStyles,
+  emailTheme,
+} from './email-template-shared'
 
 interface WeeklySummaryTemplateProps {
   subscriberCount: number
@@ -72,46 +67,35 @@ export const WeeklySummaryTemplate = ({
       : `${subscriberCount} new subscribers this week.`
 
   return (
-    <Html>
-      <Head>
-        <meta name="color-scheme" content="light" />
-        <meta name="supported-color-schemes" content="light" />
-      </Head>
-      <Preview>
-        {headingText} {'​'.repeat(150)}
-      </Preview>
-      <Body style={styles.body}>
-        <Container style={styles.container}>
-          <EmailHeader date={summaryDate} />
+    <EmailShell preview={headingText}>
+      <EmailHeader date={summaryDate} />
 
-          <Section style={styles.mainSection}>
-            <Text style={styles.eyebrow}>weekly summary</Text>
-            <Heading as="h1" style={styles.heading}>
-              {headingText}
-            </Heading>
-          </Section>
+      <Section style={styles.mainSection}>
+        <Text style={styles.eyebrow}>weekly summary</Text>
+        <Heading as="h1" style={styles.heading}>
+          {headingText}
+        </Heading>
+      </Section>
 
-          {newEmails.length > 0 && (
-            <Section style={styles.emailSection}>
-              <Text style={styles.emailsLabel}>recent signups</Text>
-              {newEmails.map((email, index) => (
-                <Row key={index} style={styles.emailRow}>
-                  <Column style={styles.emailIndexCol}>
-                    <Text style={styles.emailIndex}>{String(index + 1).padStart(2, '0')}</Text>
-                  </Column>
-                  <Column>
-                    <Text style={styles.emailText}>{email}</Text>
-                  </Column>
-                </Row>
-              ))}
-            </Section>
-          )}
+      {newEmails.length > 0 && (
+        <Section style={styles.emailSection}>
+          <Text style={styles.emailsLabel}>recent signups</Text>
+          {newEmails.map((email, index) => (
+            <Row key={index} style={styles.emailRow}>
+              <Column style={styles.emailIndexCol}>
+                <Text style={styles.emailIndex}>{String(index + 1).padStart(2, '0')}</Text>
+              </Column>
+              <Column>
+                <Text style={styles.emailText}>{email}</Text>
+              </Column>
+            </Row>
+          ))}
+        </Section>
+      )}
 
-          <Section style={styles.footerSection}>
-            <Text style={styles.footerSecondary}>Weekly digest · automated notification</Text>
-          </Section>
-        </Container>
-      </Body>
-    </Html>
+      <Section style={styles.footerSection}>
+        <Text style={styles.footerSecondary}>Weekly digest · automated notification</Text>
+      </Section>
+    </EmailShell>
   )
 }

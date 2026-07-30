@@ -13,6 +13,11 @@ import { getAllBlogPosts, getBlogPost } from '@/lib/managers/blog-manager'
 import { getResend, SENDER_EMAIL } from '@/lib/resend'
 import type { ActionResult } from '@/types/actions'
 
+/**
+ * Sends one blog post to every active subscriber. The template is rendered once with a placeholder
+ * token and the per person unsubscribe link is substituted in, so a large list costs one render
+ * rather than one each. Sending goes out in batches of a hundred, the provider's limit per call.
+ */
 export async function broadcastNewsletter(
   blogSlug: string,
   adminSecret: string,
@@ -41,6 +46,7 @@ export async function broadcastNewsletter(
 
     if (!activeSubscribers.length) return { success: false, error: toasts.noSubscribers }
 
+    /** A few recent posts for the footer, with the one being sent left out */
     const previousPosts = posts
       .filter((post) => post.slug !== blogSlug)
       .slice(0, 3)

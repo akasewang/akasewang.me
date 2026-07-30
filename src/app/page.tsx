@@ -14,15 +14,13 @@ import { getAllBlogPosts } from '@/lib/managers/blog-manager'
 import { getAllProjects } from '@/lib/managers/project-manager'
 import { constructMetadata, getOgImageUrl } from '@/lib/metadata'
 
-export async function generateMetadata(): Promise<Metadata> {
-  return constructMetadata({
-    title: homeSeoContent.title,
-    description: homeSeoContent.description,
-    path: '/',
-    image: getOgImageUrl(homeSeoContent.ogTitle),
-    imageAlt: homeSeoContent.imageAlt,
-  })
-}
+export const metadata: Metadata = constructMetadata({
+  title: homeSeoContent.title,
+  description: homeSeoContent.description,
+  path: '/',
+  image: getOgImageUrl(homeSeoContent.ogTitle),
+  imageAlt: homeSeoContent.imageAlt,
+})
 
 export default async function Home() {
   const [blogPosts, projects] = await Promise.all([getAllBlogPosts(), getAllProjects()])

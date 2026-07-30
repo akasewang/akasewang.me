@@ -9,9 +9,9 @@ import { useKeyboardShortcut } from '@/hooks/use-keyboard-shortcut'
 import { useSoundEffects } from '@/hooks/use-sound-effects'
 
 const { license, licenseHref, ownerName, changelogLabel, changelogHref } = footerContent
-const currentYear = new Date().getFullYear()
 
 export function Footer() {
+  const currentYear = new Date().getFullYear()
   const { hoverLink, navigate: navigateSound } = useSoundEffects()
   useKeyboardShortcut(
     'l',

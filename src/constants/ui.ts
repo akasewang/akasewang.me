@@ -32,6 +32,11 @@ export const SWIPE_TRANSITION: Transition = {
   mass: 0.8,
 }
 
+/** Shared with useCollapseScroll and with the duration-300 on ExpandableContent */
+export const EXPAND_DURATION = 0.3
+
+export const EXPAND_TRANSITION: Transition = { duration: EXPAND_DURATION, ease: 'easeInOut' }
+
 export const HIGHLIGHT_LEAD_SPRING: Transition = { type: 'spring', stiffness: 500, damping: 36 }
 export const HIGHLIGHT_TRAIL_SPRING: Transition = { type: 'spring', stiffness: 280, damping: 30 }
 

@@ -9,15 +9,13 @@ import { getBreadcrumbSchema } from '@/lib/json-ld'
 import { getAllBlogPosts } from '@/lib/managers/blog-manager'
 import { constructMetadata, getOgImageUrl } from '@/lib/metadata'
 
-export async function generateMetadata(): Promise<Metadata> {
-  return constructMetadata({
-    title: blogsSeoContent.title,
-    description: blogsSeoContent.description,
-    path: '/blogs',
-    image: getOgImageUrl(blogsSeoContent.ogTitle, 'Blog'),
-    imageAlt: blogsSeoContent.imageAlt,
-  })
-}
+export const metadata: Metadata = constructMetadata({
+  title: blogsSeoContent.title,
+  description: blogsSeoContent.description,
+  path: '/blogs',
+  image: getOgImageUrl(blogsSeoContent.ogTitle, 'Blog'),
+  imageAlt: blogsSeoContent.imageAlt,
+})
 
 export default async function BlogPage() {
   const allPosts = await getAllBlogPosts()

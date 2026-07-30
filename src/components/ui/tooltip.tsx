@@ -81,7 +81,7 @@ export const TooltipContent = forwardRef<HTMLDivElement, TooltipContentProps>(
           {shortcut && (
             <div className="flex items-center gap-0.5">
               {Array.isArray(shortcut) ? (
-                shortcut.map((key, i) => <Kbd key={i}>{key}</Kbd>)
+                shortcut.map((key) => <Kbd key={key}>{key}</Kbd>)
               ) : (
                 <Kbd>{shortcut}</Kbd>
               )}

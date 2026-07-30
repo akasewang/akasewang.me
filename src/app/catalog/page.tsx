@@ -8,15 +8,13 @@ import { catalogSeoContent } from '@/data/content/seo-content'
 import { getBreadcrumbSchema } from '@/lib/json-ld'
 import { constructMetadata, getOgImageUrl } from '@/lib/metadata'
 
-export async function generateMetadata(): Promise<Metadata> {
-  return constructMetadata({
-    title: catalogSeoContent.title,
-    description: catalogSeoContent.description,
-    path: '/catalog',
-    image: getOgImageUrl(catalogSeoContent.ogTitle, 'Catalog'),
-    imageAlt: catalogSeoContent.imageAlt,
-  })
-}
+export const metadata: Metadata = constructMetadata({
+  title: catalogSeoContent.title,
+  description: catalogSeoContent.description,
+  path: '/catalog',
+  image: getOgImageUrl(catalogSeoContent.ogTitle, 'Catalog'),
+  imageAlt: catalogSeoContent.imageAlt,
+})
 
 export default function CatalogPage() {
   const breadcrumbJsonLd = getBreadcrumbSchema([

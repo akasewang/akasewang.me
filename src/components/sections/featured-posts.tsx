@@ -7,9 +7,9 @@ import { BlogPostCard } from '@/components/blogs/blog-post-card'
 import { EmptyState } from '@/components/common/empty-state'
 import { SectionTitle } from '@/components/layout/section-title'
 import { useViews } from '@/components/providers/views-context'
+import { AnimatedListItem } from '@/components/ui/animated-list-item'
 import { HoverHighlight } from '@/components/ui/hover-highlight'
 import { ViewAll } from '@/components/ui/view-all'
-import { SPRING_TRANSITION } from '@/constants/ui'
 import { blogsListingContent } from '@/data/content/blogs-content'
 import { landingPageContent } from '@/data/content/landing-content'
 import type { BlogCategory, BlogPost } from '@/types/blog'
@@ -70,16 +70,9 @@ export function FeaturedPosts({ filterType, searchQuery, posts }: FeaturedPostsP
           <m.div key="post-list" ref={listRef} layout className="relative space-y-4">
             <HoverHighlight parentRef={listRef} />
             {displayed.map((post) => (
-              <m.div
-                key={post.slug}
-                layout
-                initial={{ opacity: 0, scale: 0.98 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.96 }}
-                transition={SPRING_TRANSITION}
-              >
+              <AnimatedListItem key={post.slug}>
                 <BlogPostCard post={post} />
-              </m.div>
+              </AnimatedListItem>
             ))}
           </m.div>
         ) : (

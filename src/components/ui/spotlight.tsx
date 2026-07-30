@@ -34,7 +34,7 @@ function Spotlight({
           visible,
         )}
         style={{
-          willChange: 'opacity, background',
+          willChange: isHovering ? 'opacity, background' : undefined,
           background: `radial-gradient(${outerSize * 1.6}px circle at var(--mx, 50%) var(--my, 50%), oklch(100% 0 0 / 0.06), transparent 70%)`,
         }}
       />
@@ -46,7 +46,7 @@ function Spotlight({
           visible,
         )}
         style={{
-          willChange: 'opacity, background',
+          willChange: isHovering ? 'opacity, background' : undefined,
           background: `radial-gradient(${outerSize}px circle at var(--mx, 50%) var(--my, 50%), oklch(calc(100% - 2% * var(--spotlight-intensity, 0.4)) calc(0.012 * var(--spotlight-intensity, 0.2)) 80 / calc(0.14 * var(--spotlight-intensity, 0.4))), transparent 70%)`,
         }}
       />
@@ -59,7 +59,7 @@ function Spotlight({
             visible,
           )}
           style={{
-            willChange: 'opacity, mask-image',
+            willChange: isHovering ? 'opacity, mask-image' : undefined,
             WebkitMaskImage: `radial-gradient(${outerSize * 0.4}px circle at var(--mx, 50%) var(--my, 50%), black, transparent)`,
             maskImage: `radial-gradient(${outerSize * 0.4}px circle at var(--mx, 50%) var(--my, 50%), black, transparent)`,
           }}

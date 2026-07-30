@@ -2,9 +2,15 @@
 
 import { useEffect, useMemo, useState } from 'react'
 
-const CACHE_KEY = 'github_stars_cache'
+const CACHE_KEY = 'github_stars_cache:v1'
 const CACHE_TTL = 15 * 60 * 1000
+const COMPACT_NUMBER_FORMATTER = new Intl.NumberFormat('en-US', {
+  notation: 'compact',
+  maximumFractionDigits: 1,
+})
+const NUMBER_FORMATTER = new Intl.NumberFormat('en-US')
 
+/** Module level, so several mounted components share one request instead of racing each other */
 let sharedFetchPromise: Promise<number | null> | null = null
 
 function isFreshCache(value: unknown): value is { count: number; timestamp: number } {
@@ -19,6 +25,11 @@ function isFreshCache(value: unknown): value is { count: number; timestamp: numb
   )
 }
 
+/**
+ * Star count for display, from cache when it is still fresh and otherwise from the API route that
+ * holds the token. Every failure path leaves the count null so the UI can simply omit it, since a
+ * rate limited badge is not worth surfacing as an error.
+ */
 export function useGithubStars() {
   const [stars, setStars] = useState<number | null>(null)
 
@@ -76,19 +87,11 @@ export function useGithubStars() {
   }, [])
 
   const shortCount = useMemo(
-    () =>
-      stars !== null
-        ? new Intl.NumberFormat('en-US', { notation: 'compact', maximumFractionDigits: 1 })
-            .format(stars)
-            .toLowerCase()
-        : null,
+    () => (stars !== null ? COMPACT_NUMBER_FORMATTER.format(stars).toLowerCase() : null),
     [stars],
   )
 
-  const fullCount = useMemo(
-    () => (stars !== null ? new Intl.NumberFormat('en-US').format(stars) : null),
-    [stars],
-  )
+  const fullCount = useMemo(() => (stars !== null ? NUMBER_FORMATTER.format(stars) : null), [stars])
 
   return { count: stars, shortCount, fullCount }
 }

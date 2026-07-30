@@ -2,9 +2,28 @@ import type { ReactNode } from 'react'
 import { LinkText } from '@/components/ui/link-text'
 import { LINK_REGEX } from '@/constants/constants'
 
+export function getAdjacentContent<T extends { slug: string }>(items: T[], currentSlug: string) {
+  const currentIndex = items.findIndex(({ slug }) => slug === currentSlug)
+
+  if (currentIndex === -1) {
+    return { previous: undefined, next: undefined }
+  }
+
+  return {
+    previous: items[currentIndex + 1],
+    next: currentIndex > 0 ? items[currentIndex - 1] : undefined,
+  }
+}
+
+/**
+ * Turns the markdown style links embedded in plain data strings into real LinkText nodes, so
+ * content files can carry a link without being MDX. Returns the string untouched when there is
+ * nothing to replace, which keeps callers free to render it directly.
+ */
 export function renderWithLinks(text: string): ReactNode {
   if (!text) return text
 
+  /** A local copy of the pattern, so the shared regex never carries lastIndex between calls */
   const flags = LINK_REGEX.flags.includes('g') ? LINK_REGEX.flags : `${LINK_REGEX.flags}g`
   const regex = new RegExp(LINK_REGEX.source, flags)
 

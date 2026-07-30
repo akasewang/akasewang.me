@@ -1,10 +1,16 @@
 import { useCallback, useEffect, useState } from 'react'
 
+/**
+ * Success and error state for a form, with an optional cooldown the visitor cannot escape by
+ * reloading or opening another tab. Passing a storage key persists the deadline, so a rate limit
+ * survives a refresh; leaving it out keeps everything in memory.
+ */
 export function useStatusTimer(storageKey?: string) {
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [expiresAt, setExpiresAt] = useState<number | null>(null)
   const [now, setNow] = useState(() => Date.now())
+  /** Derived from a ticking now rather than stored, so the count cannot drift from the deadline */
   const countdown = expiresAt ? Math.max(0, Math.ceil((expiresAt - now) / 1000)) : 0
   const timerStorageKey = storageKey ? `status-timer-${storageKey}` : null
 
@@ -23,6 +29,7 @@ export function useStatusTimer(storageKey?: string) {
       if (valueStr) {
         try {
           const stored = JSON.parse(valueStr)
+          /** A deadline that has already passed is cleared rather than restored */
           if (stored.expiresAt && stored.expiresAt > Date.now()) {
             setNow(Date.now())
             setExpiresAt(stored.expiresAt)

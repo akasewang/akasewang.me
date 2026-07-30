@@ -34,7 +34,7 @@ export interface TestimonialRows {
   bottomRow: Testimonial[]
 }
 
-export type SkillCategory = (typeof SKILL_CATEGORIES)[number]['value']
+type SkillCategory = (typeof SKILL_CATEGORIES)[number]['value']
 export interface Skill {
   id: string
   name: string

@@ -1,13 +1,13 @@
 'use client'
 
-import { m, useInView } from 'framer-motion'
+import { useInView } from 'framer-motion'
 import Image from 'next/image'
 import Link from 'next/link'
 import { memo, useEffect, useRef } from 'react'
 import { ProjectMediaFallback } from '@/components/common/project-media-fallback'
 import { ViewCounter } from '@/components/common/view-counter'
+import { AnimatedListItem } from '@/components/ui/animated-list-item'
 import { NewTag } from '@/components/ui/new-tag'
-import { SPRING_TRANSITION } from '@/constants/ui'
 import { useSoundEffects } from '@/hooks/use-sound-effects'
 import type { ProjectPostData } from '@/types/project'
 import { formatDateString, isNew } from '@/utils/utils'
@@ -39,13 +39,7 @@ export const ProjectCard = memo(function ProjectCard({ project }: ProjectCardPro
     : formatDateString(date)
 
   return (
-    <m.div
-      layout
-      initial={{ opacity: 0, scale: 0.98 }}
-      animate={{ opacity: 1, scale: 1 }}
-      exit={{ opacity: 0, scale: 0.96 }}
-      transition={SPRING_TRANSITION}
-    >
+    <AnimatedListItem>
       <Link
         href={external || `/projects/${slug}`}
         target={external ? '_blank' : undefined}
@@ -124,6 +118,6 @@ export const ProjectCard = memo(function ProjectCard({ project }: ProjectCardPro
           </div>
         </div>
       </Link>
-    </m.div>
+    </AnimatedListItem>
   )
 })

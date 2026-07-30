@@ -4,6 +4,7 @@ import { m } from 'framer-motion'
 import { useSoundEffects } from '@/hooks/use-sound-effects'
 import { useSpotlight } from '@/hooks/use-spotlight'
 import type { Experiment } from '@/types/experiments'
+import { cn } from '@/utils/utils'
 
 interface ExperimentTileProps {
   experiment: Experiment
@@ -11,7 +12,7 @@ interface ExperimentTileProps {
 }
 
 export function ExperimentTile({ experiment, index }: ExperimentTileProps) {
-  const { Component, name } = experiment
+  const { Component, name, span } = experiment
   const { spotlightSweep } = useSoundEffects()
   const { ref } = useSpotlight<HTMLDivElement>({ onMove: spotlightSweep })
 
@@ -22,7 +23,10 @@ export function ExperimentTile({ experiment, index }: ExperimentTileProps) {
       animate={{ opacity: 1, scale: 1, y: 0 }}
       transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1], delay: Math.min(index * 0.06, 0.6) }}
       aria-label={name}
-      className="group relative overflow-hidden rounded-2xl border border-border bg-card shadow-sm col-span-2 row-span-2"
+      className={cn(
+        'group relative overflow-hidden rounded-2xl border border-border bg-card shadow-sm',
+        span,
+      )}
     >
       <div className="absolute inset-0">
         <Component />

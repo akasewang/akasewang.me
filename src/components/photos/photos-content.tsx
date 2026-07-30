@@ -2,7 +2,6 @@
 
 import { m } from 'framer-motion'
 import Image from 'next/image'
-import { usePathname, useSearchParams } from 'next/navigation'
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { CategoryFilter } from '@/components/common/category-filter'
 import { EmptyState } from '@/components/common/empty-state'
@@ -10,8 +9,9 @@ import { Icons } from '@/components/ui/icons'
 import { PHOTO_CATEGORIES } from '@/constants/categories'
 import { ZOOM_EASE } from '@/constants/ui'
 import { photos } from '@/data/static/photos'
+import { useCategoryParam } from '@/hooks/use-category-param'
 import { useSoundEffects } from '@/hooks/use-sound-effects'
-import type { Category, Photo } from '@/types/photos'
+import type { Photo } from '@/types/photos'
 import { canUseHoverPointer } from '@/utils/pointer'
 import { cn } from '@/utils/utils'
 import { PhotoOverlay } from './photo-overlay'
@@ -20,8 +20,7 @@ const PHOTO_BY_ID = new Map(photos.map((p) => [p.id, p]))
 
 export function PhotosContent() {
   const { toggle, hoverTick } = useSoundEffects()
-  const searchParams = useSearchParams()
-  const pathname = usePathname()
+  const [activeCategory, handleCategoryChange] = useCategoryParam(PHOTO_CATEGORIES)
 
   const [view, setView] = useState<'cover' | 'contain'>('cover')
   const [zoomedPhotoId, setZoomedPhotoId] = useState<string | null>(null)
@@ -38,31 +37,6 @@ export function PhotosContent() {
   const preloadPhoto = useCallback((id: string) => {
     setPreloadIds((prev) => (prev.has(id) ? prev : new Set(prev).add(id)))
   }, [])
-
-  const categoryParam = searchParams.get('category')
-
-  const activeCategory = useMemo(() => {
-    return categoryParam && PHOTO_CATEGORIES.some((c) => c.value === categoryParam)
-      ? (categoryParam as Category)
-      : 'all'
-  }, [categoryParam])
-
-  const handleCategoryChange = useCallback(
-    (val: Category) => {
-      const params = new URLSearchParams(searchParams.toString())
-      if (val === 'all') {
-        params.delete('category')
-      } else {
-        params.set('category', val)
-      }
-
-      const query = params.toString()
-      const newUrl = query ? `${pathname}?${query}` : pathname
-
-      window.history.replaceState(null, '', newUrl)
-    },
-    [searchParams, pathname],
-  )
 
   const handleToggleView = useCallback(() => {
     const nextView = view === 'cover' ? 'contain' : 'cover'

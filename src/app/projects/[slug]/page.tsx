@@ -5,15 +5,15 @@ import { AsideTOC } from '@/components/common/mdx-components/aside-toc'
 import { MDX_COMPONENTS, MDX_OPTIONS } from '@/components/common/mdx-components/mdx-config'
 import { MdxFooter } from '@/components/common/mdx-components/mdx-footer'
 import { MdxPostHeader } from '@/components/common/mdx-components/mdx-post-header'
+import { MdxPostSummary } from '@/components/common/mdx-components/mdx-post-summary'
 import { ProjectDemo } from '@/components/common/mdx-components/project-demo'
-import { LinkText } from '@/components/ui/link-text'
-import { SeparatorSlash } from '@/components/ui/separator-slash'
 import { FULL_NAME, SITE_URL } from '@/constants/constants'
 import { getBreadcrumbSchema, getProjectSchema, serializeJsonLd } from '@/lib/json-ld'
 import { getAllProjects, getProject, getProjectSlugs } from '@/lib/managers/project-manager'
 import { constructMetadata, getOgImageUrl } from '@/lib/metadata'
+import { getAdjacentContent } from '@/utils/content-utils'
 
-export async function generateStaticParams() {
+export function generateStaticParams() {
   return getProjectSlugs()
 }
 
@@ -53,12 +53,7 @@ export default async function ProjectPost({ params }: { params: PageParams }) {
   ])
 
   const allProjects = await getAllProjects()
-  const currentIndex = allProjects.findIndex((p) => p.slug === postSlug)
-  const nextProject = currentIndex > 0 ? allProjects[currentIndex - 1] : undefined
-  const prevProject =
-    currentIndex !== -1 && currentIndex < allProjects.length - 1
-      ? allProjects[currentIndex + 1]
-      : undefined
+  const { previous: prevProject, next: nextProject } = getAdjacentContent(allProjects, postSlug)
 
   return (
     <div className="group/blog">
@@ -80,30 +75,13 @@ export default async function ProjectPost({ params }: { params: PageParams }) {
           url={`${SITE_URL}/projects/${postSlug}`}
         />
 
-        <div className="space-y-2">
-          <p className="text-pretty text-sm leading-relaxed text-muted-foreground">{excerpt}</p>
-
-          {links && links.length > 0 && (
-            <div className="flex flex-wrap items-center text-sm leading-relaxed text-muted-foreground">
-              <span className="mr-1">You can explore this project on</span>
-              {links.map((link, i) => (
-                <span key={`${link.url}-${i}`} className="flex items-center">
-                  {i > 0 && <SeparatorSlash />}
-                  <LinkText href={link.url}>{link.label}</LinkText>
-                </span>
-              ))}
-              <span>.</span>
-            </div>
-          )}
-
-          {tech && tech.length > 0 && (
-            <div className="flex flex-wrap gap-2 pt-2">
-              {tech.map((t, i) => (
-                <MDX_COMPONENTS.code key={`${t}-${i}`}>{t}</MDX_COMPONENTS.code>
-              ))}
-            </div>
-          )}
-        </div>
+        <MdxPostSummary
+          excerpt={excerpt}
+          linkLabel="You can explore this project on"
+          links={links}
+          keywords={tech}
+          keywordsClassName="pt-2"
+        />
 
         <hr className="border-t border-border" />
 

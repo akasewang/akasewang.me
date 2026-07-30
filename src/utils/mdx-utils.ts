@@ -9,6 +9,7 @@ interface MdxFileData {
   [key: string]: unknown
 }
 
+/** Slugs come from the URL, so only plain names are allowed anywhere near the filesystem */
 const SAFE_MDX_SLUG_REGEX = /^[a-z0-9][a-z0-9_-]*$/i
 const FRONTMATTER_REGEX = /^---[ \t]*\r?\n([\s\S]*?)\r?\n---[ \t]*(?:\r?\n|$)/
 
@@ -20,6 +21,10 @@ function isFrontmatterData(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value)
 }
 
+/**
+ * Splits the YAML block off the top of a file. A leading byte order mark is stripped first,
+ * because it would otherwise sit in front of the opening fence and hide it.
+ */
 function parseFrontmatter(fileContent: string): { content: string; data: Record<string, unknown> } {
   const normalizedContent = fileContent.replace(/^\uFEFF/, '')
   const match = normalizedContent.match(FRONTMATTER_REGEX)
@@ -36,6 +41,11 @@ function parseFrontmatter(fileContent: string): { content: string; data: Record<
   }
 }
 
+/**
+ * Resolves a slug to a real file, or null. The slug is checked against the allowlist and the
+ * resolved path is then confirmed to still sit inside the base directory, so neither traversal
+ * nor an absolute path can reach outside the content folder.
+ */
 export async function resolveMdxFilePath(baseDir: string, slug: string): Promise<string | null> {
   const normalizedSlug = slug.trim()
   if (!isSafeMdxSlug(normalizedSlug)) return null
@@ -57,21 +67,25 @@ export async function resolveMdxFilePath(baseDir: string, slug: string): Promise
   return null
 }
 
+/** Every readable slug in a directory, filtered by the same allowlist. Empty if it cannot be read */
 export async function getMdxSlugs(baseDir: string) {
   try {
     const entries = await fs.readdir(/* turbopackIgnore: true */ baseDir, { withFileTypes: true })
 
-    return entries
-      .filter(
-        (entry) => entry.isFile() && (entry.name.endsWith('.mdx') || entry.name.endsWith('.md')),
-      )
-      .map((entry) => ({ slug: entry.name.replace(/\.mdx?$/, '') }))
-      .filter(({ slug }) => isSafeMdxSlug(slug))
+    return entries.flatMap((entry) => {
+      if (!entry.isFile() || (!entry.name.endsWith('.mdx') && !entry.name.endsWith('.md'))) {
+        return []
+      }
+
+      const slug = entry.name.replace(/\.mdx?$/, '')
+      return isSafeMdxSlug(slug) ? [{ slug }] : []
+    })
   } catch {
     return []
   }
 }
 
+/** Reads a file and gives frontmatter a date, defaulting to now so sorting always has a value */
 export async function readMdxFile(
   filePath: string,
 ): Promise<{ content: string; data: MdxFileData }> {
@@ -87,6 +101,10 @@ export async function readMdxFile(
   }
 }
 
+/**
+ * Frontmatter for one slug with the slug folded in, or null for anything unreadable. Callers use
+ * the null to answer notFound rather than having to catch.
+ */
 export async function getMdxFrontmatter<T extends { date: string | Date; slug: string }>(
   baseDir: string,
   slug: string,
@@ -102,6 +120,7 @@ export async function getMdxFrontmatter<T extends { date: string | Date; slug: s
   }
 }
 
+/** Newest first. Dates that will not parse sort to the end rather than dropping out */
 export function sortMdxByDate<T extends { date: string | Date }>(posts: T[]): T[] {
   return posts
     .map((post) => ({

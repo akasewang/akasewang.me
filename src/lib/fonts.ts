@@ -1,3 +1,8 @@
+/**
+ * Self hosted at build time by next/font, so there is no request to Google at runtime and no layout
+ * shift. Each exposes a CSS variable that the Tailwind theme reads.
+ */
+
 import { Geist_Mono, Inter, PT_Serif } from 'next/font/google'
 
 export const fontSans = Inter({

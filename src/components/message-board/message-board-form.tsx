@@ -75,7 +75,14 @@ export function MessageBoardForm() {
 
   return (
     <form ref={formRef} action={action} className="flex flex-col gap-4">
-      <input type="text" name="honey" className="hidden" tabIndex={-1} autoComplete="off" />
+      <input
+        type="text"
+        name="honey"
+        className="hidden"
+        tabIndex={-1}
+        autoComplete="off"
+        aria-label="Leave this field empty"
+      />
 
       <Input
         id="name"
@@ -83,6 +90,7 @@ export function MessageBoardForm() {
         type="text"
         required
         placeholder={mbContent.namePlaceholder}
+        aria-label={mbContent.namePlaceholder}
         disabled={isDisabled}
       />
 
@@ -91,6 +99,7 @@ export function MessageBoardForm() {
         name="message"
         required
         placeholder={mbContent.formPlaceholder}
+        aria-label={mbContent.formPlaceholder}
         disabled={isDisabled}
         rows={3}
       />

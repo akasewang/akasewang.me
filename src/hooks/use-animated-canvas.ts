@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useEffectEvent, useRef } from 'react'
 
 interface Pointer {
   x: number
@@ -24,21 +24,22 @@ interface AnimatedCanvasOptions {
   onResize?: (size: { width: number; height: number; ctx: CanvasRenderingContext2D }) => void
 }
 
+/**
+ * Runs a draw callback on every frame against a canvas kept in step with its box and pixel ratio,
+ * handing it elapsed time, a delta and pointer velocity. The loop only turns while the canvas is on
+ * screen and the tab is visible, and reduced motion gets one static frame instead.
+ */
 export function useAnimatedCanvas(
   frame: (f: CanvasFrame) => void,
   options: AnimatedCanvasOptions = {},
 ) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
-  const frameRef = useRef(frame)
-  const onResizeRef = useRef(options.onResize)
-
-  useEffect(() => {
-    frameRef.current = frame
-  }, [frame])
-
-  useEffect(() => {
-    onResizeRef.current = options.onResize
-  }, [options.onResize])
+  const drawFrame = useEffectEvent(frame)
+  const notifyResize = useEffectEvent(
+    (size: { width: number; height: number; ctx: CanvasRenderingContext2D }) => {
+      options.onResize?.(size)
+    },
+  )
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -60,6 +61,7 @@ export function useAnimatedCanvas(
     const resize = () => {
       const rect = canvas.getBoundingClientRect()
       if (rect.width === 0 || rect.height === 0) return
+      /** Capped at 2, past which the extra pixels cost more than they show */
       const nextDpr = Math.min(window.devicePixelRatio || 1, 2)
 
       if (rect.width === width && rect.height === height && nextDpr === dpr) return
@@ -69,17 +71,18 @@ export function useAnimatedCanvas(
       canvas.width = Math.round(width * dpr)
       canvas.height = Math.round(height * dpr)
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
-      onResizeRef.current?.({ width, height, ctx })
+      notifyResize({ width, height, ctx })
     }
 
     const render = (now: number) => {
+      /** Clamped so a backgrounded tab does not resume with one enormous step */
       const dt = Math.min((now - last) / 1000, 1 / 30)
       last = now
       pointer.vx = pointer.seen ? pointer.x - pointer.px : 0
       pointer.vy = pointer.seen ? pointer.y - pointer.py : 0
       pointer.px = pointer.x
       pointer.py = pointer.y
-      frameRef.current({ ctx, width, height, dpr, time: (now - start) / 1000, dt, pointer })
+      drawFrame({ ctx, width, height, dpr, time: (now - start) / 1000, dt, pointer })
     }
 
     const loop = (now: number) => {

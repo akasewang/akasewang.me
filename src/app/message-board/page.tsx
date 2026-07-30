@@ -13,15 +13,13 @@ import { getBreadcrumbSchema } from '@/lib/json-ld'
 import { constructMetadata, getOgImageUrl } from '@/lib/metadata'
 import type { MessageBoardEntry } from '@/types/message-board'
 
-export async function generateMetadata(): Promise<Metadata> {
-  return constructMetadata({
-    title: messageBoardSeoContent.title,
-    description: messageBoardSeoContent.description,
-    path: '/message-board',
-    image: getOgImageUrl(messageBoardSeoContent.ogTitle, 'Message Board'),
-    imageAlt: messageBoardSeoContent.imageAlt,
-  })
-}
+export const metadata: Metadata = constructMetadata({
+  title: messageBoardSeoContent.title,
+  description: messageBoardSeoContent.description,
+  path: '/message-board',
+  image: getOgImageUrl(messageBoardSeoContent.ogTitle, 'Message Board'),
+  imageAlt: messageBoardSeoContent.imageAlt,
+})
 
 export default async function MessageBoardPage() {
   const breadcrumbJsonLd = getBreadcrumbSchema([

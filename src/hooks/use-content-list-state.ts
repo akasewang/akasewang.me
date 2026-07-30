@@ -25,6 +25,11 @@ interface UseContentListStateOptions<TItem extends SluggedContent, TCategory ext
 const isSortOption = (value: string | null): value is SortOption =>
   SORT_OPTIONS.includes(value as SortOption)
 
+/**
+ * Category, search and sort for the blog and project lists, held in the URL so a filtered view can
+ * be shared or reloaded. Unknown or absent parameters fall back to the defaults, which keeps a hand
+ * edited query string harmless.
+ */
 export function useContentListState<TItem extends SluggedContent, TCategory extends string>({
   items,
   categories,
@@ -54,6 +59,10 @@ export function useContentListState<TItem extends SluggedContent, TCategory exte
     prefetchViews(items.map((item) => item.slug))
   }, [items, prefetchViews])
 
+  /**
+   * Defaults are removed from the query rather than written out, so a plain list keeps a clean URL.
+   * replaceState updates the address without a navigation, a history entry or a scroll jump.
+   */
   const updateParams = useCallback(
     (updates: Record<string, string | null>) => {
       const params = new URLSearchParams(searchParams.toString())
@@ -98,6 +107,7 @@ export function useContentListState<TItem extends SluggedContent, TCategory exte
     [updateParams],
   )
 
+  /** Items arrive newest first, so the default needs no work and date-asc is just a reverse */
   const sortedItems = useMemo(() => {
     const result = [...items]
 

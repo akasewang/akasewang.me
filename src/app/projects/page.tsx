@@ -9,15 +9,13 @@ import { getBreadcrumbSchema } from '@/lib/json-ld'
 import { getAllProjects } from '@/lib/managers/project-manager'
 import { constructMetadata, getOgImageUrl } from '@/lib/metadata'
 
-export async function generateMetadata(): Promise<Metadata> {
-  return constructMetadata({
-    title: projectsSeoContent.title,
-    description: projectsSeoContent.description,
-    path: '/projects',
-    image: getOgImageUrl(projectsSeoContent.ogTitle, 'Project'),
-    imageAlt: projectsSeoContent.imageAlt,
-  })
-}
+export const metadata: Metadata = constructMetadata({
+  title: projectsSeoContent.title,
+  description: projectsSeoContent.description,
+  path: '/projects',
+  image: getOgImageUrl(projectsSeoContent.ogTitle, 'Project'),
+  imageAlt: projectsSeoContent.imageAlt,
+})
 
 export default async function ProjectsPage() {
   const projects = await getAllProjects()

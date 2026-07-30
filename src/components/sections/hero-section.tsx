@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 import { PronounceMyName } from '@/components/common/pronounce-my-name'
+import { SocialLinks } from '@/components/common/social-links'
 import { SectionTitle } from '@/components/layout/section-title'
 import { Button } from '@/components/ui/button'
 import { Icons, VerifiedIcon } from '@/components/ui/icons'
@@ -10,7 +11,7 @@ import { ProfilePicture } from '@/components/ui/profile-picture'
 import { TextFlip } from '@/components/ui/text-flip'
 import { EMAIL, FULL_NAME } from '@/constants/constants'
 import { landingPageContent } from '@/data/content/landing-content'
-import { activeSocials, inactiveSocials } from '@/data/static/social'
+import { inactiveSocials, socialGroups } from '@/data/static/social'
 import { renderWithLinks } from '@/utils/content-utils'
 
 export function HeroSection() {
@@ -53,28 +54,22 @@ export function HeroSection() {
       <div className="space-y-4">
         <SectionTitle>{hero.aboutTitle}</SectionTitle>
         <div className="max-w-full space-y-2 text-pretty text-sm leading-relaxed text-foreground">
-          {hero.about.map((paragraph: string, i: number) => (
-            <p key={i}>{renderWithLinks(paragraph)}</p>
+          {hero.about.map((paragraph: string) => (
+            <p key={paragraph}>{renderWithLinks(paragraph)}</p>
           ))}
         </div>
       </div>
 
       <div className="space-y-2">
-        {activeSocials.length > 0 && (
+        {socialGroups.length > 0 && (
           <>
             <p className="text-sm text-foreground">{hero.findMeOn}</p>
-            <div className="flex flex-wrap gap-2">
-              {activeSocials.map((link) => (
-                <LinkText key={link.label} href={link.href}>
-                  {link.label}
-                </LinkText>
-              ))}
-            </div>
+            <SocialLinks groups={socialGroups} />
           </>
         )}
         <p
           className={
-            activeSocials.length > 0 ? 'mt-4 text-sm text-foreground' : 'text-sm text-foreground'
+            socialGroups.length > 0 ? 'mt-4 text-sm text-foreground' : 'text-sm text-foreground'
           }
         >
           {hero.mailMeAt} <LinkText href={`mailto:${EMAIL}`}>{EMAIL}</LinkText>
