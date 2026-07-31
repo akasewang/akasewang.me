@@ -92,7 +92,7 @@ export const TimelineItem = memo(function TimelineItem({
       <div
         className={cn(
           'flex items-center justify-between sm:mt-0.5 sm:flex-col sm:items-end sm:gap-2',
-          hasContent && 'pointer-events-none relative z-10',
+          hasContent && 'pointer-events-none z-10',
         )}
       >
         <div className="whitespace-nowrap font-mono text-[13px] text-muted-foreground">
