@@ -15,7 +15,7 @@ export const SITE = 'akasewang.me'
 export const EMAIL = 'hi@akasewang.me'
 
 export const SITE_DESCRIPTION =
-  "A personal archive of what I'm building and consuming. Featuring software projects, interactive coding experiments, a media catalog and personal essays."
+  "A personal archive of what I'm building and consuming. Featuring software projects, technical writing, a media catalog and personal essays."
 
 /** Words per minute, the basis for every reading estimate */
 export const READING_SPEED = 200

@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { usePathname, useRouter } from 'next/navigation'
+import { usePathname } from 'next/navigation'
 import { Icons } from '@/components/ui/icons'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { SITE, USERNAME } from '@/constants/constants'
@@ -22,7 +22,6 @@ const ICON_BUTTON_STYLES =
   'relative flex size-8 items-center justify-center rounded-lg bg-transparent text-secondary ring-1 ring-transparent transition-[background-color,color,transform,scale,opacity,box-shadow] duration-300 supports-hover:hover:bg-accent supports-hover:hover:text-primary supports-hover:hover:ring-accent-border active:bg-accent active:text-primary active:ring-accent-border active:scale-[0.95] active:duration-200 retina:ring-[0.5px]'
 
 export function Navbar() {
-  const router = useRouter()
   const { isAudioEnabled, setAudioEnabled } = useAudioPreference()
   const { hoverLink, navigate: navigateSound, toggle } = useSoundEffects()
   const pathname = usePathname()
@@ -56,11 +55,6 @@ export function Navbar() {
   useKeyboardShortcut('r', () => {
     navigateSound()
     window.open('/feed.xml', '_blank', 'noopener,noreferrer')
-  })
-
-  useKeyboardShortcut('e', () => {
-    navigateSound()
-    router.push('/experiments')
   })
 
   const AudioIcon = isAudioEnabled ? Icons.volumeUp : Icons.volumeMute
@@ -101,27 +95,6 @@ export function Navbar() {
 
             <Tooltip>
               <TooltipTrigger asChild>
-                <Link
-                  href="/experiments"
-                  aria-label={navbarContent.experiments}
-                  onMouseEnter={hoverLink}
-                  onClick={navigateSound}
-                  className={cn(
-                    ICON_BUTTON_STYLES,
-                    '-ml-[7px]',
-                    pathname === '/experiments' && 'text-primary',
-                  )}
-                >
-                  <Icons.experiments className="size-4.5" />
-                </Link>
-              </TooltipTrigger>
-              <TooltipContent side="bottom" shortcut="E">
-                {navbarContent.experiments}
-              </TooltipContent>
-            </Tooltip>
-
-            <Tooltip>
-              <TooltipTrigger asChild>
                 <a
                   href={githubUrl}
                   target="_blank"
@@ -132,7 +105,7 @@ export function Navbar() {
                   className={cn(
                     ICON_BUTTON_STYLES,
                     'hidden md:flex',
-                    '-ml-[17px]',
+                    '-ml-[10px]',
                     githubStars !== null && 'w-auto px-2.5',
                   )}
                 >
@@ -160,7 +133,7 @@ export function Navbar() {
                   aria-keyshortcuts="f1"
                   onMouseEnter={hoverLink}
                   onClick={handleAudioToggle}
-                  className={cn(ICON_BUTTON_STYLES, '-ml-[14px] md:-ml-[17px]')}
+                  className={cn(ICON_BUTTON_STYLES, '-ml-[7px] md:-ml-[17px]')}
                 >
                   <AudioIcon className="size-4.5" />
                 </button>

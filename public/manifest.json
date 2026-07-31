@@ -1,7 +1,7 @@
 {
   "name": "Akash Dewangan",
   "short_name": "Akash",
-  "description": "A personal archive of what I'm building and consuming. Featuring software projects, interactive coding experiments, a media catalog and personal essays.",
+  "description": "A personal archive of what I'm building and consuming. Featuring software projects, technical writing, a media catalog and personal essays.",
   "start_url": "/",
   "display": "standalone",
   "theme_color": "#000000",

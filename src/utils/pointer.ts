@@ -12,19 +12,3 @@ export function canUseHover() {
 export function canUseHoverPointer(pointerType: string) {
   return pointerType === 'mouse' && canUseHover()
 }
-
-export function followPointer(
-  current: { x: number; y: number; primed: boolean },
-  target: { x: number; y: number },
-  smoothing: number,
-) {
-  if (!current.primed) {
-    current.x = target.x
-    current.y = target.y
-    current.primed = true
-    return
-  }
-
-  current.x += (target.x - current.x) * smoothing
-  current.y += (target.y - current.y) * smoothing
-}

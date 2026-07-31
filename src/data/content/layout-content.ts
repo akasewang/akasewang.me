@@ -7,7 +7,6 @@ export const navbarContent: NavbarContent = {
   blogs: 'Blogs',
   projects: 'Projects',
   photos: 'Photos',
-  experiments: 'Experiments',
 }
 
 export const footerContent: FooterContent = {

@@ -5,7 +5,6 @@ export interface NavbarContent {
   blogs: string
   projects: string
   photos: string
-  experiments: string
 }
 
 export interface FooterContent {

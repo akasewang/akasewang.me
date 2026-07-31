@@ -2,7 +2,7 @@
 
 <p align="center">
   The source for Akash Dewangan's personal site: software projects, technical writing,
-  experiments, photography, a message board and a small newsletter system.
+  photography, a message board and a small newsletter system.
 </p>
 
 <p align="center">
