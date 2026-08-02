@@ -2,21 +2,21 @@ import type { ToastMessages } from '@/types/site'
 
 export const toastContent: ToastMessages = {
   newsletter: {
-    success: 'All clear! Newsletter broadcast sent successfully.',
-    error: 'Houston, we have a problem. Newsletter broadcast failed.',
     broadcastSuccess: (count: number) => `Success! Broadcast sent to ${count} subscribers.`,
-    passwordRequired: 'Admin password is required',
+    otpSent: 'If that is the admin address, a code is in the inbox. It lasts 10 minutes.',
+    otpUnavailable: 'No admin address is configured to send a code to.',
+    otpEmailRequired: 'Admin email is required',
     unexpectedError: 'An unexpected error occurred',
-    unauthorized: 'Unauthorized: Incorrect admin password',
+    unauthorized: 'Unauthorized: that code is wrong, expired or used up',
     postNotFound: 'Information missing: No blog post selected.',
     noSubscribers: 'Growth needed: You have no newsletter subscribers yet.',
     broadcastError: 'Transmission failed: Could not broadcast to subscribers.',
+    partialBroadcast: (sent: number, total: number) =>
+      `Transmission stopped: reached ${sent} of ${total} subscribers before failing.`,
   },
   messageBoard: {
     success: 'Message posted successfully!',
-    error: 'Failed to post message. Please try again.',
     adminLogin: 'Admin mode activated',
-    adminLogout: 'Admin mode deactivated',
     connectionError: 'Network issue: Please check your connection.',
     botDetected: 'Bot detected: Verification failed.',
     invalidName: 'Please enter a valid name.',

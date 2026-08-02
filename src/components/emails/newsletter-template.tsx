@@ -1,116 +1,110 @@
-import { Column, Heading, Link, Row, Section, Text } from '@react-email/components'
-import { FULL_NAME, SITE_URL } from '@/constants/constants'
+import { Column, Heading, Img, Link, Row, Section, Text } from '@react-email/components'
+import { FIRST_NAME, SITE_URL } from '@/constants/constants'
+import type { EmailDateInput } from './email-template-shared'
 import {
-  EmailHeader,
+  EmailDissolve,
   EmailShell,
-  EmailUnsubscribeFooter,
-  emailFonts,
-  emailStyles,
-  emailTheme,
+  EmailSignature,
+  EmailSubscriberFooter,
+  EmailWordmark,
+  LIST_MARK_SIZE,
+  emailLayout,
+  formatEmailDate,
+  getListMarkUrl,
 } from './email-template-shared'
+
+interface NewsletterPost {
+  title: string
+  url: string
+}
 
 interface NewsletterTemplateProps {
   unsubscribeToken?: string
   blogTitle?: string
   blogUrl?: string
   blogExcerpt?: string
-  blogDate?: string | Date
+  blogDate?: EmailDateInput
   readingTime?: number
-  previousPosts?: { title: string; url: string }[]
+  previousPosts?: NewsletterPost[]
 }
 
-const styles = {
-  ...emailStyles,
-  headingLink: { color: emailTheme.text, textDecoration: 'none' },
-  excerpt: {
-    margin: '0 0 28px',
-    fontFamily: emailFonts.sans,
-    fontSize: '15px',
-    lineHeight: 1.65,
-    color: emailTheme.muted,
-  },
-  postsSection: {
-    borderTop: `1px dashed ${emailTheme.border}`,
-    padding: '28px 32px',
-  },
-  postsLabel: {
-    margin: '0 0 18px',
-    fontFamily: emailFonts.mono,
-    fontSize: '11px',
-    color: emailTheme.dim,
-    lineHeight: '16px',
-  },
-  postRow: { marginBottom: '14px' },
-  postIndexCol: { width: '32px', verticalAlign: 'top' as const },
-  postIndex: {
-    margin: 0,
-    fontFamily: emailFonts.mono,
-    fontSize: '11px',
-    color: emailTheme.dim,
-    lineHeight: '22px',
-  },
-  postLink: {
-    fontFamily: emailFonts.sans,
-    fontSize: '14px',
-    color: emailTheme.text,
-    textDecoration: 'none',
-    lineHeight: '22px',
-  },
-}
-
-const defaultPosts = [
+const defaultPosts: NewsletterPost[] = [
   {
     title: 'Building a Minimalist Writing Environment',
     url: `${SITE_URL}/blogs/minimalist-writing`,
   },
-  {
-    title: 'The Future of Agentic Coding',
-    url: `${SITE_URL}/blogs/agentic-coding`,
-  },
-  {
-    title: 'Designing for the Long Term',
-    url: `${SITE_URL}/blogs/designing-long-term`,
-  },
+  { title: 'The Future of Agentic Coding', url: `${SITE_URL}/blogs/agentic-coding` },
+  { title: 'Designing for the Long Term', url: `${SITE_URL}/blogs/designing-long-term` },
 ]
 
 export const NewsletterTemplate = ({
-  blogTitle = `A new post from ${FULL_NAME}`,
+  blogTitle = "You can't build everything at once.",
   blogUrl = SITE_URL,
   unsubscribeToken = 'preview-token',
-  blogExcerpt = 'Thinking about how we can build more focused, minimalist experiences for our users...',
-  blogDate,
+  blogExcerpt = 'Thinking about how we can build more focused, minimalist experiences, and why the constraints usually turn out to be the interesting part.',
+  blogDate = '2026-06-18',
   readingTime = 5,
   previousPosts = defaultPosts,
 }: NewsletterTemplateProps) => {
   const unsubscribeUrl = `${SITE_URL}/unsubscribe?token=${unsubscribeToken}`
+  const postMeta = [
+    formatEmailDate(blogDate),
+    readingTime > 0 ? `${readingTime} min read` : undefined,
+  ]
+    .filter(Boolean)
+    .join(' · ')
+
   return (
     <EmailShell preview={blogExcerpt || blogTitle}>
-      <EmailHeader date={blogDate} />
-
-      <Section style={styles.mainSection}>
-        <Text style={styles.eyebrow}>new post · {readingTime} min read</Text>
-        <Heading as="h1" style={styles.heading}>
-          <Link href={blogUrl} style={styles.headingLink}>
-            {blogTitle}
-          </Link>
+      <Section className="e-opener" style={emailLayout.opener}>
+        <Text style={emailLayout.meta}>{postMeta}</Text>
+        <Heading as="h1" className="e-headline" style={emailLayout.headline}>
+          {blogTitle}
         </Heading>
-        {blogExcerpt && <Text style={styles.excerpt}>{blogExcerpt}</Text>}
-        <Link href={blogUrl} style={styles.ctaLink}>
-          read full post
-        </Link>
+      </Section>
+
+      <Section className="e-body" style={emailLayout.bodySection}>
+        <EmailSignature text={`${FIRST_NAME} here.`} />
+
+        <Text style={emailLayout.body}>{blogExcerpt}</Text>
+
+        <Text style={emailLayout.body}>
+          I wrote this one slowly, which is{' '}
+          <span style={emailLayout.emphasis}>the only way I seem to write</span> anything worth
+          sending. It is up on the site now, and if it saves you an afternoon then it has more than
+          paid for itself.
+        </Text>
+
+        <Text style={emailLayout.linkLine}>
+          <Link href={blogUrl} style={emailLayout.link}>
+            Read the full post &rsaquo;
+          </Link>
+        </Text>
       </Section>
 
       {previousPosts.length > 0 && (
-        <Section style={styles.postsSection}>
-          <Text style={styles.postsLabel}>previous posts</Text>
+        <Section className="e-list" style={emailLayout.listSection}>
+          <Text style={emailLayout.sectionLabel}>More from the blog</Text>
+
           {previousPosts.map((post, index) => (
-            <Row key={index} style={styles.postRow}>
-              <Column style={styles.postIndexCol}>
-                <Text style={styles.postIndex}>{String(index + 1).padStart(2, '0')}</Text>
+            <Row
+              key={post.url}
+              style={
+                index === previousPosts.length - 1 ? emailLayout.listRowLast : emailLayout.listRow
+              }
+            >
+              <Column style={emailLayout.markCol}>
+                <Img
+                  src={getListMarkUrl(index)}
+                  width={LIST_MARK_SIZE}
+                  height={LIST_MARK_SIZE}
+                  alt=""
+                  style={emailLayout.mark}
+                />
               </Column>
-              <Column>
-                <Link href={post.url} style={styles.postLink}>
-                  {post.title}
+              <Column style={emailLayout.rowCol}>
+                <Link href={post.url} style={emailLayout.link}>
+                  {post.title} &rsaquo;
                 </Link>
               </Column>
             </Row>
@@ -118,7 +112,9 @@ export const NewsletterTemplate = ({
         </Section>
       )}
 
-      <EmailUnsubscribeFooter unsubscribeUrl={unsubscribeUrl} />
+      <EmailDissolve />
+      <EmailSubscriberFooter unsubscribeUrl={unsubscribeUrl} />
+      <EmailWordmark />
     </EmailShell>
   )
 }

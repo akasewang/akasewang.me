@@ -19,7 +19,6 @@ export const landingPageContent: LandingPageContent = {
     scheduleMeet: 'schedule a meet',
     messageBoard: 'leave a message',
     mailMeAt: 'or mail me at',
-    inactivePrefix: 'No longer active on',
     scheduleMeetUrl: 'https://cal.com/akasewang',
     designsLabel: 'Click for designs •',
     designsUrl: 'https://noddy.studio/',

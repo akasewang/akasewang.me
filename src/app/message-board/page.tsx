@@ -31,7 +31,6 @@ export default async function MessageBoardPage() {
 
   try {
     messages = await db.query.messageBoard.findMany({
-      columns: { ip: false },
       orderBy: [desc(messageBoard.id)],
       limit: MESSAGES_PER_PAGE,
     })

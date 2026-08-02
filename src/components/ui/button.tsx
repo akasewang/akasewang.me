@@ -1,11 +1,11 @@
 'use client'
 
-import { type HTMLMotionProps, m } from 'framer-motion'
+import { AnimatePresence, type HTMLMotionProps, m } from 'framer-motion'
 import { type ElementType, useEffect, useRef } from 'react'
 import { toast } from 'sonner'
 import { AnimatedArrow } from '@/components/ui/animated-arrow'
 import { Icons } from '@/components/ui/icons'
-import { SPRING_TRANSITION } from '@/constants/ui'
+import { BUTTON_SWAP_TRANSITION, SPRING_TRANSITION } from '@/constants/ui'
 import { toastContent } from '@/data/content/toast-content'
 import { useSoundEffects } from '@/hooks/use-sound-effects'
 import { cn } from '@/utils/utils'
@@ -34,6 +34,13 @@ const VARIANT_STYLES = {
 
 const SUCCESS_STYLES =
   'ring-1 ring-inset ring-success/30 retina:ring-[0.5px] bg-success/10 text-success shadow-[0_2px_4px_rgb(0_0_0/0.2),inset_0_1px_1px_rgb(255_255_255/0.1)]'
+
+/** Match AnimatedArrow: the old face rises out while its replacement rises in from below */
+const BUTTON_CONTENT_SWAP = {
+  initial: { y: '110%' },
+  animate: { y: '0%', transition: BUTTON_SWAP_TRANSITION },
+  exit: { y: '-110%', transition: BUTTON_SWAP_TRANSITION },
+}
 
 export function Button({
   isPending = false,
@@ -79,6 +86,25 @@ export function Button({
     'relative inline-flex h-10 items-center justify-center transition-[color,background-color,border-color,box-shadow,translate,transform] duration-300 ease-out',
     isSuccessState ? SUCCESS_STYLES : VARIANT_STYLES[variant],
   )
+
+  /**
+   * Re-keyed whenever the face changes, which is what drives the swap. The default text is the key
+   * in its own right, so a label that follows what is being typed animates the same way a pending
+   * or a success state does rather than snapping between words.
+   */
+  const contentKey = isPending
+    ? 'pending'
+    : isSuccessState
+      ? 'success'
+      : countdown > 0
+        ? 'wait'
+        : defaultText
+
+  /**
+   * The right box only ever shows a spinner, a count or the arrow, none of which follow the label.
+   * Keyed on the label it would have re-run the arrow on every keystroke.
+   */
+  const rightKey = isPending ? 'pending' : countdown > 0 ? 'countdown' : 'arrow'
 
   const renderContent = () => {
     if (isPending) return <span>{loadingText}</span>
@@ -135,7 +161,7 @@ export function Button({
       <span
         className={cn(
           segmentClasses,
-          'flex-1 gap-1.5 rounded-l-xl',
+          'flex-1 rounded-l-xl',
           variant === 'minimal' ? 'px-4' : 'px-5',
           hasRightBox ? 'rounded-r-md' : 'rounded-r-xl',
           isActionActive
@@ -144,7 +170,17 @@ export function Button({
                 'supports-hover:group-hover:translate-x-px group-active:translate-x-px',
         )}
       >
-        {renderContent()}
+        <span className="relative grid overflow-hidden">
+          <AnimatePresence mode="popLayout" initial={false}>
+            <m.span
+              key={contentKey}
+              {...BUTTON_CONTENT_SWAP}
+              className="col-start-1 row-start-1 inline-flex items-center gap-1.5 whitespace-nowrap"
+            >
+              {renderContent()}
+            </m.span>
+          </AnimatePresence>
+        </span>
       </span>
 
       {hasRightBox && (
@@ -157,7 +193,17 @@ export function Button({
               : 'supports-hover:group-hover:-translate-x-px group-active:-translate-x-px',
           )}
         >
-          {renderRightContent()}
+          <span className="relative grid size-full place-items-center overflow-hidden">
+            <AnimatePresence mode="popLayout" initial={false}>
+              <m.span
+                key={rightKey}
+                {...BUTTON_CONTENT_SWAP}
+                className="col-start-1 row-start-1 inline-flex items-center justify-center"
+              >
+                {renderRightContent()}
+              </m.span>
+            </AnimatePresence>
+          </span>
         </span>
       )}
     </m.button>

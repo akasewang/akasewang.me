@@ -13,17 +13,27 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import {
+  ADMIN_CODE_LENGTH,
+  ADMIN_CODE_SHAPE,
+  ADMIN_CODE_STRIP,
+  EMAIL_SHAPE,
+} from '@/constants/constants'
 import { adminNewsletterContent } from '@/data/content/admin-content'
 import { toastContent } from '@/data/content/toast-content'
 import { useSoundEffects } from '@/hooks/use-sound-effects'
 import { useStatusTimer } from '@/hooks/use-status-timer'
+import { requestAdminOtp } from '@/lib/actions/admin-otp-actions'
+import { signInAdmin } from '@/lib/actions/admin-session-actions'
 import { broadcastNewsletter } from '@/lib/actions/newsletter-actions'
 import type { BlogPost } from '@/types/blog'
 
 export function AdminNewsletterForm({ blogs }: { blogs: BlogPost[] }) {
+  const [adminEmail, setAdminEmail] = useState('')
   const [adminSecret, setAdminSecret] = useState('')
   const [selectedBlogSlug, setSelectedBlogSlug] = useState(blogs[0]?.slug || '')
   const [loading, setLoading] = useState(false)
+  const [codeSent, setCodeSent] = useState(false)
   const blogOptions = useMemo(
     () => blogs.map(({ title, slug }) => ({ label: title, value: slug })),
     [blogs],
@@ -31,20 +41,71 @@ export function AdminNewsletterForm({ blogs }: { blogs: BlogPost[] }) {
   const { success, countdown, startCountdown, resetStatus } = useStatusTimer('admin-newsletter')
   const { error: errorSound } = useSoundEffects()
 
-  async function handleSubmit(e: React.SyntheticEvent) {
-    e.preventDefault()
-    setLoading(true)
-    resetStatus()
+  /**
+   * Read from the code field rather than tracked separately, so the button cannot offer one thing
+   * while submitting does another. A filled code means there is something to spend; anything else
+   * means one still has to be asked for.
+   */
+  const isReadyToSend = ADMIN_CODE_SHAPE.test(adminSecret.trim())
+  const hasValidAdminEmail = EMAIL_SHAPE.test(adminEmail.trim())
 
-    if (!adminSecret) {
+  const isDisabled = loading || countdown > 0
+
+  const requestButtonText = !hasValidAdminEmail
+    ? adminNewsletterContent.enterEmailDefault
+    : codeSent
+      ? adminNewsletterContent.enterCodeDefault
+      : adminNewsletterContent.sendCodeDefault
+
+  async function requestCode() {
+    if (!hasValidAdminEmail) {
       errorSound()
-      toast.error(toastContent.newsletter.passwordRequired)
-      setLoading(false)
+      toast.error(
+        adminEmail.trim()
+          ? toastContent.subscribe.invalidEmail
+          : toastContent.newsletter.otpEmailRequired,
+      )
       return
     }
 
+    setLoading(true)
+    setCodeSent(false)
+
     try {
-      const response = await broadcastNewsletter(selectedBlogSlug, adminSecret)
+      const response = await requestAdminOtp(adminEmail.trim())
+
+      if (!response.success) {
+        errorSound()
+        toast.error(response.error)
+      } else {
+        setCodeSent(true)
+        toast.success(toastContent.newsletter.otpSent)
+      }
+    } catch {
+      errorSound()
+      toast.error(toastContent.newsletter.unexpectedError)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  async function broadcast() {
+    setLoading(true)
+    resetStatus()
+
+    try {
+      /**
+       * The code buys a session first, and the broadcast reads that. It means the same sign in
+       * carries over to moderating the message board rather than being spent here.
+       */
+      const signIn = await signInAdmin(adminSecret.trim())
+      if (!signIn.success) {
+        errorSound()
+        toast.error(signIn.error)
+        return
+      }
+
+      const response = await broadcastNewsletter(selectedBlogSlug)
 
       if (!response.success) {
         errorSound()
@@ -52,6 +113,7 @@ export function AdminNewsletterForm({ blogs }: { blogs: BlogPost[] }) {
       } else {
         toast.success(toastContent.newsletter.broadcastSuccess(response.data.count))
         setAdminSecret('')
+        setCodeSent(false)
         startCountdown(3)
       }
     } catch {
@@ -62,6 +124,11 @@ export function AdminNewsletterForm({ blogs }: { blogs: BlogPost[] }) {
     }
   }
 
+  async function handleSubmit(e: React.SyntheticEvent) {
+    e.preventDefault()
+    await (isReadyToSend ? broadcast() : requestCode())
+  }
+
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
       <div className="space-y-3">
@@ -69,7 +136,7 @@ export function AdminNewsletterForm({ blogs }: { blogs: BlogPost[] }) {
           items={blogOptions}
           value={selectedBlogSlug}
           onValueChange={setSelectedBlogSlug}
-          disabled={loading || countdown > 0}
+          disabled={isDisabled}
         >
           <SelectTrigger>
             <SelectValue placeholder={adminNewsletterContent.blogSelectPlaceholder} />
@@ -83,29 +150,60 @@ export function AdminNewsletterForm({ blogs }: { blogs: BlogPost[] }) {
           </SelectContent>
         </Select>
 
+        {/**
+         * Neither field is marked required, since which one is needed depends on the step. The
+         * browser would otherwise refuse to submit a code request over the empty code box.
+         */}
         <Input
-          type="password"
+          type="email"
+          autoComplete="email"
+          value={adminEmail}
+          onChange={(e) => {
+            setAdminEmail(e.target.value)
+            setCodeSent(false)
+          }}
+          placeholder={adminNewsletterContent.adminEmailPlaceholder}
+          disabled={isDisabled}
+        />
+
+        {/** Not lowercased or otherwise touched, since the code is case sensitive */}
+        <Input
+          type="text"
+          autoComplete="one-time-code"
+          spellCheck={false}
+          autoCapitalize="off"
+          maxLength={ADMIN_CODE_LENGTH}
           value={adminSecret}
-          onChange={(e) => setAdminSecret(e.target.value)}
-          placeholder={adminNewsletterContent.adminPasswordPlaceholder}
-          disabled={loading || countdown > 0}
-          required
+          onChange={(e) => setAdminSecret(e.target.value.replace(ADMIN_CODE_STRIP, ''))}
+          placeholder={adminNewsletterContent.adminCodePlaceholder}
+          disabled={isDisabled}
         />
       </div>
 
       <div className="flex justify-end">
-        <Button
-          type="submit"
-          disabled={loading || countdown > 0}
-          isPending={loading}
-          isSuccess={success}
-          countdown={countdown}
-          loadingText={adminNewsletterContent.buttonLoading}
-          successText={adminNewsletterContent.buttonSuccess}
-          successIcon={Icons.mailCheck}
-          defaultText={adminNewsletterContent.buttonDefault}
-          defaultIcon={Icons.broadcast}
-        />
+        {isReadyToSend ? (
+          <Button
+            type="submit"
+            disabled={isDisabled}
+            isPending={loading}
+            isSuccess={success}
+            countdown={countdown}
+            loadingText={adminNewsletterContent.buttonLoading}
+            successText={adminNewsletterContent.buttonSuccess}
+            successIcon={Icons.mailCheck}
+            defaultText={adminNewsletterContent.buttonDefault}
+            defaultIcon={Icons.broadcast}
+          />
+        ) : (
+          <Button
+            type="submit"
+            disabled={isDisabled || !hasValidAdminEmail || codeSent}
+            isPending={loading}
+            loadingText={adminNewsletterContent.sendCodeLoading}
+            defaultText={requestButtonText}
+            defaultIcon={Icons.mail}
+          />
+        )}
       </div>
     </form>
   )

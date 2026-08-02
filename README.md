@@ -188,8 +188,10 @@ sequenceDiagram
 
 - Neon Postgres stores view counts, newsletter subscribers and message-board entries.
 - View reads are batched and cached; increments use an atomic upsert and count once per session.
-- The public message board includes a honeypot, IP-based cooldown, cursor pagination and protected
-  admin replies/deletion.
+- Newsletter signup and message posting use atomic, HMAC-keyed server cooldowns backed by Postgres;
+  matching client timers persist across reloads and tabs without storing raw IP addresses.
+- The public message board also includes a honeypot, cursor pagination and protected admin
+  replies/deletion.
 - Resend and React Email power welcome emails, admin broadcasts and the weekly subscriber summary.
   The summary is sent even when the weekly count is zero.
 - GitHub stars and changelog data are fetched server-side; an optional token raises the API limit
@@ -268,27 +270,26 @@ exact host for Next.js development resources. The override affects development o
 | Variable | Required | Purpose |
 | --- | --- | --- |
 | `NEON_DATABASE_URL` | Yes | Neon Postgres connection string |
-| `ADMIN_PASSWORD` | Yes for admin tools | Message-board and newsletter administration |
+| `RATE_LIMIT_SECRET` | Yes | HMAC secret for pseudonymous public-action cooldown keys |
+| `OTP_EMAIL` | Yes for admin tools | Recipient for one-time admin access codes |
 | `ADMIN_EMAIL` | Yes for weekly summaries | Recipient for the scheduled subscriber report |
 | `RESEND_API_KEY` | Yes for email | Resend API authentication |
 | `RESEND_FROM_EMAIL` | Production email | Verified sender address |
 | `CRON_SECRET` | Yes in production | Bearer secret protecting the cron endpoint |
 | `GITHUB_TOKEN` | No | Raises GitHub API limits; public requests remain the fallback |
-| `NEXT_PUBLIC_ADMIN_LOGIN_PREFIX` | No | Custom browser-side admin login command |
-| `NEXT_PUBLIC_ADMIN_LOGOUT_COMMAND` | No | Custom browser-side admin logout command |
 
-Keep server secrets out of `NEXT_PUBLIC_*` variables. For Vercel, configure the same values in the
-project's environment-variable settings; the weekly schedule itself is declared in `vercel.json`.
-
-Vercel does not generate `CRON_SECRET`; it automatically sends the value you configure as a bearer
-token when invoking the cron route. Generate a secure value with:
+Keep server secrets out of `NEXT_PUBLIC_*` variables. Generate independent values for the rate-limit
+HMAC and cron authentication:
 
 ```bash
-node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+node -e "console.log('RATE_LIMIT_SECRET=' + require('crypto').randomBytes(32).toString('hex'))"
+node -e "console.log('CRON_SECRET=' + require('crypto').randomBytes(32).toString('hex'))"
 ```
 
-Add the generated value as `CRON_SECRET` in the Vercel Production environment, then redeploy the
-application so the scheduled route can authenticate successfully.
+Add both generated assignments to local `.env` and the corresponding Vercel environment settings.
+Do not reuse one value for both purposes. Vercel does not generate `CRON_SECRET`; it sends the value
+you configure as a bearer token when invoking the weekly route. The schedule is declared in
+`vercel.json`. Redeploy after adding or rotating either secret.
 
 ---
 

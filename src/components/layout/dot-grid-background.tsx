@@ -45,7 +45,7 @@ export function DotGridBackground() {
       sctx.clearRect(0, 0, spriteSize, spriteSize)
       sctx.fillStyle =
         getComputedStyle(document.documentElement).getPropertyValue('--dot-color').trim() ||
-        'oklch(0.32 0 0)'
+        'oklch(0.34 0 0)'
       sctx.beginPath()
       sctx.arc(spriteSize / 2, spriteSize / 2, radius * dpr, 0, TWO_PI)
       sctx.fill()
@@ -61,7 +61,7 @@ export function DotGridBackground() {
       points.length = 0
       for (let x = -SPACING / 2; x < w + SPACING; x += SPACING) {
         for (let y = -SPACING / 2; y < h + SPACING; y += SPACING) {
-          points.push({ x, y, nx: x / SCALE, ny: y / SCALE, opacity: Math.random() * 0.5 + 0.5 })
+          points.push({ x, y, nx: x / SCALE, ny: y / SCALE, opacity: Math.random() * 0.46 + 0.54 })
         }
       }
     }
@@ -78,7 +78,7 @@ export function DotGridBackground() {
         const cos = Math.cos(rad)
         const cx = p.x + cos * len
         const cy = p.y + Math.sin(rad) * len
-        ctx.globalAlpha = (Math.abs(cos) * 0.8 + 0.2) * p.opacity
+        ctx.globalAlpha = (Math.abs(cos) * 0.76 + 0.24) * p.opacity
         ctx.drawImage(sprite, cx * dpr - halfDev, cy * dpr - halfDev)
       }
       ctx.globalAlpha = 1

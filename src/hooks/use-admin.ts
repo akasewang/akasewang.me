@@ -1,64 +1,55 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
+import { checkAdminSession, signInAdmin, signOutAdmin } from '@/lib/actions/admin-session-actions'
 
-const STORAGE_KEY = 'adminKey'
 /** storage only fires in other tabs, so same tab listeners need an event of their own */
 const TOGGLE_EVENT = 'adminModeToggled'
 
 /**
- * Mirrors the stored admin credential across every component and tab. This only decides what the
- * UI offers: Server Actions revalidate the credential on each privileged mutation, so a forged
- * value here buys nothing.
+ * Mirrors whether a session is open across every component and tab. It holds a flag and nothing
+ * else: the session lives in an httpOnly cookie the browser cannot read, so there is no credential
+ * here to steal or forge, and every privileged action checks the cookie again for itself.
  */
 export function useAdmin() {
-  const [adminKey, setAdminKey] = useState<string | null>(null)
+  const [isAdmin, setIsAdmin] = useState(false)
 
   useEffect(() => {
-    const syncState = () => {
-      try {
-        setAdminKey(localStorage.getItem(STORAGE_KEY))
-      } catch {
-        setAdminKey(null)
-      }
-    }
+    let active = true
 
-    const handleStorage = (e: StorageEvent) => {
-      if (e.key === STORAGE_KEY) {
-        setAdminKey(e.newValue)
-      }
+    const syncState = () => {
+      checkAdminSession()
+        .then((open) => {
+          if (active) setIsAdmin(open)
+        })
+        .catch(() => {
+          if (active) setIsAdmin(false)
+        })
     }
 
     syncState()
-
     window.addEventListener(TOGGLE_EVENT, syncState)
-    window.addEventListener('storage', handleStorage)
+    window.addEventListener('focus', syncState)
 
     return () => {
+      active = false
       window.removeEventListener(TOGGLE_EVENT, syncState)
-      window.removeEventListener('storage', handleStorage)
+      window.removeEventListener('focus', syncState)
     }
   }, [])
 
-  const loginAdmin = useCallback((key: string) => {
-    if (typeof window === 'undefined') return
-    try {
-      localStorage.setItem(STORAGE_KEY, key)
-      setAdminKey(key)
-    } catch {
-      setAdminKey(null)
-    }
+  const loginAdmin = useCallback(async (code: string) => {
+    const result = await signInAdmin(code)
+    setIsAdmin(result.success)
+    window.dispatchEvent(new Event(TOGGLE_EVENT))
+    return result
+  }, [])
+
+  const logoutAdmin = useCallback(async () => {
+    await signOutAdmin()
+    setIsAdmin(false)
     window.dispatchEvent(new Event(TOGGLE_EVENT))
   }, [])
 
-  const logoutAdmin = useCallback(() => {
-    if (typeof window === 'undefined') return
-    try {
-      localStorage.removeItem(STORAGE_KEY)
-    } catch {}
-    setAdminKey(null)
-    window.dispatchEvent(new Event(TOGGLE_EVENT))
-  }, [])
-
-  return { adminKey, loginAdmin, logoutAdmin }
+  return { isAdmin, loginAdmin, logoutAdmin }
 }

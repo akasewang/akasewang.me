@@ -7,24 +7,31 @@ import { NewsletterTemplate } from '@/components/emails/newsletter-template'
 import { FULL_NAME, READING_SPEED, SITE_URL } from '@/constants/constants'
 import { logContent } from '@/data/content/log-content'
 import { toastContent } from '@/data/content/toast-content'
+import { hasAdminSession } from '@/lib/admin-session'
 import { db } from '@/lib/db/drizzle'
 import { newsletterSubscribers } from '@/lib/db/schema'
 import { getAllBlogPosts, getBlogPost } from '@/lib/managers/blog-manager'
 import { getResend, SENDER_EMAIL } from '@/lib/resend'
 import type { ActionResult } from '@/types/actions'
 
+/** The provider's ceiling for one batch call */
+const BATCH_SIZE = 100
+/** Its rate limit is two requests a second, so calls are held just over half a second apart */
+const BATCH_INTERVAL_MS = 550
+
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
+
 /**
  * Sends one blog post to every active subscriber. The template is rendered once with a placeholder
  * token and the per person unsubscribe link is substituted in, so a large list costs one render
- * rather than one each. Sending goes out in batches of a hundred, the provider's limit per call.
+ * rather than one each.
  */
 export async function broadcastNewsletter(
   blogSlug: string,
-  adminSecret: string,
 ): Promise<ActionResult<{ count: number }>> {
   const toasts = toastContent.newsletter
 
-  if (!process.env.ADMIN_PASSWORD || adminSecret !== process.env.ADMIN_PASSWORD) {
+  if (!(await hasAdminSession())) {
     return { success: false, error: toasts.unauthorized }
   }
 
@@ -70,21 +77,46 @@ export async function broadcastNewsletter(
       }),
     )
 
-    const payloads = activeSubscribers.map((s) => ({
-      from: `${FULL_NAME} <${SENDER_EMAIL}>`,
-      to: s.email,
-      subject: targetPost.title,
-      html: baseHtmlContent.replace('{{UNSUBSCRIBE_TOKEN}}', s.token),
-    }))
-
     const resend = getResend()
+    const total = activeSubscribers.length
+    let sent = 0
 
-    for (let i = 0; i < payloads.length; i += 100) {
-      const { error } = await resend.batch.send(payloads.slice(i, i + 100))
-      if (error) throw new Error(error.message)
+    for (let i = 0; i < total; i += BATCH_SIZE) {
+      const batch = activeSubscribers.slice(i, i + BATCH_SIZE)
+
+      /**
+       * Built per batch. Every payload carries its own copy of the rendered body, so building them
+       * all up front would hold one full copy of the email per subscriber before any are sent.
+       */
+      const payloads = batch.map((s) => ({
+        from: `${FULL_NAME} <${SENDER_EMAIL}>`,
+        to: s.email,
+        subject: targetPost.title,
+        /**
+         * replaceAll, not replace: a string pattern given to replace takes only the first hit, so a
+         * second unsubscribe link would ship the placeholder itself as literal text.
+         */
+        html: baseHtmlContent.replaceAll('{{UNSUBSCRIBE_TOKEN}}', s.token),
+      }))
+
+      const { error } = await resend.batch.send(payloads)
+
+      /**
+       * Reported rather than thrown, because the batches before this one have already gone out and
+       * a bare failure would leave the sender with no idea how far it got.
+       */
+      if (error) {
+        console.error(logContent.newsletter.broadcastError, error.message)
+        return { success: false, error: toasts.partialBroadcast(sent, total) }
+      }
+
+      sent += batch.length
+
+      /** Resend allows two requests a second and a batch is one request, so the loop paces itself */
+      if (sent < total) await sleep(BATCH_INTERVAL_MS)
     }
 
-    return { success: true, data: { count: activeSubscribers.length } }
+    return { success: true, data: { count: sent } }
   } catch (err) {
     console.error(logContent.newsletter.broadcastError, err instanceof Error ? err.message : err)
     return { success: false, error: toasts.broadcastError }

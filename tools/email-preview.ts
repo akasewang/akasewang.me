@@ -9,6 +9,7 @@
 import { watch } from 'node:fs'
 import fs from 'node:fs/promises'
 import http from 'node:http'
+import { createRequire, register } from 'node:module'
 import path from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import { render } from '@react-email/components'
@@ -19,11 +20,6 @@ type EmailTemplateComponent = ComponentType<Record<string, unknown>> & {
 }
 type EmailTemplateExports = Record<string, unknown>
 
-interface CachedTemplateModule {
-  templateExports: EmailTemplateExports
-  mtimeMs: number
-}
-
 interface TemplateDefinition {
   slug: string
   label: string
@@ -32,8 +28,44 @@ interface TemplateDefinition {
 }
 
 const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
-const templatesDir = path.join(rootDir, 'src', 'components', 'emails')
-const moduleCache = new Map<string, CachedTemplateModule>()
+const srcDir = path.join(rootDir, 'src')
+const templatesDir = path.join(srcDir, 'components', 'emails')
+const emailAssetsDir = path.join(rootDir, 'public', 'email')
+
+const ASSET_CONTENT_TYPES: Record<string, string> = {
+  '.png': 'image/png',
+  '.jpg': 'image/jpeg',
+  '.jpeg': 'image/jpeg',
+  '.gif': 'image/gif',
+  '.svg': 'image/svg+xml',
+}
+
+/**
+ * An email has no page to resolve a relative path against, so the templates point their images at
+ * the deployed origin. That would leave every one of them broken here until a deploy, so they are
+ * pointed back at this server, which serves the same files straight out of public.
+ */
+const ABSOLUTE_EMAIL_ASSET = /https?:\/\/[^"'\s]+?\/email\//g
+
+/**
+ * Bumped whenever a watched file changes. The loader hook stamps it onto the template URL, which is
+ * what gets a template re-imported rather than served from the module registry. Shared memory is
+ * what lets the hook read it on its own thread. Freeing the modules a template imports takes the
+ * separate purge below, so both are needed for an edit to show up.
+ */
+const generation = new Int32Array(new SharedArrayBuffer(4))
+
+try {
+  register('./email-preview-loader.mts', {
+    parentURL: import.meta.url,
+    data: { generation, watchedPrefix: `${pathToFileURL(srcDir).href}/` },
+  })
+} catch (error) {
+  console.warn(
+    'Module hooks are unavailable, so edits will need a restart to show up:',
+    error instanceof Error ? error.message : error,
+  )
+}
 
 function toLabel(slug: string): string {
   return slug
@@ -67,6 +99,20 @@ async function discoverTemplates(): Promise<TemplateDefinition[]> {
     })
 }
 
+const requireFromTools = createRequire(import.meta.url)
+
+/**
+ * The package is not declared as a module, so tsx compiles these files to CommonJS and a template's
+ * own imports become requires. Those are keyed by path in a cache the module URL never reaches,
+ * which is why the generation alone would leave a shared file stale. Dropping the src entries lets
+ * the next render pull them off disk again.
+ */
+function purgeCommonJsCache() {
+  for (const key of Object.keys(requireFromTools.cache)) {
+    if (key.startsWith(srcDir)) delete requireFromTools.cache[key]
+  }
+}
+
 const reloadClients = new Set<http.ServerResponse>()
 
 function broadcastReload() {
@@ -82,7 +128,12 @@ function watchTemplates() {
   try {
     watch(templatesDir, { recursive: true }, () => {
       clearTimeout(debounce)
-      debounce = setTimeout(broadcastReload, 120)
+      debounce = setTimeout(() => {
+        /** Ordered so the reload the browser is about to ask for lands on the new generation */
+        Atomics.add(generation, 0, 1)
+        purgeCommonJsCache()
+        broadcastReload()
+      }, 120)
     })
   } catch {
     console.warn('File watching is unavailable; live reload is disabled.')
@@ -112,39 +163,24 @@ function escapeHtml(value: string) {
     .replaceAll("'", '&#39;')
 }
 
-const globalsCssPath = path.join(rootDir, 'src', 'app', 'globals.css')
-let themeTokensCache: string | null = null
+const globalsCssPath = path.join(srcDir, 'app', 'globals.css')
 
 /**
  * Lifts the :root custom properties out of the app's stylesheet so the shell around the preview
- * matches the site. Cached because it cannot change without restarting this server.
+ * matches the site. Read afresh each time, since a shell render only happens on a full page load
+ * and a cache here would leave the chrome on an old palette after the stylesheet is edited.
  */
 async function getThemeTokens(): Promise<string> {
-  if (themeTokensCache === null) {
-    const css = await fs.readFile(globalsCssPath, 'utf8')
-    themeTokensCache = css.match(/:root\s*\{[^}]*\}/)?.[0] ?? ':root {}'
-  }
-
-  return themeTokensCache
+  const css = await fs.readFile(globalsCssPath, 'utf8')
+  return css.match(/:root\s*\{[^}]*\}/)?.[0] ?? ':root {}'
 }
 
 /**
- * Imports a template, keyed by its modification time. ES module imports are cached permanently by
- * the runtime, so the timestamp in the URL is what makes a saved edit load at all.
+ * The loader hook re-keys this URL with the current generation, so a plain import here returns the
+ * cached module while nothing has changed and a rebuilt graph once something has.
  */
 async function importTemplateModule(filePath: string): Promise<EmailTemplateExports> {
-  const { mtimeMs } = await fs.stat(filePath)
-  const cachedModule = moduleCache.get(filePath)
-
-  if (cachedModule?.mtimeMs === mtimeMs) {
-    return cachedModule.templateExports
-  }
-
-  const moduleUrl = `${pathToFileURL(filePath).href}?mtime=${mtimeMs}`
-  const templateExports = (await import(moduleUrl)) as EmailTemplateExports
-  moduleCache.set(filePath, { templateExports, mtimeMs })
-
-  return templateExports
+  return (await import(pathToFileURL(filePath).href)) as EmailTemplateExports
 }
 
 async function renderTemplate(template: TemplateDefinition): Promise<string> {
@@ -160,12 +196,14 @@ async function renderTemplate(template: TemplateDefinition): Promise<string> {
 
   /**
    * The email is its own document inside the iframe, so the shell's scrollbar styling cannot reach
-   * it. This injects the site's thin scrollbar, toned for the light email background.
+   * it. This injects the site's thin scrollbar, toned for the dark email background.
    */
-  return html.replace(
-    '</head>',
-    '<style>*{scrollbar-width:thin;scrollbar-color:#c7c7cc transparent}</style></head>',
-  )
+  return html
+    .replace(
+      '</head>',
+      '<style>*{scrollbar-width:thin;scrollbar-color:#222222 transparent}</style></head>',
+    )
+    .replace(ABSOLUTE_EMAIL_ASSET, '/email/')
 }
 
 function renderShell(
@@ -445,7 +483,7 @@ function renderShell(
         width: 100%;
         min-height: 0;
         border: 0;
-        background: #f5f5f7;
+        background: #030303;
         transition: opacity 280ms ease;
       }
 
@@ -657,6 +695,25 @@ function redirect(response: http.ServerResponse, location: string) {
   response.end()
 }
 
+/** Resolved against the assets directory and checked, so a traversal cannot read outside it */
+async function sendEmailAsset(response: http.ServerResponse, requestedName: string) {
+  const filePath = path.resolve(emailAssetsDir, requestedName)
+  const contentType = ASSET_CONTENT_TYPES[path.extname(filePath).toLowerCase()]
+
+  if (!filePath.startsWith(emailAssetsDir + path.sep) || !contentType) {
+    sendHtml(response, '<h1>Not found</h1>', 404)
+    return
+  }
+
+  try {
+    const file = await fs.readFile(filePath)
+    response.writeHead(200, { 'content-type': contentType, 'cache-control': 'no-store' })
+    response.end(file)
+  } catch {
+    sendHtml(response, '<h1>Not found</h1>', 404)
+  }
+}
+
 const server = http.createServer(async (request, response) => {
   const url = new URL(request.url ?? '/', `http://${request.headers.host ?? 'localhost'}`)
   const [, route, slug] = url.pathname.split('/')
@@ -670,6 +727,11 @@ const server = http.createServer(async (request, response) => {
     response.write('retry: 1000\n\n')
     reloadClients.add(response)
     request.on('close', () => reloadClients.delete(response))
+    return
+  }
+
+  if (route === 'email') {
+    await sendEmailAsset(response, url.pathname.slice('/email/'.length))
     return
   }
 

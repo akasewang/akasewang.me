@@ -38,7 +38,7 @@
     --verified-deep: oklch(0.546 0.245 262.881);
     --success: oklch(0.696 0.170 162.000);
     --warning: oklch(0.800 0.160 85.000);
-    --dot-color: oklch(0.32 0 0);
+    --dot-color: oklch(0.34 0 0);
 
     --accent: color-mix(in oklab, var(--muted) 40%, transparent);
     --overlay-accent: color-mix(in oklab, var(--muted) 40%, transparent);

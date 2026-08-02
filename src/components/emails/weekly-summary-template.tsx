@@ -1,101 +1,111 @@
-import { Column, Heading, Row, Section, Text } from '@react-email/components'
+import { Column, Heading, Img, Row, Section, Text } from '@react-email/components'
+import type { EmailDateInput } from './email-template-shared'
 import {
-  EmailHeader,
+  EmailDissolve,
   EmailShell,
+  EmailWordmark,
+  LIST_MARK_SIZE,
   emailFonts,
-  emailStyles,
+  emailLayout,
   emailTheme,
+  formatEmailDate,
+  getListMarkUrl,
 } from './email-template-shared'
 
 interface WeeklySummaryTemplateProps {
-  subscriberCount: number
   newEmails?: string[]
-  summaryDate?: string | number | Date
+  summaryDate?: EmailDateInput
 }
 
-const styles = {
-  ...emailStyles,
-  heading: {
-    ...emailStyles.heading,
-    margin: 0,
-  },
-  emailSection: {
-    borderTop: `1px dashed ${emailTheme.border}`,
-    padding: '28px 32px',
-  },
-  emailsLabel: {
-    margin: '0 0 18px',
-    fontFamily: emailFonts.mono,
-    fontSize: '11px',
-    color: emailTheme.dim,
-    lineHeight: '16px',
-  },
-  emailRow: { marginBottom: '14px' },
-  emailIndexCol: { width: '32px', verticalAlign: 'top' as const },
-  emailIndex: {
+const VISIBLE_SIGNUPS = 3
+
+const s = {
+  address: {
     margin: 0,
     fontFamily: emailFonts.mono,
-    fontSize: '11px',
-    color: emailTheme.dim,
+    fontSize: '14px',
     lineHeight: '22px',
-  },
-  emailText: {
-    margin: 0,
-    fontFamily: emailFonts.mono,
-    fontSize: '13px',
     color: emailTheme.text,
-    lineHeight: '22px',
     wordBreak: 'break-all' as const,
   },
-}
+  remainder: { ...emailLayout.micro, margin: '18px 0 0' },
+} as const
 
 const defaultEmails = [
   'alex.rivera@example.com',
   'sarah.j@techflow.io',
   'marcus.dev@github.com',
   'elara.vance@design.co',
+  'noor.haddad@parallel.dev',
+  't.okonkwo@fieldnotes.app',
+  'jonas.kruger@studiolm.de',
+  'priya.nair@quietloop.in',
+  'm.laurent@atelier.fr',
+  'sam.whitfield@northbound.co',
+  'yuki.tanabe@hoshi.jp',
+  'ines.correia@margem.pt',
 ]
 
 export const WeeklySummaryTemplate = ({
-  subscriberCount = 12,
   newEmails = defaultEmails,
   summaryDate,
 }: WeeklySummaryTemplateProps) => {
+  const subscriberCount = newEmails.length
+
   const headingText =
     subscriberCount === 1
       ? '1 new subscriber this week.'
       : `${subscriberCount} new subscribers this week.`
 
+  const meta = [formatEmailDate(summaryDate), 'weekly summary'].filter(Boolean).join(' · ')
+
+  const shown = newEmails.slice(0, VISIBLE_SIGNUPS)
+  const remaining = subscriberCount - shown.length
+
   return (
     <EmailShell preview={headingText}>
-      <EmailHeader date={summaryDate} />
-
-      <Section style={styles.mainSection}>
-        <Text style={styles.eyebrow}>weekly summary</Text>
-        <Heading as="h1" style={styles.heading}>
+      <Section className="e-opener" style={emailLayout.opener}>
+        <Text style={emailLayout.meta}>{meta}</Text>
+        <Heading as="h1" className="e-headline" style={emailLayout.headline}>
           {headingText}
         </Heading>
       </Section>
 
-      {newEmails.length > 0 && (
-        <Section style={styles.emailSection}>
-          <Text style={styles.emailsLabel}>recent signups</Text>
-          {newEmails.map((email, index) => (
-            <Row key={index} style={styles.emailRow}>
-              <Column style={styles.emailIndexCol}>
-                <Text style={styles.emailIndex}>{String(index + 1).padStart(2, '0')}</Text>
+      {shown.length > 0 && (
+        <Section className="e-body" style={emailLayout.bodySection}>
+          <Text style={emailLayout.sectionLabel}>Recent signups</Text>
+
+          {shown.map((email, index) => (
+            <Row
+              key={email}
+              style={index === shown.length - 1 ? emailLayout.listRowLast : emailLayout.listRow}
+            >
+              <Column style={emailLayout.markCol}>
+                <Img
+                  src={getListMarkUrl(index)}
+                  width={LIST_MARK_SIZE}
+                  height={LIST_MARK_SIZE}
+                  alt=""
+                  style={emailLayout.mark}
+                />
               </Column>
-              <Column>
-                <Text style={styles.emailText}>{email}</Text>
+              <Column style={emailLayout.rowCol}>
+                <Text style={s.address}>{email}</Text>
               </Column>
             </Row>
           ))}
+
+          {remaining > 0 && (
+            <Text style={s.remainder}>
+              and {remaining} more {remaining === 1 ? 'address' : 'addresses'}
+            </Text>
+          )}
         </Section>
       )}
 
-      <Section style={styles.footerSection}>
-        <Text style={styles.footerSecondary}>Weekly digest · automated notification</Text>
-      </Section>
+      <EmailDissolve />
+
+      <EmailWordmark spaceAbove="44px" />
     </EmailShell>
   )
 }

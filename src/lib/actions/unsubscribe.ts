@@ -10,11 +10,18 @@ import { newsletterSubscribers } from '@/lib/db/schema'
  * that is a stale link and not a fault.
  */
 export type UnsubscribeResult = 'success' | 'invalid' | 'error'
+
+/**
+ * The column is a uuid, so anything that is not one fails to cast inside Postgres and would come
+ * back as an error rather than the invalid this promises. A mangled link is a stale link.
+ */
+const TOKEN_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+
 export async function unsubscribeAction(token: string): Promise<UnsubscribeResult> {
   if (typeof token !== 'string') return 'invalid'
 
   const normalizedToken = token.trim()
-  if (!normalizedToken) return 'invalid'
+  if (!TOKEN_REGEX.test(normalizedToken)) return 'invalid'
   try {
     const updated = await db
       .update(newsletterSubscribers)

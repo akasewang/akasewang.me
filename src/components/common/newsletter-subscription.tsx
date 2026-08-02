@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { Icons } from '@/components/ui/icons'
+import { SUBSCRIBE_COOLDOWN_SECONDS } from '@/constants/rate-limits'
 import { newsletterContent } from '@/data/content/newsletter-content'
 import { toastContent } from '@/data/content/toast-content'
 import { useSoundEffects } from '@/hooks/use-sound-effects'
@@ -28,10 +29,13 @@ export function NewsletterSubscription({ hideHeader = false }: { hideHeader?: bo
       const result = await subscribeAction(email.trim())
 
       if (!result.success) {
-        throw new Error(result.error)
+        errorSound()
+        toast.error(result.error)
+        showError(result.error, result.retryAfterSeconds)
+        return
       }
 
-      startCountdown(300)
+      startCountdown(SUBSCRIBE_COOLDOWN_SECONDS)
       setEmail('')
 
       const successMessage = result.data.isNew

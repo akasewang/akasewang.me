@@ -20,6 +20,38 @@ A high level look at how the site runs, handles data and manages SEO.
     into one `getViewsBatchAction` (`WHERE slug IN (...)`) and caches the result in `localStorage`
     for five minutes. Incremented counts update from the value returned by the database.
 
+## Public Action Cooldowns
+
+- Newsletter signup has a 60-second cooldown; public message posting has a 120-second cooldown.
+- Both clients persist the matching deadline in local storage for consistent feedback across
+  reloads and tabs. This is UX only; the server remains authoritative.
+- The server HMACs the action and forwarded client IP with `RATE_LIMIT_SECRET`, then atomically
+  inserts or advances that key in `action_rate_limit`. Concurrent serverless requests cannot both
+  claim the same active window, and raw IP addresses are not stored.
+- Rate-limited responses include the remaining seconds so the button reflects the database deadline
+  instead of starting a new hardcoded interval.
+- The weekly summary job deletes expired cooldown rows, keeping the table bounded.
+
+Generate an independent secret for cooldown keys:
+
+```bash
+node -e "console.log('RATE_LIMIT_SECRET=' + require('crypto').randomBytes(32).toString('hex'))"
+```
+
+## Scheduled Newsletter Summary
+
+- Vercel invokes `/api/cron/weekly-summary` every Sunday at `09:00 UTC`, as declared in
+  `vercel.json`.
+- The route requires `Authorization: Bearer <CRON_SECRET>`, reads the week's active signups, cleans
+  expired cooldown rows and sends the summary through Resend.
+- Vercel does not create the secret. Generate it separately from `RATE_LIMIT_SECRET`:
+
+```bash
+node -e "console.log('CRON_SECRET=' + require('crypto').randomBytes(32).toString('hex'))"
+```
+
+Configure both secrets in local `.env` and in Vercel, then redeploy after adding or rotating them.
+
 ## GitHub Integration
 
 - The navbar star count and `/changelog` both read the repository through one server side helper, `fetchGithub` (`src/lib/github.ts`).

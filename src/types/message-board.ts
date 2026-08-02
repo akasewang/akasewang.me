@@ -8,6 +8,9 @@ export interface MessageBoardContent {
   buttonLoading: string
   buttonSuccess: string
   buttonDefault: string
+  buttonSendCode: string
+  buttonEnterCode: string
+  buttonSignIn: string
   loadingMore: string
   endOfMessages: string
   offline: string

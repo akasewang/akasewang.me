@@ -13,6 +13,13 @@ export const SMOOTH_SPRING_TRANSITION: Transition = {
   restDelta: 0.001,
 }
 
+/** Button labels follow the link arrow: the old face rises out as the next one rises in. */
+export const BUTTON_SWAP_TRANSITION: Transition = {
+  type: 'tween',
+  ease: 'easeOut',
+  duration: 0.2,
+}
+
 export const ZOOM_EASE: Transition = {
   type: 'tween',
   ease: 'easeOut',

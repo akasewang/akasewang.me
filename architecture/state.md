@@ -24,8 +24,9 @@ address with `window.history.replaceState`, avoiding a navigation, history entry
   [overview](overview.md).
 - **`useGithubStars`:** Reads from `/api/github-stars`, deduplicates concurrent callers with a
   module-level promise and caches valid counts in `localStorage` for 15 minutes.
-- **`useAdmin`:** Stores the supplied admin credential in `localStorage` and synchronizes it across
-  components and tabs. Server Actions still validate the credential for every privileged mutation.
+- **`useAdmin`:** Reads the server-side admin session and synchronizes its status across components
+  and tabs. The credential remains in an httpOnly cookie, and Server Actions validate the session
+  for every privileged mutation.
 - **`useContentListState`:** Provides category, search and view/date sorting for blog and project
   lists. It synchronizes URL parameters and prefetches view counts.
 - **`useCategoryParam`:** Shares category-only URL state across catalog, skills and photos. The

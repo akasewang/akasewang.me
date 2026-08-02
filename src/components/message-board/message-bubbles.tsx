@@ -18,13 +18,13 @@ type MessageBubblesProps = {
   msg: MessageBoardEntry
   msgDate: Date
   showDayHeader: boolean
-  adminKey: string | null
+  isAdmin: boolean
   onDelete: (id: number) => void
   onReply: (id: number, text: string) => Promise<boolean>
 }
 
 export const MessageBubbles = memo(
-  ({ msg, msgDate, showDayHeader, adminKey, onDelete, onReply }: MessageBubblesProps) => {
+  ({ msg, msgDate, showDayHeader, isAdmin, onDelete, onReply }: MessageBubblesProps) => {
     const { tap, clickPop, hoverTick } = useSoundEffects()
     const [isReplying, setIsReplying] = useState(false)
     const [isSubmitting, setIsSubmitting] = useState(false)
@@ -74,7 +74,7 @@ export const MessageBubbles = memo(
               </p>
               <p className="mt-1.5 text-right text-[11px] text-muted-foreground/50">{timeString}</p>
             </div>
-            {adminKey && (
+            {isAdmin && (
               <div className="ml-2 mt-1.5 flex items-center gap-3">
                 <button
                   type="button"
@@ -125,7 +125,7 @@ export const MessageBubbles = memo(
                 </p>
                 <p className="mt-1.5 text-left text-[11px] text-white/50">{timeString}</p>
               </div>
-              {adminKey && !isReplying && (
+              {isAdmin && !isReplying && (
                 <button
                   type="button"
                   onClick={() => {

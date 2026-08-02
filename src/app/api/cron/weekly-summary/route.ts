@@ -1,10 +1,10 @@
 import { render } from '@react-email/components'
-import { and, eq, gte } from 'drizzle-orm'
+import { and, eq, gte, lt } from 'drizzle-orm'
 import { NextResponse } from 'next/server'
 import React from 'react'
 import { WeeklySummaryTemplate } from '@/components/emails/weekly-summary-template'
 import { db } from '@/lib/db/drizzle'
-import { newsletterSubscribers } from '@/lib/db/schema'
+import { actionRateLimit, newsletterSubscribers } from '@/lib/db/schema'
 import { getResend, SENDER_EMAIL } from '@/lib/resend'
 
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL
@@ -28,21 +28,28 @@ export async function GET(request: Request) {
     const oneWeekAgo = new Date()
     oneWeekAgo.setDate(oneWeekAgo.getDate() - 7)
 
-    const recentSubscribers = await db.query.newsletterSubscribers.findMany({
-      where: and(
-        eq(newsletterSubscribers.isActive, true),
-        gte(newsletterSubscribers.createdAt, oneWeekAgo),
-      ),
-      columns: { email: true },
-    })
-
-    const count = recentSubscribers.length
+    const [, recentSubscribers] = await Promise.all([
+      /** Cooldown rows have no value after expiry; the weekly job keeps the table bounded */
+      db.delete(actionRateLimit).where(lt(actionRateLimit.expiresAt, new Date())),
+      db.query.newsletterSubscribers.findMany({
+        where: and(
+          eq(newsletterSubscribers.isActive, true),
+          gte(newsletterSubscribers.createdAt, oneWeekAgo),
+        ),
+        columns: { email: true },
+      }),
+    ])
 
     const emails = recentSubscribers.map((s) => s.email)
+    const count = emails.length
 
+    /**
+     * The addresses are the whole of what the template is told. It counts them itself, so the
+     * heading it sets and the subject line below are read off one array rather than off a number
+     * passed alongside it that nothing kept in step.
+     */
     const htmlContent = await render(
       React.createElement(WeeklySummaryTemplate, {
-        subscriberCount: count,
         newEmails: emails,
       }),
     )

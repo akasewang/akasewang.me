@@ -11,7 +11,7 @@ import { ProfilePicture } from '@/components/ui/profile-picture'
 import { TextFlip } from '@/components/ui/text-flip'
 import { EMAIL, FULL_NAME } from '@/constants/constants'
 import { landingPageContent } from '@/data/content/landing-content'
-import { inactiveSocials, socialGroups } from '@/data/static/social'
+import { socialGroups } from '@/data/static/social'
 import { renderWithLinks } from '@/utils/content-utils'
 
 export function HeroSection() {
@@ -75,23 +75,6 @@ export function HeroSection() {
           {hero.mailMeAt} <LinkText href={`mailto:${EMAIL}`}>{EMAIL}</LinkText>
         </p>
       </div>
-
-      {inactiveSocials.length > 0 && (
-        <div className="space-y-2">
-          <p className="text-sm text-muted-foreground">{hero.inactivePrefix}</p>
-          <div className="flex flex-wrap gap-x-4 gap-y-2">
-            {inactiveSocials.map((link) => (
-              <LinkText
-                key={link.label}
-                href={link.href}
-                className="text-muted-foreground supports-hover:hover:text-muted-foreground active:text-muted-foreground"
-              >
-                {link.label}
-              </LinkText>
-            ))}
-          </div>
-        </div>
-      )}
 
       <div className="space-y-4">
         <p className="text-sm text-foreground">{hero.connectText}</p>

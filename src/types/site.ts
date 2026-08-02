@@ -42,7 +42,6 @@ type SocialCategory = (typeof SOCIAL_CATEGORIES)[number]['value']
 export interface SocialLink {
   href: string
   label: string
-  display: string
   category: SocialCategory
 }
 
@@ -66,21 +65,20 @@ export interface ViewsContent {
 
 export interface ToastMessages {
   newsletter: {
-    success: string
-    error: string
     broadcastSuccess: (count: number) => string
-    passwordRequired: string
     unexpectedError: string
     unauthorized: string
     postNotFound: string
     noSubscribers: string
     broadcastError: string
+    partialBroadcast: (sent: number, total: number) => string
+    otpSent: string
+    otpUnavailable: string
+    otpEmailRequired: string
   }
   messageBoard: {
     success: string
-    error: string
     adminLogin: string
-    adminLogout: string
     connectionError: string
     botDetected: string
     invalidName: string

@@ -13,7 +13,6 @@ interface HeroContent {
   scheduleMeet: string
   messageBoard: string
   mailMeAt: string
-  inactivePrefix: string
   scheduleMeetUrl: string
   designsLabel: string
   designsUrl: string

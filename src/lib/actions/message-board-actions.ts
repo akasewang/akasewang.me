@@ -1,29 +1,22 @@
 'use server'
 
-import { and, desc, eq, gt, lt } from 'drizzle-orm'
+import { desc, eq, lt } from 'drizzle-orm'
 import { revalidatePath } from 'next/cache'
-import { headers } from 'next/headers'
 import { MESSAGES_PER_PAGE } from '@/constants/constants'
+import { MESSAGE_BOARD_COOLDOWN_SECONDS } from '@/constants/rate-limits'
 import { toastContent } from '@/data/content/toast-content'
 import { db } from '@/lib/db/drizzle'
 import { messageBoard } from '@/lib/db/schema'
+import { hasAdminSession } from '@/lib/admin-session'
+import { getClientIp } from '@/lib/request-ip'
+import { claimRateLimit } from '@/lib/rate-limit'
 import type { ActionResult } from '@/types/actions'
 import type { MessageBoardEntry } from '@/types/message-board'
-
-/**
- * Checked on the server for every privileged action, so the client holding a credential only ever
- * decides what to offer. An unset password fails closed rather than matching an empty secret.
- */
-const isAdmin = (secret: unknown) =>
-  typeof secret === 'string' &&
-  Boolean(process.env.ADMIN_PASSWORD) &&
-  secret === process.env.ADMIN_PASSWORD
 
 const MESSAGE_MIN_LENGTH = 2
 const MESSAGE_MAX_LENGTH = 500
 const NAME_MAX_LENGTH = 80
 const REPLY_MAX_LENGTH = 500
-const RATE_LIMIT_WINDOW_MS = 120000
 const MAX_MESSAGES_PER_PAGE = 50
 
 type MessageBoardCursor = Pick<MessageBoardEntry, 'id'>
@@ -38,12 +31,17 @@ function normalizeCursor(cursor?: MessageBoardCursor | null) {
   return { id: cursor.id }
 }
 
-function validateAdminMutation(
+/**
+ * Checked on the server for every privileged action. The caller passes no credential at all now, so
+ * what the browser holds only decides what the interface offers and there is nothing to forge.
+ */
+async function validateAdminMutation(
   id: number,
-  adminSecret: string,
   errorMessage: string,
-): ActionResult | null {
-  if (!isAdmin(adminSecret)) return { success: false, error: toastContent.newsletter.unauthorized }
+): Promise<ActionResult | null> {
+  if (!(await hasAdminSession())) {
+    return { success: false, error: toastContent.newsletter.unauthorized }
+  }
   if (!Number.isInteger(id) || id <= 0) return { success: false, error: errorMessage }
   return null
 }
@@ -60,18 +58,6 @@ async function runMutation(
     console.error(error)
     return { success: false, error: errorMessage }
   }
-}
-
-/**
- * Reads the forwarded address the platform sets, taking the first hop since anything after it is
- * caller supplied. Only used to space out submissions, never shown or returned.
- */
-async function getClientIp() {
-  const requestHeaders = await headers()
-  const forwardedFor = requestHeaders.get('x-forwarded-for')?.split(',')[0]?.trim()
-  const realIp = requestHeaders.get('x-real-ip')?.trim()
-
-  return forwardedFor || realIp || '127.0.0.1'
 }
 
 /**
@@ -94,16 +80,18 @@ export async function submitMessageBoardMessage(formData: FormData): Promise<Act
   if (message.length > MESSAGE_MAX_LENGTH) return { success: false, error: toasts.messageTooLong }
 
   const ip = await getClientIp()
-  const twoMinutesAgo = new Date(Date.now() - RATE_LIMIT_WINDOW_MS)
 
   try {
-    const lastMessage = await db.query.messageBoard.findFirst({
-      where: and(eq(messageBoard.ip, ip), gt(messageBoard.createdAt, twoMinutesAgo)),
-    })
+    const rateLimit = await claimRateLimit('message-board-post', ip, MESSAGE_BOARD_COOLDOWN_SECONDS)
+    if (!rateLimit.allowed) {
+      return {
+        success: false,
+        error: toasts.rateLimit,
+        retryAfterSeconds: rateLimit.retryAfterSeconds,
+      }
+    }
 
-    if (lastMessage) return { success: false, error: toasts.rateLimit }
-
-    await db.insert(messageBoard).values({ name, message, ip })
+    await db.insert(messageBoard).values({ name, message })
     revalidatePath('/message-board')
 
     return { success: true, data: undefined }
@@ -115,7 +103,7 @@ export async function submitMessageBoardMessage(formData: FormData): Promise<Act
 
 /**
  * A page of messages, newest first, keyed on the id cursor rather than an offset so a message
- * arriving mid scroll cannot shift the next page. The stored IP is never selected.
+ * arriving mid scroll cannot shift the next page.
  */
 export async function getMessageBoardMessages(
   cursor?: MessageBoardCursor | null,
@@ -128,7 +116,6 @@ export async function getMessageBoardMessages(
 
     /** One more than asked for, which answers hasMore without a second count query */
     const data = await db.query.messageBoard.findMany({
-      columns: { ip: false },
       where: cursorFilter,
       orderBy: [desc(messageBoard.id)],
       limit: normalizedLimit + 1,
@@ -147,15 +134,8 @@ export async function getMessageBoardMessages(
   }
 }
 
-export async function deleteMessageBoardMessage(
-  id: number,
-  adminSecret: string,
-): Promise<ActionResult> {
-  const validationError = validateAdminMutation(
-    id,
-    adminSecret,
-    toastContent.messageBoard.deleteError,
-  )
+export async function deleteMessageBoardMessage(id: number): Promise<ActionResult> {
+  const validationError = await validateAdminMutation(id, toastContent.messageBoard.deleteError)
   if (validationError) return validationError
 
   return await runMutation(toastContent.messageBoard.deleteError, async () => {
@@ -163,16 +143,8 @@ export async function deleteMessageBoardMessage(
   })
 }
 
-export async function replyMessageBoardMessage(
-  id: number,
-  reply: string,
-  adminSecret: string,
-): Promise<ActionResult> {
-  const validationError = validateAdminMutation(
-    id,
-    adminSecret,
-    toastContent.messageBoard.replyError,
-  )
+export async function replyMessageBoardMessage(id: number, reply: string): Promise<ActionResult> {
+  const validationError = await validateAdminMutation(id, toastContent.messageBoard.replyError)
   if (validationError) return validationError
 
   if (typeof reply !== 'string')

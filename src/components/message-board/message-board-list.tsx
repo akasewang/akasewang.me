@@ -26,7 +26,7 @@ const LOADING_PANEL_CLASS = 'bg-surface-40 ring-1 ring-inset ring-ring/80'
 
 export function MessageBoardList({ messages: initialMessages }: MessageBoardListProps) {
   const { destructive, hoverTick, tap, error: errorSound } = useSoundEffects()
-  const { adminKey, logoutAdmin } = useAdmin()
+  const { isAdmin, logoutAdmin } = useAdmin()
   const initialMessageList = initialMessages ?? []
 
   const [messages, setMessages] = useState<MessageBoardEntry[]>(() => initialMessageList)
@@ -36,10 +36,10 @@ export function MessageBoardList({ messages: initialMessages }: MessageBoardList
 
   const handleDelete = useCallback(
     async (id: number) => {
-      if (!adminKey || !window.confirm('Are you sure you want to delete this message?')) return
+      if (!isAdmin || !window.confirm('Are you sure you want to delete this message?')) return
 
       destructive()
-      const res = await deleteMessageBoardMessage(id, adminKey)
+      const res = await deleteMessageBoardMessage(id)
       if (res.success) {
         setMessages((prev) => prev.filter((m) => m.id !== id))
         toast.success('Message deleted')
@@ -48,14 +48,14 @@ export function MessageBoardList({ messages: initialMessages }: MessageBoardList
         toast.error(res.error)
       }
     },
-    [adminKey, destructive, errorSound],
+    [isAdmin, destructive, errorSound],
   )
 
   const handleReply = useCallback(
     async (id: number, text: string) => {
-      if (!adminKey) return false
+      if (!isAdmin) return false
 
-      const res = await replyMessageBoardMessage(id, text, adminKey)
+      const res = await replyMessageBoardMessage(id, text)
       if (res.success) {
         setMessages((prev) => prev.map((m) => (m.id === id ? { ...m, adminReply: text } : m)))
         return true
@@ -65,7 +65,7 @@ export function MessageBoardList({ messages: initialMessages }: MessageBoardList
       toast.error(res.error)
       return false
     },
-    [adminKey, errorSound],
+    [isAdmin, errorSound],
   )
 
   const loadMore = useCallback(async () => {
@@ -126,7 +126,7 @@ export function MessageBoardList({ messages: initialMessages }: MessageBoardList
           msg={msg}
           msgDate={msgDate}
           showDayHeader={showDayHeader}
-          adminKey={adminKey}
+          isAdmin={isAdmin}
           onDelete={handleDelete}
           onReply={handleReply}
         />
@@ -136,7 +136,7 @@ export function MessageBoardList({ messages: initialMessages }: MessageBoardList
 
   return (
     <div className="relative">
-      {adminKey && (
+      {isAdmin && (
         <div className="mb-6 flex justify-end">
           <button
             type="button"

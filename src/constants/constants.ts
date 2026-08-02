@@ -20,6 +20,44 @@ export const SITE_DESCRIPTION =
 /** Words per minute, the basis for every reading estimate */
 export const READING_SPEED = 200
 
+/**
+ * How long an admin code is. Both forms tell a code apart from an address by this, and the server
+ * refuses anything that is not this shape, so it lives here rather than being written out at each
+ * of the three and left to disagree the day it changes.
+ */
+export const ADMIN_CODE_LENGTH = 8
+
+/**
+ * Letters, digits and a few marks, with the ambiguous glyphs left out: no I, L or O beside 1 and 0,
+ * because this is read off an email and typed back by hand and those are what get mistyped.
+ *
+ * Neither @ nor a full stop is in it. That is what keeps a code and an address impossible to read
+ * as one another, which the message board relies on to tell which of the two has been entered.
+ */
+export const ADMIN_CODE_ALPHABET =
+  'ABCDEFGHJKMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789!#$%&*+-=?'
+
+/** Inside a character class only these carry meaning, so only these need escaping */
+const escapeForCharClass = (value: string) => value.replace(/[\\\]^-]/g, '\\$&')
+
+export const ADMIN_CODE_SHAPE = new RegExp(
+  `^[${escapeForCharClass(ADMIN_CODE_ALPHABET)}]{${ADMIN_CODE_LENGTH}}$`,
+)
+
+/** Everything the alphabet does not hold, for filtering the field as it is typed */
+export const ADMIN_CODE_STRIP = new RegExp(`[^${escapeForCharClass(ADMIN_CODE_ALPHABET)}]`, 'g')
+
+/**
+ * username@domain.extension, and nothing looser. The shape it replaced asked only for an @ and a
+ * dot somewhere after it, which let through a domain of a single hyphen, a doubled dot, digits in
+ * the extension and any trailing punctuation at all.
+ *
+ * Still a shape check rather than an RFC one: what an address really is gets settled by the mail
+ * arriving, and a stricter reading of the standard would turn away addresses that genuinely work.
+ */
+export const EMAIL_SHAPE =
+  /^[A-Za-z0-9._%+-]+@[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?(?:\.[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?)*\.[A-Za-z]{2,}$/
+
 export const TWO_WEEKS_MS = 1209600000
 
 /** Marks an entry that is still ongoing. parseAnyDate returns null for it, there being no date */

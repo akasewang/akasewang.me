@@ -19,7 +19,12 @@ export interface AdminNewsletterContent {
   title: string
   description: string
   blogSelectPlaceholder: string
-  adminPasswordPlaceholder: string
+  adminEmailPlaceholder: string
+  adminCodePlaceholder: string
+  enterEmailDefault: string
+  enterCodeDefault: string
+  sendCodeDefault: string
+  sendCodeLoading: string
   buttonDefault: string
   buttonLoading: string
   buttonSuccess: string
