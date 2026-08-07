@@ -8,6 +8,18 @@ type SpinningCircularTextProps = Omit<React.ComponentProps<'div'>, 'children'> &
   renderChar?: (char: string, index: number) => React.ReactNode
 }
 
+/**
+ * Sets a line of text around a circle and turns it slowly.
+ *
+ * Each character is placed by the same three steps: move it to the middle, turn it by its share of
+ * the full turn, then push it out to the radius. The radius itself comes from the character count,
+ * since a ring has to be wide enough for its letters to sit side by side, and that is what the sine
+ * works out. Every one of those figures is a CSS variable, so the whole ring resizes from the font
+ * size alone with nothing measured in JavaScript.
+ *
+ * The letters are hidden from assistive tech and the same text is repeated in a plain span, which
+ * reads as one word rather than as a stack of single characters.
+ */
 export function SpinningCircularText({
   text,
   charSpacing = 1,

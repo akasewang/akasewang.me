@@ -1,6 +1,7 @@
 import { type ComponentProps, forwardRef } from 'react'
 import { cn } from '@/utils/utils'
 
+/** The site's multi line field, used by the message board and the newsletter composer */
 export const TextArea = forwardRef<HTMLTextAreaElement, ComponentProps<'textarea'>>(
   ({ className, ...props }, ref) => (
     <textarea

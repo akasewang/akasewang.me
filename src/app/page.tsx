@@ -22,17 +22,18 @@ export const metadata: Metadata = constructMetadata({
   imageAlt: homeSeoContent.imageAlt,
 })
 
+/** The landing page, stacking every section of the site into one scroll */
 export default async function Home() {
   const [blogPosts, projects] = await Promise.all([getAllBlogPosts(), getAllProjects()])
 
   return (
     <main className="flex-1">
-      <section className="stagger-sections space-y-14">
+      <section className="space-y-14">
         <HeroSection />
         <Skills />
         <Experience />
-        <FeaturedProjects projects={projects} />
-        <FeaturedPosts posts={blogPosts} />
+        <FeaturedProjects projects={projects} isHomePage />
+        <FeaturedPosts posts={blogPosts} isHomePage />
         <Education />
         <Achievements />
         <Certifications />

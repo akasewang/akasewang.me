@@ -9,20 +9,13 @@ import {
   HIGHLIGHT_LEAD_SPRING,
   HIGHLIGHT_TRAIL_SPRING,
 } from '@/constants/ui'
+import { prefersReducedMotion } from '@/utils/motion'
 
 export interface HighlightBox {
   left: number
   top: number
   right: number
   bottom: number
-}
-
-/** Queried once and reused, since matchMedia is not free to call per pointer move */
-let reduceMotionQuery: MediaQueryList | null = null
-const prefersReducedMotion = () => {
-  if (typeof window === 'undefined') return false
-  reduceMotionQuery ??= window.matchMedia('(prefers-reduced-motion: reduce)')
-  return reduceMotionQuery.matches
 }
 
 /**

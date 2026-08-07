@@ -1,5 +1,6 @@
 import type { TimelineItemProps } from '@/types/site'
 
+/** Courses and certificates, newest first, drawn as a timeline on the landing page */
 export const certifications: TimelineItemProps[] = [
   {
     id: 'rust-programming-specialization',

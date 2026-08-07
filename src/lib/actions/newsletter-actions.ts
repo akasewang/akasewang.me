@@ -11,7 +11,7 @@ import { hasAdminSession } from '@/lib/admin-session'
 import { db } from '@/lib/db/drizzle'
 import { newsletterSubscribers } from '@/lib/db/schema'
 import { getAllBlogPosts, getBlogPost } from '@/lib/managers/blog-manager'
-import { getResend, SENDER_EMAIL } from '@/lib/resend'
+import { getNewsletterSender, getResend } from '@/lib/resend'
 import type { ActionResult } from '@/types/actions'
 
 /** The provider's ceiling for one batch call */
@@ -34,6 +34,13 @@ export async function broadcastNewsletter(
   if (!(await hasAdminSession())) {
     return { success: false, error: toasts.unauthorized }
   }
+
+  const sender = getNewsletterSender()
+  if (!sender) {
+    return { success: false, error: toasts.otpSenderUnavailable }
+  }
+
+  const fromAddress = sender.includes('<') ? sender : `${FULL_NAME} <${sender}>`
 
   try {
     const [posts, fullPost, activeSubscribers] = await Promise.all([
@@ -89,7 +96,7 @@ export async function broadcastNewsletter(
        * all up front would hold one full copy of the email per subscriber before any are sent.
        */
       const payloads = batch.map((s) => ({
-        from: `${FULL_NAME} <${SENDER_EMAIL}>`,
+        from: fromAddress,
         to: s.email,
         subject: targetPost.title,
         /**

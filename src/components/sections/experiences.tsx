@@ -12,9 +12,10 @@ const renderExperience = (exp: TimelineItemProps) => (
   <TimelineItem key={exp.id} {...exp} endDate={exp.endDate || PRESENT} />
 )
 
+/** Roles held, as a timeline on the landing page */
 export function Experience() {
   return (
-    <section id="experience" className="space-y-6 animate-page-simple">
+    <section id="experience" className="space-y-6">
       <SectionTitle>{landingPageContent.sections.experience}</SectionTitle>
       <ExpandableList items={experiences} renderItem={renderExperience} />
     </section>

@@ -24,6 +24,12 @@ interface MessageBoardListProps {
 
 const LOADING_PANEL_CLASS = 'bg-surface-40 ring-1 ring-inset ring-ring/80'
 
+/**
+ * The board's messages, oldest at the top, loading more as the reader scrolls back.
+ *
+ * Messages are grouped under the day they were left, and the owner's controls for replying and
+ * deleting appear here once signed in.
+ */
 export function MessageBoardList({ messages: initialMessages }: MessageBoardListProps) {
   const { destructive, hoverTick, tap, error: errorSound } = useSoundEffects()
   const { isAdmin, logoutAdmin } = useAdmin()
@@ -117,11 +123,7 @@ export function MessageBoardList({ messages: initialMessages }: MessageBoardList
     const showDayHeader = previousDateString !== currentDateString
 
     return (
-      <div
-        key={msg.id}
-        className="animate-page-simple"
-        style={{ animationDelay: `${Math.min(index * 50, 300)}ms` }}
-      >
+      <div key={msg.id}>
         <MessageBubbles
           msg={msg}
           msgDate={msgDate}

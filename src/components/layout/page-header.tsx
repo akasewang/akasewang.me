@@ -7,6 +7,7 @@ interface PageHeaderProps {
   className?: string
 }
 
+/** The heading and standfirst at the top of a page */
 export function PageHeader({ title, subtitle, className }: PageHeaderProps) {
   return (
     <header className={cn('space-y-2', className)}>

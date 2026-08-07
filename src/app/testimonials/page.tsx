@@ -15,6 +15,7 @@ export const metadata: Metadata = constructMetadata({
   imageAlt: testimonialsSeoContent.imageAlt,
 })
 
+/** every testimonial in one grid */
 export default function TestimonialsPage() {
   const breadcrumbJsonLd = getBreadcrumbSchema([
     { name: 'Home', url: SITE_URL },

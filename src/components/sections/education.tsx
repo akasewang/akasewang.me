@@ -12,9 +12,10 @@ const renderEducation = (edu: TimelineItemProps) => (
   <TimelineItem key={edu.id} {...edu} endDate={edu.endDate || PRESENT} />
 )
 
+/** Schools and degrees, as a timeline on the landing page */
 export function Education() {
   return (
-    <section id="education" className="space-y-6 animate-page-simple">
+    <section id="education" className="space-y-6">
       <SectionTitle>{landingPageContent.sections.education}</SectionTitle>
       <ExpandableList items={education} renderItem={renderEducation} />
     </section>

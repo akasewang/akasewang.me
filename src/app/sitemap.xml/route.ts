@@ -1,7 +1,7 @@
 import { SITE_URL } from '@/constants/constants'
 import { photos } from '@/data/static/photos'
 import { getAllBlogPosts } from '@/lib/managers/blog-manager'
-import { getAllProjects } from '@/lib/managers/project-manager'
+import { getAllProjects, getPageProjects } from '@/lib/managers/project-manager'
 import { parseDate } from '@/utils/utils'
 
 interface SitemapUrl {
@@ -32,7 +32,15 @@ const PHOTO_IMAGES = photos.map((photo) => `${SITE_URL}${photo.url}`)
  * priority and the image entries for the photos page.
  */
 export async function GET(): Promise<Response> {
-  const [blogPosts, projectPosts] = await Promise.all([getAllBlogPosts(), getAllProjects()])
+  /**
+   * Every project dates the listing, but only the ones with a page of their own are listed as URLs.
+   * A project that links outward has no page here to point a crawler at.
+   */
+  const [blogPosts, projectPosts, pageProjects] = await Promise.all([
+    getAllBlogPosts(),
+    getAllProjects(),
+    getPageProjects(),
+  ])
 
   const currentDate = new Date().toISOString()
 
@@ -59,7 +67,7 @@ export async function GET(): Promise<Response> {
       priority: '0.8',
       changefreq: 'weekly',
     })),
-    ...projectPosts.map((project) => ({
+    ...pageProjects.map((project) => ({
       url: `${SITE_URL}/projects/${project.slug}`,
       lastModified: parseDate(project.date),
       priority: '0.8',

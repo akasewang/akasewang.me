@@ -27,7 +27,7 @@ export function useKeyboardShortcut(
   const router = useRouter()
   const runAction = useEffectEvent(() => {
     if (typeof action === 'string') {
-      router.push(action)
+      router.push(action, { scroll: false })
     } else {
       action()
     }

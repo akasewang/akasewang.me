@@ -13,6 +13,7 @@ interface CopyButtonProps extends HTMLMotionProps<'button'> {
   copied?: boolean
 }
 
+/** Copies its value and briefly swaps to a tick, so the click is acknowledged */
 export function CopyButton({
   value,
   iconSize = 14,

@@ -14,12 +14,13 @@ import { landingPageContent } from '@/data/content/landing-content'
 import { socialGroups } from '@/data/static/social'
 import { renderWithLinks } from '@/utils/content-utils'
 
+/** The opening block: the avatar, the name, the roles it cycles through and the social links */
 export function HeroSection() {
   const { hero } = landingPageContent
   const router = useRouter()
 
   return (
-    <section id="hero" className="animate-page-simple space-y-8">
+    <section id="hero" className="space-y-8">
       <div className="flex items-center gap-6 pb-2">
         <ProfilePicture
           src="/profpic.jpg"
@@ -88,7 +89,7 @@ export function HeroSection() {
             variant="minimal"
             defaultText={hero.messageBoard}
             defaultIcon={Icons.messageBoard}
-            onClick={() => router.push('/message-board')}
+            onClick={() => router.push('/message-board', { scroll: false })}
           />
         </div>
       </div>

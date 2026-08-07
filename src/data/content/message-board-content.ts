@@ -1,5 +1,6 @@
 import type { MessageBoardContent } from '@/types/message-board'
 
+/** Every string the message board renders, including the owner's controls */
 export const messageBoardContent: MessageBoardContent = {
   title: 'message board.',
   subtitle: 'Your message is safe with me (and the entire internet).',
@@ -11,7 +12,7 @@ export const messageBoardContent: MessageBoardContent = {
   buttonSuccess: 'added!',
   buttonDefault: 'leave a message',
   buttonSendCode: 'email me a code',
-  buttonEnterCode: 'enter the 8 character code',
+  buttonEnterCode: 'enter verification code',
   buttonSignIn: 'sign in',
   loadingMore: 'Loading more...',
   endOfMessages: 'No more messages.',

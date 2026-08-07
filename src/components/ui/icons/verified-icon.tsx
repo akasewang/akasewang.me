@@ -1,6 +1,7 @@
 ﻿import { type ComponentProps, forwardRef } from 'react'
 import { cn } from '@/utils/utils'
 
+/** The check beside the owner's own replies on the message board */
 export const VerifiedIcon = forwardRef<SVGSVGElement, ComponentProps<'svg'>>(
   ({ className, ...props }, ref) => (
     <svg

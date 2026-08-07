@@ -157,17 +157,20 @@ sequenceDiagram
 
 ### Module ownership
 
-| Path | Responsibility |
-| --- | --- |
-| `src/app/` | App Router pages, layouts, route handlers, metadata and generated endpoints |
-| `docs/` | Blog and project MDX source files |
-| `src/lib/managers/` | Typed MDX discovery, parsing, caching and sorting |
-| `src/lib/actions/` | View, message-board and newsletter Server Actions |
-| `src/lib/db/` | Drizzle schema and Neon database client |
-| `src/components/common/mdx-components/` | MDX element mapping and interactive content components |
-| `src/components/ui/` | Base UI primitives, Phosphor icons and reusable interaction patterns |
-| `src/components/providers/` | Shared client-side motion and view-count state |
-| `architecture/` | Focused design and implementation notes |
+| Path                                    | Responsibility                                                              |
+| --------------------------------------- | --------------------------------------------------------------------------- |
+| `src/app/`                              | App Router pages, layouts, route handlers, metadata and generated endpoints |
+| `docs/`                                 | Blog and project MDX source files                                           |
+| `src/lib/managers/`                     | Typed MDX discovery, parsing, caching and sorting                           |
+| `src/lib/actions/`                      | View, message-board and newsletter Server Actions                           |
+| `src/lib/db/`                           | Drizzle schema and Neon database client                                     |
+| `src/components/common/mdx-components/` | MDX element mapping and interactive content components                      |
+| `src/components/ui/`                    | Base UI primitives, Phosphor icons and reusable interaction patterns        |
+| `src/components/providers/`             | Shared client-side motion and view-count state                              |
+| `src/hooks/`                            | Reusable client behavior: media loading, audio, scroll and pointer state    |
+| `src/utils/`                            | Framework-free helpers for dates, text, pointer and motion preferences      |
+| `src/constants/`                        | Filter option lists and shared animation values                             |
+| `architecture/`                         | Focused design and implementation notes                                     |
 
 ---
 
@@ -186,7 +189,8 @@ sequenceDiagram
 
 ### Live features
 
-- Neon Postgres stores view counts, newsletter subscribers and message-board entries.
+- Neon Postgres stores view counts, HMAC cooldown rows, hashed admin OTP/session records,
+  newsletter subscribers and message-board entries.
 - View reads are batched and cached; increments use an atomic upsert and count once per session.
 - Newsletter signup and message posting use atomic, HMAC-keyed server cooldowns backed by Postgres;
   matching client timers persist across reloads and tabs without storing raw IP addresses.
@@ -204,6 +208,8 @@ sequenceDiagram
 - Framer Motion is loaded through `LazyMotion`; layout, gesture and transition behavior remains
   component-owned.
 - Phosphor duotone icons provide the shared icon language.
+- Project cards degrade rather than break: work marked `preview` shows a `COMING SOON` plate, and
+  artwork that is missing or fails to load falls back to a placeholder instead of a broken frame.
 - Procedural Web Audio feedback follows one global preference and a documented interaction
   palette.
 - `npm run dev` binds to the local network and prints a QR code for testing from a phone on the
@@ -212,6 +218,10 @@ sequenceDiagram
 ### Repository safeguards
 
 - ESLint checks TypeScript and React rules; Biome handles formatting.
+- Code comments are deliberately concentrated in `src/lib/`, `src/utils/`, `src/hooks/` and
+  `src/constants/`, where the reasoning is not visible in the code itself. Components, pages, types
+  and content data are left uncommented; the exception is a functional directive such as
+  `turbopackIgnore`, which is part of the code rather than a note about it.
 - The pre-commit hook formats staged files after `npm install` configures the repository hook path.
 - GitHub Actions verifies npm registry signatures and audits dependencies for every pull request,
   every push to `main`, daily at `09:00` Asia/Kolkata, and on demand.
@@ -221,17 +231,17 @@ sequenceDiagram
 
 ## Technology
 
-| Layer | Choice |
-| --- | --- |
-| Framework | Next.js 16 App Router, React 19 |
-| Language | TypeScript in strict mode |
-| UI | Base UI, Tailwind CSS v4, Framer Motion |
-| Icons | Phosphor Icons, duotone weight |
-| Content | MDX, `next-mdx-remote`, Remark GFM, Rehype Highlight |
-| Data | Neon Postgres, Drizzle ORM |
-| Email | Resend, React Email |
-| Hosting and telemetry | Vercel, Vercel Analytics, Speed Insights |
-| Quality | ESLint, Biome, TypeScript, npm audit |
+| Layer                 | Choice                                               |
+| --------------------- | ---------------------------------------------------- |
+| Framework             | Next.js 16 App Router, React 19                      |
+| Language              | TypeScript in strict mode                            |
+| UI                    | Base UI, Tailwind CSS v4, Framer Motion              |
+| Icons                 | Phosphor Icons, duotone weight                       |
+| Content               | MDX, `next-mdx-remote`, Remark GFM, Rehype Highlight |
+| Data                  | Neon Postgres, Drizzle ORM                           |
+| Email                 | Resend, React Email                                  |
+| Hosting and telemetry | Vercel, Vercel Analytics, Speed Insights             |
+| Quality               | ESLint, Biome, TypeScript, npm audit                 |
 
 ---
 
@@ -267,16 +277,16 @@ exact host for Next.js development resources. The override affects development o
 
 ### Environment variables
 
-| Variable | Required | Purpose |
-| --- | --- | --- |
-| `NEON_DATABASE_URL` | Yes | Neon Postgres connection string |
-| `RATE_LIMIT_SECRET` | Yes | HMAC secret for pseudonymous public-action cooldown keys |
-| `OTP_EMAIL` | Yes for admin tools | Recipient for one-time admin access codes |
-| `ADMIN_EMAIL` | Yes for weekly summaries | Recipient for the scheduled subscriber report |
-| `RESEND_API_KEY` | Yes for email | Resend API authentication |
-| `RESEND_FROM_EMAIL` | Production email | Verified sender address |
-| `CRON_SECRET` | Yes in production | Bearer secret protecting the cron endpoint |
-| `GITHUB_TOKEN` | No | Raises GitHub API limits; public requests remain the fallback |
+| Variable                  | Required                  | Purpose                                                                      |
+| ------------------------- | ------------------------- | ---------------------------------------------------------------------------- |
+| `NEON_DATABASE_URL`       | Yes                       | Neon Postgres connection string                                              |
+| `RATE_LIMIT_SECRET`       | Yes                       | HMAC secret for pseudonymous public-action cooldown keys                     |
+| `RESEND_API_KEY`          | Yes for email             | Resend API authentication                                                    |
+| `RESEND_ADMIN_EMAIL`      | Yes for admin access/cron | Admin recipient email for OTP codes and weekly subscriber reports            |
+| `RESEND_OTP_EMAIL`        | Yes for admin OTP         | Sender email address for OTP codes                                           |
+| `RESEND_NEWSLETTER_EMAIL` | Yes for newsletter        | Sender email address for newsletter broadcasts and welcome emails            |
+| `CRON_SECRET`             | Yes for cron route        | Bearer secret protecting the cron endpoint                                   |
+| `GITHUB_TOKEN`            | No                        | Raises GitHub API limits; public requests remain the fallback                |
 
 Keep server secrets out of `NEXT_PUBLIC_*` variables. Generate independent values for the rate-limit
 HMAC and cron authentication:
@@ -295,17 +305,17 @@ you configure as a bearer token when invoking the weekly route. The schedule is 
 
 ## Commands
 
-| Command | Purpose |
-| --- | --- |
-| `npm run dev` | Start Next.js on the LAN and print the mobile QR code |
-| `npm run build` | Create and validate the production build |
-| `npm run start` | Serve the completed production build |
-| `npm run lint` | Run ESLint across TypeScript and TSX source files |
-| `npm run typecheck` | Type-check the application and repository tools |
-| `npm run format` | Format the repository with Biome |
-| `npm run security:audit` | Run the dependency vulnerability audit |
-| `npm run email` | Preview React Email templates on port 3001 |
-| `npm run db:push` | Push the Drizzle schema to Neon |
+| Command                  | Purpose                                               |
+| ------------------------ | ----------------------------------------------------- |
+| `npm run dev`            | Start Next.js on the LAN and print the mobile QR code |
+| `npm run build`          | Create and validate the production build              |
+| `npm run start`          | Serve the completed production build                  |
+| `npm run lint`           | Run ESLint across TypeScript and TSX source files     |
+| `npm run typecheck`      | Type-check the application and repository tools       |
+| `npm run format`         | Format the repository with Biome                      |
+| `npm run security:audit` | Run the dependency vulnerability audit                |
+| `npm run email`          | Preview React Email templates on port 3001            |
+| `npm run db:push`        | Push the Drizzle schema to Neon                       |
 
 ---
 
@@ -317,6 +327,8 @@ you configure as a bearer token when invoking the weekly route. The schedule is 
 - [UI and animations](./architecture/ui.md) — visual tokens, motion and canvas effects
 - [Audio feedback design system](./architecture/audio-design-system.md) — global preference and
   interaction sounds
+- [Newsletter and admin access](./architecture/newsletter.md) — signup, OTP sessions, broadcasts and
+  scheduled summaries
 - [Message board](./architecture/message-board.md) — validation, rate limiting and admin behavior
 - [GitHub repository governance](./architecture/github.md) — automated audits, Dependabot and
   branch protection

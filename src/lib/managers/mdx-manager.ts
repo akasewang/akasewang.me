@@ -13,7 +13,7 @@ import {
  * two stay identical. Reads are wrapped in React's cache, so a page rendering a post and its
  * metadata hits the filesystem once per request.
  */
-export function createMdxManager<T extends { date: string | Date; slug: string }>(
+export function createMdxManager<T extends { date?: string | Date; slug: string }>(
   directory: string,
   entityName: string,
 ) {

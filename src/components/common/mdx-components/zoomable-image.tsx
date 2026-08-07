@@ -9,6 +9,7 @@ import { useSoundEffects } from '@/hooks/use-sound-effects'
 import type { Photo } from '@/types/photos'
 import { cn } from '@/utils/utils'
 
+/** An image in a post that opens full screen when clicked */
 export function ZoomableImage({
   src,
   alt,

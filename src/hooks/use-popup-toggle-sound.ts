@@ -2,6 +2,10 @@
 
 import { useCallback, useRef } from 'react'
 
+/**
+ * Plays the open and close sounds for a popup, staying silent on the close that follows a
+ * selection, where the sound for what was chosen has already been played.
+ */
 export function usePopupToggleSound(toggle: (open: boolean) => void) {
   const skipNextCloseSoundRef = useRef(false)
 

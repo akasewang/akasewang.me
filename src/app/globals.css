@@ -98,6 +98,8 @@
     min-height: 100%;
     background-color: var(--background);
     isolation: isolate;
+    /** Route entrances slide sideways, clip keeps that off the scrollbar without killing sticky. */
+    overflow-x: clip;
   }
 
   img,
@@ -200,59 +202,6 @@
 }
 
 @layer utilities {
-  .stagger-sections {
-    & > * {
-      animation-delay: var(--stagger-delay, 0ms) !important;
-    }
-
-    & > *:nth-child(1) {
-      --stagger-delay: 0ms;
-    }
-
-    & > *:nth-child(2) {
-      --stagger-delay: 150ms;
-    }
-
-    & > *:nth-child(3) {
-      --stagger-delay: 300ms;
-    }
-
-    & > *:nth-child(4) {
-      --stagger-delay: 450ms;
-    }
-
-    & > *:nth-child(5) {
-      --stagger-delay: 600ms;
-    }
-
-    & > *:nth-child(6) {
-      --stagger-delay: 750ms;
-    }
-
-    & > *:nth-child(7) {
-      --stagger-delay: 900ms;
-    }
-
-    & > *:nth-child(8) {
-      --stagger-delay: 1050ms;
-    }
-
-    & > *:nth-child(9) {
-      --stagger-delay: 1200ms;
-    }
-
-    & > *:nth-child(10) {
-      --stagger-delay: 1350ms;
-    }
-
-    & > *:nth-child(11) {
-      --stagger-delay: 1500ms;
-    }
-
-    & > *:nth-child(12) {
-      --stagger-delay: 1650ms;
-    }
-  }
 
   .hljs-keyword,
   .hljs-selector-tag,
@@ -316,6 +265,15 @@
   .mask-fade-l {
     -webkit-mask-image: linear-gradient(to right, transparent, black 10%);
     mask-image: linear-gradient(to right, transparent, black 10%);
+  }
+
+  .scrollbar-hidden {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
   }
 
   .bg-dot-pattern {
@@ -384,15 +342,27 @@
     animation: select-check-in 300ms cubic-bezier(0.16, 1, 0.3, 1) both;
   }
 
-  .animate-page-simple {
-    animation: page-simple-in 0.6s ease-out both;
+  .command-backdrop[data-open] {
+    animation: command-backdrop-in 300ms cubic-bezier(0.16, 1, 0.3, 1) both;
   }
 
-  /*
-   * The mask is what makes this read as a fade rather than a bar: it thins out the tint and the
-   * blur together towards the top. Mobile used to drop both and keep a flat tint, which is why the
-   * bottom of a phone screen looked like a grey smudge over still sharp text.
-   */
+  .command-backdrop[data-closed] {
+    animation: command-backdrop-out 180ms cubic-bezier(0.4, 0, 1, 1) both;
+  }
+
+  .command-popup {
+    will-change: opacity, transform;
+    transform-origin: center;
+  }
+
+  .command-popup[data-open] {
+    animation: command-popup-in 320ms cubic-bezier(0.175, 0.885, 0.32, 1.15) both;
+  }
+
+  .command-popup[data-closed] {
+    animation: command-popup-out 180ms cubic-bezier(0.4, 0, 1, 1) both;
+  }
+
   .bottom-blur-fade {
     position: fixed;
     bottom: 0;
@@ -446,6 +416,75 @@
       -webkit-backdrop-filter: blur(6px);
       backdrop-filter: blur(6px);
     }
+  }
+
+  .command-edge-fade {
+    position: absolute;
+    inset-inline: 0;
+    height: 3.5rem;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 20;
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+  }
+
+  .command-edge-fade--top {
+    top: 0;
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+    background: linear-gradient(
+      to bottom,
+      color-mix(in oklab, var(--dropdown-background) 100%, transparent) 0%,
+      color-mix(in oklab, var(--dropdown-background) 88%, transparent) 30%,
+      color-mix(in oklab, var(--dropdown-background) 55%, transparent) 55%,
+      color-mix(in oklab, var(--dropdown-background) 20%, transparent) 80%,
+      transparent 100%
+    );
+    -webkit-mask-image: linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 1) 0%,
+      rgba(0, 0, 0, 0.88) 30%,
+      rgba(0, 0, 0, 0.55) 55%,
+      rgba(0, 0, 0, 0.2) 80%,
+      transparent 100%
+    );
+    mask-image: linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 1) 0%,
+      rgba(0, 0, 0, 0.88) 30%,
+      rgba(0, 0, 0, 0.55) 55%,
+      rgba(0, 0, 0, 0.2) 80%,
+      transparent 100%
+    );
+  }
+
+  .command-edge-fade--bottom {
+    bottom: 0;
+    border-radius: 0 0 var(--radius-xl) var(--radius-xl);
+    background: linear-gradient(
+      to top,
+      color-mix(in oklab, var(--dropdown-background) 100%, transparent) 0%,
+      color-mix(in oklab, var(--dropdown-background) 88%, transparent) 30%,
+      color-mix(in oklab, var(--dropdown-background) 55%, transparent) 55%,
+      color-mix(in oklab, var(--dropdown-background) 20%, transparent) 80%,
+      transparent 100%
+    );
+    -webkit-mask-image: linear-gradient(
+      to top,
+      rgba(0, 0, 0, 1) 0%,
+      rgba(0, 0, 0, 0.88) 30%,
+      rgba(0, 0, 0, 0.55) 55%,
+      rgba(0, 0, 0, 0.2) 80%,
+      transparent 100%
+    );
+    mask-image: linear-gradient(
+      to top,
+      rgba(0, 0, 0, 1) 0%,
+      rgba(0, 0, 0, 0.88) 30%,
+      rgba(0, 0, 0, 0.55) 55%,
+      rgba(0, 0, 0, 0.2) 80%,
+      transparent 100%
+    );
   }
 }
 
@@ -543,30 +582,104 @@
   }
 }
 
-@keyframes page-simple-in {
-  0% {
+@keyframes command-backdrop-in {
+  from {
     opacity: 0;
-    transform: translateY(12px);
   }
 
-  100% {
+  to {
     opacity: 1;
-    transform: translateY(0);
+  }
+}
+
+@keyframes command-backdrop-out {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes command-popup-in {
+  from {
+    opacity: 0;
+    transform: translateY(-14px) scale(0.97);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes command-popup-out {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+
+  to {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.98);
   }
 }
 
 @keyframes shimmer {
   0% {
-    transform: translateX(-100%) skewX(-20deg);
+    transform: translate3d(-100%, 0, 0);
   }
 
   100% {
-    transform: translateX(300%) skewX(-20deg);
+    transform: translate3d(100%, 0, 0);
   }
 }
 
+/**
+ * Scrolls a marquee row by exactly half its width. The row renders its text twice, so landing on
+ * -50% lands on a copy identical to where it started and the loop has no seam.
+ */
+@keyframes marquee {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+
+  100% {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+.animate-shimmer {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.animate-shimmer::after {
+  position: absolute;
+  inset: 0;
+  transform: translate3d(-100%, 0, 0);
+  background-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    color-mix(in oklab, var(--foreground) 7%, transparent) 50%,
+    transparent 100%
+  );
+  animation: shimmer 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  will-change: transform;
+  content: '';
+  pointer-events: none;
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .animate-page-simple {
+  .animate-shimmer::after {
+    animation: none !important;
+    display: none !important;
+  }
+
+  /** Holds the rows still. They already read as a filled plate without travelling */
+  .marquee-row {
     animation: none !important;
   }
 
@@ -579,8 +692,76 @@
   .tooltip-elegant,
   .select-content-elegant,
   .dropdown-elegant,
-  .select-check-elegant {
+  .select-check-elegant,
+  .command-popup {
     animation: none !important;
     transition: opacity 120ms linear;
+  }
+}
+
+.sonner-toast-callout {
+  --callout-hue: oklch(0.6 0.17 250);
+  background-color: color-mix(in oklab, var(--callout-hue) 12%, var(--surface-50)) !important;
+  border: 1px solid color-mix(in oklab, var(--callout-hue) 18%, transparent) !important;
+  box-shadow: 0 4px 12px rgb(0 0 0 / 0.15) !important;
+
+  &[data-type='success'] {
+    --callout-hue: oklch(0.6 0.16 160);
+    background-color: color-mix(in oklab, oklch(0.6 0.16 160) 12%, var(--surface-50)) !important;
+    border-color: color-mix(in oklab, oklch(0.6 0.16 160) 18%, transparent) !important;
+    & [data-icon] {
+      color: #6ee7b7 !important;
+      opacity: 0.8 !important;
+    }
+  }
+
+  &[data-type='error'] {
+    --callout-hue: oklch(0.6 0.18 20);
+    background-color: color-mix(in oklab, oklch(0.6 0.18 20) 12%, var(--surface-50)) !important;
+    border-color: color-mix(in oklab, oklch(0.6 0.18 20) 18%, transparent) !important;
+    & [data-icon] {
+      color: #fda4af !important;
+      opacity: 0.8 !important;
+    }
+  }
+
+  &[data-type='warning'] {
+    --callout-hue: oklch(0.7 0.15 60);
+    background-color: color-mix(in oklab, oklch(0.7 0.15 60) 12%, var(--surface-50)) !important;
+    border-color: color-mix(in oklab, oklch(0.7 0.15 60) 18%, transparent) !important;
+    & [data-icon] {
+      color: #fcd34d !important;
+      opacity: 0.8 !important;
+    }
+  }
+
+  &[data-type='info'] {
+    --callout-hue: oklch(0.6 0.17 250);
+    background-color: color-mix(in oklab, oklch(0.6 0.17 250) 12%, var(--surface-50)) !important;
+    border-color: color-mix(in oklab, oklch(0.6 0.17 250) 18%, transparent) !important;
+    & [data-icon] {
+      color: #93c5fd !important;
+      opacity: 0.8 !important;
+    }
+  }
+
+  &[data-type='loading'] {
+    --callout-hue: oklch(0.6 0.17 300);
+    background-color: color-mix(in oklab, oklch(0.6 0.17 300) 12%, var(--surface-50)) !important;
+    border-color: color-mix(in oklab, oklch(0.6 0.17 300) 18%, transparent) !important;
+    & [data-icon] {
+      color: #c4b5fd !important;
+      opacity: 0.8 !important;
+    }
+  }
+
+  &[data-type='default'] {
+    --callout-hue: oklch(0.6 0.17 250);
+    background-color: color-mix(in oklab, oklch(0.6 0.17 250) 12%, var(--surface-50)) !important;
+    border-color: color-mix(in oklab, oklch(0.6 0.17 250) 18%, transparent) !important;
+    & [data-icon] {
+      color: #93c5fd !important;
+      opacity: 0.8 !important;
+    }
   }
 }

@@ -15,6 +15,7 @@ type TooltipProviderProps = ComponentProps<typeof TooltipPrimitive.Provider> & {
   delayDuration?: number
 }
 
+/** Wraps the app so tooltips share one delay, the second opening at once after the first */
 export const TooltipProvider = ({ delayDuration = 0, delay, ...props }: TooltipProviderProps) => (
   <TooltipPrimitive.Provider delay={delay ?? delayDuration} {...props} />
 )
@@ -60,6 +61,7 @@ const ARROW_CLASS = cn(
   'data-[side=right]:left-[-7.5px] data-[side=right]:-rotate-90',
 )
 
+/** The tooltip itself, optionally showing the keyboard shortcut for whatever it describes */
 export const TooltipContent = forwardRef<HTMLDivElement, TooltipContentProps>(
   ({ align, alignOffset, className, side, sideOffset = 6, children, shortcut, ...props }, ref) => (
     <TooltipPrimitive.Portal>

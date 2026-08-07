@@ -22,6 +22,13 @@ interface InfiniteCarouselProps<T> {
   loopMultiplier?: number
 }
 
+/**
+ * A row that scrolls on its own and never reaches an end, used for the marquees of cards on the
+ * landing page.
+ *
+ * Scrolling pauses under the pointer so something can be read or clicked, but not on drag, which
+ * would otherwise leave the row stopped for good after a stray swipe.
+ */
 export function InfiniteCarousel<T>({
   items,
   renderItem,
@@ -56,6 +63,10 @@ export function InfiniteCarousel<T>({
     plugins,
   )
 
+  /**
+   * The items repeated, since a loop can only be seamless where the row is wider than the screen.
+   * A short list is repeated more, having less to fill that width with in the first place.
+   */
   const displayItems = useMemo(
     () =>
       Array(loopMultiplier ?? (items.length < 5 ? 4 : 2))
@@ -74,6 +85,7 @@ export function InfiniteCarousel<T>({
     >
       <div className={cn('flex touch-pan-y will-change-transform', containerClassName)}>
         {displayItems.map((item, index) => {
+          /* Which item this is, and which pass of the list it belongs to, so copies key apart */
           const originalIndex = index % items.length
           const loopIndex = Math.floor(index / items.length)
           const key = `${keyExtractor(item, originalIndex)}-${loopIndex}`

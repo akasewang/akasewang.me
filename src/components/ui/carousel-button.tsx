@@ -1,7 +1,7 @@
 'use client'
 
-import Link from 'next/link'
 import { Icons } from '@/components/ui/icons'
+import { Link } from '@/components/ui/route-link'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { useSoundEffects } from '@/hooks/use-sound-effects'
 import { cn } from '@/utils/utils'
@@ -14,6 +14,7 @@ interface CarouselButtonProps {
   className?: string
 }
 
+/** The control that leads from a landing page carousel through to its fuller page */
 export function CarouselButton({
   href,
   label,

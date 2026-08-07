@@ -16,10 +16,14 @@ messages with cursor-based infinite scrolling.
 - Messages persist to the Neon Postgres database through Drizzle, the same stack as the rest of the site.
 - Raw IP addresses are not stored with messages. Pagination uses the numeric message id as a cursor
   and caps each server request.
-- Entering the configured admin email in the name input requests a one-time code. The next valid
-  eight-character code entered in the message input is exchanged for a server-side session; neither
-  value is posted.
+- Entering the configured admin email in the name input requests a short-lived eight-character
+  code. After that request in the same browser flow, a matching code entered in the message input is
+  validated to create a server-side session. The email and code are sent only to authentication
+  Server Actions and are never inserted into or published on the message board. The code is valid
+  for ten minutes with at most five failed guesses and stays usable during that window so the same
+  sign-in flow can be completed from another admin surface.
 - The session is represented by an httpOnly cookie backed by a hashed, expiring database record.
   Delete and reply Server Actions verify that session before every privileged mutation.
-- `useAdmin` mirrors session status across components and tabs (see [State & Hooks](state.md)). The
-  visible **Leave Admin Mode** button ends the server session and clears its cookie.
+- `useAdmin` refreshes same-tab admin UI immediately and rechecks the shared cookie when another tab
+  is focused (see [State & Hooks](state.md)). The visible **Leave Admin Mode** button deletes the
+  database session and clears its cookie.

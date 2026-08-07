@@ -11,6 +11,12 @@ interface GradientAvatarProps {
   className?: string
 }
 
+/**
+ * Stands in for a photo on the message board, giving each name its own gradient.
+ *
+ * The colours come from the name itself, so the same person is always drawn the same way with
+ * nothing stored, and a little noise is laid over it to keep the blend from banding.
+ */
 export const GradientAvatar = memo(function GradientAvatar({
   name,
   size = 30,

@@ -15,6 +15,7 @@ export const metadata: Metadata = constructMetadata({
   imageAlt: newsletterSeoContent.imageAlt,
 })
 
+/** the newsletter signup page */
 export default function NewsletterPage() {
   const breadcrumbJsonLd = getBreadcrumbSchema([
     { name: 'Home', url: SITE_URL },

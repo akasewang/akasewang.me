@@ -1,5 +1,6 @@
 import type { TimelineItemProps } from '@/types/site'
 
+/** Schools and degrees, newest first, drawn as a timeline on the landing page */
 export const education: TimelineItemProps[] = [
   {
     id: 'bachelor-of-technology-in-data-science',

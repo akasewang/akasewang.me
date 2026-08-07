@@ -1,7 +1,6 @@
 'use client'
 
 import { AnimatePresence, m } from 'framer-motion'
-import { usePathname } from 'next/navigation'
 import { useEffect, useMemo, useRef } from 'react'
 import { BlogPostCard } from '@/components/blogs/blog-post-card'
 import { EmptyState } from '@/components/common/empty-state'
@@ -12,12 +11,14 @@ import { HoverHighlight } from '@/components/ui/hover-highlight'
 import { ViewAll } from '@/components/ui/view-all'
 import { blogsListingContent } from '@/data/content/blogs-content'
 import { landingPageContent } from '@/data/content/landing-content'
+import { usePageArriving } from '@/hooks/use-page-arrival'
 import type { BlogCategory, BlogPost } from '@/types/blog'
 
 interface FeaturedPostsProps {
   filterType?: BlogCategory
   searchQuery?: string
   posts: BlogPost[]
+  isHomePage?: boolean
 }
 
 const { featuredPosts } = landingPageContent.sections
@@ -25,12 +26,16 @@ const { featuredPosts } = landingPageContent.sections
 const EMPTY_MESSAGES: Partial<Record<BlogCategory, string>> = {
   technical: blogsListingContent.noTechnical,
   personal: blogsListingContent.noPersonal,
-  'short-notes': blogsListingContent.noShortNotes,
 }
 
-export function FeaturedPosts({ filterType, searchQuery, posts }: FeaturedPostsProps) {
-  const pathname = usePathname()
-  const isHomePage = pathname === '/'
+/** The most recent posts on the landing page, with a link through to the rest */
+export function FeaturedPosts({
+  filterType,
+  searchQuery,
+  posts,
+  isHomePage = false,
+}: FeaturedPostsProps) {
+  const isArriving = usePageArriving()
   const { prefetchViews } = useViews()
   const listRef = useRef<HTMLDivElement>(null)
 
@@ -62,12 +67,17 @@ export function FeaturedPosts({ filterType, searchQuery, posts }: FeaturedPostsP
   }, [displayed, prefetchViews])
 
   return (
-    <section id="posts" className="space-y-6 animate-page-simple">
+    <section id="posts" className="space-y-6">
       {isHomePage && <SectionTitle>{featuredPosts.title}</SectionTitle>}
 
       <AnimatePresence mode="popLayout">
         {displayed.length > 0 ? (
-          <m.div key="post-list" ref={listRef} layout className="relative space-y-4">
+          <m.div
+            key="post-list"
+            ref={listRef}
+            layout={!isArriving ? 'position' : false}
+            className="relative space-y-4"
+          >
             <HoverHighlight parentRef={listRef} />
             {displayed.map((post) => (
               <AnimatedListItem key={post.slug}>

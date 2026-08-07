@@ -23,17 +23,18 @@ const SHARED_CAROUSEL_PROPS = {
   renderItem: (item: Testimonial) => <TestimonialCard testimonial={item} className="w-[400px]" />,
 }
 
+/** The testimonials carousel on the landing page */
 export function Testimonials() {
   const router = useRouter()
   const { navigate: navigateSound } = useSoundEffects()
 
   useKeyboardShortcut('T', () => {
     navigateSound()
-    router.push('/testimonials')
+    router.push('/testimonials', { scroll: false })
   })
 
   return (
-    <section id="testimonials" className="animate-page-simple">
+    <section id="testimonials">
       <div className="relative">
         <div className="mask-fade-l relative flex flex-col gap-2 py-2">
           <InfiniteCarousel

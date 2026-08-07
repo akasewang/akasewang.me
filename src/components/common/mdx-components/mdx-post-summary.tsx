@@ -11,6 +11,7 @@ interface MdxPostSummaryProps {
   keywordsClassName?: string
 }
 
+/** The standfirst under a post's title, with its links and topic tags */
 export function MdxPostSummary({
   excerpt,
   linkLabel,

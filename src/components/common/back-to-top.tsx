@@ -21,6 +21,8 @@ import { SMOOTH_SPRING_TRANSITION, SPRING_TRANSITION } from '@/constants/ui'
 import { commonContent } from '@/data/content/layout-content'
 import { useSoundEffects } from '@/hooks/use-sound-effects'
 
+import { cn } from '@/utils/utils'
+
 const buttonVariants: Variants = {
   initial: { opacity: 0, scale: 0.5, y: 20 },
   animate: { opacity: 1, scale: 1, y: 0 },
@@ -32,6 +34,7 @@ const buttonVariants: Variants = {
   },
 }
 
+/** The arrow enters from the side it points away from, so the swap reads as it turning around */
 const iconVariants: Variants = {
   initial: (isDown: boolean) => ({
     opacity: 0,
@@ -42,6 +45,17 @@ const iconVariants: Variants = {
   exit: (isDown: boolean) => ({ opacity: 0, y: isDown ? 20 : -20, scale: 0.5 }),
 }
 
+/**
+ * The floating button that sends the reader down to the next section, then back to the top once
+ * there is nothing left below.
+ *
+ * The ring around it is scroll position drawn as an arc, using a dash offset run through a spring
+ * so it settles rather than tracking every jitter of the wheel. It completes at nine tenths of the
+ * page, since the last stretch is footer nobody reads to.
+ *
+ * Page measurements are kept in a ref and refreshed on resize, so scrolling reads numbers already
+ * taken instead of asking the layout for them on every frame.
+ */
 export function BackToTop() {
   const { navigate: navigateSound, hoverTick } = useSoundEffects()
   const { scrollYProgress, scrollY } = useScroll()
@@ -130,7 +144,7 @@ export function BackToTop() {
     })
   }, [mode, navigateSound])
 
-  const Icon = mode === 'down' ? Icons.arrowDownward : Icons.doubleArrowUp
+  const Icon = mode === 'down' ? Icons.chevronDown : Icons.doubleArrowUp
 
   return (
     <AnimatePresence>
@@ -146,7 +160,7 @@ export function BackToTop() {
           exit="exit"
           transition={SMOOTH_SPRING_TRANSITION}
           whileTap={{ scale: 0.95 }}
-          className="group fixed bottom-8 right-8 z-50 flex size-[58px] items-center justify-center rounded-full bg-floating ring-1 ring-inset ring-ring retina:ring-[0.5px] shadow-md md:bottom-10"
+          className="group fixed bottom-[28px] right-[28px] z-50 flex size-[58px] items-center justify-center rounded-full bg-floating ring-1 ring-inset ring-ring retina:ring-[0.5px] shadow-md md:bottom-[36px]"
         >
           <svg
             viewBox={`0 0 ${BACK_TO_TOP_SIZE} ${BACK_TO_TOP_SIZE}`}
@@ -176,7 +190,12 @@ export function BackToTop() {
             />
           </svg>
 
-          <div className="relative mb-[1px] flex size-full items-center justify-center overflow-hidden rounded-full">
+          <div
+            className={cn(
+              'relative flex size-full items-center justify-center overflow-hidden rounded-full',
+              mode === 'up' ? 'mb-[1px]' : 'translate-y-[1px]',
+            )}
+          >
             <AnimatePresence initial={false}>
               <m.div
                 key={mode}

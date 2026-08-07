@@ -1,18 +1,18 @@
 'use client'
 
-import Link from 'next/link'
 import { ViewCounter } from '@/components/common/view-counter'
-import { NewTag } from '@/components/ui/new-tag'
+import { Link } from '@/components/ui/route-link'
 import { SeparatorBullet } from '@/components/ui/separator-bullet'
 import { useSoundEffects } from '@/hooks/use-sound-effects'
 import type { BlogPost } from '@/types/blog'
-import { cn, formatDateString, isNew } from '@/utils/utils'
+import { cn, formatDateString } from '@/utils/utils'
 
 interface BlogPostCardProps {
   post: BlogPost
   className?: string
 }
 
+/** One post in the listing: its title, date, view count and standfirst */
 export function BlogPostCard({
   post: { title, slug, date, excerpt },
   className,
@@ -33,22 +33,13 @@ export function BlogPostCard({
     >
       <article className="flex flex-col">
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between sm:gap-6">
-          <h3 className="text-balance text-[15px] tracking-tight text-primary sm:text-base">
-            {title}
-            {isNew(date) && <NewTag className="ml-2 inline-flex align-middle" />}
-          </h3>
+          <h3 className="text-balance text-base tracking-tight text-primary">{title}</h3>
 
-          <div className="hidden sm:flex shrink-0 items-center font-mono tabular-nums text-[12.5px] text-muted-foreground mt-0.5">
+          <div className="mt-1 flex shrink-0 items-center font-mono tabular-nums text-[12.5px] text-muted-foreground sm:mt-0.5">
             <time className="whitespace-nowrap">{formatDateString(date)}</time>
             <SeparatorBullet />
             <ViewCounter slug={slug} readOnly />
           </div>
-        </div>
-
-        <div className="flex sm:hidden items-center font-mono text-[11.5px] text-muted-foreground mt-1">
-          <time className="whitespace-nowrap">{formatDateString(date)}</time>
-          <SeparatorBullet />
-          <ViewCounter slug={slug} readOnly />
         </div>
 
         {excerpt && (

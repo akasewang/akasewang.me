@@ -17,6 +17,7 @@ export const metadata: Metadata = constructMetadata({
   imageAlt: projectsSeoContent.imageAlt,
 })
 
+/** the projects grid, filtered in the browser */
 export default async function ProjectsPage() {
   const projects = await getAllProjects()
 

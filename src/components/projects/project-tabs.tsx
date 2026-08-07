@@ -6,6 +6,7 @@ import { PROJECT_CATEGORIES } from '@/constants/categories'
 import { useContentListState } from '@/hooks/use-content-list-state'
 import type { ProjectPostData } from '@/types/project'
 
+/** The projects listing with its category filter, search and sort */
 export function ProjectTabs({ projects }: { projects: ProjectPostData[] }) {
   const {
     category,

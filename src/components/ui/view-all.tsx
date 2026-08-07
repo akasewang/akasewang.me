@@ -1,7 +1,7 @@
 'use client'
 
-import Link from 'next/link'
 import { Icons } from '@/components/ui/icons'
+import { Link } from '@/components/ui/route-link'
 import { useSoundEffects } from '@/hooks/use-sound-effects'
 import { cn } from '@/utils/utils'
 
@@ -11,6 +11,7 @@ interface ViewAllProps {
   className?: string
 }
 
+/** The link at the foot of a landing page section, through to its fuller page */
 export function ViewAll({ href, label, className }: ViewAllProps) {
   const { hoverLink, navigate: navigateSound } = useSoundEffects()
 

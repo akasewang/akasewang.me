@@ -8,26 +8,22 @@ const TOAST_OPTIONS = {
   unstyled: true,
   classNames: {
     toast:
-      'group/toast relative flex w-full items-start gap-3.5 rounded-xl bg-toast px-4 py-3.5 font-sans shadow-xl ring-1 ring-inset ring-ring/80 retina:ring-[0.5px] transition-[background-color,box-shadow,transform,opacity,scale] antialiased',
-    content: 'flex min-w-0 flex-1 flex-col gap-1.5 pr-6',
-    icon: 'mt-[1px] flex shrink-0 items-center justify-center text-primary [&>svg]:size-[18px]',
-    loader: 'mt-[1px] shrink-0 opacity-50',
-    title: 'text-sm font-medium leading-5 tracking-[-0.02em] text-primary',
-    description:
-      'text-[13px] font-normal leading-[1.6] text-muted-foreground [&_strong]:font-medium [&_strong]:text-foreground',
+      'sonner-toast-callout group/toast relative flex w-full select-none items-center gap-2 rounded-lg px-3 py-2 font-sans transition-[background-color,border-color,box-shadow,transform,scale,opacity] duration-200 antialiased',
+    content: 'flex min-w-0 flex-1 flex-col gap-0.5 pr-4',
+    icon: 'flex shrink-0 items-center justify-center [&>svg]:size-3.5',
+    loader: 'shrink-0 opacity-70',
+    title: 'text-xs font-medium tracking-tight text-primary/90',
+    description: 'text-xs leading-relaxed text-muted-foreground mt-0.5',
     actionButton:
-      'inline-flex shrink-0 items-center justify-center rounded-md bg-primary px-3 py-1.5 text-[13px] font-medium text-primary-foreground transition-[background-color,box-shadow,transform,scale] supports-hover:hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-toast active:bg-primary/90 active:scale-[0.95]',
+      'inline-flex shrink-0 items-center justify-center rounded-md bg-[color-mix(in_oklab,var(--callout-hue)_25%,var(--surface-50))] border border-[var(--callout-border)] px-2.5 py-1 text-xs font-medium text-primary transition-[background-color,border-color,color,transform,scale,opacity] duration-200 ease-out supports-hover:hover:bg-[color-mix(in_oklab,var(--callout-hue)_35%,var(--surface-50))] active:scale-95 active:duration-150',
     cancelButton:
-      'inline-flex shrink-0 items-center justify-center rounded-md bg-muted px-3 py-1.5 text-[13px] font-medium text-muted-foreground transition-colors supports-hover:hover:bg-muted/80 supports-hover:hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring active:bg-muted/80 active:text-primary',
+      'inline-flex shrink-0 items-center justify-center rounded-md bg-surface-40 border border-border/40 px-2.5 py-1 text-xs font-medium text-muted-foreground transition-[background-color,border-color,color,transform,scale,opacity] duration-200 ease-out supports-hover:hover:bg-surface-50 supports-hover:hover:text-primary active:scale-95 active:duration-150',
     closeButton:
-      'absolute right-2.5 top-2.5 flex items-center justify-center rounded-md p-1 text-muted-foreground opacity-0 transition-[color,background-color,opacity] !bg-transparent supports-hover:hover:!bg-muted/50 supports-hover:hover:text-primary focus-visible:opacity-100 supports-hover:group-hover/toast:opacity-100 active:!bg-muted/50 active:text-primary [@media(hover:none)]:opacity-100',
-    success: 'bg-success/10 ring-ring [&_[data-icon]]:text-success',
-    error: 'bg-destructive/10 ring-ring [&_[data-icon]]:text-destructive',
-    warning: 'bg-warning/10 ring-ring [&_[data-icon]]:text-warning',
-    info: 'bg-verified/10 ring-ring [&_[data-icon]]:text-verified',
+      'absolute right-2 top-1/2 -translate-y-1/2 flex size-5 items-center justify-center rounded !bg-transparent !p-0 !border-0 text-secondary/60 transition-[color,transform,scale,opacity] duration-200 ease-out supports-hover:hover:text-primary active:text-primary active:scale-90 active:duration-150 [&>svg]:size-3.5',
   },
 }
 
+/** The toast host, styled to match the site rather than the library's defaults */
 export function Toaster(props: ComponentProps<typeof Sonner>) {
   return (
     <Sonner
@@ -37,9 +33,9 @@ export function Toaster(props: ComponentProps<typeof Sonner>) {
       toastOptions={TOAST_OPTIONS}
       icons={{
         success: <Icons.checkCircle />,
-        error: <Icons.cancelCircle />,
+        error: <Icons.alertCircle />,
         warning: <Icons.alertTriangle />,
-        info: <Icons.lightbulb />,
+        info: <Icons.question />,
       }}
       {...props}
     />

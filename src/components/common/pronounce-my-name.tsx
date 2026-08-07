@@ -15,6 +15,7 @@ interface PronounceMyNameProps {
   namePronunciationUrl: string
 }
 
+/** Plays a recording of how the name is said */
 export function PronounceMyName({ className, namePronunciationUrl }: PronounceMyNameProps) {
   const { play, preload } = useSoundLazy(namePronunciationUrl)
   const { hoverTick } = useSoundEffects()

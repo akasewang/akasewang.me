@@ -15,6 +15,7 @@ interface PhotoOverlayProps {
   onClose: () => void
 }
 
+/** A photo opened full screen, steppable through the rest with the arrow keys */
 export function PhotoOverlay({ photo, isOpen, onClose }: PhotoOverlayProps) {
   const { zoom } = useSoundEffects()
   useScrollLock(isOpen)

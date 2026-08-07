@@ -16,6 +16,7 @@ export const metadata: Metadata = constructMetadata({
   imageAlt: catalogSeoContent.imageAlt,
 })
 
+/** everything read, watched and played */
 export default function CatalogPage() {
   const breadcrumbJsonLd = getBreadcrumbSchema([
     { name: 'Home', url: SITE_URL },

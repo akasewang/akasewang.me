@@ -3,11 +3,10 @@ import { and, eq, gte, lt } from 'drizzle-orm'
 import { NextResponse } from 'next/server'
 import React from 'react'
 import { WeeklySummaryTemplate } from '@/components/emails/weekly-summary-template'
+import { adminRecipient, otpSender } from '@/lib/admin-otp'
 import { db } from '@/lib/db/drizzle'
 import { actionRateLimit, newsletterSubscribers } from '@/lib/db/schema'
-import { getResend, SENDER_EMAIL } from '@/lib/resend'
-
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL
+import { getNewsletterSender, getResend } from '@/lib/resend'
 
 /**
  * Mails the week's new subscribers to the owner. Reachable on the public internet, so the bearer
@@ -20,8 +19,20 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  if (!ADMIN_EMAIL) {
-    return NextResponse.json({ error: 'Missing ADMIN_EMAIL environment variable' }, { status: 500 })
+  const recipient = adminRecipient()
+  if (!recipient) {
+    return NextResponse.json(
+      { error: 'Missing RESEND_ADMIN_EMAIL environment variable' },
+      { status: 500 },
+    )
+  }
+
+  const sender = getNewsletterSender() || otpSender()
+  if (!sender) {
+    return NextResponse.json(
+      { error: 'Missing sender email configuration (RESEND_NEWSLETTER_EMAIL or RESEND_OTP_EMAIL)' },
+      { status: 500 },
+    )
   }
 
   try {
@@ -54,9 +65,11 @@ export async function GET(request: Request) {
       }),
     )
 
+    const fromAddress = sender.includes('<') ? sender : `Weekly Cron <${sender}>`
+
     const { error } = await getResend().emails.send({
-      from: `Weekly Cron <${SENDER_EMAIL}>`,
-      to: ADMIN_EMAIL,
+      from: fromAddress,
+      to: recipient,
       subject: `Weekly Subscriber Summary - ${count} new!`,
       html: htmlContent,
     })

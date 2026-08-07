@@ -1,5 +1,6 @@
 import type { TimelineItemProps } from '@/types/site'
 
+/** Awards and recognitions, newest first, drawn as a timeline on the landing page */
 export const achievements: TimelineItemProps[] = [
   {
     id: 'mongodb-diamante-track-winner',

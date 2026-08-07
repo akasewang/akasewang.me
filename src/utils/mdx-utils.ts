@@ -5,7 +5,7 @@ import { load as loadYaml } from 'js-yaml'
 import { parseAnyDate } from '@/utils/utils'
 
 interface MdxFileData {
-  date: string | Date
+  date?: string | Date
   [key: string]: unknown
 }
 
@@ -85,27 +85,24 @@ export async function getMdxSlugs(baseDir: string) {
   }
 }
 
-/** Reads a file and gives frontmatter a date, defaulting to now so sorting always has a value */
+/**
+ * Reads a file and its frontmatter. A missing date is left missing rather than backfilled with
+ * now, so content that genuinely has no date stays that way. Sorting puts those entries last.
+ */
 export async function readMdxFile(
   filePath: string,
 ): Promise<{ content: string; data: MdxFileData }> {
   const fileContent = await fs.readFile(/* turbopackIgnore: true */ filePath, 'utf8')
   const { content, data } = parseFrontmatter(fileContent)
 
-  return {
-    content,
-    data: {
-      ...data,
-      date: data.date || new Date().toISOString(),
-    } as MdxFileData,
-  }
+  return { content, data: data as MdxFileData }
 }
 
 /**
  * Frontmatter for one slug with the slug folded in, or null for anything unreadable. Callers use
  * the null to answer notFound rather than having to catch.
  */
-export async function getMdxFrontmatter<T extends { date: string | Date; slug: string }>(
+export async function getMdxFrontmatter<T extends { date?: string | Date; slug: string }>(
   baseDir: string,
   slug: string,
 ): Promise<T | null> {
@@ -120,8 +117,8 @@ export async function getMdxFrontmatter<T extends { date: string | Date; slug: s
   }
 }
 
-/** Newest first. Dates that will not parse sort to the end rather than dropping out */
-export function sortMdxByDate<T extends { date: string | Date }>(posts: T[]): T[] {
+/** Newest first. Dates that are missing or will not parse sort to the end rather than dropping out */
+export function sortMdxByDate<T extends { date?: string | Date }>(posts: T[]): T[] {
   return posts
     .map((post) => ({
       post,

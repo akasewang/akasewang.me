@@ -11,9 +11,10 @@ const renderBookmark = (bookmark: TimelineItemProps) => (
   <TimelineItem key={bookmark.id} {...bookmark} />
 )
 
+/** Writing and talks worth keeping, as a timeline on the landing page */
 export function Bookmarks() {
   return (
-    <section id="bookmarks" className="space-y-6 animate-page-simple">
+    <section id="bookmarks" className="space-y-6">
       <SectionTitle>{landingPageContent.sections.bookmarks}</SectionTitle>
       <ExpandableList items={bookmarks} renderItem={renderBookmark} />
     </section>

@@ -3,10 +3,7 @@
 import { domMax, LazyMotion, MotionConfig } from 'framer-motion'
 import type { ReactNode } from 'react'
 
-/**
- * reducedMotion user drops every positional value app wide, transforms and layout plus width and
- * height, leaving fades and colour to still play. Components do not check the preference themselves.
- */
+/** Loads framer's features on demand, so the animation code is not in the first bundle */
 export function MotionProvider({ children }: { children: ReactNode }) {
   return (
     <LazyMotion features={domMax} strict>

@@ -23,6 +23,7 @@ type MessageBubblesProps = {
   onReply: (id: number, text: string) => Promise<boolean>
 }
 
+/** One message and the owner's reply beneath it, drawn as a short exchange */
 export const MessageBubbles = memo(
   ({ msg, msgDate, showDayHeader, isAdmin, onDelete, onReply }: MessageBubblesProps) => {
     const { tap, clickPop, hoverTick } = useSoundEffects()

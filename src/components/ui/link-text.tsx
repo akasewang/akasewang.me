@@ -1,8 +1,8 @@
 'use client'
 
-import Link from 'next/link'
 import type { ReactNode } from 'react'
 import { AnimatedArrow } from '@/components/ui/animated-arrow'
+import { Link } from '@/components/ui/route-link'
 import { useSoundEffects } from '@/hooks/use-sound-effects'
 import { cn } from '@/utils/utils'
 
@@ -14,6 +14,7 @@ interface LinkTextProps {
   showIcon?: boolean
 }
 
+/** A link inside running text, underlined on hover rather than by default */
 export function LinkText({ href, children, className, target, showIcon = true }: LinkTextProps) {
   const { hoverLink, navigate: navigateSound } = useSoundEffects()
   const isExternal = href.startsWith('http')

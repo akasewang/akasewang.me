@@ -12,6 +12,7 @@ import { getAllBlogPosts, getBlogPost, getBlogSlugs } from '@/lib/managers/blog-
 import { constructMetadata, getOgImageUrl } from '@/lib/metadata'
 import { getAdjacentContent } from '@/utils/content-utils'
 
+/** One page per post file, so every post is built ahead of any request for it */
 export function generateStaticParams() {
   return getBlogSlugs()
 }
@@ -35,6 +36,7 @@ export async function generateMetadata({ params }: { params: PageParams }): Prom
   })
 }
 
+/** A single post: its header, the MDX body and the contents alongside it */
 export default async function BlogPost({ params }: { params: PageParams }) {
   const { slug } = await params
   const post = await getBlogPost(slug)
@@ -60,9 +62,9 @@ export default async function BlogPost({ params }: { params: PageParams }) {
   const { previous: prevPost, next: nextPost } = getAdjacentContent(allPosts, postSlug)
 
   return (
-    <div className="group/blog">
+    <div className="group/blog relative">
       <AsideTOC content={content} />
-      <div className="relative space-y-6 animate-page-simple">
+      <div className="relative space-y-6">
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{

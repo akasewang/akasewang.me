@@ -12,6 +12,16 @@ A high level look at how the site runs, handles data and manages SEO.
 ## Database & Views
 
 - Data lives in a serverless Postgres database from Neon, queried through Drizzle ORM for end to end type safety.
+- The schema has six tables with separate responsibilities:
+  - `views` stores one aggregate counter per content slug.
+  - `newsletter_subscribers` stores normalized email addresses, stable unsubscribe UUIDs, active
+    state and the current subscription date.
+  - `message_board` stores public messages and optional admin replies.
+  - `admin_otp` stores the current short-lived admin-code hash, expiry and failed-attempt count.
+  - `admin_session` stores hashes and expiries for revocable browser sessions.
+  - `action_rate_limit` stores expiring HMAC keys for public-action cooldowns.
+- Subscriber and message rows do not contain IP addresses. The only IP-derived value retained is the
+  pseudonymous, action-scoped HMAC key in `action_rate_limit` until its expired row is cleaned up.
 - **View Counter** (`src/lib/actions/views.ts`, Server Actions):
   - Increments are a single atomic Postgres upsert (`INSERT ... ON CONFLICT DO UPDATE SET count = count + 1`), so concurrent views never race.
   - A `sessionStorage` key (`viewed-<slug>`) plus an in-memory guard caps it at one successful
@@ -19,6 +29,15 @@ A high level look at how the site runs, handles data and manages SEO.
   - Lists batch their reads: `ViewsProvider` coalesces `prefetchViews` calls within a 50 ms window
     into one `getViewsBatchAction` (`WHERE slug IN (...)`) and caches the result in `localStorage`
     for five minutes. Incremented counts update from the value returned by the database.
+  - **Visits**: a project that carries an `external` link has no page here to be viewed, so its card
+    counts being opened instead, recorded by the card itself through `recordVisit` when it is
+    followed. The tally is kept in the same table under a `visit:` prefixed key, which cannot
+    collide with a page view: a content slug is validated against `[a-z0-9][a-z0-9_-]*` and can
+    never contain a colon. Everything else is shared unchanged, including the once per session
+    guard, so opening a project twice in a session counts once.
+  - `countKeyFor` decides which of the two a given item uses, and is the single rule the counter,
+    the listing prefetch and sorting by count all read. Deriving it separately in any of them would
+    let a card show one number while the sort ordered by another.
 
 ## Public Action Cooldowns
 
@@ -42,8 +61,9 @@ node -e "console.log('RATE_LIMIT_SECRET=' + require('crypto').randomBytes(32).to
 
 - Vercel invokes `/api/cron/weekly-summary` every Sunday at `09:00 UTC`, as declared in
   `vercel.json`.
-- The route requires `Authorization: Bearer <CRON_SECRET>`, reads the week's active signups, cleans
-  expired cooldown rows and sends the summary through Resend.
+- The route requires `Authorization: Bearer <CRON_SECRET>`, selects active addresses created or
+  reactivated during the previous seven days, cleans expired cooldown rows and sends the summary
+  through Resend.
 - Vercel does not create the secret. Generate it separately from `RATE_LIMIT_SECRET`:
 
 ```bash
@@ -51,6 +71,19 @@ node -e "console.log('CRON_SECRET=' + require('crypto').randomBytes(32).toString
 ```
 
 Configure both secrets in local `.env` and in Vercel, then redeploy after adding or rotating them.
+Run `npm run db:push` whenever the Drizzle schema changes, including before deploying the admin and
+cooldown tables for the first time.
+
+## Admin Authentication
+
+- Admin access uses an emailed eight-character code instead of a password or command prefix. The
+  recipient is `RESEND_ADMIN_EMAIL`, sent from `RESEND_OTP_EMAIL`.
+- The database keeps the code's hash, ten-minute expiry and failed-attempt count. A successful code
+  exchange creates a random session token in an httpOnly, same-site cookie; only the token hash and
+  one-hour expiry are stored.
+- Message moderation and newsletter broadcasts validate that revocable session independently for
+  every privileged Server Action. See [Newsletter & Admin Access](newsletter.md) for the complete
+  flow.
 
 ## GitHub Integration
 

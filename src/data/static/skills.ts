@@ -1,5 +1,6 @@
 import type { SkillRows } from '@/types/home'
 
+/** The skills grid, split into two rows so each can scroll in its own direction */
 export const skillRows: SkillRows = {
   firstRow: [
     {
@@ -16,13 +17,7 @@ export const skillRows: SkillRows = {
       url: 'https://developer.mozilla.org/en-US/docs/Web/JavaScript',
       category: 'frontend',
     },
-    {
-      id: 'html',
-      name: 'HTML5',
-      icon: '/skill-icons/html.svg',
-      url: 'https://developer.mozilla.org/en-US/docs/Web/HTML',
-      category: 'frontend',
-    },
+
     {
       id: 'react',
       name: 'React',
@@ -58,13 +53,7 @@ export const skillRows: SkillRows = {
       url: 'https://mui.com',
       category: 'frontend',
     },
-    {
-      id: 'redux',
-      name: 'Redux',
-      icon: '/skill-icons/redux.svg',
-      url: 'https://redux.js.org',
-      category: 'frontend',
-    },
+
     {
       id: 'framer',
       name: 'Framer Motion',
@@ -123,13 +112,7 @@ export const skillRows: SkillRows = {
       url: 'https://www.prisma.io',
       category: 'backend',
     },
-    {
-      id: 'supabase',
-      name: 'Supabase',
-      icon: '/skill-icons/supabase.svg',
-      url: 'https://supabase.com',
-      category: 'backend',
-    },
+
     {
       id: 'postgresql',
       name: 'PostgreSQL',
@@ -151,13 +134,7 @@ export const skillRows: SkillRows = {
       url: 'https://www.mysql.com',
       category: 'backend',
     },
-    {
-      id: 'redis',
-      name: 'Redis',
-      icon: '/skill-icons/redis.svg',
-      url: 'https://redis.io',
-      category: 'backend',
-    },
+
     {
       id: 'git',
       name: 'Git',
@@ -165,13 +142,7 @@ export const skillRows: SkillRows = {
       url: 'https://git-scm.com',
       category: 'tools',
     },
-    {
-      id: 'github',
-      name: 'GitHub',
-      icon: '/skill-icons/github.svg',
-      url: 'https://github.com',
-      category: 'tools',
-    },
+
     {
       id: 'figma',
       name: 'Figma',
@@ -207,13 +178,7 @@ export const skillRows: SkillRows = {
       url: 'https://kubernetes.io',
       category: 'devops',
     },
-    {
-      id: 'rust',
-      name: 'Rust',
-      icon: '/skill-icons/rust.svg',
-      url: 'https://www.rust-lang.org',
-      category: 'languages',
-    },
+
     {
       id: 'cpp',
       name: 'C++',

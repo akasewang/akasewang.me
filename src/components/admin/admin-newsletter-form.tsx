@@ -28,6 +28,7 @@ import { signInAdmin } from '@/lib/actions/admin-session-actions'
 import { broadcastNewsletter } from '@/lib/actions/newsletter-actions'
 import type { BlogPost } from '@/types/blog'
 
+/** The owner's composer for a newsletter issue, with a preview and a test send */
 export function AdminNewsletterForm({ blogs }: { blogs: BlogPost[] }) {
   const [adminEmail, setAdminEmail] = useState('')
   const [adminSecret, setAdminSecret] = useState('')
@@ -41,11 +42,6 @@ export function AdminNewsletterForm({ blogs }: { blogs: BlogPost[] }) {
   const { success, countdown, startCountdown, resetStatus } = useStatusTimer('admin-newsletter')
   const { error: errorSound } = useSoundEffects()
 
-  /**
-   * Read from the code field rather than tracked separately, so the button cannot offer one thing
-   * while submitting does another. A filled code means there is something to spend; anything else
-   * means one still has to be asked for.
-   */
   const isReadyToSend = ADMIN_CODE_SHAPE.test(adminSecret.trim())
   const hasValidAdminEmail = EMAIL_SHAPE.test(adminEmail.trim())
 
@@ -94,10 +90,6 @@ export function AdminNewsletterForm({ blogs }: { blogs: BlogPost[] }) {
     resetStatus()
 
     try {
-      /**
-       * The code buys a session first, and the broadcast reads that. It means the same sign in
-       * carries over to moderating the message board rather than being spent here.
-       */
       const signIn = await signInAdmin(adminSecret.trim())
       if (!signIn.success) {
         errorSound()
@@ -150,10 +142,6 @@ export function AdminNewsletterForm({ blogs }: { blogs: BlogPost[] }) {
           </SelectContent>
         </Select>
 
-        {/**
-         * Neither field is marked required, since which one is needed depends on the step. The
-         * browser would otherwise refuse to submit a code request over the empty code box.
-         */}
         <Input
           type="email"
           autoComplete="email"
@@ -166,7 +154,6 @@ export function AdminNewsletterForm({ blogs }: { blogs: BlogPost[] }) {
           disabled={isDisabled}
         />
 
-        {/** Not lowercased or otherwise touched, since the code is case sensitive */}
         <Input
           type="text"
           autoComplete="one-time-code"

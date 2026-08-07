@@ -24,17 +24,18 @@ const SHARED_CAROUSEL_PROPS = {
   renderItem: (skill: Skill) => <SkillCard skill={skill} />,
 }
 
+/** The skills carousel on the landing page */
 export function Skills() {
   const router = useRouter()
   const { navigate: navigateSound } = useSoundEffects()
 
   useKeyboardShortcut('S', () => {
     navigateSound()
-    router.push('/skills')
+    router.push('/skills', { scroll: false })
   })
 
   return (
-    <section id="skills" className="animate-page-simple">
+    <section id="skills">
       <div className="relative">
         <div className="mask-fade-l relative flex flex-col gap-2 py-2">
           <InfiniteCarousel

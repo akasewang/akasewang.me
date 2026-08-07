@@ -19,6 +19,7 @@ function styled<T extends ElementType>(Tag: T, base: string, name: string) {
   return Comp
 }
 
+/** A table in a post, restyled and made to scroll sideways rather than widen the page */
 const Table = forwardRef<
   HTMLTableElement,
   ComponentProps<'table'> & { containerClassName?: string }

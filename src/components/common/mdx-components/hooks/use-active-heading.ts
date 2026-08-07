@@ -3,6 +3,16 @@
 import { useEffect, useState } from 'react'
 import type { TocItem } from '../utils/parse-toc'
 
+/**
+ * Which heading the reader is currently under, for marking the matching entry in the contents.
+ *
+ * Headings are walked from the bottom up and the first one that has passed the offset line wins,
+ * so a heading counts as active from the moment it reaches the top of the page rather than when it
+ * scrolls out of sight. The last heading is forced active at the very bottom of the page, since a
+ * short final section may never reach that line and would otherwise leave the wrong entry marked.
+ *
+ * Scroll fires far more often than the page can paint, so the work is held to one frame at a time.
+ */
 export function useActiveHeading(items: TocItem[], offset = 120): string {
   const [activeId, setActiveId] = useState('')
 
@@ -54,6 +64,7 @@ export function useActiveHeading(items: TocItem[], offset = 120): string {
   return activeId
 }
 
+/** Scrolls a heading into view, stopping short of the top so it clears the navbar above it */
 export function scrollToHeading(id: string, yOffset = -100): void {
   const element = document.getElementById(id)
   if (element)

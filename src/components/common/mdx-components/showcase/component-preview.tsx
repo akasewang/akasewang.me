@@ -10,6 +10,7 @@ interface ComponentPreviewProps {
   className?: string
 }
 
+/** Renders a live component inside a post, beside the source that produced it */
 export function ComponentPreview({ children, code, className }: ComponentPreviewProps) {
   const canvas = (
     <div

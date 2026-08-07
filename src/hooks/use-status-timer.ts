@@ -1,5 +1,13 @@
 import { useCallback, useEffect, useState } from 'react'
 
+/** Drops the persisted deadline when there is a key, swallowing storage access errors */
+function clearStoredTimer(key: string | null) {
+  if (!key) return
+  try {
+    localStorage.removeItem(key)
+  } catch {}
+}
+
 /**
  * Success and error state for a form, with an optional cooldown the visitor cannot escape by
  * reloading or opening another tab. Passing a storage key persists the deadline, so a rate limit
@@ -38,9 +46,7 @@ export function useStatusTimer(storageKey?: string) {
             return
           }
 
-          try {
-            if (timerStorageKey) localStorage.removeItem(timerStorageKey)
-          } catch {}
+          clearStoredTimer(timerStorageKey)
         } catch {}
       }
 
@@ -74,9 +80,7 @@ export function useStatusTimer(storageKey?: string) {
         setSuccess(false)
         setError(null)
         setExpiresAt(null)
-        try {
-          if (timerStorageKey) localStorage.removeItem(timerStorageKey)
-        } catch {}
+        clearStoredTimer(timerStorageKey)
       },
       Math.max(0, expiresAt - Date.now()),
     )
@@ -90,9 +94,7 @@ export function useStatusTimer(storageKey?: string) {
 
       if (sec <= 0) {
         setExpiresAt(null)
-        try {
-          if (timerStorageKey) localStorage.removeItem(timerStorageKey)
-        } catch {}
+        clearStoredTimer(timerStorageKey)
         return
       }
 
@@ -139,9 +141,7 @@ export function useStatusTimer(storageKey?: string) {
     setError(null)
     setExpiresAt(null)
     setNow(Date.now())
-    try {
-      if (timerStorageKey) localStorage.removeItem(timerStorageKey)
-    } catch {}
+    clearStoredTimer(timerStorageKey)
   }, [timerStorageKey])
 
   return {

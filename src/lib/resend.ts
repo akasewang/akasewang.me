@@ -15,4 +15,4 @@ export function getResend(): Resend {
   return resendInstance
 }
 
-export const SENDER_EMAIL = process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev'
+export const getNewsletterSender = () => process.env.RESEND_NEWSLETTER_EMAIL?.trim() || null

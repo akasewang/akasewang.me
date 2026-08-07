@@ -8,8 +8,11 @@ import { AnimatedListItem } from '@/components/ui/animated-list-item'
 import { CATALOG_CATEGORIES } from '@/constants/categories'
 import { catalog } from '@/data/static/catalog'
 import { useCategoryParam } from '@/hooks/use-category-param'
+import { usePageArriving } from '@/hooks/use-page-arrival'
 
+/** Everything read, watched and played, filtered by medium */
 export function CatalogList() {
+  const isArriving = usePageArriving()
   const [activeCategory, handleCategoryChange] = useCategoryParam(CATALOG_CATEGORIES)
 
   const filteredItems = useMemo(
@@ -29,7 +32,11 @@ export function CatalogList() {
       />
       <AnimatePresence mode="popLayout">
         {filteredItems.length > 0 ? (
-          <m.div key="catalog-grid" layout className="flex flex-col">
+          <m.div
+            key="catalog-grid"
+            layout={!isArriving ? 'position' : false}
+            className="flex flex-col"
+          >
             {filteredItems.map((item) => (
               <AnimatedListItem
                 key={`${item.category}-${item.title}`}

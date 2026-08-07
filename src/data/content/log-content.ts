@@ -1,3 +1,4 @@
+/** Messages the server logs, kept together so their wording stays consistent */
 export const logContent = {
   view: {
     incrementError: 'Error incrementing view (likely offline)',

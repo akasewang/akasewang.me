@@ -4,12 +4,12 @@ import {
   EmailDissolve,
   EmailShell,
   EmailWordmark,
-  LIST_MARK_SIZE,
   emailFonts,
   emailLayout,
   emailTheme,
   formatEmailDate,
   getListMarkUrl,
+  LIST_MARK_SIZE,
 } from './email-template-shared'
 
 interface WeeklySummaryTemplateProps {
@@ -46,6 +46,7 @@ const defaultEmails = [
   'ines.correia@margem.pt',
 ]
 
+/** The weekly digest of what was published, sent by the cron job */
 export const WeeklySummaryTemplate = ({
   newEmails = defaultEmails,
   summaryDate,

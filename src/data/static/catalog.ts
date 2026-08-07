@@ -1,5 +1,6 @@
 import type { CatalogItem } from '@/types/catalog'
 
+/** Everything read, watched and played, filtered by medium on the catalog page */
 export const catalog: CatalogItem[] = [
   {
     title: 'Attack on Titan',

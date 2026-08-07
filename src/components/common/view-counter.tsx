@@ -3,18 +3,34 @@
 import { useEffect, useRef } from 'react'
 import { useViews } from '@/components/providers/views-context'
 import { Icons } from '@/components/ui/icons'
+import { Skeleton } from '@/components/ui/skeleton'
 import { viewsContent } from '@/data/content/views-content'
+import { visitKey } from '@/hooks/use-visits'
+
+type CounterType = 'views' | 'sessions' | 'visits'
 
 type ViewCounterProps = {
   slug?: string
   readOnly?: boolean
-  type?: 'views' | 'sessions'
+  type?: CounterType
 }
 
+function counterKey(type: CounterType, slug?: string) {
+  if (type === 'sessions') return '_sessions'
+  if (!slug) return ''
+  return type === 'visits' ? visitKey(slug) : slug
+}
+
+/**
+ * The view count for a page.
+ *
+ * Read only where a count is merely being shown, such as in a list. Otherwise it also counts the
+ * visit, which the store keeps to once per session.
+ */
 export function ViewCounter({ slug, readOnly = false, type = 'views' }: ViewCounterProps) {
   const { getViews, requestView, incrementViews } = useViews()
 
-  const effectiveSlug = type === 'sessions' ? '_sessions' : (slug ?? '')
+  const effectiveSlug = counterKey(type, slug)
   const count = getViews(effectiveSlug)
 
   const processedSlug = useRef<string | null>(null)
@@ -32,7 +48,7 @@ export function ViewCounter({ slug, readOnly = false, type = 'views' }: ViewCoun
   }, [effectiveSlug, readOnly, requestView, incrementViews])
 
   if (count === undefined) {
-    return <span className="animate-pulse">...</span>
+    return <Skeleton className="inline-block h-3.5 w-10 align-middle opacity-60" />
   }
 
   if (count === null) {
@@ -60,7 +76,7 @@ export function ViewCounter({ slug, readOnly = false, type = 'views' }: ViewCoun
 
   return (
     <span>
-      {count.toLocaleString()} {viewsContent.views}
+      {count.toLocaleString()} {type === 'visits' ? viewsContent.visits : viewsContent.views}
     </span>
   )
 }

@@ -12,9 +12,10 @@ const renderVolunteer = (vol: TimelineItemProps) => (
   <TimelineItem key={vol.id} {...vol} endDate={vol.endDate || PRESENT} />
 )
 
+/** Unpaid work, as a timeline on the landing page */
 export function Volunteer() {
   return (
-    <section id="volunteer" className="space-y-6 animate-page-simple">
+    <section id="volunteer" className="space-y-6">
       <SectionTitle>{landingPageContent.sections.volunteer}</SectionTitle>
       <ExpandableList items={volunteer} renderItem={renderVolunteer} />
     </section>

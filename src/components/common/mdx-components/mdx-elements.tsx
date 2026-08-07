@@ -48,6 +48,7 @@ const createHeading = (level: 1 | 2 | 3 | 4 | 5 | 6) => {
   return HeadingComponent
 }
 
+/** The plain HTML elements a post can produce, restyled to match the site */
 export const mdxElements = {
   h1: createHeading(1),
   h2: createHeading(2),

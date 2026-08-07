@@ -1,123 +1,170 @@
 'use client'
 
-import { useInView } from 'framer-motion'
 import Image from 'next/image'
-import Link from 'next/link'
-import { memo, useEffect, useRef } from 'react'
+import { memo } from 'react'
+import { MarqueeField } from '@/components/common/marquee-field'
 import { ProjectMediaFallback } from '@/components/common/project-media-fallback'
 import { ViewCounter } from '@/components/common/view-counter'
-import { AnimatedListItem } from '@/components/ui/animated-list-item'
-import { NewTag } from '@/components/ui/new-tag'
+import { VisitCounter } from '@/components/common/visit-counter'
+import { PROJECT_CARD_ASPECT } from '@/components/projects/project-card-skeleton'
+import { Link } from '@/components/ui/route-link'
+import { useCursorParallax } from '@/hooks/use-cursor-parallax'
+import { useInViewVideo } from '@/hooks/use-in-view-video'
+import { useMediaFallback } from '@/hooks/use-media-fallback'
 import { useSoundEffects } from '@/hooks/use-sound-effects'
+import { useVisits } from '@/hooks/use-visits'
 import type { ProjectPostData } from '@/types/project'
-import { formatDateString, isNew } from '@/utils/utils'
+import { cn, formatDateString } from '@/utils/utils'
 
 interface ProjectCardProps {
   project: ProjectPostData
 }
 
+/** Its own outline is dropped in favour of the ring drawn on the surface below */
+const LINK_CLASS = 'group block w-full rounded-xl outline-none'
+
+const SURFACE_CLASS = `relative ${PROJECT_CARD_ASPECT} w-full overflow-hidden rounded-xl bg-card ring-1 ring-inset ring-ring/80 retina:ring-[0.5px] transition-[box-shadow,transform,scale] duration-300 ease-out group-focus-visible:ring-2 group-focus-visible:ring-primary/60 supports-hover:group-hover:ring-ring supports-hover:group-hover:shadow-2xl md:active:ring-ring md:active:scale-[0.98] md:active:duration-200 md:active:shadow-none`
+
+/**
+ * Media drifts with the pointer and grows slightly under it. The offset is read from variables the
+ * parallax hook writes, so following the pointer costs no re-render, and both fall back to zero
+ * where nothing has written them.
+ */
+const MEDIA_MOTION =
+  'transition-[scale,translate] duration-500 ease-out [translate:var(--parallax-x,0px)_var(--parallax-y,0px)] supports-hover:group-hover:scale-[1.03]'
+
+const MEDIA_CLASS = `object-cover ${MEDIA_MOTION}`
+
+const META_CLASS = 'font-mono text-[13px] text-foreground'
+
+/**
+ * Whatever the card has to show, in order of preference: unreleased work gets the marquee, then a
+ * video, then an image, then the placeholder.
+ *
+ * A file named in frontmatter can still be missing, so each is asked whether it actually loaded and
+ * a failure falls through to the next choice the same way an absence does.
+ */
+function CardMedia({
+  project,
+  videoRef,
+}: {
+  project: ProjectPostData
+  videoRef: React.Ref<HTMLVideoElement>
+}) {
+  const { title, video, image, preview } = project
+  const { failed: videoFailed, onError: onVideoError } = useMediaFallback(video)
+  const { failed: imageFailed, ref: imageRef, onError: onImageError } = useMediaFallback(image)
+
+  if (preview) {
+    return (
+      <MarqueeField text="COMING SOON" label={`${title}, coming soon`} className={MEDIA_MOTION} />
+    )
+  }
+
+  if (video && !videoFailed) {
+    return (
+      <video
+        ref={videoRef}
+        src={video}
+        muted
+        loop
+        playsInline
+        disablePictureInPicture
+        preload="none"
+        onError={onVideoError}
+        className={cn('absolute inset-0 h-full w-full', MEDIA_CLASS)}
+      />
+    )
+  }
+
+  if (image && !imageFailed) {
+    return (
+      <Image
+        src={image}
+        alt={title}
+        fill
+        sizes="(max-width: 640px) 100vw, 400px"
+        ref={imageRef}
+        onError={onImageError}
+        className={MEDIA_CLASS}
+      />
+    )
+  }
+
+  return <ProjectMediaFallback title={title} className={MEDIA_MOTION} />
+}
+
+/**
+ * One project in the grid.
+ *
+ * The date, the counter and the title all rest on the media and lift in together on hover. Where
+ * the pointer cannot hover they simply stay put, a tap on a card following its link rather than
+ * revealing anything.
+ *
+ * A project with external set opens at its source, and its counter reports visits sent there rather
+ * than views of a page here.
+ */
 export const ProjectCard = memo(function ProjectCard({ project }: ProjectCardProps) {
-  const { title, slug, video, image, date, period, external } = project
+  const { title, slug, date, period, external, preview } = project
   const { hoverCard, navigate: navigateSound } = useSoundEffects()
-  const videoRef = useRef<HTMLVideoElement>(null)
-  const containerRef = useRef<HTMLDivElement>(null)
-
-  const isInView = useInView(containerRef, { amount: 0.5 })
-
-  useEffect(() => {
-    if (!videoRef.current) return
-
-    if (isInView) {
-      videoRef.current.play().catch(() => {})
-    } else {
-      videoRef.current.pause()
-    }
-  }, [isInView])
+  const { containerRef, videoRef } = useInViewVideo()
+  const { recordVisit } = useVisits()
+  const { ref: parallaxRef, onPointerMove, onPointerLeave } = useCursorParallax<HTMLAnchorElement>()
 
   const displayDate = period
     ? `${formatDateString(period.start)} - ${formatDateString(period.end)}`
     : formatDateString(date)
 
   return (
-    <AnimatedListItem>
-      <Link
-        href={external || `/projects/${slug}`}
-        target={external ? '_blank' : undefined}
-        rel={external ? 'noopener noreferrer' : undefined}
-        prefetch={!external ? false : undefined}
-        onMouseEnter={hoverCard}
-        onClick={navigateSound}
-        className="group block w-full rounded-xl"
-      >
-        <div
-          ref={containerRef}
-          className="relative aspect-[16/10] w-full overflow-hidden rounded-xl bg-card ring-1 ring-inset ring-ring/80 retina:ring-[0.5px] transition-[box-shadow,transform,scale] duration-300 ease-out md:supports-hover:group-hover:ring-ring md:supports-hover:group-hover:shadow-2xl md:active:ring-ring md:active:scale-[0.98] md:active:duration-200 md:active:shadow-none"
-        >
-          {video ? (
-            <video
-              ref={videoRef}
-              src={video}
-              muted
-              loop
-              playsInline
-              disablePictureInPicture
-              preload="none"
-              className="absolute inset-0 h-full w-full object-cover transition-[transform,scale] duration-500 ease-out md:supports-hover:group-hover:scale-[1.03]"
-            />
-          ) : image ? (
-            <Image
-              src={image}
-              alt={title}
-              fill
-              sizes="(max-width: 640px) 100vw, 400px"
-              className="object-cover transition-[transform,scale] duration-500 ease-out md:supports-hover:group-hover:scale-[1.03]"
-            />
-          ) : (
-            <ProjectMediaFallback title={title} />
-          )}
+    <Link
+      href={external || `/projects/${slug}`}
+      target={external ? '_blank' : undefined}
+      rel={external ? 'noopener noreferrer' : undefined}
+      prefetch={!external ? false : undefined}
+      ref={parallaxRef}
+      onMouseEnter={hoverCard}
+      onPointerMove={onPointerMove}
+      onPointerLeave={onPointerLeave}
+      onClick={() => {
+        navigateSound()
+        if (external) recordVisit(slug)
+      }}
+      className={LINK_CLASS}
+    >
+      <div ref={containerRef} className={SURFACE_CLASS}>
+        <CardMedia project={project} videoRef={videoRef} />
 
-          <div className="pointer-events-none absolute inset-0 hidden bg-black/0 transition-colors duration-300 ease-out md:block md:supports-hover:group-hover:bg-black/40" />
+        {/* Darkens under the text on hover, and stays dark where there is no hover to trigger it */}
+        <div className="pointer-events-none absolute inset-0 bg-black/55 transition-opacity duration-300 ease-out supports-hover:opacity-0 supports-hover:group-hover:opacity-100" />
 
-          {isNew(date) && (
-            <div className="absolute left-3 top-3 z-20">
-              <NewTag />
-            </div>
-          )}
+        {/* A hairline of light along the top edge, which lifts the card off the page */}
+        <div className="pointer-events-none absolute inset-0 rounded-xl shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06)]" />
 
-          {displayDate && (
-            <div className="absolute right-4 top-3 z-20 hidden -translate-y-0.5 opacity-0 transition-[translate,opacity] duration-300 ease-out md:block md:supports-hover:group-hover:translate-y-0 md:supports-hover:group-hover:opacity-100">
-              <span className="font-mono text-[13px] text-white/40">{displayDate}</span>
-            </div>
-          )}
-
-          <div className="absolute inset-0 hidden flex-col justify-end px-4 py-3 text-white md:flex">
-            <div className="flex translate-y-1 items-end justify-between opacity-0 transition-[translate,opacity] duration-300 ease-out md:supports-hover:group-hover:translate-y-0 md:supports-hover:group-hover:opacity-100">
-              <h3 className="text-balance text-base font-medium leading-tight tracking-tight text-white drop-shadow-md">
-                {title}
-              </h3>
-              <div className="font-mono text-xs text-white/40">
-                <ViewCounter slug={slug} readOnly />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="mt-3 flex items-end justify-between px-0.5 md:hidden">
-          <div className="flex flex-col gap-1">
-            <h3 className="text-balance text-sm font-medium leading-tight tracking-tight text-foreground">
-              {title}
-            </h3>
-            {displayDate && (
-              <span className="font-mono text-[13px] leading-none text-muted-foreground">
-                {displayDate}
-              </span>
+        {displayDate && (
+          <div
+            className={cn(
+              'absolute left-4 top-3 z-20 transition-[translate,opacity] duration-300 ease-out supports-hover:-translate-y-0.5 supports-hover:opacity-0 supports-hover:group-hover:translate-y-0 supports-hover:group-hover:opacity-100',
+              META_CLASS,
+              /* Unreleased work has a date but not one worth reading, so it is shown out of focus
+                 and left unannounced */
+              preview && 'select-none blur-[2px]',
             )}
+            aria-hidden={preview || undefined}
+          >
+            {displayDate}
           </div>
-          <div className="font-mono text-[11px] text-muted-foreground">
-            <ViewCounter slug={slug} readOnly />
+        )}
+
+        <div className="absolute inset-0 text-white transition-[translate,opacity] duration-300 ease-out supports-hover:translate-y-1 supports-hover:opacity-0 supports-hover:group-hover:translate-y-0 supports-hover:group-hover:opacity-100">
+          <div className={cn('absolute right-4 top-3', META_CLASS)}>
+            {external ? <VisitCounter slug={slug} /> : <ViewCounter slug={slug} readOnly />}
           </div>
+
+          <h3 className="absolute inset-x-4 bottom-3 text-balance text-base font-medium leading-tight tracking-tight text-white drop-shadow-md">
+            {title}
+          </h3>
         </div>
-      </Link>
-    </AnimatedListItem>
+      </div>
+    </Link>
   )
 })

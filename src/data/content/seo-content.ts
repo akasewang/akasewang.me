@@ -1,6 +1,12 @@
 import { FULL_NAME, SITE_DESCRIPTION, SITE_NAME } from '@/constants/constants'
 import type { SeoContent } from '@/types/site'
 
+/**
+ * What each page reports to search engines and share cards, one entry per page.
+ *
+ * Kept together rather than beside the pages themselves, so the titles and descriptions can be
+ * read against one another and stay consistent in voice.
+ */
 export const homeSeoContent: SeoContent = {
   title: `${FULL_NAME} | Software Engineer`,
   description: SITE_DESCRIPTION,

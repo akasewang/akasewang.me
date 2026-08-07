@@ -11,6 +11,7 @@ export const metadata: Metadata = {
   },
 }
 
+/** The owner's page for writing and sending an issue, behind the code sign in */
 export default async function AdminNewsletterPage() {
   const blogs = await getAllBlogPosts()
 

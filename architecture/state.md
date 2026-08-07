@@ -10,7 +10,7 @@ example, `?category=react&q=audio&sort=views-desc`). Catalog, skills and photos 
 approach for category-only filters.
 
 - Client list components read with `useSearchParams` inside `Suspense` boundaries. They update the
-address with `window.history.replaceState`, avoiding a navigation, history entry or scroll jump.
+  address with `window.history.replaceState`, avoiding a navigation, history entry or scroll jump.
 - Default category and sort values are omitted from the query string. Unknown values fall back to
   the configured defaults.
 - Shared URLs preserve the selected filters when opened in another browser.
@@ -24,10 +24,28 @@ address with `window.history.replaceState`, avoiding a navigation, history entry
   [overview](overview.md).
 - **`useGithubStars`:** Reads from `/api/github-stars`, deduplicates concurrent callers with a
   module-level promise and caches valid counts in `localStorage` for 15 minutes.
-- **`useAdmin`:** Reads the server-side admin session and synchronizes its status across components
-  and tabs. The credential remains in an httpOnly cookie, and Server Actions validate the session
-  for every privileged mutation.
+- **`useStatusTimer`:** Holds success and error state and derives its countdown from an absolute
+  expiry timestamp. Newsletter signup and message posting give it distinct storage keys, so their
+  cooldown feedback survives reloads and synchronizes through browser `storage` events. This
+  browser state is only feedback; the atomic Postgres cooldown remains authoritative.
+- **`useAdmin`:** Reads the server-side admin session on mount and window focus, and refreshes
+  same-tab consumers through an internal event after sign-in or sign-out. The credential remains in
+  an httpOnly cookie, so client state contains only a boolean. Server Actions validate the database-
+  backed session for every privileged mutation.
 - **`useContentListState`:** Provides category, search and view/date sorting for blog and project
-  lists. It synchronizes URL parameters and prefetches view counts.
+  lists. It synchronizes URL parameters and prefetches counts, taking each item's key from
+  `countKeyFor` so a project that links away is prefetched and sorted on its visit count rather than
+  on a page view count it can never accumulate.
+- **`useVisits`:** Records a project being opened, for projects that live somewhere else. See the
+  View Counter in the [overview](overview.md).
 - **`useCategoryParam`:** Shares category-only URL state across catalog, skills and photos. The
   first configured category is the default and is omitted from the URL.
+- **`useMediaFallback`:** Tracks whether a media file named in frontmatter actually loaded, which is
+  a different question from whether one was named and cannot be answered while rendering. It resets
+  during render when the source changes rather than in an effect, so a newly named source is never
+  reported as failed before it has been tried, and it exposes a ref callback that checks the element
+  on mount for images that finished failing before hydration attached a handler.
+- **`useCursorParallax`:** Leans a hovered medium toward the cursor. Offsets are written to the
+  element as custom properties and coalesced into an animation frame, so pointer movement re-renders
+  nothing, and the drift is bounded by the hover zoom. See the Card Media Lean in the [UI
+  notes](ui.md).

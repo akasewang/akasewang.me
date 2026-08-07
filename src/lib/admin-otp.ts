@@ -18,28 +18,32 @@ const hashesMatch = (a: string, b: string) => {
 }
 
 /**
- * Hashed before comparing so the two sides are always the same length, which timingSafeEqual
- * requires and which stops the length of a guess being readable from whether it threw.
+ * Resolves the recipient address where the admin code should be sent.
+ * Uses RESEND_ADMIN_EMAIL.
  */
-export function isAdminAddress(email: unknown): boolean {
-  const configured = otpRecipient()
-  if (!configured || typeof email !== 'string') return false
-
-  return hashesMatch(sha256Hex(configured), sha256Hex(email.trim().toLowerCase()))
-}
+export const adminRecipient = () => process.env.RESEND_ADMIN_EMAIL?.trim().toLowerCase() || null
 
 /**
- * Its own variable rather than the address the weekly summary reports to, because that one is a
- * destination for a report and can be shared freely while this one is half of the credential. It
- * falls back to that address rather than failing, so nothing has to be configured twice to work,
- * and setting OTP_EMAIL is what separates them when they should not be the same.
+ * Resolves the sender email address for OTP emails.
+ * Uses RESEND_OTP_EMAIL.
  */
-export const otpRecipient = () =>
-  process.env.OTP_EMAIL?.trim().toLowerCase() ||
-  process.env.ADMIN_EMAIL?.trim().toLowerCase() ||
-  null
+export const otpSender = () => process.env.RESEND_OTP_EMAIL?.trim() || null
 
-type IssuedOtp = { code: string } | { retryInSeconds: number } | { activeForSeconds: number }
+/**
+ * Validates whether the given email matches the configured admin email.
+ * Hashed before comparing so both sides are equal length, stopping length leakage.
+ */
+export function isAdminAddress(email: unknown): boolean {
+  if (typeof email !== 'string') return false
+  const normalized = email.trim().toLowerCase()
+
+  const admin = adminRecipient()
+  if (!admin) return false
+
+  return hashesMatch(sha256Hex(admin), sha256Hex(normalized))
+}
+
+type IssuedOtp = { code: string } | { retryInSeconds: number }
 
 /**
  * randomInt rather than Math.random, which is seeded well enough to predict and has no business
@@ -49,19 +53,6 @@ export async function issueAdminOtp(): Promise<IssuedOtp> {
   const [latest] = await db.select().from(adminOtp).orderBy(desc(adminOtp.id)).limit(1)
 
   if (latest) {
-    /**
-     * A code that still works is never traded for a new one, and no mail goes out. This endpoint has
-     * to be reachable without a credential, since a credential is what it hands out, so replacing on
-     * request let anyone who found it retire the code sitting in the owner's inbox and post another
-     * in its place. Refusing means the worst a stranger can do is learn that one is already out.
-     */
-    const stillUsable =
-      latest.expiresAt.getTime() > Date.now() && latest.attempts < OTP_MAX_ATTEMPTS
-
-    if (stillUsable) {
-      return { activeForSeconds: Math.ceil((latest.expiresAt.getTime() - Date.now()) / 1000) }
-    }
-
     const age = Date.now() - latest.createdAt.getTime()
     if (age < REISSUE_INTERVAL_MS) {
       return { retryInSeconds: Math.ceil((REISSUE_INTERVAL_MS - age) / 1000) }

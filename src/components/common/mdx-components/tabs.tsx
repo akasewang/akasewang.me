@@ -70,6 +70,12 @@ const hoverShift = (
   return towardsLeft ? -slide : slide
 }
 
+/**
+ * Tabbed panels in a post, with a highlight that slides between the labels.
+ *
+ * The panels travel in the direction the strip was moved, so a panel enters from the side its own
+ * tab sits on.
+ */
 export const Tabs = ({ items, defaultIndex = 0, className, children }: TabsProps) => {
   const { select, hoverTick } = useSoundEffects()
   const [activeIndex, setActiveIndex] = useState(defaultIndex)
@@ -243,4 +249,5 @@ export const Tabs = ({ items, defaultIndex = 0, className, children }: TabsProps
   )
 }
 
+/** One panel's contents. Rendered by Tabs above, which reads the labels off these */
 export const Tab = ({ children }: TabProps) => <>{children}</>

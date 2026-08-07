@@ -2,6 +2,7 @@ import { FIRST_NAME, LAST_NAME, ROLES } from '@/constants/constants'
 import type { LandingPageContent } from '@/types/home'
 import type { SharedContent } from '@/types/site'
 
+/** Every string and list the landing page renders, section by section */
 export const landingPageContent: LandingPageContent = {
   hero: {
     firstName: FIRST_NAME,
@@ -10,7 +11,7 @@ export const landingPageContent: LandingPageContent = {
     roles: ROLES,
     aboutTitle: 'about me.',
     about: [
-      "Hey there! I'm a software engineer who likes to [build applications](/projects) that make everyday things a little easier for me and the people around me and design [reusable components](https://library.noddy.studio/) for the joy of making things.",
+      "Hey there! I'm a software engineer who likes to [build applications](/projects) that make everyday things a little easier for me and the people around me and design [reusable components](https://ui.manakin.studio/) for the joy of making things.",
       "When I'm not building, I [write about](/blogs) what I'm working on or figuring out along the way and send the occasional email update to [subscribers](/newsletter) who like to follow along.",
       'Away from the keyboard, I enjoy [taking photos](/photos), playing games and keeping a [catalog](/catalog) of the anime and movies I watch.',
     ],
@@ -21,7 +22,7 @@ export const landingPageContent: LandingPageContent = {
     mailMeAt: 'or mail me at',
     scheduleMeetUrl: 'https://cal.com/akasewang',
     designsLabel: 'Click for designs •',
-    designsUrl: 'https://noddy.studio/',
+    designsUrl: 'https://www.manakin.studio/',
   },
   sections: {
     experience: 'experience.',
@@ -41,6 +42,7 @@ export const landingPageContent: LandingPageContent = {
   },
 }
 
+/** Strings reused across sections, such as the labels on a show more toggle */
 export const sharedContent: SharedContent = {
   more: 'show more',
   less: 'show less',

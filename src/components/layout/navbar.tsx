@@ -1,10 +1,11 @@
 'use client'
 
-import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Icons } from '@/components/ui/icons'
+import { Link } from '@/components/ui/route-link'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { SITE, USERNAME } from '@/constants/constants'
+import { NAV_ROUTES, type NavRoute } from '@/constants/navigation'
 import { navbarContent } from '@/data/content/layout-content'
 import { useAudioPreference } from '@/hooks/use-audio-preference'
 import { useGithubStars } from '@/hooks/use-github-stars'
@@ -12,15 +13,18 @@ import { useKeyboardShortcut } from '@/hooks/use-keyboard-shortcut'
 import { useSoundEffects } from '@/hooks/use-sound-effects'
 import { cn } from '@/utils/utils'
 
-const NAV_ITEMS = [
-  { href: '/blogs', label: navbarContent.blogs, Icon: Icons.blogs },
-  { href: '/projects', label: navbarContent.projects, Icon: Icons.projects },
-  { href: '/photos', label: navbarContent.photos, Icon: Icons.photos },
-]
+const NAV_ITEM_DETAILS: Record<NavRoute, { label: string; Icon: typeof Icons.blogs }> = {
+  '/blogs': { label: navbarContent.blogs, Icon: Icons.blogs },
+  '/projects': { label: navbarContent.projects, Icon: Icons.projects },
+  '/photos': { label: navbarContent.photos, Icon: Icons.photos },
+}
+
+const NAV_ITEMS = NAV_ROUTES.map((href) => ({ href, ...NAV_ITEM_DETAILS[href] }))
 
 const ICON_BUTTON_STYLES =
   'relative flex size-8 items-center justify-center rounded-lg bg-transparent text-secondary ring-1 ring-transparent transition-[background-color,color,transform,scale,opacity,box-shadow] duration-300 supports-hover:hover:bg-accent supports-hover:hover:text-primary supports-hover:hover:ring-accent-border active:bg-accent active:text-primary active:ring-accent-border active:scale-[0.95] active:duration-200 retina:ring-[0.5px]'
 
+/** The bar at the top: the mark, the section links and the command menu trigger */
 export function Navbar() {
   const { isAudioEnabled, setAudioEnabled } = useAudioPreference()
   const { hoverLink, navigate: navigateSound, toggle } = useSoundEffects()
@@ -104,7 +108,7 @@ export function Navbar() {
                   onClick={navigateSound}
                   className={cn(
                     ICON_BUTTON_STYLES,
-                    'hidden md:flex',
+                    'group hidden md:flex',
                     '-ml-[10px]',
                     githubStars !== null && 'w-auto px-2.5',
                   )}
@@ -112,7 +116,7 @@ export function Navbar() {
                   <div className="flex items-center gap-1.5">
                     <Icons.github className="size-4.5" />
                     {formattedStarsShort !== null && (
-                      <span className="text-xs font-semibold tracking-wide text-muted-foreground">
+                      <span className="inline-flex items-center justify-center rounded-none bg-muted px-1.5 py-0.5 font-mono text-[11px] font-medium leading-none text-secondary transition-colors duration-200 supports-hover:group-hover:bg-muted/80 supports-hover:group-hover:text-primary">
                         {formattedStarsShort}
                       </span>
                     )}

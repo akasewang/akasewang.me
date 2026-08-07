@@ -26,19 +26,16 @@ type ViewsContextType = {
 
 const ViewsContext = createContext<ViewsContextType | null>(null)
 
-/**
- * View counts for every list and page on the site. A list of twenty cards would otherwise fire
- * twenty requests, so reads are collected for a moment and sent as one batch, then cached so
- * moving between pages does not ask again.
- *
- * A count reads as undefined while unknown and null once a read failed, which lets a card tell
- * loading apart from unavailable and simply omit the number in the second case.
- */
+/** Versioned, so a change to the stored shape is ignored rather than read as the old one */
 const CACHE_KEY = 'views-cache-all:v1'
 
+/** How long stored counts are trusted before being asked for again */
 const CACHE_DURATION = 5 * 60 * 1000
 
-/** Long enough for a list to finish mounting and register every card, short enough to feel instant */
+/**
+ * How long a slug waits for company before being sent. A list mounts its cards together, so this
+ * is what turns a page of counters into one request.
+ */
 const BATCH_DELAY = 50
 
 function normalizeClientSlug(slug: string): string | null {
@@ -46,6 +43,10 @@ function normalizeClientSlug(slug: string): string | null {
   return normalizedSlug || null
 }
 
+/**
+ * Mirrors the counts to storage so a return visit paints numbers immediately. Nulls are dropped,
+ * being the marker for a count that could not be read, which is worth retrying rather than keeping.
+ */
 function syncCache(views: Record<string, number | null>) {
   if (typeof window === 'undefined') return
   try {
@@ -59,16 +60,37 @@ function syncCache(views: Record<string, number | null>) {
   } catch {}
 }
 
+/**
+ * Holds the view count for every slug on the page and hands it to whichever counters ask.
+ *
+ * Counters are scattered across a list, so asking one at a time would mean a request per card.
+ * Instead each request joins a short queue and the whole queue goes out as one call, with counts
+ * kept in storage so a page paints numbers before that call comes back.
+ *
+ * The sets below are refs rather than state because they gate the requests themselves, and a
+ * render would come too late to stop a duplicate that has already been asked for.
+ */
 export function ViewsProvider({ children }: { children: ReactNode }) {
   const [viewsMap, setViewsMap] = useState<Record<string, number | null>>({})
+
+  /** The same counts as the state, readable inside callbacks without making them depend on it */
   const viewsMapRef = useRef<Record<string, number | null>>({})
 
+  /** Waiting to be asked for */
   const pendingSlugsRef = useRef<Set<string>>(new Set())
+
+  /** Already in flight, so a second counter for the same slug does not ask again */
   const fetchingRef = useRef<Set<string>>(new Set())
+
+  /** Mid increment, which keeps a double click from counting twice */
   const incrementingRef = useRef<Set<string>>(new Set())
+
+  /** Counted once already, so revisiting a post in the same session does not count again */
   const countedThisSessionRef = useRef<Set<string>>(new Set())
+
   const batchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
+  /** Writes to the ref, the state and storage together, so no reader sees a stale set of counts */
   const commitViews = useCallback((updates: Record<string, number | null>) => {
     const nextViews = { ...viewsMapRef.current, ...updates }
     viewsMapRef.current = nextViews
@@ -81,7 +103,6 @@ export function ViewsProvider({ children }: { children: ReactNode }) {
       const cached = localStorage.getItem(CACHE_KEY)
       if (!cached) return
 
-      /** Anything already in state wins, since it was read fresh from the server */
       const data = JSON.parse(cached) as ViewsCache
       if (Date.now() - data.timestamp < CACHE_DURATION) {
         const nextViews = { ...data.views, ...viewsMapRef.current }
@@ -105,10 +126,6 @@ export function ViewsProvider({ children }: { children: ReactNode }) {
     }
   }, [])
 
-  /**
-   * Every slug in the batch is written back, including the ones the server did not return, so a
-   * missing count settles as null instead of being retried forever.
-   */
   const fetchBatch = useCallback(
     async (slugs: string[]) => {
       if (!slugs.length) return
@@ -139,8 +156,10 @@ export function ViewsProvider({ children }: { children: ReactNode }) {
   )
 
   /**
-   * Queues slugs that are neither known nor already in flight, then restarts the batch window so
-   * cards mounting one after another still land in a single request.
+   * Queues slugs whose counts are not known yet and sends the queue as one call.
+   *
+   * Each new slug pushes the send back, so a list mounting its cards over several frames still
+   * goes out as a single request once they have all arrived.
    */
   const prefetchViews = useCallback(
     (slugs: string[]) => {
@@ -171,6 +190,7 @@ export function ViewsProvider({ children }: { children: ReactNode }) {
     [fetchBatch],
   )
 
+  /** Asks for one slug's count without counting a visit, which is what a read only counter wants */
   const requestView = useCallback(
     (slug: string) => {
       prefetchViews([slug])
@@ -178,6 +198,10 @@ export function ViewsProvider({ children }: { children: ReactNode }) {
     [prefetchViews],
   )
 
+  /**
+   * The count for a slug. A number is the count, null means it could not be read and undefined
+   * means it has not arrived yet, which is what a counter shows its skeleton for.
+   */
   const getViews = useCallback(
     (slug: string): number | null | undefined => {
       const normalizedSlug = normalizeClientSlug(slug)
@@ -186,16 +210,17 @@ export function ViewsProvider({ children }: { children: ReactNode }) {
     [viewsMap],
   )
 
+  /**
+   * Counts a visit, then shows the new total.
+   *
+   * A slug is only counted once per session, remembered both in this tab and in session storage so
+   * a reload does not count again. The in flight set guards the gap before either has been written.
+   */
   const incrementViews = useCallback(
     async (rawSlug: string) => {
       const slug = normalizeClientSlug(rawSlug)
       if (!slug) return
 
-      /**
-       * Session storage is what stops a refresh counting twice, and it outlives this provider.
-       * The ref covers the same tab in case storage is unavailable. Either way an already counted
-       * page still reads the current number, it just does not add to it.
-       */
       const sessionKey = `viewed-${encodeURIComponent(slug)}`
       let alreadyCounted = countedThisSessionRef.current.has(slug)
 
@@ -241,7 +266,10 @@ export function ViewsProvider({ children }: { children: ReactNode }) {
   return <ViewsContext.Provider value={contextValue}>{children}</ViewsContext.Provider>
 }
 
-/** Throws rather than returning null, since a silent zero would look like real data */
+/**
+ * Reads the views store. Throws where the provider is missing, since a counter with nothing above
+ * it would otherwise just never show a number and give no hint why.
+ */
 export function useViews() {
   const context = useContext(ViewsContext)
   if (!context) {

@@ -9,13 +9,16 @@ import { MdxPostSummary } from '@/components/common/mdx-components/mdx-post-summ
 import { ProjectDemo } from '@/components/common/mdx-components/project-demo'
 import { FULL_NAME, SITE_URL } from '@/constants/constants'
 import { getBreadcrumbSchema, getProjectSchema, serializeJsonLd } from '@/lib/json-ld'
-import { getAllProjects, getProject, getProjectSlugs } from '@/lib/managers/project-manager'
+import { getPageProjects, getProject } from '@/lib/managers/project-manager'
 import { constructMetadata, getOgImageUrl } from '@/lib/metadata'
 import { getAdjacentContent } from '@/utils/content-utils'
 
-export function generateStaticParams() {
-  return getProjectSlugs()
+/** One page per project file, so every project is built ahead of any request for it */
+export async function generateStaticParams() {
+  return (await getPageProjects()).map(({ slug }) => ({ slug }))
 }
+
+export const dynamicParams = false
 
 type PageParams = Promise<{ slug: string }>
 
@@ -23,7 +26,7 @@ export async function generateMetadata({ params }: { params: PageParams }): Prom
   const { slug } = await params
   const post = await getProject(slug)
 
-  if (!post) notFound()
+  if (!post || post.data.external) notFound()
 
   return constructMetadata({
     title: `${post.data.title} - ${FULL_NAME}`,
@@ -36,11 +39,12 @@ export async function generateMetadata({ params }: { params: PageParams }): Prom
   })
 }
 
+/** A single project: its header, its demo, the MDX body and the links out */
 export default async function ProjectPost({ params }: { params: PageParams }) {
   const { slug } = await params
   const post = await getProject(slug)
 
-  if (!post) notFound()
+  if (!post || post.data.external) notFound()
 
   const { content, data } = post
   const { title, excerpt, date, slug: postSlug, tech, links, image, video } = data
@@ -52,13 +56,13 @@ export default async function ProjectPost({ params }: { params: PageParams }) {
     { name: title, url: `${SITE_URL}/projects/${postSlug}` },
   ])
 
-  const allProjects = await getAllProjects()
-  const { previous: prevProject, next: nextProject } = getAdjacentContent(allProjects, postSlug)
+  const pageProjects = await getPageProjects()
+  const { previous: prevProject, next: nextProject } = getAdjacentContent(pageProjects, postSlug)
 
   return (
-    <div className="group/blog">
+    <div className="group/blog relative">
       <AsideTOC content={content} />
-      <div className="relative space-y-6 animate-page-simple">
+      <div className="relative space-y-6">
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: serializeJsonLd([projectJsonLd, breadcrumbJsonLd]) }}

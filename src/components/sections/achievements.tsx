@@ -11,9 +11,10 @@ const renderAchievement = (achievement: TimelineItemProps) => (
   <TimelineItem key={achievement.id} {...achievement} />
 )
 
+/** Awards and recognitions, as a timeline on the landing page */
 export function Achievements() {
   return (
-    <section id="achievements" className="space-y-6 animate-page-simple">
+    <section id="achievements" className="space-y-6">
       <SectionTitle>{landingPageContent.sections.achievements}</SectionTitle>
       <ExpandableList items={achievements} renderItem={renderAchievement} />
     </section>

@@ -1,7 +1,8 @@
 'use client'
 
 import { m } from 'framer-motion'
-import { useId } from 'react'
+import { usePathname } from 'next/navigation'
+import { useId, useState } from 'react'
 import { SMOOTH_SPRING_TRANSITION, SPRING_TRANSITION } from '@/constants/ui'
 import { useSoundEffects } from '@/hooks/use-sound-effects'
 import { cn } from '@/utils/utils'
@@ -12,13 +13,16 @@ interface CategoryFilterProps<T extends string> {
   onChange: (value: T) => void
 }
 
+/** The row of category chips above a filtered list */
 export function CategoryFilter<T extends string>({
   categories,
   value,
   onChange,
 }: CategoryFilterProps<T>) {
   const { select, hoverTick } = useSoundEffects()
-  const id = useId()
+  const reactId = useId()
+  const pathname = usePathname()
+  const [id] = useState(() => `${reactId}-${pathname}`)
 
   return (
     <div className="flex flex-wrap items-center gap-x-1 gap-y-2">

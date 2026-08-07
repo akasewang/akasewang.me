@@ -21,6 +21,7 @@ export const metadata: Metadata = constructMetadata({
   imageAlt: messageBoardSeoContent.imageAlt,
 })
 
+/** the public message board */
 export default async function MessageBoardPage() {
   const breadcrumbJsonLd = getBreadcrumbSchema([
     { name: 'Home', url: SITE_URL },

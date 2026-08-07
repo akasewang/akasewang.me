@@ -15,7 +15,7 @@ export const fontMono = Geist_Mono({
   subsets: ['latin'],
   variable: '--font-mono',
   display: 'swap',
-  weight: ['400', '500', '600', '700'],
+  weight: ['100', '200', '300', '400', '500', '600', '700', '900'],
 })
 
 export const fontSerif = PT_Serif({

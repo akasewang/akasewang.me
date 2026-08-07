@@ -6,13 +6,14 @@ import { OtpTemplate } from '@/components/emails/otp-template'
 import { FULL_NAME } from '@/constants/constants'
 import { toastContent } from '@/data/content/toast-content'
 import {
+  adminRecipient,
   isAdminAddress,
   issueAdminOtp,
   OTP_MAX_ATTEMPTS,
   OTP_TTL_MINUTES,
-  otpRecipient,
+  otpSender,
 } from '@/lib/admin-otp'
-import { getResend, SENDER_EMAIL } from '@/lib/resend'
+import { getResend } from '@/lib/resend'
 import type { ActionResult } from '@/types/actions'
 
 /**
@@ -27,19 +28,37 @@ import type { ActionResult } from '@/types/actions'
  */
 export async function requestAdminOtp(email: string): Promise<ActionResult> {
   const toasts = toastContent.newsletter
-  const recipient = otpRecipient()
+  const recipient = adminRecipient()
+  const sender = otpSender()
+
+  if (!recipient) return { success: false, error: toasts.otpUnavailable }
+  if (!sender) return { success: false, error: toasts.otpSenderUnavailable }
 
   /**
-   * Answered before the address is looked at, so it says nothing about which address is right. It is
-   * a fault in the deployment rather than a fact about the credential, and the owner has to see it.
+   * Typed as a string, but this is a server action and the type is a claim about the caller rather
+   * than a guarantee about the request. The check is on the type rather than on truthiness so a
+   * value that is neither missing nor a string is turned away here instead of reaching trim and
+   * throwing, which is also what isAdminAddress does with the same value further down.
    */
-  if (!recipient) return { success: false, error: toasts.otpUnavailable }
+  if (typeof email !== 'string' || !email.trim()) {
+    return { success: false, error: toasts.otpEmailRequired }
+  }
 
-  if (!isAdminAddress(email)) return { success: true, data: undefined }
+  if (!isAdminAddress(email)) {
+    return { success: false, error: toasts.otpEmailInvalid }
+  }
 
   try {
     const issued = await issueAdminOtp()
-    if (!('code' in issued)) return { success: true, data: undefined }
+    if ('retryInSeconds' in issued) {
+      return {
+        success: false,
+        error: `Please wait ${issued.retryInSeconds}s before requesting a new code`,
+      }
+    }
+    if (!('code' in issued)) {
+      return { success: false, error: toasts.otpSendFailed }
+    }
 
     const htmlContent = await render(
       React.createElement(OtpTemplate, {
@@ -49,22 +68,23 @@ export async function requestAdminOtp(email: string): Promise<ActionResult> {
       }),
     )
 
-    await getResend().emails.send({
-      from: `${FULL_NAME} <${SENDER_EMAIL}>`,
+    const fromAddress = sender.includes('<') ? sender : `${FULL_NAME} <${sender}>`
+
+    const { error } = await getResend().emails.send({
+      from: fromAddress,
       to: recipient,
       subject: `${issued.code} is your admin code`,
       html: htmlContent,
     })
 
+    if (error) {
+      console.error('Admin code email send failed:', error.message)
+      return { success: false, error: toasts.otpSendFailed }
+    }
+
     return { success: true, data: undefined }
   } catch (error) {
-    /**
-     * Logged rather than reported. Nothing past the address check is reachable with a wrong address,
-     * so a failure surfaced here would only ever be seen by someone who had guessed right, and a
-     * provider having a bad minute would be enough to confirm the guess. The owner learns of it from
-     * the code never arriving, and from this line in the server log.
-     */
     console.error('Admin code request failed:', error instanceof Error ? error.message : error)
-    return { success: true, data: undefined }
+    return { success: false, error: toasts.otpSendFailed }
   }
 }

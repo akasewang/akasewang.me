@@ -1,5 +1,6 @@
 import type { TimelineItemProps } from '@/types/site'
 
+/** Writing and talks worth keeping, drawn as a timeline on the landing page */
 export const bookmarks: TimelineItemProps[] = [
   {
     id: 'understanding-react-server-components',

@@ -29,6 +29,7 @@ const remarkCodeMeta = () => (tree: CodeMetaNode) => {
   visit(tree)
 }
 
+/** The plugins a post is put through: heading anchors, syntax highlighting and the rest */
 export const MDX_OPTIONS = {
   mdxOptions: {
     rehypePlugins: [rehypeHighlight],

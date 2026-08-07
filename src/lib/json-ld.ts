@@ -82,7 +82,7 @@ export function getProjectSchema({
 }: {
   title: string
   excerpt: string
-  date: string
+  date?: string
   slug: string
   tech?: string[]
 }) {
@@ -92,7 +92,8 @@ export function getProjectSchema({
     name: title,
     headline: title,
     description: excerpt,
-    datePublished: date,
+    /** Left out entirely when undated, rather than published as an empty value */
+    ...(date && { datePublished: date }),
     author: PERSON_SCHEMA,
     creator: PERSON_SCHEMA,
     url: `${SITE_URL}/projects/${slug}`,

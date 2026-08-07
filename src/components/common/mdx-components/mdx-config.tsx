@@ -17,6 +17,7 @@ type MdxAnchorProps = AnchorHTMLAttributes<HTMLAnchorElement> & {
   children?: ReactNode
 }
 
+/** Every component a post can use, from restyled HTML to the custom blocks */
 export const MDX_COMPONENTS = {
   ...mdxElements,
   a: ({ href, children, ...props }: MdxAnchorProps) => (

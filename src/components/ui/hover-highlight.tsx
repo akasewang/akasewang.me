@@ -9,6 +9,17 @@ interface HoverHighlightProps {
   parentRef: React.RefObject<HTMLElement | null>
 }
 
+/**
+ * A single box that follows the pointer between the items of a list, rather than each item lighting
+ * its own background.
+ *
+ * One listener sits on the list and finds the item under the pointer by walking up from the event's
+ * target, so items need only carry the marker attribute and nothing has to be wired up per item or
+ * rebound as the list changes. Touch is ignored, there being no hover to follow, and a tap would
+ * otherwise strand the box wherever it was last left.
+ *
+ * The sibling of this in menus is MenuHighlight, which follows the keyboard rather than the pointer.
+ */
 export function HoverHighlight({ parentRef }: HoverHighlightProps) {
   const { style, moveTo, hide } = useHighlightBox()
 
@@ -23,6 +34,7 @@ export function HoverHighlight({ parentRef }: HoverHighlightProps) {
 
       const item = (e.target as HTMLElement | null)?.closest<HTMLElement>('[data-highlight-item]')
 
+      /* The remembered item may have been filtered out of the list, which makes it stale */
       if (active && !active.isConnected) active = null
 
       if (!item || item === active || !parent.contains(item)) return
@@ -53,7 +65,7 @@ export function HoverHighlight({ parentRef }: HoverHighlightProps) {
   return (
     <m.div
       style={style}
-      className="pointer-events-none absolute left-0 top-0 z-0 rounded-xl bg-gradient-to-b from-accent to-accent/50 shadow-md ring-1 ring-accent-border retina:ring-[0.5px]"
+      className="pointer-events-none absolute left-0 top-0 z-0 rounded-xl bg-accent shadow-sm ring-1 ring-accent-border retina:ring-[0.5px]"
     />
   )
 }

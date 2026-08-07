@@ -17,11 +17,13 @@ import { activeSocials } from '@/data/static/social'
 
 export type EmailDateInput = string | number | Date
 
+/** Web fonts for the emails, with the stacks a client that blocks them falls back to */
 export const emailFonts = {
   mono: 'ui-monospace, "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace',
   sans: '-apple-system, BlinkMacSystemFont, "Inter", "Helvetica Neue", Arial, sans-serif',
 } as const
 
+/** The palette and spacing the templates share, so every email looks like the same sender */
 export const emailTheme = {
   page: '#030303',
   card: '#0f0f0f',

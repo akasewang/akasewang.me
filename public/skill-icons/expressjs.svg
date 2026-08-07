@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="64" height="64">
   <style>
     path {
-      fill: black;
+      fill: white;
     }
     @media (prefers-color-scheme: dark) {
       path {

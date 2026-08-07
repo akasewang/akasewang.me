@@ -120,6 +120,7 @@ function CommitRow({ commit }: { commit: ChangelogCommit }) {
   )
 }
 
+/** Commits to this site, grouped under the day they landed */
 export function ChangelogTimeline({ days }: ChangelogTimelineProps) {
   const listRef = useRef<HTMLDivElement>(null)
 

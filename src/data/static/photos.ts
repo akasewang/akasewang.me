@@ -1,5 +1,6 @@
 import type { Photo } from '@/types/photos'
 
+/** The photos page, each marked as captured or generated, which is what its filter splits on */
 export const photos: Photo[] = [
   {
     id: 'c1',

@@ -12,9 +12,10 @@ const renderCertification = (cert: TimelineItemProps) => (
   <TimelineItem key={cert.id} {...cert} endDate={cert.endDate || PRESENT} />
 )
 
+/** Courses and certificates, as a timeline on the landing page */
 export function Certifications() {
   return (
-    <section id="certifications" className="space-y-6 animate-page-simple">
+    <section id="certifications" className="space-y-6">
       <SectionTitle>{landingPageContent.sections.certifications}</SectionTitle>
       <ExpandableList items={certifications} renderItem={renderCertification} />
     </section>

@@ -18,6 +18,12 @@ import { adminIntent } from '@/utils/admin-intent'
 
 const mbToast = toastContent.messageBoard
 
+/**
+ * The box at the foot of the board, which doubles as the owner's way in.
+ *
+ * An ordinary message is posted, while an email address or a sign in code typed into the same box
+ * starts or finishes the owner's sign in, which is why the two can never be read as one another.
+ */
 export function MessageBoardForm() {
   const [isPending, setIsPending] = useState(false)
   const { success, countdown, startCountdown, showError, resetStatus } =
@@ -27,12 +33,10 @@ export function MessageBoardForm() {
   const formRef = useRef<HTMLFormElement>(null)
   const [nameDraft, setNameDraft] = useState('')
   const [messageDraft, setMessageDraft] = useState('')
-  /** Set once a code has been asked for here, which is what lets a bare one be read as a code */
   const [awaitingCode, setAwaitingCode] = useState(false)
 
   const fieldsDisabled = isPending || countdown > 0
 
-  /** Reset the honeypot and the two controlled fields together after a completed flow */
   const resetForm = () => {
     formRef.current?.reset()
     setNameDraft('')
@@ -54,7 +58,7 @@ export function MessageBoardForm() {
     post: Icons.chatUpload,
     sendCode: Icons.mail,
     awaitCode: Icons.mail,
-    signIn: Icons.check,
+    signIn: Icons.checkCircle,
   }[intent]
 
   const handleAdminAction = (
@@ -76,32 +80,36 @@ export function MessageBoardForm() {
     )
 
     const failWith = (message: string) => {
-      /** Keep the address in its field so a mistyped code can be corrected without starting over */
       setMessageDraft('')
       errorSound()
       toast.error(message)
     }
 
-    /** None of these reach the table, since each returns before the message is ever submitted */
     if (submitted === 'sendCode') {
-      const requested = await requestAdminOtp(argument)
-      if (!requested.success) return failWith(requested.error)
+      setIsPending(true)
+      try {
+        const requested = await requestAdminOtp(argument)
+        if (!requested.success) return failWith(requested.error)
 
-      setAwaitingCode(true)
-      return handleAdminAction(toastContent.newsletter.otpSent, successSound, 'message')
+        setAwaitingCode(true)
+        return handleAdminAction(toastContent.newsletter.otpSent, successSound, 'message')
+      } finally {
+        setIsPending(false)
+      }
     }
 
     if (submitted === 'awaitCode') return
 
     if (submitted === 'signIn') {
-      /**
-       * Checked on the server before anything is said, where before the value was simply kept and
-       * every wrong one still reported a welcome.
-       */
-      const result = await loginAdmin(argument)
-      if (!result.success) return failWith(result.error)
+      setIsPending(true)
+      try {
+        const result = await loginAdmin(argument)
+        if (!result.success) return failWith(result.error)
 
-      return handleAdminAction(mbToast.adminLogin, successSound)
+        return handleAdminAction(mbToast.adminLogin, successSound)
+      } finally {
+        setIsPending(false)
+      }
     }
 
     setIsPending(true)
@@ -171,7 +179,7 @@ export function MessageBoardForm() {
           countdown={countdown}
           loadingText={mbContent.buttonLoading}
           successText={mbContent.buttonSuccess}
-          successIcon={Icons.chatCheck}
+          successIcon={Icons.check}
           defaultText={buttonLabel}
           defaultIcon={buttonIcon}
         />

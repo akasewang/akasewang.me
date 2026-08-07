@@ -12,6 +12,7 @@ interface AsideTOCProps {
   className?: string
 }
 
+/** The table of contents in the margin, marking whichever heading is being read */
 export const AsideTOC = ({ content, className }: AsideTOCProps) => {
   const { select, hoverTick } = useSoundEffects()
   const items = useMemo(() => (content ? parseTocFromContent(content) : []), [content])
@@ -20,13 +21,14 @@ export const AsideTOC = ({ content, className }: AsideTOCProps) => {
   if (!items.length) return null
 
   return (
-    <nav
+    <div
       className={cn(
-        'not-prose hidden xl:block fixed left-8 top-24 z-50 h-[calc(100vh-6rem)] w-56',
+        'not-prose pointer-events-none absolute inset-y-0 z-50 hidden w-56 xl:block',
         className,
       )}
+      style={{ left: 'calc(50% - 50vw + 2rem)' }}
     >
-      <div className="flex flex-col gap-4">
+      <nav className="pointer-events-auto sticky top-24 flex flex-col gap-4">
         <Icons.menu className="size-[18px] text-muted-foreground transition-colors duration-300 supports-hover:hover:text-primary supports-hover:group-hover/blog:text-primary [@media(hover:none)]:text-primary" />
         <div className="flex flex-col gap-2.5 opacity-0 transition-opacity duration-300 ease-in-out supports-hover:hover:opacity-100 supports-hover:group-hover/blog:opacity-100 focus-within:opacity-100 [@media(hover:none)]:opacity-100">
           {items.map(({ id, level, text }) => (
@@ -53,7 +55,7 @@ export const AsideTOC = ({ content, className }: AsideTOCProps) => {
             </button>
           ))}
         </div>
-      </div>
-    </nav>
+      </nav>
+    </div>
   )
 }

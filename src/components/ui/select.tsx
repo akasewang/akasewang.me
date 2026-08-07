@@ -12,6 +12,7 @@ type SelectProps = Omit<SelectPrimitive.Root.Props<string>, 'onValueChange'> & {
   onValueChange?: (value: string) => void
 }
 
+/** A select styled to match the site, used by the sort control on filtered lists */
 const Select = ({ onOpenChange, onValueChange, ...props }: SelectProps) => {
   const { toggle, select } = useSoundEffects()
   const { markSelectionClose, playOpenChange } = usePopupToggleSound(toggle)

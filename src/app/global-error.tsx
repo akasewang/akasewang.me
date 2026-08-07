@@ -6,13 +6,11 @@ import { fontMono, fontSans, fontSerif } from '@/lib/fonts'
 
 import './globals.css'
 
-export default function GlobalError({
-  error,
-  reset,
-}: {
-  error: Error & { digest?: string }
-  reset: () => void
-}) {
+/**
+ * The last resort, for a failure in the root layout itself. Renders its own html and body, the
+ * usual shell being what has failed.
+ */
+export default function GlobalError({ error }: { error: Error & { digest?: string } }) {
   return (
     <html
       lang="en"
@@ -24,9 +22,8 @@ export default function GlobalError({
           <div className="flex-grow px-8 py-12 flex flex-col justify-center">
             <ErrorState
               error={error}
-              reset={reset}
               title="critical error."
-              subtitle="A critical error occurred at the application root. Please try again."
+              subtitle="A critical error occurred at the application root."
             />
           </div>
         </div>

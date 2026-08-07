@@ -1,5 +1,6 @@
 import type { TestimonialRows } from '@/types/home'
 
+/** Quotes from people worked with, split into two rows so each can scroll its own way */
 export const testimonials: TestimonialRows = {
   topRow: [
     {

@@ -7,10 +7,10 @@ import {
   EmailSignature,
   EmailSubscriberFooter,
   EmailWordmark,
-  LIST_MARK_SIZE,
   emailLayout,
   formatEmailDate,
   getListMarkUrl,
+  LIST_MARK_SIZE,
 } from './email-template-shared'
 
 interface NewsletterPost {
@@ -37,6 +37,7 @@ const defaultPosts: NewsletterPost[] = [
   { title: 'Designing for the Long Term', url: `${SITE_URL}/blogs/designing-long-term` },
 ]
 
+/** A newsletter issue as it arrives in an inbox */
 export const NewsletterTemplate = ({
   blogTitle = "You can't build everything at once.",
   blogUrl = SITE_URL,

@@ -28,6 +28,7 @@ const s = {
   },
 } as const
 
+/** Carries the sign in code to the owner, and goes nowhere else */
 export const OtpTemplate = ({
   code = 'k7Rm$2Xq',
   expiresInMinutes = 10,

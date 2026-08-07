@@ -14,6 +14,10 @@ interface LinkableSpotlightCardProps {
   revealLayer?: ReactNode
 }
 
+/**
+ * A spotlight card that may or may not be a link. Given an href it renders as an anchor, so a card
+ * that leads somewhere is reachable by keyboard rather than being a div listening for clicks.
+ */
 export function LinkableSpotlightCard({
   children,
   className,

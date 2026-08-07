@@ -6,6 +6,7 @@ interface StepsProps {
   className?: string
 }
 
+/** A numbered sequence in a post, drawn against a rule down the side */
 export const Steps = ({ children, className }: StepsProps) => {
   return <div className={cn('my-8 ml-4 [counter-reset:step]', className)}>{children}</div>
 }
@@ -15,6 +16,7 @@ interface StepProps {
   children: ReactNode
 }
 
+/** One step, its number taken from where it sits among its siblings */
 export const Step = ({ title, children }: StepProps) => {
   return (
     <div className="group relative pb-6 pl-8 last:pb-2">

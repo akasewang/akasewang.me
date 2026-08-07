@@ -9,6 +9,7 @@ import { BLOG_CATEGORIES } from '@/constants/categories'
 import { useContentListState } from '@/hooks/use-content-list-state'
 import type { BlogPost } from '@/types/blog'
 
+/** The blogs listing with its category filter, search and sort */
 export function BlogTabs({ allPosts }: { allPosts: BlogPost[] }) {
   const router = useRouter()
   const {
@@ -27,13 +28,13 @@ export function BlogTabs({ allPosts }: { allPosts: BlogPost[] }) {
         <Button
           defaultText="join newsletter"
           defaultIcon={Icons.newsletter}
-          onClick={() => router.push('/newsletter')}
+          onClick={() => router.push('/newsletter', { scroll: false })}
         />
         <Button
           variant="minimal"
           defaultText="leave a message"
           defaultIcon={Icons.messageBoard}
-          onClick={() => router.push('/message-board')}
+          onClick={() => router.push('/message-board', { scroll: false })}
         />
       </div>
 

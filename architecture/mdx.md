@@ -12,9 +12,27 @@ Blogs and projects are authored as Markdown or MDX. Files live under `docs/`, gr
   to remain inside their configured content directory. Both `.md` and `.mdx` files are supported.
 - Files are read asynchronously with `fs.readFile`. React's `cache()` wraps post and collection
   lookups so repeated requests during the same server render reuse their result.
-- YAML frontmatter is parsed with `js-yaml`. A missing date falls back to the current timestamp;
-  other fields are represented by TypeScript types but are not runtime-schema validated. Malformed
-  files are omitted or return `null` through the manager's error handling.
+- YAML frontmatter is parsed with `js-yaml` and spread through as-is, so adding a field to the
+  TypeScript type is enough to make it available; the manager needs no change. Fields are
+  represented by types but are not runtime-schema validated, and malformed files are omitted or
+  return `null` through the manager's error handling.
+- `date` is optional and a missing one is left missing rather than backfilled with the current
+  timestamp, so work with no meaningful date is not given an invented one. `sortMdxByDate` treats
+  those entries as time `0`, which sorts them last.
+
+## Project Frontmatter
+
+Beyond the shared fields, a project understands:
+
+| Field | Meaning |
+| --- | --- |
+| `type` | Which filter chip it appears under. Values come from `PROJECT_CATEGORIES`; anything unrecognised or absent shows only under All. |
+| `external` | Sends the card and the command palette straight to this URL instead of the generated `/projects/[slug]` page. |
+| `image` / `video` | Artwork for the card. A video is preferred and falls back to the image. |
+| `preview` | Marks work that is not out yet. The card shows a `COMING SOON` plate in place of any artwork. |
+
+`preview` is checked before `image` and `video`, because it is a claim about the work rather than
+about the assets: a screenshot sitting where a not-yet-released notice belongs would contradict it.
 
 ## React in Markdown
 
@@ -28,6 +46,7 @@ Blogs and projects are authored as Markdown or MDX. Files live under `docs/`, gr
 
 ## Table of Contents
 
-- While parsing, every heading (`<h1>` through `<h6>`) is given a generated id and a clickable anchor link.
+- The custom `h1`–`h6` renderers use an explicit `id` when supplied; otherwise they generate one
+  from plain-string heading children and render a clickable hash anchor.
 - The sidebar table of contents extracts levels 2 through 4 and highlights the active section while
   the reader scrolls.

@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from 'react'
 import { createNoise3D } from 'simplex-noise'
+import { prefersReducedMotion } from '@/utils/motion'
 
 const SCALE = 200
 const LENGTH = 5
@@ -9,6 +10,14 @@ const SPACING = 15
 const MAX_DPR = 2
 const TWO_PI = Math.PI * 2
 
+/**
+ * The field of drifting dots behind every page.
+ *
+ * Drawn on a canvas rather than as elements, there being far too many to make each one a node.
+ * Each dot's offset comes from simplex noise sampled over time, so the field moves as one field
+ * rather than as points wandering independently, and the whole thing stops while the tab is hidden
+ * or where reduced motion is asked for.
+ */
 export function DotGridBackground() {
   const containerRef = useRef<HTMLDivElement>(null)
 
@@ -24,7 +33,7 @@ export function DotGridBackground() {
     container.appendChild(canvas)
 
     const noise3d = createNoise3D()
-    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const prefersReduced = prefersReducedMotion()
 
     let w = window.innerWidth
     let h = window.innerHeight
@@ -61,7 +70,7 @@ export function DotGridBackground() {
       points.length = 0
       for (let x = -SPACING / 2; x < w + SPACING; x += SPACING) {
         for (let y = -SPACING / 2; y < h + SPACING; y += SPACING) {
-          points.push({ x, y, nx: x / SCALE, ny: y / SCALE, opacity: Math.random() * 0.46 + 0.54 })
+          points.push({ x, y, nx: x / SCALE, ny: y / SCALE, opacity: Math.random() * 0.42 + 0.48 })
         }
       }
     }

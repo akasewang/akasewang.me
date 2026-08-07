@@ -11,6 +11,16 @@ interface SpotlightProps {
   withBaseReveal?: boolean
 }
 
+/**
+ * A pool of light that follows the pointer across a card.
+ *
+ * Two gradients are stacked, a wide faint one and a tighter brighter one, which together fall off
+ * more like real light than a single circle does. Both are centred on CSS variables the hook writes
+ * as the pointer moves, so following it costs no re-render.
+ *
+ * With withBaseReveal the children are also laid down faintly underneath, so whatever the light
+ * picks out is dimly visible before the pointer ever reaches it.
+ */
 function Spotlight({
   isHovering,
   outerSize = 140,
@@ -51,6 +61,8 @@ function Spotlight({
         }}
       />
 
+      {/* The children again at full strength, masked to a tighter circle so only what the pointer
+          is over is fully lit */}
       {children && (
         <div
           aria-hidden
@@ -81,6 +93,13 @@ interface SpotlightCardProps<T extends React.ElementType = 'div'> {
   children?: React.ReactNode
 }
 
+/**
+ * A card that lights up under the pointer, wrapping its own children in the spotlight above.
+ *
+ * The element rendered is the caller's to choose, so a card can be a link or an article without
+ * nesting anything extra. Pass revealLayer to light something other than the children, which suits
+ * a card whose lit state is a different picture rather than a brighter copy of the same one.
+ */
 export function SpotlightCard<T extends React.ElementType = 'div'>({
   as,
   children,

@@ -13,6 +13,7 @@ interface UnsubscribeConfirmProps {
 }
 
 type View = 'confirm' | 'pending' | UnsubscribeResult
+/** Asks before unsubscribing, so a link opened by a scanner does not remove anyone */
 export function UnsubscribeConfirm({ token, content }: UnsubscribeConfirmProps) {
   const [view, setView] = useState<View>('confirm')
   async function handleConfirm() {

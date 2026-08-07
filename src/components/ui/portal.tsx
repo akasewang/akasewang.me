@@ -7,6 +7,7 @@ const subscribe = () => () => {}
 const getClientSnapshot = () => true
 const getServerSnapshot = () => false
 
+/** Renders its children at the end of the body, for anything that must escape a clipped parent */
 export function Portal({ children }: { children: ReactNode }) {
   const mounted = useSyncExternalStore(subscribe, getClientSnapshot, getServerSnapshot)
 

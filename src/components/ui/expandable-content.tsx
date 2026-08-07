@@ -6,6 +6,7 @@ interface ExpandableContentProps {
   children: ReactNode
 }
 
+/** Animates its own height between hidden and shown, for one row of a timeline */
 export function ExpandableContent({ isExpanded, children }: ExpandableContentProps) {
   return (
     <div

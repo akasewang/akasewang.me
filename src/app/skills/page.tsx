@@ -16,6 +16,7 @@ export const metadata: Metadata = constructMetadata({
   imageAlt: skillsSeoContent.imageAlt,
 })
 
+/** the skills grid */
 export default function SkillsPage() {
   const breadcrumbJsonLd = getBreadcrumbSchema([
     { name: 'Home', url: SITE_URL },

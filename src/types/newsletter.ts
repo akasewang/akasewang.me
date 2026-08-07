@@ -1,8 +1,10 @@
+/** Copy for the public newsletter page */
 export interface NewsletterPageContent {
   title: string
   subtitle: string
 }
 
+/** Copy for the signup block that appears at the end of a post */
 export interface NewsletterSectionContent {
   title: string
   descriptionPrefix: string
@@ -15,6 +17,7 @@ export interface NewsletterSectionContent {
   errorFallback: string
 }
 
+/** Copy for the owner's page for writing and sending an issue */
 export interface AdminNewsletterContent {
   title: string
   description: string
@@ -30,6 +33,7 @@ export interface AdminNewsletterContent {
   buttonSuccess: string
 }
 
+/** Copy for the page a reader lands on from the unsubscribe link in an email */
 export interface UnsubscribePageContent {
   confirmTitle: string
   confirmDescription: string

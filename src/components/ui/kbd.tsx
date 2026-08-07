@@ -5,6 +5,7 @@ interface KbdProps extends React.HTMLAttributes<HTMLElement> {
   children: React.ReactNode
 }
 
+/** A single key drawn as a keycap, for the shortcut hints */
 export function Kbd({ children, className, ...props }: KbdProps) {
   return (
     <kbd

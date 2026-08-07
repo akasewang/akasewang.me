@@ -12,6 +12,7 @@ import {
 } from 'react'
 import { ProjectMediaFallback } from '@/components/common/project-media-fallback'
 import { Icons } from '@/components/ui/icons'
+import { useMediaFallback } from '@/hooks/use-media-fallback'
 import { useSoundEffects } from '@/hooks/use-sound-effects'
 import { canUseHoverPointer } from '@/utils/pointer'
 
@@ -21,8 +22,18 @@ interface ProjectDemoProps {
   title: string
 }
 
+/**
+ * The video or image at the top of a project page, with its own play control and progress bar.
+ *
+ * Controls fade out while it plays and return on any pointer movement, so they are there when
+ * wanted and out of the way otherwise.
+ */
 export function ProjectDemo({ image, video, title }: ProjectDemoProps) {
   const { hoverCard, media } = useSoundEffects()
+  const { failed: videoFailed, onError: onVideoError } = useMediaFallback(video)
+  const { failed: imageFailed, ref: imageRef, onError: onImageError } = useMediaFallback(image)
+
+  const showsVideo = Boolean(video) && !videoFailed
   const [state, setState] = useState({
     isPlaying: true,
     isBuffering: true,
@@ -111,7 +122,7 @@ export function ProjectDemo({ image, video, title }: ProjectDemoProps) {
         onPointerEnter={(event) => {
           if (!canUseHoverPointer(event.pointerType)) return
 
-          if (video) hoverCard()
+          if (showsVideo) hoverCard()
           updateState({ isHovered: true })
           resetHideTimer()
         }}
@@ -119,13 +130,13 @@ export function ProjectDemo({ image, video, title }: ProjectDemoProps) {
         onPointerMove={(event) => {
           if (canUseHoverPointer(event.pointerType)) resetHideTimer()
         }}
-        onClick={video ? handleToggleClick : undefined}
-        onKeyDown={video ? handleToggleKeyDown : undefined}
-        role={video ? 'button' : undefined}
-        tabIndex={video ? 0 : undefined}
+        onClick={showsVideo ? handleToggleClick : undefined}
+        onKeyDown={showsVideo ? handleToggleKeyDown : undefined}
+        role={showsVideo ? 'button' : undefined}
+        tabIndex={showsVideo ? 0 : undefined}
       >
         <div className="relative aspect-video w-full">
-          {video ? (
+          {showsVideo ? (
             <>
               <video
                 ref={videoRef}
@@ -134,6 +145,7 @@ export function ProjectDemo({ image, video, title }: ProjectDemoProps) {
                 muted
                 loop
                 playsInline
+                onError={onVideoError}
                 onTimeUpdate={() => {
                   const videoEl = videoRef.current
                   if (videoEl) {
@@ -152,7 +164,7 @@ export function ProjectDemo({ image, video, title }: ProjectDemoProps) {
                   resetHideTimer(true)
                 }}
                 className="size-full object-cover"
-                poster={image}
+                poster={imageFailed ? undefined : image}
               />
               <AnimatePresence>
                 {state.isBuffering && (
@@ -249,7 +261,7 @@ export function ProjectDemo({ image, video, title }: ProjectDemoProps) {
                 )}
               </AnimatePresence>
             </>
-          ) : image ? (
+          ) : image && !imageFailed ? (
             <Image
               src={image}
               alt={title}
@@ -257,6 +269,8 @@ export function ProjectDemo({ image, video, title }: ProjectDemoProps) {
               sizes="(max-width: 800px) 100vw, 800px"
               className="object-cover"
               priority
+              ref={imageRef}
+              onError={onImageError}
             />
           ) : (
             <ProjectMediaFallback title={title} />

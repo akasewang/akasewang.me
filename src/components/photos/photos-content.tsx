@@ -1,6 +1,6 @@
 'use client'
 
-import { m } from 'framer-motion'
+import { AnimatePresence, m } from 'framer-motion'
 import Image from 'next/image'
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { CategoryFilter } from '@/components/common/category-filter'
@@ -10,6 +10,7 @@ import { PHOTO_CATEGORIES } from '@/constants/categories'
 import { ZOOM_EASE } from '@/constants/ui'
 import { photos } from '@/data/static/photos'
 import { useCategoryParam } from '@/hooks/use-category-param'
+import { useArrivedWithPage, usePageArriving } from '@/hooks/use-page-arrival'
 import { useSoundEffects } from '@/hooks/use-sound-effects'
 import type { Photo } from '@/types/photos'
 import { canUseHoverPointer } from '@/utils/pointer'
@@ -18,9 +19,11 @@ import { PhotoOverlay } from './photo-overlay'
 
 const PHOTO_BY_ID = new Map(photos.map((p) => [p.id, p]))
 
+/** The photos page: the grid, its filter, and the overlay a photo opens into */
 export function PhotosContent() {
   const { toggle, hoverTick } = useSoundEffects()
   const [activeCategory, handleCategoryChange] = useCategoryParam(PHOTO_CATEGORIES)
+  const isArriving = usePageArriving()
 
   const [view, setView] = useState<'cover' | 'contain'>('cover')
   const [zoomedPhotoId, setZoomedPhotoId] = useState<string | null>(null)
@@ -58,12 +61,12 @@ export function PhotosContent() {
 
   return (
     <>
-      <div className="z-50 mb-6 animate-page-simple md:fixed md:left-8 md:top-24 md:mb-0">
+      <div className="z-50 mb-6 md:absolute md:inset-y-0 md:left-8 md:mb-0 md:w-8">
         <button
           type="button"
           onClick={handleToggleView}
           onMouseEnter={hoverTick}
-          className="relative flex h-8 shrink-0 items-center justify-center text-sm font-medium text-muted-foreground transition-[color,transform,scale] duration-300 supports-hover:hover:text-primary active:text-primary active:scale-[0.95] active:duration-200"
+          className="relative flex h-8 shrink-0 items-center justify-center text-sm font-medium text-muted-foreground transition-[color,transform,scale] duration-300 supports-hover:hover:text-primary active:text-primary active:scale-[0.95] active:duration-200 md:sticky md:top-24"
           aria-label="Toggle layout mode"
           title="Toggle layout mode"
         >
@@ -75,7 +78,7 @@ export function PhotosContent() {
         </button>
       </div>
 
-      <div className="mx-auto max-w-7xl animate-page-simple">
+      <div className="mx-auto max-w-7xl">
         <div className="mb-8">
           <CategoryFilter
             categories={PHOTO_CATEGORIES}
@@ -83,25 +86,28 @@ export function PhotosContent() {
             onChange={handleCategoryChange}
           />
         </div>
-        {filteredPhotos.length > 0 ? (
-          <div
-            key="photo-grid"
-            className="columns-1 gap-2 space-y-2 sm:columns-2 sm:gap-2.5 sm:space-y-2.5 lg:columns-3 xl:columns-4"
-          >
-            {filteredPhotos.map((photo) => (
-              <PhotoCard
-                key={photo.id}
-                photo={photo}
-                view={view}
-                isToggling={isToggling}
-                onZoom={setZoomedPhotoId}
-                onPreload={preloadPhoto}
-              />
-            ))}
-          </div>
-        ) : (
-          <EmptyState key="no-photos" message="no photos found in this category." />
-        )}
+        <AnimatePresence mode="popLayout">
+          {filteredPhotos.length > 0 ? (
+            <m.div
+              key="photo-grid"
+              layout={!isArriving ? 'position' : false}
+              className="grid grid-cols-1 gap-2 sm:grid-cols-2 sm:gap-2.5 md:grid-cols-4"
+            >
+              {filteredPhotos.map((photo) => (
+                <PhotoCard
+                  key={photo.id}
+                  photo={photo}
+                  view={view}
+                  isToggling={isToggling}
+                  onZoom={setZoomedPhotoId}
+                  onPreload={preloadPhoto}
+                />
+              ))}
+            </m.div>
+          ) : (
+            <EmptyState key="no-photos" message="no photos found in this category." />
+          )}
+        </AnimatePresence>
       </div>
 
       <PreloadRenderer ids={preloadIds} />
@@ -129,13 +135,17 @@ const PhotoCard = memo(function PhotoCard({
   onPreload: (id: string) => void
 }) {
   const { hoverCard, zoom } = useSoundEffects()
+  const arrivedWithPage = useArrivedWithPage()
+  const isArriving = usePageArriving()
+
   return (
     <m.div
-      initial={{ opacity: 0 }}
+      layout={!isArriving && !isToggling}
+      initial={arrivedWithPage ? false : { opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={ZOOM_EASE}
-      className="break-inside-avoid"
+      className="w-full"
     >
       <button
         type="button"
@@ -159,7 +169,7 @@ const PhotoCard = memo(function PhotoCard({
 
         <m.div
           layoutId={`photo-${photo.id}`}
-          transition={isToggling ? { duration: 0 } : ZOOM_EASE}
+          transition={isToggling || isArriving ? { duration: 0 } : ZOOM_EASE}
           className="relative size-full overflow-hidden"
         >
           <Image
@@ -167,7 +177,7 @@ const PhotoCard = memo(function PhotoCard({
             alt={photo.alt}
             width={photo.width}
             height={photo.height}
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw"
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
             className="size-full object-cover"
           />
         </m.div>

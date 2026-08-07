@@ -7,13 +7,12 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 }
 
+/** Shown for a URL that matches nothing */
 export default function NotFound() {
   return (
     <PageLayout
       title="page not found."
       subtitle="The page you are looking for does not exist or has been moved."
-      footerText="You're lost, but at least the UI looks good, right?"
-      animate={true}
     />
   )
 }

@@ -47,7 +47,7 @@ Current npm policy:
 - Schedule: weekly, Monday at `09:00` Asia/Kolkata
 - Open PR limit: `1`
 - Labels: `dependencies`
-- Commit prefix: `chore`
+- Commit prefix: `chore`, with dependency scope included
 - Grouping: all minor and patch npm updates are grouped into one version-update PR
 - Major version updates are ignored
 
@@ -58,7 +58,7 @@ Current GitHub Actions policy:
 - Schedule: weekly, Monday at `09:15` Asia/Kolkata
 - Open PR limit: `1`
 - Labels: `dependencies`
-- Commit prefix: `chore`
+- Commit prefix: `chore`, with dependency scope included
 - Grouping: all GitHub Actions updates are grouped into one version-update PR
 
 This keeps routine update PRs quiet while maintaining the workflow's immutable action references.
@@ -103,13 +103,12 @@ Rulesets apply to everyone who is not on the bypass list. With an empty bypass l
 the repository creator and org/repo admins. Each one must open a pull request and merge it
 instead of pushing to `main`.
 
-This repo keeps `Repository admin` on the bypass list. That is a deliberate tradeoff for a
-solo-maintained portfolio: admins keep an escape hatch and can push directly to `main` or
-recover quickly, while non-admins still go through pull requests. The cost is that the
-`accidental direct pushes` protection no longer applies to admins, so an accidental
-`git push origin main` from an admin succeeds instead of being rejected. The normal workflow
-below is therefore self-enforced for admins. To make the protection apply to everyone, empty
-the bypass list.
+The intended solo-maintainer configuration keeps `Repository admin` on the bypass list. That gives
+admins an escape hatch to push directly to `main` or recover quickly, while non-admins still go
+through pull requests. The tradeoff is that accidental-direct-push protection no longer applies to
+admins, so the normal workflow below is self-enforced for them. Empty the bypass list if the
+protection should apply to everyone. Because rulesets live in GitHub rather than this repository,
+verify the active bypass list in repository settings after changing it.
 
 Enable `Require status checks to pass` only after the automated `npm audit` check has completed
 successfully on a pull request. Requiring a check that has never run can block merges.

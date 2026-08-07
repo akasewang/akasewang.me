@@ -1,5 +1,6 @@
 import type { TimelineItemProps } from '@/types/site'
 
+/** Unpaid work, newest first, drawn as a timeline on the landing page */
 export const volunteer: TimelineItemProps[] = [
   {
     id: 'independent-technical-researcher',

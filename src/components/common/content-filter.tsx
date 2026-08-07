@@ -16,6 +16,7 @@ interface ContentFilterProps<T extends string> {
   placeholder?: string
 }
 
+/** The search field and sort control above a filtered list */
 export function ContentFilter<T extends string>({
   searchQuery,
   onSearchChange,

@@ -1,5 +1,6 @@
 import type { UnsubscribePageContent } from '@/types/newsletter'
 
+/** Copy for the page a reader lands on from the unsubscribe link in an email */
 export const unsubscribeContent: UnsubscribePageContent = {
   confirmTitle: 'unsubscribe.',
   confirmDescription:

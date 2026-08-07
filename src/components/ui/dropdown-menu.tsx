@@ -19,6 +19,7 @@ const ITEM_CLASS =
 
 const DropdownSoundContext = React.createContext<DropdownSoundContextValue | null>(null)
 
+/** A dropdown styled to match the site, carrying the sliding highlight between its items */
 const DropdownMenu: React.FC<React.ComponentProps<typeof DropdownMenuPrimitive.Root>> = ({
   onOpenChange,
   ...props

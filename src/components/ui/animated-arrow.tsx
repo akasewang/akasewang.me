@@ -10,6 +10,7 @@ interface AnimatedArrowProps {
 const ARROW_CLASS =
   'absolute inset-0 size-full transition-transform duration-200 ease-out motion-reduce:transition-none'
 
+/** An arrow that leans in the direction of travel when its link is hovered */
 export function AnimatedArrow({ className }: AnimatedArrowProps) {
   return (
     <span className={cn('relative inline-block size-4 overflow-hidden', className)}>

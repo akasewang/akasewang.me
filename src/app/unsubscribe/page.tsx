@@ -11,6 +11,7 @@ type Props = {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }
 
+/** Where the unsubscribe link in an email lands, carrying the token that identifies the reader */
 export default async function UnsubscribePage({ searchParams }: Props) {
   const resolvedParams = await searchParams
   const token = typeof resolvedParams.token === 'string' ? resolvedParams.token.trim() : null

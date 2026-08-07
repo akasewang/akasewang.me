@@ -20,6 +20,10 @@ const BLOCKED_AI_BOTS = [
   'FacebookBot',
 ]
 
+/**
+ * What crawlers may read. Search engines are welcome everywhere except the owner's own pages,
+ * while the AI crawlers listed above are turned away from the site entirely.
+ */
 export default function robots(): MetadataRoute.Robots {
   return {
     rules: [

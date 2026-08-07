@@ -12,10 +12,11 @@ interface SkillCardProps {
 }
 
 const SKILL_CARD_BASE_CLASSES =
-  'group relative inline-flex select-none items-center gap-1.5 overflow-hidden rounded-lg bg-card px-2.5 py-1.5 ring-1 ring-ring transition-all duration-200 ease-out focus:outline-none retina:ring-[0.5px]'
+  'group relative inline-flex select-none items-center gap-1.5 overflow-hidden rounded-lg bg-card px-2.5 py-1.5 ring-1 ring-ring transition-[box-shadow,transform,scale] duration-200 ease-out focus:outline-none retina:ring-[0.5px]'
 
 const SKILL_NAME_BASE_CLASSES = 'whitespace-nowrap font-mono text-xs font-medium leading-none'
 
+/** One technology in the skills grid, with its icon */
 export function SkillCard({ skill: { url, icon, name }, className }: SkillCardProps) {
   const isLink = !!url
   const { spotlightSweep, navigate: navigateSound } = useSoundEffects()

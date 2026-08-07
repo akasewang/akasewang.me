@@ -30,6 +30,7 @@ const readProjectFile = (src: string): string | null => {
   }
 }
 
+/** Shows the source of a component inside a post, read from the repository at build time */
 export function ComponentSource({ src, title, className }: ComponentSourceProps) {
   const codeString = readProjectFile(src)
 

@@ -4,6 +4,7 @@ import { usePathname, useSearchParams } from 'next/navigation'
 import { useCallback, useEffect, useMemo } from 'react'
 import type { SortOption } from '@/components/common/content-filter'
 import { useViews } from '@/components/providers/views-context'
+import { countKeyFor } from '@/hooks/use-visits'
 
 const DEFAULT_SORT: SortOption = 'date-desc'
 const SORT_OPTIONS = ['date-desc', 'date-asc', 'views-desc', 'views-asc'] as const
@@ -15,6 +16,7 @@ interface CategoryOption<T extends string> {
 
 interface SluggedContent {
   slug: string
+  external?: string
 }
 
 interface UseContentListStateOptions<TItem extends SluggedContent, TCategory extends string> {
@@ -56,7 +58,7 @@ export function useContentListState<TItem extends SluggedContent, TCategory exte
   const sortBy = useMemo(() => (isSortOption(sortParam) ? sortParam : DEFAULT_SORT), [sortParam])
 
   useEffect(() => {
-    prefetchViews(items.map((item) => item.slug))
+    prefetchViews(items.map(countKeyFor))
   }, [items, prefetchViews])
 
   /**
@@ -114,9 +116,9 @@ export function useContentListState<TItem extends SluggedContent, TCategory exte
     if (sortBy === 'date-asc') {
       result.reverse()
     } else if (sortBy === 'views-desc') {
-      result.sort((a, b) => (getViews(b.slug) || 0) - (getViews(a.slug) || 0))
+      result.sort((a, b) => (getViews(countKeyFor(b)) || 0) - (getViews(countKeyFor(a)) || 0))
     } else if (sortBy === 'views-asc') {
-      result.sort((a, b) => (getViews(a.slug) || 0) - (getViews(b.slug) || 0))
+      result.sort((a, b) => (getViews(countKeyFor(a)) || 0) - (getViews(countKeyFor(b)) || 0))
     }
 
     return result

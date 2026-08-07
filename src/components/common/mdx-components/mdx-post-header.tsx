@@ -10,7 +10,7 @@ interface AdjacentPost {
 
 interface MdxPostHeaderProps {
   title: string
-  date: string
+  date?: string
   slug: string
   content: string
   basePath: string
@@ -19,6 +19,7 @@ interface MdxPostHeaderProps {
   next?: AdjacentPost
 }
 
+/** The title of a post with its date, view count and reading time, above the body */
 export function MdxPostHeader({
   title,
   date,
@@ -29,6 +30,8 @@ export function MdxPostHeader({
   prev,
   next,
 }: MdxPostHeaderProps) {
+  const formattedDate = formatDateString(date)
+
   return (
     <div className="flex items-start justify-between gap-4">
       <div className="space-y-2">
@@ -37,8 +40,12 @@ export function MdxPostHeader({
         </h1>
 
         <div className="flex items-center text-xs text-muted-foreground">
-          <span>{formatDateString(date)}</span>
-          <SeparatorBullet />
+          {formattedDate && (
+            <>
+              <span>{formattedDate}</span>
+              <SeparatorBullet />
+            </>
+          )}
           <ViewCounter slug={slug} readOnly={false} />
           <SeparatorBullet />
           <span>{getReadingTime(content)} min read</span>

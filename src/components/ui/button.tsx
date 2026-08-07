@@ -35,13 +35,13 @@ const VARIANT_STYLES = {
 const SUCCESS_STYLES =
   'ring-1 ring-inset ring-success/30 retina:ring-[0.5px] bg-success/10 text-success shadow-[0_2px_4px_rgb(0_0_0/0.2),inset_0_1px_1px_rgb(255_255_255/0.1)]'
 
-/** Match AnimatedArrow: the old face rises out while its replacement rises in from below */
 const BUTTON_CONTENT_SWAP = {
   initial: { y: '110%' },
   animate: { y: '0%', transition: BUTTON_SWAP_TRANSITION },
   exit: { y: '-110%', transition: BUTTON_SWAP_TRANSITION },
 }
 
+/** The site's button, in the sizes and variants the rest of the interface draws from */
 export function Button({
   isPending = false,
   isSuccess = false,
@@ -87,11 +87,6 @@ export function Button({
     isSuccessState ? SUCCESS_STYLES : VARIANT_STYLES[variant],
   )
 
-  /**
-   * Re-keyed whenever the face changes, which is what drives the swap. The default text is the key
-   * in its own right, so a label that follows what is being typed animates the same way a pending
-   * or a success state does rather than snapping between words.
-   */
   const contentKey = isPending
     ? 'pending'
     : isSuccessState
@@ -100,10 +95,6 @@ export function Button({
         ? 'wait'
         : defaultText
 
-  /**
-   * The right box only ever shows a spinner, a count or the arrow, none of which follow the label.
-   * Keyed on the label it would have re-run the arrow on every keystroke.
-   */
   const rightKey = isPending ? 'pending' : countdown > 0 ? 'countdown' : 'arrow'
 
   const renderContent = () => {

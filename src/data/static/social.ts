@@ -2,6 +2,7 @@ import { SOCIAL_CATEGORIES } from '@/constants/categories'
 import { USERNAME } from '@/constants/constants'
 import type { SocialGroup, SocialLink } from '@/types/site'
 
+/** Every profile linked to, each tagged with the kind of place it is */
 export const activeSocials: SocialLink[] = [
   {
     href: `https://github.com/${USERNAME}`,

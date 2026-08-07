@@ -1,8 +1,8 @@
 'use client'
 
-import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { Icons } from '@/components/ui/icons'
+import { Link } from '@/components/ui/route-link'
 import { SeparatorSlash } from '@/components/ui/separator-slash'
 import { useKeyboardShortcut } from '@/hooks/use-keyboard-shortcut'
 import { useSoundEffects } from '@/hooks/use-sound-effects'
@@ -14,6 +14,7 @@ interface BackButtonProps {
   className?: string
 }
 
+/** Returns to the listing a page was reached from */
 export function BackButton({ href = '/', label, className }: BackButtonProps) {
   const router = useRouter()
   const { hoverLink, navigate: navigateSound } = useSoundEffects()
@@ -21,7 +22,7 @@ export function BackButton({ href = '/', label, className }: BackButtonProps) {
 
   useKeyboardShortcut('Escape', () => {
     navigateSound()
-    router.push(href)
+    router.push(href, { scroll: false })
   })
 
   return (

@@ -48,6 +48,7 @@ const VARIANTS: Record<
   },
 }
 
+/** An aside in a post, tinted by the kind of note it is */
 export const Callout = ({ type = 'info', title, children, className }: CalloutProps) => {
   const { icon, label, accent, hue } = VARIANTS[type]
   const Icon = Icons[icon] as React.ComponentType<{ className?: string }>

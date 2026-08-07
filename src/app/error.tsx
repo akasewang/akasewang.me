@@ -2,19 +2,13 @@
 
 import { ErrorState } from '@/components/common/error-state'
 
-export default function Error({
-  error,
-  reset,
-}: {
-  error: Error & { digest?: string }
-  reset: () => void
-}) {
+/** Shown when a page throws, offering a way back rather than a blank screen */
+export default function Error({ error }: { error: Error & { digest?: string } }) {
   return (
     <ErrorState
       error={error}
-      reset={reset}
       title="something broke."
-      subtitle="An unexpected error occurred. You can try again or head back home."
+      subtitle="An unexpected error occurred while rendering this page."
     />
   )
 }

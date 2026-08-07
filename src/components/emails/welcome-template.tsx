@@ -17,6 +17,7 @@ interface WelcomeTemplateProps {
   optInDate?: EmailDateInput
 }
 
+/** The first email a new subscriber receives */
 export const WelcomeTemplate = ({
   unsubscribeToken = 'preview-token',
   isResubscribe = false,

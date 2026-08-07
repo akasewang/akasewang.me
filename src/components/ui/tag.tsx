@@ -1,6 +1,7 @@
 import type { ComponentProps } from 'react'
 import { cn } from '@/utils/utils'
 
+/** A small label for a technology or topic, as listed on a project or a post */
 export function Tag({ className, ...props }: ComponentProps<'span'>) {
   return (
     <span

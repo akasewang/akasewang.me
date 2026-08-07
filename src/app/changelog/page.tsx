@@ -18,6 +18,7 @@ export const metadata: Metadata = constructMetadata({
   imageAlt: changelogSeoContent.imageAlt,
 })
 
+/** commits to this site, grouped by day */
 export default async function ChangelogPage() {
   const days = await getChangelog()
 

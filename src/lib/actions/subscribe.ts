@@ -12,7 +12,7 @@ import { db } from '@/lib/db/drizzle'
 import { newsletterSubscribers } from '@/lib/db/schema'
 import { claimRateLimit } from '@/lib/rate-limit'
 import { getClientIp } from '@/lib/request-ip'
-import { getResend, SENDER_EMAIL } from '@/lib/resend'
+import { getNewsletterSender, getResend } from '@/lib/resend'
 import type { ActionResult } from '@/types/actions'
 
 const MAX_EMAIL_LENGTH = 254
@@ -23,24 +23,30 @@ const MAX_EMAIL_LENGTH = 254
  * quota and, worse, send unasked for mail to any address it liked from this domain, which is the
  * sort of thing that costs a sending reputation.
  */
-/**
- * The row is written before this runs, and the subscription is the thing the reader actually asked
- * for, so a mail provider having a bad minute does not undo it. Reporting the failure upward would
- * tell them the signup did not work while they are on the list, and their retry could then only
- * answer that they are already subscribed.
- */
 async function sendWelcomeEmail(email: string, token: string, isResubscribe: boolean) {
+  const sender = getNewsletterSender()
+  if (!sender) {
+    console.error('Missing RESEND_NEWSLETTER_EMAIL for welcome email')
+    return
+  }
+
   try {
     const htmlContent = await render(
       React.createElement(WelcomeTemplate, { unsubscribeToken: token, isResubscribe }),
     )
 
-    await getResend().emails.send({
-      from: `${FULL_NAME} <${SENDER_EMAIL}>`,
+    const fromAddress = sender.includes('<') ? sender : `${FULL_NAME} <${sender}>`
+
+    const { error } = await getResend().emails.send({
+      from: fromAddress,
       to: email,
       subject: isResubscribe ? 'Welcome Back!' : 'Welcome Aboard!',
       html: htmlContent,
     })
+
+    if (error) {
+      console.error(logContent.subscribe.error, error.message)
+    }
   } catch (err) {
     console.error(logContent.subscribe.error, err instanceof Error ? err.message : err)
   }

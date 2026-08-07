@@ -23,6 +23,7 @@ const TESTIMONIAL_QUOTE_CLASSES =
 
 const TESTIMONIAL_ROLE_CLASSES = 'truncate font-mono text-xs font-medium tracking-tight'
 
+/** One quote with the person it came from */
 export function TestimonialCard({
   testimonial: { url, quote, author, role, image, verified },
   className,

@@ -1,8 +1,8 @@
 'use client'
 
-import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { ViewCounter } from '@/components/common/view-counter'
+import { Link } from '@/components/ui/route-link'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { footerContent } from '@/data/content/layout-content'
 import { useKeyboardShortcut } from '@/hooks/use-keyboard-shortcut'
@@ -10,6 +10,7 @@ import { useSoundEffects } from '@/hooks/use-sound-effects'
 
 const { license, licenseHref, ownerName, changelogLabel, changelogHref } = footerContent
 
+/** The site footer, with the links out and the note at the bottom of every page */
 export function Footer() {
   const currentYear = new Date().getFullYear()
   const { hoverLink, navigate: navigateSound } = useSoundEffects()
@@ -28,7 +29,7 @@ export function Footer() {
   useKeyboardShortcut('l', () => {
     if (changelogHref) {
       navigateSound()
-      router.push(changelogHref)
+      router.push(changelogHref, { scroll: false })
     }
   })
 

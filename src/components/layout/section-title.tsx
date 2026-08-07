@@ -7,6 +7,7 @@ interface SectionTitleProps {
   element?: 'h1' | 'h2' | 'h3'
 }
 
+/** The heading above a section of the landing page */
 export function SectionTitle({ children, className, element: Tag = 'h2' }: SectionTitleProps) {
   return (
     <Tag

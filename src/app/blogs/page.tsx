@@ -17,6 +17,7 @@ export const metadata: Metadata = constructMetadata({
   imageAlt: blogsSeoContent.imageAlt,
 })
 
+/** the blogs listing, filtered and sorted in the browser */
 export default async function BlogPage() {
   const allPosts = await getAllBlogPosts()
 

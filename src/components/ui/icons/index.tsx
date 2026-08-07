@@ -6,6 +6,7 @@ import {
   ArrowUpRight,
   Article,
   Bell,
+  Books,
   Broadcast,
   CalendarBlank,
   CalendarCheck,
@@ -26,6 +27,7 @@ import {
   GithubLogo,
   GridFour,
   Hash,
+  House,
   Lightbulb,
   Link,
   LinkedinLogo,
@@ -36,12 +38,14 @@ import {
   Pause,
   Play,
   Question,
+  Quotes,
   RedditLogo,
   Rows,
   Rss,
   ShareNetwork,
   SpeakerHigh,
   SpeakerSlash,
+  Stack,
   Table,
   Warning,
   WarningCircle,
@@ -65,14 +69,26 @@ interface PhosphorIconProps extends IconProps {
   weight?: IconWeight
 }
 
+/** Phosphor's two tone weight, which is the site's default for icons */
 const duotone = (Icon: PhosphorIcon) =>
   function DuotoneIcon({ size = 24, weight = 'duotone', ...props }: PhosphorIconProps) {
     return <Icon {...props} size={size} weight={weight} />
   }
 
+/** A plain single weight, for the few icons that read badly with a second tone behind them */
+const regular = (Icon: PhosphorIcon) =>
+  function RegularIcon({ size = 24, weight = 'regular', ...props }: PhosphorIconProps) {
+    return <Icon {...props} size={size} weight={weight} />
+  }
+
+const check = duotone(Check)
 const checkCircle = duotone(CheckCircle)
 const lightbulb = duotone(Lightbulb)
 
+/**
+ * Every icon the site draws, under names that say what they are for rather than what they depict,
+ * so an icon can be swapped without hunting through the components that use it.
+ */
 export const Icons = {
   initials: ({ size = 32, className, ...props }: IconProps) => (
     <svg
@@ -104,12 +120,16 @@ export const Icons = {
   projects: lightbulb,
   blogs: duotone(Article),
   photos: duotone(Camera),
+  home: duotone(House),
+  skills: duotone(Stack),
+  catalog: duotone(Books),
+  testimonials: duotone(Quotes),
   chatUpload: duotone(PaperPlaneTilt),
   chatCheck: checkCircle,
   messageBoard: duotone(ChatsCircle),
   newsletter: duotone(Newspaper),
   mailCheck: duotone(EnvelopeSimpleOpen),
-  check: duotone(Check),
+  check,
   search: duotone(MagnifyingGlass),
   menu: duotone(List),
   doubleArrowUp: duotone(CaretDoubleUp),
@@ -131,10 +151,10 @@ export const Icons = {
   facebook: duotone(FacebookLogo),
   reddit: duotone(RedditLogo),
   x: duotone(XLogo),
-  close: duotone(X),
+  close: regular(X),
   linkedin: duotone(LinkedinLogo),
   github: duotone(GithubLogo),
-  rss: duotone(Rss),
+  rss: regular(Rss),
   cancelCircle: duotone(XCircle),
   link: duotone(Link),
   question: duotone(Question),

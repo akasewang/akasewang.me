@@ -13,6 +13,7 @@ import { SectionTitle } from '../layout/section-title'
 import { Button } from '../ui/button'
 import { Input } from '../ui/input'
 
+/** The signup form at the end of a post, reporting back through a toast */
 export function NewsletterSubscription({ hideHeader = false }: { hideHeader?: boolean }) {
   const [email, setEmail] = useState('')
   const [loading, setLoading] = useState(false)
@@ -54,7 +55,7 @@ export function NewsletterSubscription({ hideHeader = false }: { hideHeader?: bo
   }
 
   return (
-    <section id="newsletter" className="space-y-4 animate-page-simple">
+    <section id="newsletter" className="space-y-4">
       {!hideHeader && (
         <>
           <SectionTitle>{newsletterContent.title}</SectionTitle>

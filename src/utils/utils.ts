@@ -11,7 +11,6 @@ import {
   PRESENT,
   READING_SPEED,
   TEXT_MONTH_YEAR_REGEX,
-  TWO_WEEKS_MS,
   YEAR_REGEX,
 } from '../constants/constants'
 
@@ -158,16 +157,4 @@ export function generateGradientFromName(name: string) {
     colors: [c1, c2, c3],
     angle,
   }
-}
-
-/**
- * Within the last two weeks. A day of slack on the future side absorbs clock skew between the
- * visitor and whoever dated the entry.
- */
-export function isNew(dateStr?: string | Date): boolean {
-  const date = parseAnyDate(dateStr)
-  if (!date) return false
-
-  const diff = Date.now() - date.getTime()
-  return diff >= -86400000 && diff <= TWO_WEEKS_MS
 }

@@ -2,6 +2,7 @@ import { FULL_NAME } from '@/constants/constants'
 import type { CommonContent, FooterContent, NavbarContent } from '@/types/site'
 import pkg from '../../../package.json'
 
+/** Copy for the navbar and its links */
 export const navbarContent: NavbarContent = {
   home: 'Home',
   blogs: 'Blogs',
@@ -9,6 +10,7 @@ export const navbarContent: NavbarContent = {
   photos: 'Photos',
 }
 
+/** Copy for the site footer */
 export const footerContent: FooterContent = {
   ownerName: FULL_NAME,
   license: 'CC BY-NC-SA 4.0',
@@ -17,6 +19,7 @@ export const footerContent: FooterContent = {
   changelogHref: '/changelog',
 }
 
+/** Strings shared by the chrome around every page */
 export const commonContent: CommonContent = {
   pronounceName: 'Pronounce my name',
   backToTop: 'Back to Top',

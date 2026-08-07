@@ -29,6 +29,7 @@ interface SearchBarProps {
   placeholder?: string
 }
 
+/** The search field above a filtered list */
 export function SearchBar({
   searchQuery,
   onSearchChange,

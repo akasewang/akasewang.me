@@ -16,6 +16,7 @@ interface ProfilePictureProps {
 
 const DURATION = 4
 
+/** The avatar in the hero, ringed by its own name turning slowly around it */
 export function ProfilePicture({ src, alt, href, label, className }: ProfilePictureProps) {
   const shouldReduceMotion = useReducedMotion()
   const { hoverLink, navigate: navigateSound } = useSoundEffects()

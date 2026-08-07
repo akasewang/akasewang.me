@@ -11,6 +11,7 @@ export interface VolumeIconHandle {
   stopAnimation: () => void
 }
 
+/** The sound toggle, whose waves animate in and out as sound is switched */
 export const VolumeIcon = forwardRef<VolumeIconHandle, ComponentProps<'svg'>>((props, ref) => {
   const [isPlaying, setIsPlaying] = useState(false)
 

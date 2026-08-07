@@ -14,9 +14,9 @@ interface PageLayoutProps {
   backButtonHref?: string
   breadcrumb?: JsonLdValue
   className?: string
-  animate?: boolean
 }
 
+/** The frame every inner page shares: its heading, its body and the note at the foot */
 export function PageLayout({
   children,
   title,
@@ -25,12 +25,11 @@ export function PageLayout({
   backButtonHref,
   breadcrumb,
   className,
-  animate = true,
 }: PageLayoutProps) {
   const breadcrumbJson = breadcrumb ? serializeJsonLd(breadcrumb) : null
 
   return (
-    <main className={cn('space-y-8', animate && 'animate-page-simple', className)}>
+    <main className={cn('space-y-8', className)}>
       {breadcrumbJson && <script type="application/ld+json">{breadcrumbJson}</script>}
 
       {(title || subtitle) && <PageHeader title={title || ''} subtitle={subtitle} />}

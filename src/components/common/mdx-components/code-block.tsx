@@ -11,6 +11,12 @@ interface PreProps extends HTMLAttributes<HTMLPreElement> {
   title?: string
 }
 
+/**
+ * The plain text of a highlighted block, for copying.
+ *
+ * Highlighting turns a snippet into a tree of coloured spans, so the text has to be gathered back
+ * out of it by walking through and collecting the strings at the leaves.
+ */
 const extractCode = (node: ReactNode): string => {
   if (node == null || typeof node === 'boolean') return ''
   if (typeof node === 'string' || typeof node === 'number') return String(node)
@@ -20,6 +26,7 @@ const extractCode = (node: ReactNode): string => {
   return ''
 }
 
+/** The language a fence was opened with, which the highlighter leaves in a class on the code element */
 const extractLanguage = (node: ReactNode): string | null => {
   if (Array.isArray(node)) {
     for (const child of node) {
@@ -33,6 +40,12 @@ const extractLanguage = (node: ReactNode): string | null => {
   return /language-([\w-]+)/.exec(className ?? '')?.[1] ?? extractLanguage(children ?? null)
 }
 
+/**
+ * The filename written after the language on a fence, shown as the block's header.
+ *
+ * Where that lands depends on the plugins a snippet passed through, so both are read: a title prop
+ * if one was set, otherwise the raw meta string the fence was opened with.
+ */
 const extractMetaTitle = (node: ReactNode): string | null => {
   if (Array.isArray(node)) {
     for (const child of node) {
@@ -55,6 +68,13 @@ const extractMetaTitle = (node: ReactNode): string | null => {
   return extractMetaTitle(children ?? null)
 }
 
+/**
+ * Every fenced code block in a post: the snippet itself, its filename header and a copy button.
+ *
+ * Language, title and text are all read back out of the highlighted tree rather than passed in,
+ * since MDX hands this the finished markup and not the fence it came from. Blocks inside a tab
+ * panel drop their own frame, the panel already providing one.
+ */
 export const Pre = ({
   copyable = true,
   raw = false,

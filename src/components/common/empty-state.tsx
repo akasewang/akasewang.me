@@ -10,6 +10,7 @@ interface EmptyStateProps {
   className?: string
 }
 
+/** Shown where a filter matches nothing, so an empty list still says something */
 export function EmptyState({ title, message, children, className }: EmptyStateProps) {
   return (
     <div

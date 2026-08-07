@@ -18,11 +18,27 @@ interface ExpandableListProps<T> {
 
 const TOGGLE_LABELS = [sharedContent.more, sharedContent.less] as const
 
+/** Both labels stack in one grid cell, so the button is as wide as the longer of them and never
+    changes width as they swap */
 const CELL_CLASS = 'col-start-1 row-start-1 whitespace-nowrap'
+
+/**
+ * The padding is cancelled by matching negative margins, so clipping the height for the animation
+ * does not also clip whatever a row draws outside itself, such as a hover highlight. Scroll
+ * anchoring is switched off, since the browser correcting for the changing height would fight the
+ * scroll adjustment made on collapse.
+ */
 const HIDDEN_BLOCK_CLASS = '-mb-4 -mx-4 overflow-hidden px-4 pb-4 [overflow-anchor:none]'
 
 const LABEL_TRANSITION: Transition = { duration: 0.2, ease: 'easeOut' }
 
+/**
+ * A list that shows a few rows and reveals the rest behind a toggle.
+ *
+ * Collapsing is the awkward direction: the page above shrinks under the reader, so the scroll
+ * position is adjusted by the height being removed and the view stays where it was rather than
+ * jumping up the page.
+ */
 export function ExpandableList<T>({ items, renderItem, initialCount = 3 }: ExpandableListProps<T>) {
   const { toggle, hoverTick } = useSoundEffects()
   const [showAll, setShowAll] = useState(false)

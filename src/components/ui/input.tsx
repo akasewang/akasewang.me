@@ -1,6 +1,7 @@
 import { type ComponentProps, forwardRef } from 'react'
 import { cn } from '@/utils/utils'
 
+/** The site's text field */
 export const Input = forwardRef<HTMLInputElement, ComponentProps<'input'>>(
   ({ className, type = 'text', ...props }, ref) => (
     <input

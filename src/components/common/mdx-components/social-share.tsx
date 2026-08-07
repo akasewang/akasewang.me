@@ -61,6 +61,7 @@ const getShareUrl = (network: string, url: string, title: string) => {
   }
 }
 
+/** Share buttons on a post, each opening its network's own composer with the link filled in */
 export function SocialShare({ url, title, className }: SocialShareProps) {
   const { hoverTick, error: errorSound } = useSoundEffects()
   const [isOpen, setIsOpen] = useState(false)

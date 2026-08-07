@@ -14,6 +14,12 @@ import type { TimelineItemProps } from '@/types/site'
 import { renderWithLinks } from '@/utils/content-utils'
 import { cn, formatDateString } from '@/utils/utils'
 
+/**
+ * One entry in a timeline, such as a job or a course, with its dates set to the side.
+ *
+ * An entry with a description expands to show it and reads as a control, while one without is
+ * simply a heading and a date and stays inert.
+ */
 export const TimelineItem = memo(function TimelineItem({
   id,
   title,

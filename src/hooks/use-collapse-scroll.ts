@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef } from 'react'
 import { EXPAND_DURATION } from '@/constants/ui'
 
-/** Input that means the visitor has taken the scroll over, so we stop steering it */
+/** Input that means the visitor has taken the scroll over, so the hook stops steering it */
 const INTERRUPT_EVENTS = ['wheel', 'touchmove', 'keydown'] as const
 
 /** Long enough to outlast the height animation and whatever frame it settles on */
@@ -11,7 +11,7 @@ const FOLLOW_MS = (EXPAND_DURATION + 0.15) * 1000
 
 /**
  * The document carries scroll-smooth, so every plain scrollTo would be handed to the native
- * smooth scroller and race the frames we are driving. Each step has to land immediately.
+ * smooth scroller and race the frames this hook drives. Each step has to land immediately.
  */
 const scrollToNow = (top: number) => window.scrollTo({ top, behavior: 'instant' })
 

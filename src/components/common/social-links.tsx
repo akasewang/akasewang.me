@@ -6,6 +6,7 @@ interface SocialLinksProps {
   groups: SocialGroup[]
 }
 
+/** The row of profile links in the hero, grouped by the kind of place they lead to */
 export function SocialLinks({ groups }: SocialLinksProps) {
   return (
     <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-4 sm:gap-x-5 sm:gap-y-1.5">

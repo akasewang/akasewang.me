@@ -1,3 +1,4 @@
+/** Every string the board renders, kept out of the components so the copy lives in one place */
 export interface MessageBoardContent {
   title: string
   subtitle: string
@@ -27,6 +28,10 @@ export interface MessageBoardContent {
   }
 }
 
+/**
+ * One message as the board shows it. The reply is the owner's answer beneath it, absent on a
+ * message that has not been answered.
+ */
 export interface MessageBoardEntry {
   id: number
   name: string
