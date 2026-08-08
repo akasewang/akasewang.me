@@ -36,6 +36,15 @@ const nextConfig: NextConfig = {
     },
   },
   images: {
+    /**
+     * Images are served as they sit rather than through the image route.
+     *
+     * That route is metered, and once its allowance is spent it answers every request with a 402
+     * regardless of what is being asked for, which reaches the page as an image that failed to
+     * load. Serving the files directly takes the whole site off that meter. The sources are
+     * already WebP at the size they are shown, so there is little left for it to have done.
+     */
+    unoptimized: true,
     formats: ['image/webp', 'image/avif'],
     minimumCacheTTL: 60 * 60 * 24 * 30,
     remotePatterns: [

@@ -14,7 +14,7 @@ const require = createRequire(import.meta.url)
 const packagePath = require.resolve('brace-expansion/package.json')
 const packageJson = JSON.parse(await readFile(packagePath, 'utf8'))
 
-if (packageJson.version !== '5.0.8') {
+if (packageJson.version !== '5.0.9') {
   throw new Error(
     `Update the brace-expansion compatibility patch for version ${packageJson.version}`,
   )

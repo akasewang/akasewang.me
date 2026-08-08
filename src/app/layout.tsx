@@ -35,8 +35,19 @@ export const metadata: Metadata = {
   creator: FULL_NAME,
   metadataBase: new URL(SITE_URL),
   manifest: '/manifest.json',
+  /**
+   * Declaring any of these takes over from the icon files app/ would otherwise wire up on its own,
+   * so the mark has to be named here as well. Left out, the only icon reaching a browser is the
+   * 48px favicon, and every surface that wants something larger goes looking elsewhere.
+   */
   icons: {
-    apple: '/profpic.jpg',
+    /** The mark itself, redrawn at whatever size it is asked for */
+    icon: [{ url: '/icon.svg', type: 'image/svg+xml' }],
+    /**
+     * The same mark, since Apple's touch icon cannot be an SVG. This is the largest icon most
+     * surfaces find, so bookmark tiles, home screens and start pages reach for it first.
+     */
+    apple: '/apple-touch-icon.png',
   },
   robots: {
     index: true,
@@ -100,7 +111,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       suppressHydrationWarning
     >
       <head>
-        <link rel="preload" href="/profpic.jpg" as="image" />
+        <link rel="preload" href="/profpic.webp" as="image" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}

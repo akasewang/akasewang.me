@@ -4,7 +4,14 @@ import {
 } from '@/components/projects/project-card-skeleton'
 import { Skeleton } from '@/components/ui/skeleton'
 
-/** Shown while the landing page loads, laid out to match it so nothing shifts when the real content arrives */
+/**
+ * Shown while the landing page loads, laid out to match it so nothing shifts when the real content
+ * arrives.
+ *
+ * Sits inside the home route group rather than at the root of app, which is what keeps it to this
+ * one page. A loading file at the root is the fallback for every route beneath it, so a skeleton
+ * shaped like the landing page would appear over the projects grid, the blogs list and the rest.
+ */
 export default function Loading() {
   return (
     <main className="flex-1">

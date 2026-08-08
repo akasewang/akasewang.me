@@ -23,7 +23,7 @@ export function HeroSection() {
     <section id="hero" className="space-y-8">
       <div className="flex items-center gap-6 pb-2">
         <ProfilePicture
-          src="/profpic.jpg"
+          src="/profpic.webp"
           alt={FULL_NAME}
           href={hero.designsUrl}
           label={hero.designsLabel}
