@@ -1,8 +1,8 @@
 'use server'
 
-import { render } from '@react-email/components'
 import { eq } from 'drizzle-orm'
 import React from 'react'
+import { render } from 'react-email'
 import { NewsletterTemplate } from '@/components/emails/newsletter-template'
 import { FULL_NAME, READING_SPEED, SITE_URL } from '@/constants/constants'
 import { logContent } from '@/data/content/log-content'

@@ -1,7 +1,7 @@
-import { render } from '@react-email/components'
 import { and, eq, gte, lt } from 'drizzle-orm'
 import { NextResponse } from 'next/server'
 import React from 'react'
+import { render } from 'react-email'
 import { WeeklySummaryTemplate } from '@/components/emails/weekly-summary-template'
 import { adminRecipient, otpSender } from '@/lib/admin-otp'
 import { db } from '@/lib/db/drizzle'

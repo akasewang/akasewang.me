@@ -12,8 +12,8 @@ import http from 'node:http'
 import { createRequire, register } from 'node:module'
 import path from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
-import { render } from '@react-email/components'
 import { type ComponentType, createElement } from 'react'
+import { render } from 'react-email'
 
 type EmailTemplateComponent = ComponentType<Record<string, unknown>> & {
   PreviewProps?: Record<string, unknown>

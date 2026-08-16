@@ -50,19 +50,19 @@ interface CommandItemBase {
 
 /** The three kinds of row, told apart by kind: one goes somewhere, one does something, one opens a
  * group of its own */
-export interface CommandLinkItem extends CommandItemBase {
+interface CommandLinkItem extends CommandItemBase {
   kind: 'link'
   href: string
   external?: boolean
   visitSlug?: string
 }
 
-export interface CommandActionItem extends CommandItemBase {
+interface CommandActionItem extends CommandItemBase {
   kind: 'action'
   action: CommandActionId
 }
 
-export interface CommandSectionItem extends CommandItemBase {
+interface CommandSectionItem extends CommandItemBase {
   kind: 'section'
   sectionId: string
 }

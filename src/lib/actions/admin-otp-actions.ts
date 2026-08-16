@@ -1,7 +1,7 @@
 'use server'
 
-import { render } from '@react-email/components'
 import React from 'react'
+import { render } from 'react-email'
 import { OtpTemplate } from '@/components/emails/otp-template'
 import { FULL_NAME } from '@/constants/constants'
 import { toastContent } from '@/data/content/toast-content'

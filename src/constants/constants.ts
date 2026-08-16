@@ -127,7 +127,7 @@ export const CORE_TECHS = ['TypeScript', 'Python', 'SQL', 'PostgreSQL']
 export const SECONDARY_TECHS = ['Next.js', 'AWS', 'Prisma']
 
 /** The hero flips through all of these. The first stands alone as the job title in the structured data */
-export const ROLES = ['Software Engineer', 'Design Engineer', 'Open Source Contributor']
+export const ROLES = ['Engineer & Designer', 'Open Source Contributor']
 
 /** The keywords meta tag, gathered from the pieces above so each name and tech is written once */
 export const ALL_KEYWORDS = [

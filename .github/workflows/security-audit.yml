@@ -26,15 +26,15 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        uses: actions/checkout@v4
         with:
           persist-credentials: false
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@fc06bc1257f339d1d5d8b3a19a8cae5388b55320 # v4.4.0
+      - name: Install pnpm
+        run: npm install -g pnpm@10.13.1
 
       - name: Setup Node
-        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        uses: actions/setup-node@v4
         with:
           node-version: 24
           cache: pnpm
@@ -43,4 +43,4 @@ jobs:
         run: pnpm install --frozen-lockfile --ignore-scripts
 
       - name: Audit dependencies
-        run: pnpm audit --audit-level=low
+        run: pnpm run security:audit

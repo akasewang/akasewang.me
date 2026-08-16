@@ -174,6 +174,7 @@ sequenceDiagram
 | `src/utils/`                            | Framework-free helpers: dates, text, routing direction and scroll, travel resolution, pointer and motion preferences. Nothing here imports React, so a helper that returns nodes belongs beside its component instead |
 | `src/constants/`                        | Filter option lists, shared animation values and the marks drawn without React |
 | `patches/`                              | pnpm-managed compatibility patches applied during dependency installation   |
+| `tools/`                                | Build-time and development utility scripts                                  |
 | `architecture/`                         | Focused design and implementation notes                                     |
 
 ---

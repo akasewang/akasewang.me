@@ -1,8 +1,8 @@
 'use server'
 
-import { render } from '@react-email/components'
 import { and, eq } from 'drizzle-orm'
 import React from 'react'
+import { render } from 'react-email'
 import { WelcomeTemplate } from '@/components/emails/welcome-template'
 import { EMAIL_SHAPE, FULL_NAME } from '@/constants/constants'
 import { SUBSCRIBE_COOLDOWN_SECONDS } from '@/constants/rate-limits'

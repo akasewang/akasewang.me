@@ -1,4 +1,4 @@
-import { Heading, Section, Text } from '@react-email/components'
+import { Heading, Section, Text } from 'react-email'
 import type { EmailDateInput } from './email-template-shared'
 import {
   EmailDissolve,
