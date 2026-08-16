@@ -92,7 +92,7 @@ indexes.
 
 ```mermaid
 flowchart LR
-  AUTHOR["Write an MDX file"] --> FRONTMATTER["Read and validate frontmatter"]
+  AUTHOR["Write an MDX file"] --> FRONTMATTER["Parse typed frontmatter"]
   FRONTMATTER --> MANAGER["Shared MDX manager<br/>cache, sort and resolve slugs"]
   MANAGER --> PARAMS["generateStaticParams"]
   MANAGER --> COMPILE["next-mdx-remote"]
@@ -165,11 +165,15 @@ sequenceDiagram
 | `src/lib/actions/`                      | View, message-board and newsletter Server Actions                           |
 | `src/lib/db/`                           | Drizzle schema and Neon database client                                     |
 | `src/components/common/mdx-components/` | MDX element mapping and interactive content components                      |
+| `src/components/command/`               | Hierarchical command menu, search results and keyboard guidance             |
 | `src/components/ui/`                    | Base UI primitives, Phosphor icons and reusable interaction patterns        |
+| `src/components/skeletons/`             | Every composed loading placeholder, kept together rather than beside its subject |
 | `src/components/providers/`             | Shared client-side motion and view-count state                              |
+| `src/data/`                             | Authored interface copy, navigation targets and static collections. A page's title, standfirst and closing line live here so the page and its loading state read the same words |
 | `src/hooks/`                            | Reusable client behavior: media loading, audio, scroll and pointer state    |
-| `src/utils/`                            | Framework-free helpers for dates, text, pointer and motion preferences      |
-| `src/constants/`                        | Filter option lists and shared animation values                             |
+| `src/utils/`                            | Framework-free helpers: dates, text, routing direction and scroll, travel resolution, pointer and motion preferences. Nothing here imports React, so a helper that returns nodes belongs beside its component instead |
+| `src/constants/`                        | Filter option lists, shared animation values and the marks drawn without React |
+| `patches/`                              | pnpm-managed compatibility patches applied during dependency installation   |
 | `architecture/`                         | Focused design and implementation notes                                     |
 
 ---
@@ -181,7 +185,8 @@ sequenceDiagram
 - Blogs and project case studies are authored in MDX with typed frontmatter.
 - Custom MDX components provide callouts, steps, tabs, tables, code blocks, demos and zoomable
   images.
-- Blog and project detail routes are statically generated from the files under `docs/`.
+- Blog and internal-project detail routes are statically generated from the files under `docs/`;
+  projects with an external destination link outward and deliberately have no local page.
 - RSS, XML sitemap, canonical metadata, JSON-LD and dynamic Open Graph images come from the same
   content sources.
 - URL-backed filters and sorting keep list views shareable without introducing a global state
@@ -195,7 +200,9 @@ sequenceDiagram
 - Newsletter signup and message posting use atomic, HMAC-keyed server cooldowns backed by Postgres;
   matching client timers persist across reloads and tabs without storing raw IP addresses.
 - The public message board also includes a honeypot, cursor pagination and protected admin
-  replies/deletion.
+  replies/deletion, with replies timestamped separately from the message they answer.
+- Every blog post and every project with a page here carries a board of its own, sharing that table
+  and its moderation. Projects that link out have no page and so no board.
 - Resend and React Email power welcome emails, admin broadcasts and the weekly subscriber summary.
   The summary is sent even when the weekly count is zero.
 - GitHub stars and changelog data are fetched server-side; an optional token raises the API limit
@@ -208,11 +215,16 @@ sequenceDiagram
 - Framer Motion is loaded through `LazyMotion`; layout, gesture and transition behavior remains
   component-owned.
 - Phosphor duotone icons provide the shared icon language.
-- Project cards degrade rather than break: work marked `preview` shows a `COMING SOON` plate, and
-  artwork that is missing or fails to load falls back to a placeholder instead of a broken frame.
+- One fixed branching canvas grows inward from the viewport edges, mounted once for the whole site
+  and sized so a phone's address bar sliding away during a scroll does not redraw it.
+- The command menu opens on section choices, then searches one selected section. Blog and project
+  results include their metadata and excerpts, while section slides and container resizing share
+  reduced-motion behavior with the rest of the interface.
+- Project cards degrade rather than break: artwork that is missing or fails to load falls back to a
+  placeholder instead of a broken frame.
 - Procedural Web Audio feedback follows one global preference and a documented interaction
   palette.
-- `npm run dev` binds to the local network and prints a QR code for testing from a phone on the
+- `pnpm run dev` binds to the local network and prints a QR code for testing from a phone on the
   same Wi-Fi network.
 
 ### Repository safeguards
@@ -222,10 +234,13 @@ sequenceDiagram
   `src/constants/`, where the reasoning is not visible in the code itself. Components, pages, types
   and content data are left uncommented; the exception is a functional directive such as
   `turbopackIgnore`, which is part of the code rather than a note about it.
-- The pre-commit hook formats staged files after `npm install` configures the repository hook path.
-- GitHub Actions verifies npm registry signatures and audits dependencies for every pull request,
-  every push to `main`, daily at `09:00` Asia/Kolkata, and on demand.
-- Dependabot groups routine minor and patch npm updates and maintains pinned GitHub Actions.
+- The pre-commit hook runs Biome across the repository and re-stages only paths that were already
+  staged after `pnpm install` configures the repository hook path.
+- GitHub Actions installs the frozen pnpm dependency tree without lifecycle scripts and audits it
+  for every pull request, every push to `main`, daily at `09:00` Asia/Kolkata, and on demand.
+- Dependabot groups routine minor and patch dependency updates and maintains pinned GitHub Actions.
+- Dependency compatibility changes use pnpm's committed patch mechanism, and dependency lifecycle
+  scripts are allowlisted only for packages that require them.
 
 ---
 
@@ -241,27 +256,30 @@ sequenceDiagram
 | Data                  | Neon Postgres, Drizzle ORM                           |
 | Email                 | Resend, React Email                                  |
 | Hosting and telemetry | Vercel, Vercel Analytics, Speed Insights             |
-| Quality               | ESLint, Biome, TypeScript, npm audit                 |
+| Quality               | ESLint, Biome, TypeScript, pnpm audit                |
+| Package manager       | pnpm 10.13.1 with a committed frozen lockfile        |
 
 ---
 
 ## Getting started
 
-Prerequisites: Node.js 20.9 or newer, npm, a Neon Postgres database and a Resend account for email
-features.
+Prerequisites: Node.js 20.9 or newer, Corepack (recommended) or pnpm 10.13.1, a Neon Postgres
+database and a Resend account for email features. Skip `corepack enable` when the pinned pnpm
+version is already installed directly.
 
 ```powershell
 git clone https://github.com/akasewang/akasewang.me.git
 cd akasewang.me
-npm install
+corepack enable
+pnpm install --frozen-lockfile
 Copy-Item .env.example .env
 ```
 
 Configure `.env`, then synchronize the database schema and start development:
 
 ```powershell
-npm run db:push
-npm run dev
+pnpm run db:push
+pnpm run dev
 ```
 
 The terminal prints both the local URL and a mobile-preview QR code. The phone and development
@@ -269,7 +287,7 @@ machine must be connected to the same local network. If Windows, a VPN or a virt
 the wrong address to be selected, override it explicitly:
 
 ```powershell
-npm run dev -- --mobile-host 192.168.0.9
+pnpm run dev -- --mobile-host 192.168.0.9
 ```
 
 The wrapper verifies the selected URL before printing the QR code and automatically permits that
@@ -305,26 +323,34 @@ you configure as a bearer token when invoking the weekly route. The schedule is 
 
 ## Commands
 
-| Command                  | Purpose                                               |
-| ------------------------ | ----------------------------------------------------- |
-| `npm run dev`            | Start Next.js on the LAN and print the mobile QR code |
-| `npm run build`          | Create and validate the production build              |
-| `npm run start`          | Serve the completed production build                  |
-| `npm run lint`           | Run ESLint across TypeScript and TSX source files     |
-| `npm run typecheck`      | Type-check the application and repository tools       |
-| `npm run format`         | Format the repository with Biome                      |
-| `npm run security:audit` | Run the dependency vulnerability audit                |
-| `npm run email`          | Preview React Email templates on port 3001            |
-| `npm run db:push`        | Push the Drizzle schema to Neon                       |
+| Command                    | Purpose                                               |
+| -------------------------- | ----------------------------------------------------- |
+| `pnpm run dev`             | Start Next.js on the LAN and print the mobile QR code |
+| `pnpm run build`           | Create and validate the production build              |
+| `pnpm run start`           | Serve the completed production build                  |
+| `pnpm run lint`            | Run ESLint across TypeScript and TSX source files     |
+| `pnpm run typecheck`       | Type-check the application and repository tools       |
+| `pnpm run test:dev-server` | Test port, host and collision handling                |
+| `pnpm run format`          | Format the repository with Biome                      |
+| `pnpm run security:audit`  | Run the dependency vulnerability audit                |
+| `pnpm run email`           | Preview React Email templates on port 3001            |
+| `pnpm run db:push`         | Push the Drizzle schema to Neon                       |
 
 ---
 
 ## Documentation
 
+These notes, along with most of the comments through the source, were written with AI assistance.
+They describe the code as it was read rather than as it was intended, so the two can disagree. Where
+they do, the code is what runs and the note is what needs correcting.
+
 - [System overview](./architecture/overview.md) — hosting, rendering, data and SEO
 - [MDX and content parsing](./architecture/mdx.md) — typed files, compilation and component mapping
 - [State and hooks](./architecture/state.md) — URL state, caches and reusable client hooks
 - [UI and animations](./architecture/ui.md) — visual tokens, motion and canvas effects
+- [Interface scale](./architecture/ui-scale.md) — the 3% scale, what it reaches and what opts out
+- [Optical spacing adjustments](./architecture/optical-spacing.md) — the offsets that favour
+  perceived alignment over equal gaps
 - [Audio feedback design system](./architecture/audio-design-system.md) — global preference and
   interaction sounds
 - [Newsletter and admin access](./architecture/newsletter.md) — signup, OTP sessions, broadcasts and

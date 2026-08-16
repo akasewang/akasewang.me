@@ -1,34 +1,14 @@
 import { useEffect, useRef, useState } from 'react'
 import { canUseHoverPointer } from '@/utils/pointer'
 
-export interface SpotlightMoveState {
-  phase: 'enter' | 'move'
-  intensity: number
-  x: number
-  y: number
-  ratioX: number
-  ratioY: number
-}
-
-interface UseSpotlightOptions {
-  onMove?: (state: SpotlightMoveState) => void
-}
-
 /**
  * Tracks the pointer across an element and publishes its position as CSS custom properties, so the
  * glow itself is drawn in CSS and no React state changes per move. Intensity rises with pointer
  * speed, which makes a card brighten as it is swept across and settle once the pointer slows.
  */
-export function useSpotlight<T extends HTMLElement = HTMLElement>({
-  onMove,
-}: UseSpotlightOptions = {}) {
+export function useSpotlight<T extends HTMLElement = HTMLElement>() {
   const ref = useRef<T>(null)
-  const onMoveRef = useRef(onMove)
   const [isHovering, setIsHovering] = useState(false)
-
-  useEffect(() => {
-    onMoveRef.current = onMove
-  }, [onMove])
 
   useEffect(() => {
     const el = ref.current
@@ -39,7 +19,7 @@ export function useSpotlight<T extends HTMLElement = HTMLElement>({
     let lastY = 0
     let lastTime = 0
 
-    const handlePointerMove = (e: PointerEvent, phase: SpotlightMoveState['phase'] = 'move') => {
+    const handlePointerMove = (e: PointerEvent) => {
       if (!canUseHoverPointer(e.pointerType)) return
 
       /** Only the newest position matters, so a queued frame is replaced rather than added to */
@@ -70,14 +50,6 @@ export function useSpotlight<T extends HTMLElement = HTMLElement>({
         el.style.setProperty('--mx', `${x}px`)
         el.style.setProperty('--my', `${y}px`)
         el.style.setProperty('--spotlight-intensity', intensity.toString())
-        onMoveRef.current?.({
-          phase,
-          intensity,
-          x,
-          y,
-          ratioX: x / rect.width,
-          ratioY: y / rect.height,
-        })
       })
     }
 
@@ -86,7 +58,7 @@ export function useSpotlight<T extends HTMLElement = HTMLElement>({
 
       lastTime = 0
       setIsHovering(true)
-      handlePointerMove(e, 'enter')
+      handlePointerMove(e)
     }
 
     const handlePointerLeave = () => {

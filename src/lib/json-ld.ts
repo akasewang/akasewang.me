@@ -9,6 +9,13 @@ import {
 import { activeSocials } from '@/data/static/social'
 import { getOgImageUrl } from '@/lib/metadata'
 
+/** The vocabulary every node here is written against, named once so no helper can misspell it */
+const SCHEMA_CONTEXT = 'https://schema.org'
+
+/**
+ * The author, without a context of its own so it can sit inside the schemas below. A nested node
+ * inherits the context of the one holding it, and getPersonSchema adds it for the standalone use.
+ */
 const PERSON_SCHEMA = {
   '@type': 'Person',
   name: FULL_NAME,
@@ -24,13 +31,16 @@ const PERSON_SCHEMA = {
  * Structured data for search engines, kept beside the metadata so the two cannot drift. Each helper
  * returns a plain object that a page embeds through serializeJsonLd.
  */
+
+/** The author behind everything else here, embedded on its own in the root layout */
 export function getPersonSchema() {
-  return PERSON_SCHEMA
+  return { '@context': SCHEMA_CONTEXT, ...PERSON_SCHEMA }
 }
 
+/** The site itself, including the search entry point that lets engines offer a sitelinks box */
 export function getWebsiteSchema() {
   return {
-    '@context': 'https://schema.org',
+    '@context': SCHEMA_CONTEXT,
     '@type': 'WebSite',
     name: FULL_NAME,
     url: SITE_URL,
@@ -48,6 +58,7 @@ export function getWebsiteSchema() {
   }
 }
 
+/** One blog post, falling back to its generated OG image when the post names none */
 export function getBlogPostingSchema({
   title,
   excerpt,
@@ -62,7 +73,7 @@ export function getBlogPostingSchema({
   image?: string
 }) {
   return {
-    '@context': 'https://schema.org',
+    '@context': SCHEMA_CONTEXT,
     '@type': 'BlogPosting',
     headline: title,
     description: excerpt,
@@ -73,6 +84,7 @@ export function getBlogPostingSchema({
   }
 }
 
+/** One project, as a CreativeWork rather than a posting, since a project is not dated news */
 export function getProjectSchema({
   title,
   excerpt,
@@ -87,7 +99,7 @@ export function getProjectSchema({
   tech?: string[]
 }) {
   return {
-    '@context': 'https://schema.org',
+    '@context': SCHEMA_CONTEXT,
     '@type': 'CreativeWork',
     name: title,
     headline: title,
@@ -102,9 +114,10 @@ export function getProjectSchema({
   }
 }
 
+/** Marks the home page as the profile of the person above, which is what it actually is */
 export function getProfilePageSchema() {
   return {
-    '@context': 'https://schema.org',
+    '@context': SCHEMA_CONTEXT,
     '@type': 'ProfilePage',
     mainEntity: PERSON_SCHEMA,
     dateCreated: '2024-01-01',
@@ -126,9 +139,10 @@ export function getProfilePageSchema() {
   }
 }
 
+/** The trail a page sits on, numbered from one in the order it is given */
 export function getBreadcrumbSchema(items: { name: string; url: string }[]) {
   return {
-    '@context': 'https://schema.org',
+    '@context': SCHEMA_CONTEXT,
     '@type': 'BreadcrumbList',
     itemListElement: items.map((item, index) => ({
       '@type': 'ListItem',

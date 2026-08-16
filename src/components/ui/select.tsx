@@ -12,7 +12,10 @@ type SelectProps = Omit<SelectPrimitive.Root.Props<string>, 'onValueChange'> & {
   onValueChange?: (value: string) => void
 }
 
-/** A select styled to match the site, used by the sort control on filtered lists */
+/**
+ * A select styled to match the site, used by the sort control. The root only adds sound, marking
+ * the close that a choice causes so it does not sound twice.
+ */
 const Select = ({ onOpenChange, onValueChange, ...props }: SelectProps) => {
   const { toggle, select } = useSoundEffects()
   const { markSelectionClose, playOpenChange } = usePopupToggleSound(toggle)
@@ -41,6 +44,7 @@ type SelectTriggerProps = Omit<SelectPrimitive.Trigger.Props, 'className'> & {
   className?: string
 }
 
+/** The closed control: the current value, and a chevron that turns over while the list is open */
 const SelectTrigger = forwardRef<HTMLButtonElement, SelectTriggerProps>(
   ({ className, children, ...props }, ref) => {
     const { hoverTick } = useSoundEffects()
@@ -85,6 +89,10 @@ type SelectContentProps = Omit<SelectPopupProps, 'children' | 'className'> &
     position?: 'item-aligned' | 'popper'
   }
 
+/**
+ * The open list, portalled out and positioned against the trigger. It carries the shared highlight
+ * box, which returns to the checked item whenever the pointer leaves rather than simply vanishing.
+ */
 const SelectContent = forwardRef<HTMLDivElement, SelectContentProps>(
   (
     {
@@ -143,6 +151,7 @@ type SelectItemProps = Omit<SelectPrimitive.Item.Props, 'className'> & {
   className?: string
 }
 
+/** One option. The data attribute is what the highlight box above tracks it by */
 const SelectItem = forwardRef<HTMLElement, SelectItemProps>(
   ({ className, children, ...props }, ref) => {
     const { hoverTick } = useSoundEffects()
@@ -155,7 +164,7 @@ const SelectItem = forwardRef<HTMLElement, SelectItemProps>(
           props.onMouseEnter?.(event)
         }}
         className={cn(
-          'group relative z-10 flex w-full select-none items-center gap-2.5 whitespace-nowrap rounded-lg px-2.5 py-1.5 pr-8 text-left text-xs font-medium tracking-tight text-secondary outline-none ring-1 ring-inset ring-transparent transition-colors duration-200 ease-in-out',
+          'group relative z-10 flex w-full select-none items-center gap-2.5 whitespace-nowrap rounded-lg px-2.5 py-1.5 pr-8 text-left text-xs font-medium tracking-tight text-secondary outline-none ring-1 ring-inset ring-transparent transition-colors duration-200 ease-in-out retina:ring-[0.5px]',
           'data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
           'data-[highlighted]:text-primary',
           'data-[selected]:text-primary',

@@ -35,12 +35,27 @@ const markCameFromHistory = () => {
  * teardown, so a caller can pass it straight to an effect.
  */
 export function takeOverScrollRestoration() {
-  if ('scrollRestoration' in window.history) window.history.scrollRestoration = 'manual'
+  const canControlRestoration = 'scrollRestoration' in window.history
+  const previousRestoration = canControlRestoration ? window.history.scrollRestoration : null
+  if (canControlRestoration) window.history.scrollRestoration = 'manual'
 
   currentPath = window.location.pathname
   window.addEventListener('popstate', markCameFromHistory)
 
-  return () => window.removeEventListener('popstate', markCameFromHistory)
+  return () => {
+    window.removeEventListener('popstate', markCameFromHistory)
+    if (
+      canControlRestoration &&
+      previousRestoration !== null &&
+      window.history.scrollRestoration === 'manual'
+    ) {
+      window.history.scrollRestoration = previousRestoration
+    }
+    cameFromHistory = false
+    pending = null
+    currentPath = ''
+    positions.clear()
+  }
 }
 
 /**
@@ -67,8 +82,39 @@ export function flushScrollReset() {
   const top = pending
   pending = null
 
-  /** An anchor in the URL already named a place to be, so that one is left to win */
-  if (window.location.hash) return
+  const hash = window.location.hash.slice(1)
+
+  if (hash) {
+    let targetId = hash
+    /** A malformed escape leaves the raw hash in place, which may still name an element */
+    try {
+      targetId = decodeURIComponent(hash)
+    } catch {}
+
+    let timeout = 0
+    const scrollToTarget = () => {
+      const target = document.getElementById(targetId)
+      if (!target) return false
+
+      target.scrollIntoView({ block: 'start' })
+      if (timeout) window.clearTimeout(timeout)
+      return true
+    }
+
+    if (scrollToTarget()) return
+
+    /** Streaming content can mount after the route shell, so wait briefly for its anchor target. */
+    const observer = new MutationObserver(() => {
+      if (scrollToTarget()) observer.disconnect()
+    })
+    observer.observe(document.body, { childList: true, subtree: true })
+    timeout = window.setTimeout(() => observer.disconnect(), 3_000)
+
+    return () => {
+      observer.disconnect()
+      window.clearTimeout(timeout)
+    }
+  }
 
   window.scrollTo({ top, behavior: 'instant' })
 }

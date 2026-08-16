@@ -30,7 +30,7 @@ export default async function BlogPage() {
     <PageLayout
       title={blogsListingContent.title}
       subtitle={blogsListingContent.subtitle}
-      footerText="If you've made it this far, you deserve a coffee. Or a nap."
+      footerText={blogsListingContent.footerText}
       breadcrumb={breadcrumbJsonLd}
     >
       <Suspense fallback={null}>

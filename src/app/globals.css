@@ -1,5 +1,12 @@
 @import 'tailwindcss';
-@import './cursor.css';
+
+/**
+ * The repo's own notes are prose about the code rather than code, so the class names quoted in
+ * their examples are not classes anything renders. Left in the scan they compile to real rules that
+ * nothing can ever match, and editing a document would quietly change the stylesheet. The MDX under
+ * `docs` stays in the scan, since those files are pages and the markup in them is live.
+ */
+@source not "../../architecture";
 
 @plugin "tailwindcss-animate";
 
@@ -17,53 +24,90 @@
 
 @layer base {
   :root {
-    --background: oklch(0.10 0 0);
-    --foreground: oklch(0.789 0 0);
-    --card: oklch(0.10 0 0);
-    --toast: oklch(0.193 0 0);
-    --floating: oklch(0.193 0 0);
-    --code-block: oklch(0.175 0 0);
-    --code-tab: oklch(0.205 0 0);
-    --code-tab-bar: oklch(0.245 0 0);
-    --primary: oklch(0.97 0 0);
-    --primary-foreground: oklch(0.175 0 0);
-    --secondary: oklch(0.632 0 0);
-    --muted: oklch(0.237 0 0);
-    --muted-foreground: oklch(0.556 0 0);
-    --dropdown-background: oklch(0.10 0 0);
-    --border: oklch(0.253 0 0);
-    --ring: oklch(0.253 0 0);
-    --destructive: oklch(58.03% 0.21468 27.177);
+    --background: oklch(0.125 0.0045 285.823);
+    --foreground: oklch(0.788 0.0105 286.13);
+    --card: oklch(0.141 0.005 285.823);
+    --toast: oklch(0.1962 0.0058 285.874);
+    --floating: oklch(0.16 0.0052 285.84);
+    --code-block: oklch(0.152 0.0052 285.857);
+    --code-tab: oklch(0.182 0.0056 285.885);
+    --code-tab-bar: oklch(0.218 0.0058 285.974);
+    --primary: oklch(0.967 0.001 286.375);
+    --primary-foreground: oklch(0.1755 0.0055 285.857);
+    --secondary: oklch(0.6285 0.0155 286);
+    --muted: oklch(0.242 0.006 285.959);
+    --muted-foreground: oklch(0.552 0.016 285.938);
+    --dropdown-background: oklch(0.141 0.005 285.823);
+    --border: oklch(0.258 0.006 285.996);
+    --ring: oklch(0.258 0.006 285.996);
+    --destructive: oklch(0.5803 0.21468 27.177);
     --verified: oklch(0.623 0.214 259.815);
     --verified-deep: oklch(0.546 0.245 262.881);
-    --success: oklch(0.696 0.170 162.000);
-    --warning: oklch(0.800 0.160 85.000);
+    --success: oklch(0.696 0.17 162);
+    --warning: oklch(0.8 0.16 85);
     --dot-color: oklch(0.34 0 0);
 
-    --accent: color-mix(in oklab, var(--muted) 40%, transparent);
-    --overlay-accent: color-mix(in oklab, var(--muted) 40%, transparent);
-    --accent-border: color-mix(in oklab, var(--ring) 60%, transparent);
-    --overlay-accent-border: color-mix(in oklab, var(--ring) 60%, transparent);
+    --mask-eased-to-top: linear-gradient(to top, oklch(0 0 0) 0%, oklch(0 0 0 / 0.9025) 12.5%, oklch(0 0 0 / 0.6724) 25%, oklch(0 0 0 / 0.4225) 37.5%, oklch(0 0 0 / 0.2116) 50%, oklch(0 0 0 / 0.0784) 62.5%, oklch(0 0 0 / 0.0169) 75%, oklch(0 0 0 / 0.0016) 87.5%, transparent 100%);
+    --mask-eased-to-bottom: linear-gradient(to bottom, oklch(0 0 0) 0%, oklch(0 0 0 / 0.9025) 12.5%, oklch(0 0 0 / 0.6724) 25%, oklch(0 0 0 / 0.4225) 37.5%, oklch(0 0 0 / 0.2116) 50%, oklch(0 0 0 / 0.0784) 62.5%, oklch(0 0 0 / 0.0169) 75%, oklch(0 0 0 / 0.0016) 87.5%, transparent 100%);
+    --mask-eased-to-left: linear-gradient(to left, oklch(0 0 0) 0%, oklch(0 0 0 / 0.9025) 12.5%, oklch(0 0 0 / 0.6724) 25%, oklch(0 0 0 / 0.4225) 37.5%, oklch(0 0 0 / 0.2116) 50%, oklch(0 0 0 / 0.0784) 62.5%, oklch(0 0 0 / 0.0169) 75%, oklch(0 0 0 / 0.0016) 87.5%, transparent 100%);
+    --mask-eased-to-right: linear-gradient(to right, oklch(0 0 0) 0%, oklch(0 0 0 / 0.9025) 12.5%, oklch(0 0 0 / 0.6724) 25%, oklch(0 0 0 / 0.4225) 37.5%, oklch(0 0 0 / 0.2116) 50%, oklch(0 0 0 / 0.0784) 62.5%, oklch(0 0 0 / 0.0169) 75%, oklch(0 0 0 / 0.0016) 87.5%, transparent 100%);
 
-    --surface-20: color-mix(in oklab, var(--muted) 20%, var(--background));
-    --surface-30: color-mix(in oklab, var(--muted) 30%, var(--background));
-    --surface-40: color-mix(in oklab, var(--muted) 40%, var(--background));
-    --surface-50: color-mix(in oklab, var(--muted) 50%, var(--background));
+    --accent: oklch(0.215 0.006 285.959 / 0.5);
+    --overlay-accent: oklch(0.215 0.006 285.959 / 0.5);
+    --accent-border: oklch(0.258 0.006 285.996 / 0.7);
+    --overlay-accent-border: oklch(0.258 0.006 285.996 / 0.7);
 
-    --shadow-sm: 0 1px 3px rgb(0 0 0 / 0.06), 0 2px 8px rgb(0 0 0 / 0.06);
-    --shadow-md: 0 2px 8px rgb(0 0 0 / 0.07), 0 6px 24px rgb(0 0 0 / 0.07);
-    --shadow-lg: 0 4px 12px rgb(0 0 0 / 0.08), 0 12px 32px rgb(0 0 0 / 0.08);
-    --shadow-xl: 0 6px 16px rgb(0 0 0 / 0.1), 0 20px 48px rgb(0 0 0 / 0.1);
-    --shadow-2xl: 0 8px 24px rgb(0 0 0 / 0.12), 0 32px 64px rgb(0 0 0 / 0.12);
+    --surface-10: oklch(0.1511 0.0051 285.834);
+    --surface-20: oklch(0.1612 0.0052 285.85);
+    --surface-30: oklch(0.1713 0.0053 285.866);
+    --surface-40: oklch(0.1814 0.0054 285.882);
+    --surface-50: oklch(0.1915 0.0055 285.898);
 
-    --shadow-inner: inset 0 2px 8px rgb(0 0 0 / 0.6);
-    --shadow-inner-sm: inset 0 1px 4px rgb(0 0 0 / 0.4);
+    /* Loading placeholders: four steps from large fills up to headings, plus the pulse highlight */
+    --skeleton-panel: oklch(0.1385 0.0048 285.826);
+    --skeleton-muted: oklch(0.1475 0.005 285.83);
+    --skeleton: oklch(0.1565 0.0051 285.84);
+    --skeleton-strong: oklch(0.1665 0.0052 285.855);
+    --skeleton-highlight: oklch(0.788 0.0105 286.13 / 0.055);
 
-    --shadow-l-lg: -8px 0 16px -4px rgb(0 0 0 / 0.8);
-    --shadow-t-sm: 0 -2px 4px 0 rgb(0 0 0 / 0.3);
+    --shadow-sm: 0 1px 3px oklch(0 0 0 / 0.06), 0 2px 8px oklch(0 0 0 / 0.06);
+    --shadow-md: 0 2px 8px oklch(0 0 0 / 0.07), 0 6px 24px oklch(0 0 0 / 0.07);
+    --shadow-lg: 0 4px 12px oklch(0 0 0 / 0.08), 0 12px 32px oklch(0 0 0 / 0.08);
+    --shadow-xl: 0 6px 16px oklch(0 0 0 / 0.1), 0 20px 48px oklch(0 0 0 / 0.1);
+    --shadow-2xl: 0 8px 24px oklch(0 0 0 / 0.12), 0 32px 64px oklch(0 0 0 / 0.12);
+    --shadow-inner: inset 0 2px 8px oklch(0 0 0 / 0.8);
+    --shadow-inner-sm: inset 0 1px 4px oklch(0 0 0 / 0.6);
+    --shadow-t-sm: 0 -2px 4px 0 oklch(0 0 0 / 0.3);
 
     --radius: 0.35rem;
     --spacing: 0.25rem;
+
+    /**
+     * How much larger the interface is drawn than its natural size.
+     *
+     * Applied as the root font size, so it reaches everything measured in rem at once: `--spacing`,
+     * which every padding, margin, gap and size utility multiplies, `--radius`, the whole type
+     * scale, and any rem a component states for itself. Nothing is transformed, so elements keep
+     * their real geometry and anything measuring them at runtime still reads true.
+     *
+     * Anything opting out divides by this rather than restating a fixed size, which keeps it tied
+     * to the reader's own base size. Breakpoints are unaffected: Tailwind states them in rem, but
+     * relative units in media queries resolve against the browser's initial font size rather than
+     * this computed root size. The layout therefore changes shape at the same viewport widths and
+     * only its contents are drawn larger.
+     */
+    --ui-scale: 1.03;
+
+    /**
+     * How wide the column of content is allowed to run.
+     *
+     * Written in rem so it follows both the interface scale and the reader's browser font size. The
+     * measure is what the width is really for: a column that stayed put while its type grew would
+     * fit fewer words to the line and read narrower than it was drawn to. Held here rather than
+     * repeated at each place that lays out a column, so the page, footer and error screen cannot
+     * drift apart.
+     */
+    --content-width: 50rem;
   }
 
   ::selection {
@@ -85,6 +129,34 @@
 
   html {
     background-color: var(--background);
+    color-scheme: dark;
+
+    /** Stated as a percentage so it multiplies the reader's own base size instead of replacing it */
+    font-size: calc(100% * var(--ui-scale));
+  }
+
+  /**
+   * Deliberate full and partial scale exemptions.
+   *
+   * A tooltip is a label for something else rather than a structural part of the layout, so it reads
+   * better held at a constant size against whatever it points at. It is also positioned from
+   * measurements taken at runtime: it renders in a portal at the end of the document and is placed
+   * against its trigger's box, with the gap between them given in raw pixels. Growing the popup
+   * while that gap stays fixed is what pulls it off its mark.
+   *
+   * Tags intentionally share only the spacing and radius reset. Their rem-based text still grows
+   * with the interface while their padding, gaps, icons and corners remain compact. This asymmetry
+   * is intentional: do not remove the tag selector as an apparent partial-scaling inconsistency.
+   *
+   * Dividing the tokens back out beats restating them in pixels, which would pin these tokens to one
+   * base size while everything around them still followed the reader's. Tooltip type is already
+   * stated in pixels; tag type deliberately is not. The reset also reaches shortcut keys and tag
+   * icons through inheritance while the same elements shown elsewhere scale as usual.
+   */
+  [data-slot='tooltip-content'],
+  [data-slot='tag'] {
+    --spacing: calc(0.25rem / var(--ui-scale));
+    --radius: calc(0.35rem / var(--ui-scale));
   }
 
   html,
@@ -98,7 +170,6 @@
     min-height: 100%;
     background-color: var(--background);
     isolation: isolate;
-    /** Route entrances slide sideways, clip keeps that off the scrollbar without killing sticky. */
     overflow-x: clip;
   }
 
@@ -136,6 +207,50 @@
     caret-shape: bar;
   }
 
+  /*
+   * Autofilled fields. Browsers paint their own yellow over an autofilled input and ignore
+   * background-color, so the fill is faked with a huge inset shadow and the text recoloured
+   * through the one property WebKit does respect. Hence the !important on all of it.
+   */
+  .form-field {
+    color-scheme: dark;
+  }
+
+  .form-field:-webkit-autofill {
+    -webkit-text-fill-color: var(--primary) !important;
+    caret-color: var(--primary);
+    -webkit-box-shadow:
+      inset 0 0 0 1000px var(--surface-30), inset 0 0 0 1px var(--ring),
+      0 1px 2px oklch(0 0 0 / 0.18) !important;
+  }
+
+  .form-field:-webkit-autofill:hover {
+    -webkit-text-fill-color: var(--primary) !important;
+    -webkit-box-shadow:
+      inset 0 0 0 1000px var(--surface-40),
+      inset 0 0 0 1px oklch(0.967 0.001 286.375 / 0.15),
+      0 1px 2px oklch(0 0 0 / 0.18) !important;
+  }
+
+  .form-field:-webkit-autofill:focus {
+    -webkit-text-fill-color: var(--primary) !important;
+    caret-color: var(--primary);
+    -webkit-box-shadow:
+      inset 0 0 0 1000px var(--surface-40),
+      inset 0 0 0 1.5px oklch(0.967 0.001 286.375 / 0.3),
+      0 2px 6px oklch(0 0 0 / 0.22) !important;
+  }
+
+  .form-field:autofill {
+    color: var(--primary) !important;
+    background-color: var(--surface-30) !important;
+  }
+
+  .form-field:autofill:hover,
+  .form-field:autofill:focus {
+    background-color: var(--surface-40) !important;
+  }
+
   :is(a, button, select, [role="button"], [tabindex]:not([tabindex="-1"])):focus-visible {
     outline: 2px solid var(--primary);
     outline-offset: 2px;
@@ -163,10 +278,15 @@
   --color-overlay-accent: var(--overlay-accent);
   --color-accent-border: var(--accent-border);
   --color-overlay-accent-border: var(--overlay-accent-border);
+  --color-surface-10: var(--surface-10);
   --color-surface-20: var(--surface-20);
   --color-surface-30: var(--surface-30);
   --color-surface-40: var(--surface-40);
   --color-surface-50: var(--surface-50);
+  --color-skeleton: var(--skeleton);
+  --color-skeleton-strong: var(--skeleton-strong);
+  --color-skeleton-muted: var(--skeleton-muted);
+  --color-skeleton-panel: var(--skeleton-panel);
   --color-destructive: var(--destructive);
   --color-border: var(--border);
   --color-ring: var(--ring);
@@ -174,35 +294,49 @@
   --color-verified-deep: var(--verified-deep);
   --color-success: var(--success);
   --color-warning: var(--warning);
-  --radius-xs: calc(var(--radius) - 6px);
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
+  /**
+   * The steps either side of `--radius`, each a fixed distance from it rather than a multiple.
+   *
+   * Stated in rem so a step travels with the corner it adjusts. Held in pixels they would stay put
+   * while `--radius` grew, which spreads the scale unevenly: the tightest corners would gain a
+   * sixth of their size while the widest gained a fiftieth. Every value here is the pixel distance
+   * it replaces divided by 16, so the steps are unchanged at the reader's base size.
+   */
+  --radius-xs: calc(var(--radius) - 0.375rem);
+  --radius-sm: calc(var(--radius) - 0.25rem);
+  --radius-md: calc(var(--radius) - 0.125rem);
   --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
-  --radius-2xl: calc(var(--radius) + 8px);
-  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-xl: calc(var(--radius) + 0.25rem);
+  --radius-2xl: calc(var(--radius) + 0.5rem);
+  --radius-3xl: calc(var(--radius) + 0.75rem);
+
+  /**
+   * The steps below Tailwind's `xs`, plus the one between `xs` and `sm`.
+   *
+   * The site leans on four sizes the default scale has no name for, the 13px step alone setting
+   * type in a dozen places. Named here rather than written out at each use so they read as steps of
+   * a scale, and stated in rem so they follow the interface scale like every other size.
+   */
+  --text-4xs: 0.5625rem;
+  --text-3xs: 0.625rem;
+  --text-2xs: 0.6875rem;
+  --text-xs-plus: 0.8125rem;
+
   --shadow-sm: var(--shadow-sm);
   --shadow-md: var(--shadow-md);
   --shadow-lg: var(--shadow-lg);
   --shadow-xl: var(--shadow-xl);
   --shadow-2xl: var(--shadow-2xl);
-  --shadow-l-lg: var(--shadow-l-lg);
   --shadow-t-sm: var(--shadow-t-sm);
   --shadow-inner: var(--shadow-inner);
   --shadow-inner-sm: var(--shadow-inner-sm);
-  --cursor-auto: var(--custom-cursor-auto);
-  --cursor-not-allowed: var(--custom-cursor-not-allowed);
-  --cursor-wait: var(--custom-cursor-wait);
-  --cursor-pointer: var(--custom-cursor-pointer);
-  --cursor-grab: var(--custom-cursor-grab);
-  --cursor-grabbing: var(--custom-cursor-grabbing);
-  --cursor-text: var(--custom-cursor-text);
-  --cursor-zoom-in: var(--custom-cursor-zoom-in);
-  --cursor-zoom-out: var(--custom-cursor-zoom-out);
 }
 
 @layer utilities {
-
+  /*
+   * Syntax highlighting. rehype-highlight ships its own stylesheet colours, which these override
+   * to the site's palette, and each has to win against that sheet.
+   */
   .hljs-keyword,
   .hljs-selector-tag,
   .hljs-built_in,
@@ -217,7 +351,7 @@
 
   .hljs-number,
   .hljs-literal {
-    color: oklch(0.80 0.13 50) !important;
+    color: oklch(0.8 0.13 50) !important;
   }
 
   .hljs-comment {
@@ -232,7 +366,7 @@
 
   .hljs-variable,
   .hljs-params {
-    color: oklch(0.90 0.02 260) !important;
+    color: oklch(0.9 0.02 260) !important;
   }
 
   .hljs-type,
@@ -243,28 +377,92 @@
   .hljs-meta,
   .hljs-operator,
   .hljs-punctuation {
-    color: oklch(0.70 0.05 260) !important;
+    color: oklch(0.7 0.05 260) !important;
   }
 
   .mdx-content {
-    blockquote {
-      border-left: 2px solid var(--primary);
-      padding-left: 1.25rem;
-      font-style: italic;
-      color: oklch(0.62 0 0);
-      margin: 1.5rem 0;
-    }
     hr {
       border: 0;
       border-top: 1px solid var(--border);
       margin: 2rem 0;
       opacity: 0.6;
+
+      @variant retina {
+        border-top-width: 0.5px;
+      }
     }
   }
 
-  .mask-fade-l {
-    -webkit-mask-image: linear-gradient(to right, transparent, black 10%);
-    mask-image: linear-gradient(to right, transparent, black 10%);
+  /* Softens both ends of a carousel, so items enter and leave rather than being cut off */
+  .mask-fade-x {
+    -webkit-mask-image:
+      var(--mask-eased-to-right),
+      var(--mask-eased-to-left),
+      linear-gradient(oklch(0 0 0), oklch(0 0 0));
+    mask-image:
+      var(--mask-eased-to-right),
+      var(--mask-eased-to-left),
+      linear-gradient(oklch(0 0 0), oklch(0 0 0));
+    -webkit-mask-size:
+      var(--scroll-fade-left-width, var(--scroll-fade-size, 3.5rem)) 100%,
+      var(--scroll-fade-right-width, var(--scroll-fade-size, 3.5rem)) 100%,
+      100% 100%;
+    mask-size:
+      var(--scroll-fade-left-width, var(--scroll-fade-size, 3.5rem)) 100%,
+      var(--scroll-fade-right-width, var(--scroll-fade-size, 3.5rem)) 100%,
+      100% 100%;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position:
+      0 0,
+      100% 0,
+      0 0;
+    mask-position:
+      0 0,
+      100% 0,
+      0 0;
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+  }
+  /*
+   * The same for a scrolling panel, except the two edge heights are written by useScrollOverflow
+   * as it measures. They start at zero and only the fade with somewhere left to scroll is drawn.
+   */
+  .scroll-fade-y {
+    --scroll-fade-size: 3.5rem;
+    --scroll-fade-top-height: 0px;
+    --scroll-fade-bottom-height: var(--scroll-fade-size);
+  }
+
+  .scroll-fade-y[data-scrollable] {
+    -webkit-mask-image:
+      var(--mask-eased-to-bottom),
+      var(--mask-eased-to-top),
+      linear-gradient(oklch(0 0 0), oklch(0 0 0));
+    mask-image:
+      var(--mask-eased-to-bottom),
+      var(--mask-eased-to-top),
+      linear-gradient(oklch(0 0 0), oklch(0 0 0));
+    -webkit-mask-size:
+      100% var(--scroll-fade-top-height),
+      100% var(--scroll-fade-bottom-height),
+      100% 100%;
+    mask-size:
+      100% var(--scroll-fade-top-height),
+      100% var(--scroll-fade-bottom-height),
+      100% 100%;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position:
+      0 0,
+      0 100%,
+      0 0;
+    mask-position:
+      0 0,
+      0 100%,
+      0 0;
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
   }
 
   .scrollbar-hidden {
@@ -277,7 +475,7 @@
   }
 
   .bg-dot-pattern {
-    background-image: radial-gradient(color-mix(in oklab, var(--muted-foreground) 20%, transparent) 1px, transparent 0);
+    background-image: radial-gradient(oklch(0.552 0.016 285.938 / 0.2) 1px, transparent 0);
     background-size: 16px 16px;
   }
 
@@ -351,8 +549,7 @@
   }
 
   .command-popup {
-    will-change: opacity, transform;
-    transform-origin: center;
+    transform-origin: center top;
   }
 
   .command-popup[data-open] {
@@ -363,128 +560,22 @@
     animation: command-popup-out 180ms cubic-bezier(0.4, 0, 1, 1) both;
   }
 
-  .bottom-blur-fade {
+  .bottom-edge-fade {
     position: fixed;
     bottom: 0;
     inset-inline: 0;
     height: 7rem;
     pointer-events: none;
     z-index: 40;
-    background: linear-gradient(
-      to top,
-      color-mix(in oklab, var(--background) 100%, transparent) 0%,
-      color-mix(in oklab, var(--background) 95%, transparent) 12.5%,
-      color-mix(in oklab, var(--background) 82%, transparent) 25%,
-      color-mix(in oklab, var(--background) 65%, transparent) 37.5%,
-      color-mix(in oklab, var(--background) 46%, transparent) 50%,
-      color-mix(in oklab, var(--background) 28%, transparent) 62.5%,
-      color-mix(in oklab, var(--background) 13%, transparent) 75%,
-      color-mix(in oklab, var(--background) 4%, transparent) 87.5%,
-      transparent 100%
-    );
-    -webkit-backdrop-filter: blur(8px);
-    backdrop-filter: blur(8px);
-    -webkit-mask-image: linear-gradient(
-      to top,
-      rgba(0, 0, 0, 1) 0%,
-      rgba(0, 0, 0, 0.95) 12.5%,
-      rgba(0, 0, 0, 0.82) 25%,
-      rgba(0, 0, 0, 0.65) 37.5%,
-      rgba(0, 0, 0, 0.46) 50%,
-      rgba(0, 0, 0, 0.28) 62.5%,
-      rgba(0, 0, 0, 0.13) 75%,
-      rgba(0, 0, 0, 0.04) 87.5%,
-      transparent 100%
-    );
-    mask-image: linear-gradient(
-      to top,
-      rgba(0, 0, 0, 1) 0%,
-      rgba(0, 0, 0, 0.95) 12.5%,
-      rgba(0, 0, 0, 0.82) 25%,
-      rgba(0, 0, 0, 0.65) 37.5%,
-      rgba(0, 0, 0, 0.46) 50%,
-      rgba(0, 0, 0, 0.28) 62.5%,
-      rgba(0, 0, 0, 0.13) 75%,
-      rgba(0, 0, 0, 0.04) 87.5%,
-      transparent 100%
-    );
+    background: var(--background);
+    -webkit-mask-image: var(--mask-eased-to-top);
+    mask-image: var(--mask-eased-to-top);
   }
 
   @media (max-width: 767px) {
-    .bottom-blur-fade {
+    .bottom-edge-fade {
       height: 6rem;
-      -webkit-backdrop-filter: blur(6px);
-      backdrop-filter: blur(6px);
     }
-  }
-
-  .command-edge-fade {
-    position: absolute;
-    inset-inline: 0;
-    height: 3.5rem;
-    opacity: 0;
-    pointer-events: none;
-    z-index: 20;
-    -webkit-backdrop-filter: blur(12px);
-    backdrop-filter: blur(12px);
-  }
-
-  .command-edge-fade--top {
-    top: 0;
-    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
-    background: linear-gradient(
-      to bottom,
-      color-mix(in oklab, var(--dropdown-background) 100%, transparent) 0%,
-      color-mix(in oklab, var(--dropdown-background) 88%, transparent) 30%,
-      color-mix(in oklab, var(--dropdown-background) 55%, transparent) 55%,
-      color-mix(in oklab, var(--dropdown-background) 20%, transparent) 80%,
-      transparent 100%
-    );
-    -webkit-mask-image: linear-gradient(
-      to bottom,
-      rgba(0, 0, 0, 1) 0%,
-      rgba(0, 0, 0, 0.88) 30%,
-      rgba(0, 0, 0, 0.55) 55%,
-      rgba(0, 0, 0, 0.2) 80%,
-      transparent 100%
-    );
-    mask-image: linear-gradient(
-      to bottom,
-      rgba(0, 0, 0, 1) 0%,
-      rgba(0, 0, 0, 0.88) 30%,
-      rgba(0, 0, 0, 0.55) 55%,
-      rgba(0, 0, 0, 0.2) 80%,
-      transparent 100%
-    );
-  }
-
-  .command-edge-fade--bottom {
-    bottom: 0;
-    border-radius: 0 0 var(--radius-xl) var(--radius-xl);
-    background: linear-gradient(
-      to top,
-      color-mix(in oklab, var(--dropdown-background) 100%, transparent) 0%,
-      color-mix(in oklab, var(--dropdown-background) 88%, transparent) 30%,
-      color-mix(in oklab, var(--dropdown-background) 55%, transparent) 55%,
-      color-mix(in oklab, var(--dropdown-background) 20%, transparent) 80%,
-      transparent 100%
-    );
-    -webkit-mask-image: linear-gradient(
-      to top,
-      rgba(0, 0, 0, 1) 0%,
-      rgba(0, 0, 0, 0.88) 30%,
-      rgba(0, 0, 0, 0.55) 55%,
-      rgba(0, 0, 0, 0.2) 80%,
-      transparent 100%
-    );
-    mask-image: linear-gradient(
-      to top,
-      rgba(0, 0, 0, 1) 0%,
-      rgba(0, 0, 0, 0.88) 30%,
-      rgba(0, 0, 0, 0.55) 55%,
-      rgba(0, 0, 0, 0.2) 80%,
-      transparent 100%
-    );
   }
 }
 
@@ -605,7 +696,7 @@
 @keyframes command-popup-in {
   from {
     opacity: 0;
-    transform: translateY(-14px) scale(0.97);
+    transform: translateY(-10px) scale(0.985);
   }
 
   to {
@@ -622,24 +713,21 @@
 
   to {
     opacity: 0;
-    transform: translateY(-10px) scale(0.98);
+    transform: translateY(-8px) scale(0.99);
   }
 }
 
-@keyframes shimmer {
-  0% {
-    transform: translate3d(-100%, 0, 0);
-  }
-
+@keyframes skeleton-pulse {
+  0%,
   100% {
-    transform: translate3d(100%, 0, 0);
+    opacity: 0;
+  }
+
+  50% {
+    opacity: 1;
   }
 }
 
-/**
- * Scrolls a marquee row by exactly half its width. The row renders its text twice, so landing on
- * -50% lands on a copy identical to where it started and the loop has no seam.
- */
 @keyframes marquee {
   0% {
     transform: translate3d(0, 0, 0);
@@ -650,35 +738,32 @@
   }
 }
 
-.animate-shimmer {
-  position: relative;
-  overflow: hidden;
-  isolation: isolate;
-}
-
-.animate-shimmer::after {
+/**
+ * The pulse on a loading placeholder, drawn as an overlay that fades in and out.
+ *
+ * Fading an overlay rather than the block itself holds any ring around the block at a steady
+ * colour. The overlay inherits the radius so it never squares off a rounded corner. Every
+ * placeholder shares one timing, so a page of them reads as a single surface breathing.
+ *
+ * The element needs a position for this to sit against, which the component supplies as a utility
+ * class so a caller can still place a placeholder absolutely.
+ */
+.animate-skeleton-pulse::after {
   position: absolute;
   inset: 0;
-  transform: translate3d(-100%, 0, 0);
-  background-image: linear-gradient(
-    90deg,
-    transparent 0%,
-    color-mix(in oklab, var(--foreground) 7%, transparent) 50%,
-    transparent 100%
-  );
-  animation: shimmer 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
-  will-change: transform;
+  border-radius: inherit;
+  background-color: var(--skeleton-highlight);
+  animation: skeleton-pulse 2.4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
   content: '';
   pointer-events: none;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .animate-shimmer::after {
+  .animate-skeleton-pulse::after {
     animation: none !important;
-    display: none !important;
+    opacity: 0.5;
   }
 
-  /** Holds the rows still. They already read as a filled plate without travelling */
   .marquee-row {
     animation: none !important;
   }
@@ -693,6 +778,7 @@
   .select-content-elegant,
   .dropdown-elegant,
   .select-check-elegant,
+  .command-backdrop,
   .command-popup {
     animation: none !important;
     transition: opacity 120ms linear;
@@ -700,68 +786,43 @@
 }
 
 .sonner-toast-callout {
-  --callout-hue: oklch(0.6 0.17 250);
-  background-color: color-mix(in oklab, var(--callout-hue) 12%, var(--surface-50)) !important;
-  border: 1px solid color-mix(in oklab, var(--callout-hue) 18%, transparent) !important;
-  box-shadow: 0 4px 12px rgb(0 0 0 / 0.15) !important;
+  --callout-background: oklch(0.221908 0.023912 255.885);
+  --callout-border: oklch(0.6 0.17 250 / 0.18);
+  --callout-icon: oklch(0.809 0.105 251.813);
+  background-color: var(--callout-background) !important;
+  border: 1px solid var(--callout-border) !important;
+  box-shadow: 0 4px 12px oklch(0 0 0 / 0.15) !important;
+
+  @variant retina {
+    border-width: 0.5px !important;
+  }
+
+  & [data-icon] {
+    color: var(--callout-icon) !important;
+    opacity: 0.8 !important;
+  }
 
   &[data-type='success'] {
-    --callout-hue: oklch(0.6 0.16 160);
-    background-color: color-mix(in oklab, oklch(0.6 0.16 160) 12%, var(--surface-50)) !important;
-    border-color: color-mix(in oklab, oklch(0.6 0.16 160) 18%, transparent) !important;
-    & [data-icon] {
-      color: #6ee7b7 !important;
-      opacity: 0.8 !important;
-    }
+    --callout-background: oklch(0.221908 0.017087 171.428);
+    --callout-border: oklch(0.6 0.16 160 / 0.18);
+    --callout-icon: oklch(0.845 0.143 164.978);
   }
 
   &[data-type='error'] {
-    --callout-hue: oklch(0.6 0.18 20);
-    background-color: color-mix(in oklab, oklch(0.6 0.18 20) 12%, var(--surface-50)) !important;
-    border-color: color-mix(in oklab, oklch(0.6 0.18 20) 18%, transparent) !important;
-    & [data-icon] {
-      color: #fda4af !important;
-      opacity: 0.8 !important;
-    }
+    --callout-background: oklch(0.221908 0.021706 8.926);
+    --callout-border: oklch(0.6 0.18 20 / 0.18);
+    --callout-icon: oklch(0.81 0.117 11.638);
   }
 
   &[data-type='warning'] {
-    --callout-hue: oklch(0.7 0.15 60);
-    background-color: color-mix(in oklab, oklch(0.7 0.15 60) 12%, var(--surface-50)) !important;
-    border-color: color-mix(in oklab, oklch(0.7 0.15 60) 18%, transparent) !important;
-    & [data-icon] {
-      color: #fcd34d !important;
-      opacity: 0.8 !important;
-    }
-  }
-
-  &[data-type='info'] {
-    --callout-hue: oklch(0.6 0.17 250);
-    background-color: color-mix(in oklab, oklch(0.6 0.17 250) 12%, var(--surface-50)) !important;
-    border-color: color-mix(in oklab, oklch(0.6 0.17 250) 18%, transparent) !important;
-    & [data-icon] {
-      color: #93c5fd !important;
-      opacity: 0.8 !important;
-    }
+    --callout-background: oklch(0.233908 0.015387 48.749);
+    --callout-border: oklch(0.7 0.15 60 / 0.18);
+    --callout-icon: oklch(0.879 0.169 91.605);
   }
 
   &[data-type='loading'] {
-    --callout-hue: oklch(0.6 0.17 300);
-    background-color: color-mix(in oklab, oklch(0.6 0.17 300) 12%, var(--surface-50)) !important;
-    border-color: color-mix(in oklab, oklch(0.6 0.17 300) 18%, transparent) !important;
-    & [data-icon] {
-      color: #c4b5fd !important;
-      opacity: 0.8 !important;
-    }
-  }
-
-  &[data-type='default'] {
-    --callout-hue: oklch(0.6 0.17 250);
-    background-color: color-mix(in oklab, oklch(0.6 0.17 250) 12%, var(--surface-50)) !important;
-    border-color: color-mix(in oklab, oklch(0.6 0.17 250) 18%, transparent) !important;
-    & [data-icon] {
-      color: #93c5fd !important;
-      opacity: 0.8 !important;
-    }
+    --callout-background: oklch(0.221908 0.024475 297.617);
+    --callout-border: oklch(0.6 0.17 300 / 0.18);
+    --callout-icon: oklch(0.811 0.111 293.571);
   }
 }

@@ -10,10 +10,17 @@ interface AnimatedArrowProps {
 const ARROW_CLASS =
   'absolute inset-0 size-full transition-transform duration-200 ease-out motion-reduce:transition-none'
 
-/** An arrow that leans in the direction of travel when its link is hovered */
+/**
+ * An arrow that leans in the direction of travel when its link is hovered. Two of them inside a
+ * clipped box, the first leaving through the corner as the second arrives from the opposite one, so
+ * what is seen is one arrow moving rather than an arrow sliding off and back.
+ */
 export function AnimatedArrow({ className }: AnimatedArrowProps) {
   return (
-    <span className={cn('relative inline-block size-4 overflow-hidden', className)}>
+    <span
+      aria-hidden="true"
+      className={cn('relative inline-block size-4 overflow-hidden', className)}
+    >
       <Icons.arrowOutward
         className={cn(
           ARROW_CLASS,

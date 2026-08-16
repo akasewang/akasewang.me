@@ -36,6 +36,11 @@ export function SpinningCircularText({
         'grid size-(--sc-container-size) place-items-center font-mono font-medium uppercase select-none',
         className,
       )}
+      /**
+       * The ring is worked out in CSS from three numbers: the character count, the spacing and the
+       * size. The radius falls out of the sine of the angle between characters, which is what keeps
+       * them evenly spaced whatever the text is, and the container is sized from that radius.
+       */
       style={
         {
           '--sc-size': fontSize,
@@ -60,6 +65,7 @@ export function SpinningCircularText({
         )}
         aria-hidden
       >
+        {/** Each character only carries its index, the transform above turning that into a place */}
         {text.split('').map((char, index) => (
           <span key={index} style={{ '--sc-char-index': index } as React.CSSProperties}>
             {renderChar ? renderChar(char, index) : char}

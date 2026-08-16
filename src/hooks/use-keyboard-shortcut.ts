@@ -4,6 +4,8 @@ import { useEffect, useEffectEvent } from 'react'
 interface ShortcutOptions {
   ctrlKey?: boolean
   metaKey?: boolean
+  /** Accept either Control or Command, but not both at once. */
+  ctrlOrMetaKey?: boolean
   altKey?: boolean
   shiftKey?: boolean
   preventDefault?: boolean
@@ -19,6 +21,7 @@ export function useKeyboardShortcut(
   {
     ctrlKey = false,
     metaKey = false,
+    ctrlOrMetaKey = false,
     altKey = false,
     shiftKey = false,
     preventDefault = true,
@@ -37,6 +40,9 @@ export function useKeyboardShortcut(
     const targetKey = key.toLowerCase()
 
     const handleKeyDown = (e: KeyboardEvent) => {
+      /** One physical press is one command, and already-claimed or composing input is left alone. */
+      if (e.defaultPrevented || e.repeat || e.isComposing) return
+
       const target = e.target as HTMLElement
 
       /** Someone typing owns the keystroke, however the shortcut is configured */
@@ -44,10 +50,13 @@ export function useKeyboardShortcut(
         return
       }
 
+      const primaryModifierMatches = ctrlOrMetaKey
+        ? e.ctrlKey !== e.metaKey
+        : e.ctrlKey === ctrlKey && e.metaKey === metaKey
+
       if (
         e.key.toLowerCase() === targetKey &&
-        e.ctrlKey === ctrlKey &&
-        e.metaKey === metaKey &&
+        primaryModifierMatches &&
         e.altKey === altKey &&
         e.shiftKey === shiftKey
       ) {
@@ -61,5 +70,5 @@ export function useKeyboardShortcut(
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [key, ctrlKey, metaKey, altKey, shiftKey, preventDefault])
+  }, [key, ctrlKey, metaKey, ctrlOrMetaKey, altKey, shiftKey, preventDefault])
 }

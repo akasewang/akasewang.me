@@ -1,6 +1,7 @@
 import type { ComponentProps } from 'react'
 import { cn } from '@/utils/utils'
 
+/** A filled dot used as a marker, as opposed to SeparatorBullet which sits between two things */
 export function Bullet({ className, ...props }: ComponentProps<'div'>) {
   return (
     <div

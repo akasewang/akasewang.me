@@ -3,6 +3,7 @@
 import { m } from 'framer-motion'
 import { usePathname } from 'next/navigation'
 import { useId, useState } from 'react'
+import { CATEGORY_FILTER_ROW_CLASS } from '@/components/skeletons/shared'
 import { SMOOTH_SPRING_TRANSITION, SPRING_TRANSITION } from '@/constants/ui'
 import { useSoundEffects } from '@/hooks/use-sound-effects'
 import { cn } from '@/utils/utils'
@@ -20,12 +21,17 @@ export function CategoryFilter<T extends string>({
   onChange,
 }: CategoryFilterProps<T>) {
   const { select, hoverTick } = useSoundEffects()
+  /**
+   * The sliding block below is shared by whichever chips carry the same layout id. Keying it to the
+   * route as well as the instance stops the filter on an arriving page from animating its block
+   * across from the page being left, which are two different lists that happen to look alike.
+   */
   const reactId = useId()
   const pathname = usePathname()
   const [id] = useState(() => `${reactId}-${pathname}`)
 
   return (
-    <div className="flex flex-wrap items-center gap-x-1 gap-y-2">
+    <div className={CATEGORY_FILTER_ROW_CLASS}>
       {categories.map(({ value: catValue, label }) => {
         const isActive = value === catValue
 
@@ -42,7 +48,7 @@ export function CategoryFilter<T extends string>({
             }}
             onMouseEnter={hoverTick}
             className={cn(
-              'relative flex min-w-12 items-center justify-center rounded-none px-3 py-1 font-mono text-[13px] font-medium lowercase transition-colors duration-300',
+              'relative flex min-w-12 items-center justify-center rounded-none px-3 py-0.5 font-mono text-xs-plus font-medium lowercase transition-colors duration-300',
               isActive
                 ? 'text-primary-foreground'
                 : 'text-secondary supports-hover:hover:text-primary active:text-primary',

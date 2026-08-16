@@ -19,21 +19,25 @@ const SKILL_NAME_BASE_CLASSES = 'whitespace-nowrap font-mono text-xs font-medium
 /** One technology in the skills grid, with its icon */
 export function SkillCard({ skill: { url, icon, name }, className }: SkillCardProps) {
   const isLink = !!url
-  const { spotlightSweep, navigate: navigateSound } = useSoundEffects()
+  const { navigate: navigateSound } = useSoundEffects()
 
+  /**
+   * Drawn twice, once plainly and once as the layer the spotlight reveals. The reveal copy holds a
+   * blank of the icon's size rather than the icon, so the two line up without drawing it twice.
+   */
   const renderContent = (isReveal: boolean = false) => {
     const inner = (
       <>
         {isReveal ? (
-          <div className="size-[13px] shrink-0" />
+          <div className="size-3.25 shrink-0" />
         ) : (
           <Image
             src={icon}
-            alt={name}
+            alt=""
             width={13}
             height={13}
             draggable={false}
-            className="relative z-10 size-[13px] shrink-0 object-contain"
+            className="relative z-10 size-3.25 shrink-0 object-contain"
           />
         )}
         <span
@@ -60,7 +64,6 @@ export function SkillCard({ skill: { url, icon, name }, className }: SkillCardPr
       revealLayer={renderContent(true)}
       outerSize={120}
       className={cn(SKILL_CARD_BASE_CLASSES, isLink && 'active:scale-[0.97]', className)}
-      onSpotlightMove={spotlightSweep}
       onActivate={navigateSound}
     >
       {renderContent()}

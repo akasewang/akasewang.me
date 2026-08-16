@@ -3,6 +3,7 @@
 import { useEffect } from 'react'
 import { type KeyKind, useSoundEffects } from '@/hooks/use-sound-effects'
 
+/** Fields whose keystrokes are audible. A password field is deliberately not among them */
 const AUDIBLE_INPUT_TYPES = ['text', 'search', 'email', 'url', 'tel', 'number']
 
 function isTypingTarget(target: EventTarget | null): boolean {
@@ -17,7 +18,11 @@ function isTypingTarget(target: EventTarget | null): boolean {
   return name === 'TEXTAREA'
 }
 
-function keyKindOf(key: string): KeyKind | null {
+/** Sorts a key into the sound it makes, or into nothing for the ones that should be silent */
+function keyKindOf(key: unknown): KeyKind | null {
+  /** Autofill and browser integrations can dispatch keydown-shaped events without a key value. */
+  if (typeof key !== 'string' || key.length === 0) return null
+
   if (key === ' ' || key === 'Spacebar') return 'space'
   if (key === 'Enter') return 'enter'
   if (key === 'Backspace' || key === 'Delete') return 'delete'
@@ -33,6 +38,7 @@ export function TypingSounds() {
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
+      /** A shortcut is not typing, however much it looks like it from here */
       if (event.metaKey || event.ctrlKey || event.altKey) return
       if (!isTypingTarget(event.target)) return
 

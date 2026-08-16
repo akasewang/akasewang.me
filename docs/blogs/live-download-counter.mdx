@@ -2,52 +2,50 @@
 title: 'Building a Live Download Counter'
 excerpt: 'How to build a live telemetry tracker using decoupled React components, atomic PostgreSQL upserts and nonblocking Next.js API routes to prevent CLI race conditions.'
 date: '2026-05-31'
-slug: live-download-counter
 type: technical
-tags: ['react', 'nextjs', 'drizzle-orm', 'database']
+
 ---
 
-When building the component registry for this portfolio, I wanted a way to track how many times a component was installed via the CLI (`npx shadcn add`). 
+A component registry can count installations at the route that serves each component to the CLI. Displaying that number is simple; recording it without coupling the visual component to the database or delaying the download requires a little more care.
 
-While standard web applications often just render a raw metric string (e.g., `10,420`), I wanted something that felt more tactile and hardware inspired. By segmenting the digits into distinct monospaced blocks, we create a highly legible, aesthetic counter that feels right at home on an engineering dashboard.
+The implementation has three boundaries:
 
-But building a live counter isn't just about CSS. We have to solve a few structural problems:
-1. **Separation of Concerns**: The UI component itself must remain pure and stateless so it can be easily distributed.
-2. **Concurrency**: If a popular component drops, hundreds of developers might run the CLI command simultaneously. We need to prevent database race conditions.
-3. **Performance**: Tracking telemetry shouldn't slow down the actual CLI download speed for the end user.
+1. A stateless counter renders any numeric value.
+2. PostgreSQL owns concurrent increments through an atomic upsert.
+3. The registry route schedules telemetry after preparing the CLI response.
 
-Here is how I engineered the full stack architecture using **React**, **Next.js Server Actions** and **Drizzle ORM**.
+## A counter with no data dependency
 
-## 1. The Pure UI Component
+The display component receives a number, pads it to a fixed width and gives each digit its own tile. It does not fetch, cache or know what an installation is.
 
-Following the Shadcn philosophy, we start by building a completely isolated, stateless UI component. It doesn't know anything about databases or server fetching. 
+```tsx title="download-counter.tsx"
+import type { HTMLAttributes } from 'react'
 
-It simply accepts a `value` prop, pads it with leading zeros to maintain a consistent width (e.g., `00420`) and maps over each digit to render it inside a dedicated tile.
-
-```tsx title="src/components/ui/download-counter.tsx"
-'use client'
-import * as React from 'react'
-import { cn } from '@/utils/utils'
-export interface DownloadCounterProps extends React.HTMLAttributes<HTMLDivElement> {
+type DownloadCounterProps = HTMLAttributes<HTMLDivElement> & {
   value: number
   padLength?: number
 }
-export function DownloadCounter({ 
-  value, 
+
+export function DownloadCounter({
+  value,
   padLength = 5,
-  className,
-  ...props 
+  className = '',
+  ...props
 }: DownloadCounterProps) {
-  const displayCount = (value ?? 0).toString().padStart(padLength, '0')
+  const safeValue = Number.isFinite(value) ? Math.max(0, Math.trunc(value)) : 0
+  const digits = String(safeValue).padStart(padLength, '0').split('')
+
   return (
-    <div 
-      className={cn('flex items-center gap-1 sm:gap-1.5', className)}
+    <div
+      aria-label={`${safeValue.toLocaleString()} installations`}
+      className={`flex items-center gap-1 sm:gap-1.5 ${className}`}
       {...props}
     >
-      {displayCount.split('').map((digit, i) => (
-        <span 
-          key={i} 
-          className="flex h-10 w-8 items-center justify-center rounded-md bg-muted/50 font-mono text-lg font-medium tracking-tight text-foreground"
+      {digits.map((digit, index) => (
+        <span
+          key={`${index}-${digit}`}
+          aria-hidden="true"
+          className="flex h-10 w-8 items-center justify-center rounded-md bg-slate-100 font-mono text-lg font-medium text-slate-950"
         >
           {digit}
         </span>
@@ -57,105 +55,248 @@ export function DownloadCounter({
 }
 ```
 
-Because it's decoupled, you can use it anywhere immediately with static data:
-`<DownloadCounter value={420} padLength={5} />`
+It can render static data immediately:
 
-## 2. Telemetry Database Schema
+```tsx title="counter-example.tsx"
+import { DownloadCounter } from './download-counter'
 
-To make the counter live, we need a place to store the metrics. We create a minimalist PostgreSQL table that tracks the total `installs` for each unique component `slug`.
+export function CounterExample() {
+  return <DownloadCounter value={420} padLength={5} />
+}
+```
 
-```typescript title="src/lib/db/schema.ts"
-import { pgTable, varchar, integer } from 'drizzle-orm/pg-core'
-export const component_metrics = pgTable('component_metrics', {
+Keeping this layer pure makes it usable in a registry page, admin screen or preview without carrying server code into each use.
+
+## Let PostgreSQL serialize increments
+
+The examples use Drizzle with the `postgres` driver. Database creation stays in one server-only module so UI components never import the connection.
+
+```bash
+npm install drizzle-orm postgres server-only
+```
+
+```ts title="lib/db.ts"
+import 'server-only'
+
+import { drizzle } from 'drizzle-orm/postgres-js'
+import postgres from 'postgres'
+
+const connectionString = process.env.DATABASE_URL
+if (!connectionString) throw new Error('DATABASE_URL is required')
+
+// My implementation reuses its existing shared Drizzle client. This explicit
+// connection keeps the standalone dependency visible.
+const client = postgres(connectionString, { max: 10 })
+export const db = drizzle(client)
+```
+
+The table needs one row per component:
+
+```ts title="lib/schema.ts"
+import { integer, pgTable, varchar } from 'drizzle-orm/pg-core'
+
+export const componentMetrics = pgTable('component_metrics', {
   slug: varchar('slug', { length: 255 }).primaryKey(),
-  installs: integer('installs').default(0).notNull(),
+  installs: integer('installs').notNull().default(0),
 })
 ```
 
-## 3. Atomic Server Actions
+Generate and apply a migration for this schema before serving the routes. The TypeScript declaration describes the table to Drizzle; it does not create the PostgreSQL table by itself.
 
-Next, we need a secure way to interface with the database. We write two Next.js Server Actions: one to fetch the data for the UI and one to increment the data when a CLI installation occurs.
+A read followed by a separate write is unsafe under concurrency. Two requests can both read `10`, calculate `11` and overwrite each other. The increment must happen inside the database statement.
 
-The increment action is where things get interesting. If we run a standard `SELECT` followed by an `UPDATE count + 1`, we run the risk of a race condition. If two users install the component at the exact same millisecond, they might both read `10` and both write `11`, effectively losing a metric.
+```ts title="lib/install-metrics.ts"
+import 'server-only'
 
-To solve this, we rely on Drizzle's `onConflictDoUpdate` to perform an **Atomic Upsert**. We push the math down to the PostgreSQL engine itself, ensuring the increment is perfectly transactional.
-
-```typescript title="src/lib/actions/views.ts"
-'use server'
-import { db } from '@/lib/db/drizzle'
-import { component_metrics } from '@/lib/db/schema'
 import { eq, sql } from 'drizzle-orm'
-export async function getInstallsAction(slug: string) {
-  if (!slug) return { installs: null }
-  try {
-    const [result] = await db
-      .select({ installs: component_metrics.installs })
-      .from(component_metrics)
-      .where(eq(component_metrics.slug, slug))
-    return { installs: result?.installs ?? 0 }
-  } catch (error) {
-    return { installs: null }
-  }
+import { db } from './db'
+import { componentMetrics } from './schema'
+
+const slugPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
+
+export function parseMetricSlug(value: string): string | null {
+  const slug = value.trim().toLowerCase()
+  return slug.length <= 255 && slugPattern.test(slug) ? slug : null
 }
-export async function incrementInstallAction(slug: string) {
-  if (!slug) return { installs: null }
-  try {
-    const [result] = await db
-      .insert(component_metrics)
-      .values({ slug, installs: 1 })
-      .onConflictDoUpdate({
-        target: component_metrics.slug,
-        set: { installs: sql`${component_metrics.installs} + 1` }, 
-      })
-      .returning({ installs: component_metrics.installs })
-    return { installs: result?.installs ?? 0 }
-  } catch (error) {
-    return { installs: null }
-  }
+
+export async function getInstallCount(value: string): Promise<number> {
+  const slug = parseMetricSlug(value)
+  if (!slug) throw new Error('Invalid slug')
+
+  const [row] = await db
+    .select({ installs: componentMetrics.installs })
+    .from(componentMetrics)
+    .where(eq(componentMetrics.slug, slug))
+    .limit(1)
+
+  return row?.installs ?? 0
 }
-```
 
-## 4. Hydration & The Frontend Wrapper
+export async function incrementInstallCount(value: string): Promise<number> {
+  const slug = parseMetricSlug(value)
+  if (!slug) throw new Error('Invalid slug')
 
-Now we need to bridge the server and the client. We build a React client component that mounts, fires off the `getInstallsAction` and handles the loading state.
-
-While waiting for the network response, we return a smooth `animate-pulse` skeleton. Once the database integer arrives, we pass it into our pure `DownloadCounter` UI.
-
-```tsx title="src/components/live-counter.tsx"
-'use client'
-import { useEffect, useState } from 'react'
-import { DownloadCounter } from '@/components/ui/download-counter'
-import { getInstallsAction } from '@/lib/actions/views'
-export function LiveCounter({ slug }: { slug: string }) {
-  const [installs, setInstalls] = useState<number | undefined>(undefined)
-  useEffect(() => {
-    getInstallsAction(slug).then(res => {
-      if (res.installs !== null) setInstalls(res.installs)
+  const [row] = await db
+    .insert(componentMetrics)
+    .values({ slug, installs: 1 })
+    .onConflictDoUpdate({
+      target: componentMetrics.slug,
+      set: { installs: sql`${componentMetrics.installs} + 1` },
     })
-  }, [slug])
-  if (installs === undefined) {
-    return <div className="h-10 w-48 animate-pulse rounded-md bg-muted" />
-  }
-  return <DownloadCounter value={installs} />
+    .returning({ installs: componentMetrics.installs })
+
+  if (!row) throw new Error('Install increment returned no row')
+  return row.installs
 }
 ```
 
-## 5. Nonblocking API Triggers
+The upsert is atomic at the database, so simultaneous installations do not depend on application-level timing.
 
-Finally, we need to actually trigger the `incrementInstallAction` whenever someone uses the CLI. 
+## Fetch live data outside the display
 
-In our Next.js API route that serves the component JSON payload, we invoke the server action, but we **do not await it**. By using `.catch()` instead of `await`, we create a "fire and forget" telemetry ping. The CLI payload is returned to the user instantly, while the database upsert happens silently in the background.
+A small read-only Route Handler exposes the current total. Validate the slug before it reaches the database and return a consistent JSON shape.
 
-```typescript title="src/app/r/[slug]/route.ts"
-import { incrementInstallAction } from '@/lib/actions/views'
+```ts title="app/api/installs/[slug]/route.ts"
 import { NextResponse } from 'next/server'
+import { getInstallCount, parseMetricSlug } from '../../../../lib/install-metrics'
+
 export async function GET(
-  request: Request,
-  { params }: { params: { slug: string } }
+  _request: Request,
+  { params }: { params: Promise<{ slug: string }> },
 ) {
-  incrementInstallAction(params.slug).catch(console.error)
-  return NextResponse.json({ ...registryPayload })
+  const { slug: rawSlug } = await params
+  const slug = parseMetricSlug(rawSlug)
+
+  if (!slug) {
+    return NextResponse.json({ error: 'Invalid slug' }, { status: 400 })
+  }
+
+  const installs = await getInstallCount(slug)
+  return NextResponse.json(
+    { installs },
+    { headers: { 'Cache-Control': 'private, no-store' } },
+  )
 }
 ```
 
-By decoupling the UI from the database logic, utilizing atomic upserts to prevent race conditions and leveraging nonblocking API triggers, we've built an extremely robust, edge ready metrics system that scales effortlessly.
+A client wrapper can fetch that value while a statically generated page remains cacheable. It cancels the request on unmount and distinguishes loading from failure, so a rejected request does not leave an ambiguous skeleton forever.
+
+```tsx title="live-counter.tsx"
+'use client'
+
+import { useEffect, useState } from 'react'
+import { DownloadCounter } from './download-counter'
+
+type CounterState =
+  | { status: 'loading' }
+  | { status: 'ready'; installs: number }
+  | { status: 'error' }
+
+export function LiveCounter({ slug }: { slug: string }) {
+  const [state, setState] = useState<CounterState>({ status: 'loading' })
+
+  useEffect(() => {
+    const controller = new AbortController()
+    setState({ status: 'loading' })
+
+    fetch(`/api/installs/${encodeURIComponent(slug)}`, { signal: controller.signal })
+      .then(async (response) => {
+        if (!response.ok) throw new Error(`Request failed with ${response.status}`)
+        const payload: unknown = await response.json()
+        const installs =
+          payload && typeof payload === 'object' && 'installs' in payload
+            ? payload.installs
+            : null
+
+        if (typeof installs !== 'number' || !Number.isSafeInteger(installs) || installs < 0) {
+          throw new Error('Invalid installation response')
+        }
+
+        return installs
+      })
+      .then((installs) => setState({ status: 'ready', installs }))
+      .catch((error: unknown) => {
+        if (error instanceof DOMException && error.name === 'AbortError') return
+        setState({ status: 'error' })
+      })
+
+    return () => controller.abort()
+  }, [slug])
+
+  if (state.status === 'loading') {
+    return <div aria-label="Loading installation count" className="h-10 w-44 animate-pulse rounded-md bg-slate-100" />
+  }
+
+  if (state.status === 'error') {
+    return <p role="status">Installation count unavailable</p>
+  }
+
+  return <DownloadCounter value={state.installs} />
+}
+```
+
+The pure `DownloadCounter` still receives ordinary data rather than acquiring a network responsibility.
+
+## Record telemetry without delaying the download
+
+An unawaited promise is not a dependable background task in a serverless route. Once the response completes, the platform may suspend the invocation before that promise settles.
+
+Next.js provides [`after()`](https://nextjs.org/docs/app/api-reference/functions/after) for work that should run after the response is produced while remaining part of the request lifecycle. This complete example serves registry JSON from a local directory and rejects slugs that could escape it:
+
+```ts title="app/r/[slug]/route.ts"
+import { readFile } from 'node:fs/promises'
+import path from 'node:path'
+import { after, NextResponse } from 'next/server'
+import { incrementInstallCount, parseMetricSlug } from '../../../lib/install-metrics'
+
+// My implementation loads registry entries through its content layer. Reading
+// JSON files here keeps that application-specific loader out of the guide.
+const registryDirectory = path.join(process.cwd(), 'registry')
+
+export async function GET(
+  _request: Request,
+  { params }: { params: Promise<{ slug: string }> },
+) {
+  const { slug: rawSlug } = await params
+  const slug = parseMetricSlug(rawSlug)
+
+  if (!slug) {
+    return NextResponse.json({ error: 'Invalid slug' }, { status: 400 })
+  }
+
+  let source: string
+
+  try {
+    source = await readFile(path.join(registryDirectory, `${slug}.json`), 'utf8')
+  } catch (error) {
+    const code = error && typeof error === 'object' && 'code' in error ? error.code : undefined
+    if (code === 'ENOENT') {
+      return NextResponse.json({ error: 'Component not found' }, { status: 404 })
+    }
+    throw error
+  }
+
+  let payload: unknown
+  try {
+    payload = JSON.parse(source)
+  } catch {
+    return NextResponse.json({ error: 'Invalid registry entry' }, { status: 500 })
+  }
+
+  after(async () => {
+    try {
+      await incrementInstallCount(slug)
+    } catch (error) {
+      console.error('Failed to record installation', { slug, error })
+    }
+  })
+
+  return NextResponse.json(payload)
+}
+```
+
+The CLI receives its registry payload without waiting for the database roundtrip, and the framework keeps the scheduled increment alive. If every count must be guaranteed rather than treated as best-effort telemetry, use a durable queue with retries and idempotency.
+
+The route also needs a clear definition of an installation. Counting every `GET` may include retries, bots or cache misses; signing requests or attaching an installation identifier can improve accuracy when the metric matters beyond a rough popularity signal.
+
+The architecture stays simple because each layer owns one concern: React renders, PostgreSQL handles contention, and the route decides when telemetry belongs in the request lifecycle.

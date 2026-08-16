@@ -2,6 +2,7 @@
 
 import { useCallback } from 'react'
 import { useViews } from '@/components/providers/views-context'
+import { getProjectDestination } from '@/utils/project'
 
 /**
  * What separates a visit tally from a page view tally.
@@ -23,7 +24,7 @@ export const visitKey = (slug: string) => `visit:${slug}`
  * every blog post, is unaffected and keeps its plain slug.
  */
 export const countKeyFor = ({ slug, external }: { slug: string; external?: string }) =>
-  external ? visitKey(slug) : slug
+  getProjectDestination({ slug, external }).external ? visitKey(slug) : slug
 
 /**
  * Counts a project being opened, for the projects that live somewhere else.
@@ -37,9 +38,9 @@ export const countKeyFor = ({ slug, external }: { slug: string; external?: strin
  * twice in one session counts once, exactly as re-reading a page does. Reading a visit count needs
  * nothing from here, since the counter renders through the same component views do.
  *
- * Recording is deliberately the card's job rather than the counter's. `VisitCounter` is read only,
- * because a card sitting in a listing has not been taken up on merely by being on screen: counting
- * it where it renders would tally the listing rather than the project.
+ * Recording belongs to the control that actually opens the destination rather than the counter.
+ * `VisitCounter` is read only because rendering a card or command result is not a visit; project
+ * cards and command selection both call this only when the external destination is followed.
  */
 export function useVisits() {
   const { incrementViews } = useViews()

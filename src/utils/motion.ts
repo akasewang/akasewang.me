@@ -1,6 +1,12 @@
 /** Queried once and reused, since matchMedia is not free to call per pointer move */
 let reduceMotionQuery: MediaQueryList | null = null
 
+function getReducedMotionQuery() {
+  if (typeof window === 'undefined' || !window.matchMedia) return null
+  reduceMotionQuery ??= window.matchMedia('(prefers-reduced-motion: reduce)')
+  return reduceMotionQuery
+}
+
 /**
  * Whether the reader has asked for less movement.
  *
@@ -10,8 +16,15 @@ let reduceMotionQuery: MediaQueryList | null = null
  * only ever needed while one is already under way.
  */
 export function prefersReducedMotion() {
-  if (typeof window === 'undefined' || !window.matchMedia) return false
+  return getReducedMotionQuery()?.matches ?? false
+}
 
-  reduceMotionQuery ??= window.matchMedia('(prefers-reduced-motion: reduce)')
-  return reduceMotionQuery.matches
+/** Keeps long-running canvas animation in sync when the OS preference changes mid-session. */
+export function subscribeToReducedMotion(listener: (reduced: boolean) => void) {
+  const query = getReducedMotionQuery()
+  if (!query) return () => {}
+
+  const handleChange = (event: MediaQueryListEvent) => listener(event.matches)
+  query.addEventListener('change', handleChange)
+  return () => query.removeEventListener('change', handleChange)
 }

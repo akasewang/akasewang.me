@@ -20,7 +20,7 @@ const SHARED_CAROUSEL_PROPS = {
   keyExtractor: (item: Testimonial) => item.id,
   emblaOptions: CAROUSEL_OPTIONS.embla,
   autoScrollOptions: CAROUSEL_OPTIONS.autoScroll,
-  renderItem: (item: Testimonial) => <TestimonialCard testimonial={item} className="w-[400px]" />,
+  renderItem: (item: Testimonial) => <TestimonialCard testimonial={item} className="w-100" />,
 }
 
 /** The testimonials carousel on the landing page */
@@ -36,7 +36,7 @@ export function Testimonials() {
   return (
     <section id="testimonials">
       <div className="relative">
-        <div className="mask-fade-l relative flex flex-col gap-2 py-2">
+        <div className="mask-fade-x relative flex flex-col gap-2 py-2">
           <InfiniteCarousel
             items={testimonials.topRow}
             direction="backward"

@@ -20,6 +20,7 @@ type MdxAnchorProps = AnchorHTMLAttributes<HTMLAnchorElement> & {
 /** Every component a post can use, from restyled HTML to the custom blocks */
 export const MDX_COMPONENTS = {
   ...mdxElements,
+  /** Every link in a post goes through the site's own, which sorts out target and rel for itself */
   a: ({ href, children, ...props }: MdxAnchorProps) => (
     <LinkText href={href || '#'} {...props}>
       {children}

@@ -6,4 +6,6 @@ export const blogsListingContent: BlogsListingContent = {
   subtitle: 'More thoughts than I know what to do with.',
   noTechnical: 'No technical articles published yet.',
   noPersonal: 'No personal blogs published yet.',
+  /** The closing line under the page, shown by the page and by its loading state alike */
+  footerText: "If you've made it this far, you deserve a coffee. Or a nap.",
 }

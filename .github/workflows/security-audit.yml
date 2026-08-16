@@ -17,12 +17,12 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  npm-audit:
-    name: npm audit
+  pnpm-audit:
+    name: pnpm audit
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     env:
-      NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+      PNPM_CONFIG_REGISTRY: https://registry.npmjs.org
 
     steps:
       - name: Checkout
@@ -30,17 +30,17 @@ jobs:
         with:
           persist-credentials: false
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@fc06bc1257f339d1d5d8b3a19a8cae5388b55320 # v4.4.0
+
       - name: Setup Node
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: 24
-          package-manager-cache: false
+          cache: pnpm
 
       - name: Install dependencies without lifecycle scripts
-        run: npm ci --ignore-scripts --no-audit --fund=false
-
-      - name: Verify registry signatures
-        run: npm audit signatures
+        run: pnpm install --frozen-lockfile --ignore-scripts
 
       - name: Audit dependencies
-        run: npm audit --package-lock-only --audit-level=info
+        run: pnpm audit --audit-level=low

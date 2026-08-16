@@ -13,6 +13,7 @@ import { createContext, useContext, useState } from 'react'
  */
 export const PageArrivalContext = createContext(false)
 
+/** Follows the flag above, for anything that should sit still only while the page is moving */
 export const usePageArriving = () => useContext(PageArrivalContext)
 
 /**

@@ -1,18 +1,18 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
+import { FeaturedSocialLinks } from '@/components/common/featured-social-links'
 import { PronounceMyName } from '@/components/common/pronounce-my-name'
-import { SocialLinks } from '@/components/common/social-links'
 import { SectionTitle } from '@/components/layout/section-title'
+import { HERO_ROW_CLASS } from '@/components/skeletons/shared'
 import { Button } from '@/components/ui/button'
 import { Icons, VerifiedIcon } from '@/components/ui/icons'
-import { LinkText } from '@/components/ui/link-text'
+import { LinkText, renderWithLinks } from '@/components/ui/link-text'
 import { ProfilePicture } from '@/components/ui/profile-picture'
 import { TextFlip } from '@/components/ui/text-flip'
 import { EMAIL, FULL_NAME } from '@/constants/constants'
 import { landingPageContent } from '@/data/content/landing-content'
-import { socialGroups } from '@/data/static/social'
-import { renderWithLinks } from '@/utils/content-utils'
+import { activeSocials, homepageSocials } from '@/data/static/social'
 
 /** The opening block: the avatar, the name, the roles it cycles through and the social links */
 export function HeroSection() {
@@ -62,31 +62,36 @@ export function HeroSection() {
       </div>
 
       <div className="space-y-2">
-        {socialGroups.length > 0 && (
+        {activeSocials.length > 0 && (
           <>
             <p className="text-sm text-foreground">{hero.findMeOn}</p>
-            <SocialLinks groups={socialGroups} />
+            <FeaturedSocialLinks links={homepageSocials} totalCount={activeSocials.length} />
           </>
         )}
         <p
           className={
-            socialGroups.length > 0 ? 'mt-4 text-sm text-foreground' : 'text-sm text-foreground'
+            activeSocials.length > 0 ? 'mt-4 text-sm text-foreground' : 'text-sm text-foreground'
           }
         >
-          {hero.mailMeAt} <LinkText href={`mailto:${EMAIL}`}>{EMAIL}</LinkText>
+          {hero.mailMeAt}{' '}
+          <LinkText href={`mailto:${EMAIL}`} className="font-mono">
+            {EMAIL}
+          </LinkText>
         </p>
       </div>
 
       <div className="space-y-4">
         <p className="text-sm text-foreground">{hero.connectText}</p>
-        <div className="flex flex-wrap items-center gap-2 sm:gap-4">
+        <div className={HERO_ROW_CLASS}>
+          {/* Opens a booking page on another site, so it takes the colour that says so */}
           <Button
             defaultText={hero.scheduleMeet}
             defaultIcon={Icons.calendar}
             onClick={() => window.open(hero.scheduleMeetUrl, '_blank', 'noopener,noreferrer')}
+            accent="offsite"
           />
+          {/* Moves to a page here, which is what a button does unasked */}
           <Button
-            variant="minimal"
             defaultText={hero.messageBoard}
             defaultIcon={Icons.messageBoard}
             onClick={() => router.push('/message-board', { scroll: false })}

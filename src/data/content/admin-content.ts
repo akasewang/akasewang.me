@@ -11,7 +11,7 @@ export const adminNewsletterContent: AdminNewsletterContent = {
   enterCodeDefault: 'Enter verification code',
   sendCodeDefault: 'Email me a code',
   sendCodeLoading: 'Sending...',
-  buttonDefault: 'Broadcast Transmission',
-  buttonLoading: 'Transmitting...',
-  buttonSuccess: 'Broadcast Sent!',
+  buttonDefault: 'send newsletter',
+  buttonLoading: 'sending newsletter',
+  buttonSuccess: 'newsletter sent!',
 }

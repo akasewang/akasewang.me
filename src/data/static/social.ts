@@ -3,7 +3,7 @@ import { USERNAME } from '@/constants/constants'
 import type { SocialGroup, SocialLink } from '@/types/site'
 
 /** Every profile linked to, each tagged with the kind of place it is */
-export const activeSocials: SocialLink[] = [
+export const activeSocials = [
   {
     href: `https://github.com/${USERNAME}`,
     label: 'GitHub',
@@ -82,21 +82,21 @@ export const activeSocials: SocialLink[] = [
   {
     href: `https://www.linkedin.com/in/${USERNAME}`,
     label: 'LinkedIn',
-    category: 'network',
+    category: 'ecosystem',
   },
   {
     href: `https://peerlist.io/${USERNAME}`,
     label: 'Peerlist',
-    category: 'network',
+    category: 'ecosystem',
   },
   {
     href: `https://superteam.fun/earn/t/${USERNAME}`,
     label: 'Superteam',
-    category: 'network',
+    category: 'ecosystem',
   },
   {
     href: `https://x.com/${USERNAME}`,
-    label: 'X [Twitter]',
+    label: 'X (Twitter)',
     category: 'social',
   },
   {
@@ -106,7 +106,7 @@ export const activeSocials: SocialLink[] = [
   },
   {
     href: `https://mastodon.social/@${USERNAME}`,
-    label: 'Mastodon [Social]',
+    label: 'Mastodon (Social)',
     category: 'social',
   },
   {
@@ -134,7 +134,25 @@ export const activeSocials: SocialLink[] = [
     label: 'Substack',
     category: 'media',
   },
-]
+] as const satisfies readonly SocialLink[]
+
+/** Every label above, so a subset naming one that has been renamed or dropped fails to compile */
+export type SocialLabel = (typeof activeSocials)[number]['label']
+
+/** The small, broadly useful subset shown before the homepage links through to the full directory */
+const HOMEPAGE_SOCIAL_LABELS = new Set<SocialLabel>([
+  'GitHub',
+  'Hugging Face',
+  'Figma',
+  'LinkedIn',
+  'X (Twitter)',
+  'Instagram',
+])
+
+/** The handful shown in the hero, the rest living on the links page */
+export const homepageSocials = activeSocials.filter(({ label }) =>
+  HOMEPAGE_SOCIAL_LABELS.has(label),
+)
 
 /**
  * Grouped once at module scope, since the list is static. Categories keep the order declared in

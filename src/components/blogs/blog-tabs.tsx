@@ -1,17 +1,13 @@
 'use client'
 
-import { useRouter } from 'next/navigation'
 import { ContentFilter } from '@/components/common/content-filter'
 import { FeaturedPosts } from '@/components/sections/featured-posts'
-import { Button } from '@/components/ui/button'
-import { Icons } from '@/components/ui/icons'
 import { BLOG_CATEGORIES } from '@/constants/categories'
 import { useContentListState } from '@/hooks/use-content-list-state'
 import type { BlogPost } from '@/types/blog'
 
 /** The blogs listing with its category filter, search and sort */
 export function BlogTabs({ allPosts }: { allPosts: BlogPost[] }) {
-  const router = useRouter()
   const {
     category,
     searchQuery,
@@ -24,20 +20,6 @@ export function BlogTabs({ allPosts }: { allPosts: BlogPost[] }) {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-center gap-2">
-        <Button
-          defaultText="join newsletter"
-          defaultIcon={Icons.newsletter}
-          onClick={() => router.push('/newsletter', { scroll: false })}
-        />
-        <Button
-          variant="minimal"
-          defaultText="leave a message"
-          defaultIcon={Icons.messageBoard}
-          onClick={() => router.push('/message-board', { scroll: false })}
-        />
-      </div>
-
       <ContentFilter
         searchQuery={searchQuery}
         onSearchChange={handleSearchChange}

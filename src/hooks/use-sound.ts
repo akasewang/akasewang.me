@@ -11,6 +11,7 @@ const audioCache = new Map<string, CacheEntry>()
 /** Browsers cap how many contexts a page may open, so every clip plays through this one */
 let sharedAudioContext: AudioContext | null = null
 
+/** Opens the shared context on first use, under whichever name the browser has for it */
 function getAudioContext(): AudioContext | null {
   if (typeof window === 'undefined') return null
   if (sharedAudioContext) return sharedAudioContext
@@ -25,6 +26,10 @@ function getAudioContext(): AudioContext | null {
   return sharedAudioContext
 }
 
+/**
+ * Fetches and decodes a clip once. Callers arriving mid flight join the same promise, and a failed
+ * load drops out of the cache so the next attempt is a real retry rather than the old rejection.
+ */
 function loadAudio(url: string, audioCtx: AudioContext): Promise<AudioBuffer> {
   const cached = audioCache.get(url)
   if (cached?.buffer) return Promise.resolve(cached.buffer)
@@ -50,6 +55,7 @@ function loadAudio(url: string, audioCtx: AudioContext): Promise<AudioBuffer> {
   return loadingPromise
 }
 
+/** A source node is single use, so every play builds its own and lets it go when it ends */
 function playAudioBuffer(buffer: AudioBuffer, audioCtx: AudioContext, volume: number = 1) {
   const source = audioCtx.createBufferSource()
   const gainNode = audioCtx.createGain()
@@ -73,6 +79,7 @@ export function useSoundLazy(url: string) {
   const [isLoading, setIsLoading] = useState(false)
   const [isLoaded, setIsLoaded] = useState(() => !!audioCache.get(url)?.buffer)
 
+  /** A changed url points at a different clip, which may or may not already be decoded */
   useEffect(() => {
     bufferRef.current = audioCache.get(url)?.buffer || null
     setIsLoaded(!!bufferRef.current)

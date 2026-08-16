@@ -1,5 +1,6 @@
 import { SITE, USERNAME } from '@/constants/constants'
 
+/** The API root for this repository, which the star count and the changelog both read from */
 export const GITHUB_REPO_URL = `https://api.github.com/repos/${USERNAME}/${SITE}`
 
 /** Sent on every call. The token is added when present, which raises the rate limit */

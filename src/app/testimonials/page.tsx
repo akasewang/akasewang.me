@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { PageLayout } from '@/components/layout/page-layout'
+import { TESTIMONIALS_PAGE_CLASS } from '@/components/skeletons/testimonial-card'
 import { TestimonialsGrid } from '@/components/testimonials/testimonials-grid'
 import { SITE_URL } from '@/constants/constants'
 import { testimonialsSeoContent } from '@/data/content/seo-content'
@@ -26,9 +27,9 @@ export default function TestimonialsPage() {
     <PageLayout
       title={testimonialsPageContent.title}
       subtitle={testimonialsPageContent.subtitle}
-      footerText="Kind words from people who (mostly) like me."
+      footerText={testimonialsPageContent.footerText}
       breadcrumb={breadcrumbJsonLd}
-      className="relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] w-screen overflow-hidden px-8 md:px-28"
+      className={TESTIMONIALS_PAGE_CLASS}
     >
       <TestimonialsGrid />
     </PageLayout>

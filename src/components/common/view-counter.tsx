@@ -33,6 +33,7 @@ export function ViewCounter({ slug, readOnly = false, type = 'views' }: ViewCoun
   const effectiveSlug = counterKey(type, slug)
   const count = getViews(effectiveSlug)
 
+  /** Guards against counting twice for the same slug, which a re-render would otherwise do */
   const processedSlug = useRef<string | null>(null)
 
   useEffect(() => {
@@ -47,8 +48,9 @@ export function ViewCounter({ slug, readOnly = false, type = 'views' }: ViewCoun
     processedSlug.current = effectiveSlug
   }, [effectiveSlug, readOnly, requestView, incrementViews])
 
+  /** Undefined is still loading, null is a failed read. The first waits, the second says so */
   if (count === undefined) {
-    return <Skeleton className="inline-block h-3.5 w-10 align-middle opacity-60" />
+    return <Skeleton tone="muted" className="inline-block h-3 w-10 align-middle" />
   }
 
   if (count === null) {

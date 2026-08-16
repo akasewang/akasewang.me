@@ -18,10 +18,9 @@ import type { ActionResult } from '@/types/actions'
 const MAX_EMAIL_LENGTH = 254
 
 /**
- * The countdown on the form is a courtesy to whoever is looking at it, not a control: this is a
- * server action and anything can call it directly. Without a limit here a loop could burn the mail
- * quota and, worse, send unasked for mail to any address it liked from this domain, which is the
- * sort of thing that costs a sending reputation.
+ * Renders and sends the welcome mail. A failure is logged rather than thrown, the subscription
+ * having already been written by the time this runs, and losing that over an undelivered greeting
+ * would be the worse outcome.
  */
 async function sendWelcomeEmail(email: string, token: string, isResubscribe: boolean) {
   const sender = getNewsletterSender()
@@ -73,9 +72,13 @@ export async function subscribeAction(email: string): Promise<ActionResult<{ isN
     const ip = await getClientIp()
 
     /**
-     * Checked before the address is looked up, so every path is spaced out rather than only the one
-     * that inserts. Answering at the same rate whatever the address turns out to be also stops the
-     * form being used to work out who is already on the list.
+     * The countdown on the form is a courtesy to whoever is looking at it, not a control: this is a
+     * server action and anything can call it directly. Unlimited, a loop could burn the mail quota
+     * and send unasked for mail to any address it liked from this domain, which is the sort of thing
+     * that costs a sending reputation.
+     *
+     * Claimed before the address is looked up, so a repeat costs the same wait whether or not the
+     * address is already there rather than only the path that inserts being spaced out.
      */
     const rateLimit = await claimRateLimit('newsletter-subscribe', ip, SUBSCRIBE_COOLDOWN_SECONDS)
     if (!rateLimit.allowed) {

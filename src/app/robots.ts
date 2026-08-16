@@ -31,7 +31,8 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: '*',
         allow: ['/', '/api/og'],
-        disallow: '/api/',
+        /** The card images are the one thing under /api worth indexing, hence the allow above */
+        disallow: ['/api/', '/admin/', '/dev/'],
         crawlDelay: 0,
       },
     ],

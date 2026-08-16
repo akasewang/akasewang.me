@@ -14,6 +14,8 @@ const { license, licenseHref, ownerName, changelogLabel, changelogHref } = foote
 export function Footer() {
   const currentYear = new Date().getFullYear()
   const { hoverLink, navigate: navigateSound } = useSoundEffects()
+
+  /** Shift and L for the licence, plain L for the changelog */
   useKeyboardShortcut(
     'l',
     () => {
@@ -35,23 +37,25 @@ export function Footer() {
 
   return (
     <footer className="py-6">
-      <div className="mx-auto flex max-w-[800px] flex-col items-center justify-between gap-2 px-8 sm:flex-row text-sm text-muted-foreground/50">
+      <div className="mx-auto flex max-w-(--content-width) flex-col items-center justify-between gap-2 px-8 sm:flex-row text-sm text-muted-foreground/50">
         <div className="flex items-center gap-1.5">
           {license &&
             (licenseHref ? (
               <Tooltip>
-                <TooltipTrigger asChild>
-                  <Link
-                    href={licenseHref}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onMouseEnter={hoverLink}
-                    onClick={navigateSound}
-                    className="transition-colors duration-300 supports-hover:hover:text-foreground active:text-foreground"
-                  >
-                    {license}
-                  </Link>
-                </TooltipTrigger>
+                <TooltipTrigger
+                  render={
+                    <Link
+                      href={licenseHref}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onMouseEnter={hoverLink}
+                      onClick={navigateSound}
+                      className="transition-colors duration-300 supports-hover:hover:text-foreground active:text-foreground"
+                    >
+                      {license}
+                    </Link>
+                  }
+                />
                 <TooltipContent side="top" shortcut={['Shift', 'L']}>
                   View License
                 </TooltipContent>
@@ -69,16 +73,18 @@ export function Footer() {
 
           {changelogLabel && changelogHref && (
             <Tooltip>
-              <TooltipTrigger asChild>
-                <Link
-                  href={changelogHref}
-                  onMouseEnter={hoverLink}
-                  onClick={navigateSound}
-                  className="transition-colors duration-300 supports-hover:hover:text-foreground active:text-foreground font-mono"
-                >
-                  {changelogLabel}
-                </Link>
-              </TooltipTrigger>
+              <TooltipTrigger
+                render={
+                  <Link
+                    href={changelogHref}
+                    onMouseEnter={hoverLink}
+                    onClick={navigateSound}
+                    className="transition-colors duration-300 supports-hover:hover:text-foreground active:text-foreground font-mono"
+                  >
+                    {changelogLabel}
+                  </Link>
+                }
+              />
               <TooltipContent side="top" shortcut="L">
                 View Changelog
               </TooltipContent>

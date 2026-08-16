@@ -18,6 +18,7 @@ export async function signInAdmin(code: string): Promise<ActionResult> {
   return { success: true, data: undefined }
 }
 
+/** Drops the cookie. Nothing else has to be undone, since the session was the whole of it */
 export async function signOutAdmin(): Promise<ActionResult> {
   await endAdminSession()
   return { success: true, data: undefined }

@@ -79,7 +79,6 @@ All procedural cues should sit in the same perceived range: roughly 100-160 ms a
 | `hoverTick`             | switch pre-travel, no pitch       | hovering a discrete control (button/menu/tab/filter) |
 | `hoverLink`             | the faintest contact              | hovering a navigation link                           |
 | `hoverCard`             | pre-travel on a larger body       | hovering a large content/media card                  |
-| `spotlightSweep(state)` | soft low brushed movement         | moving across a spotlight card (Skill/Testimonial)   |
 | `typeKey(kind, key)`    | a keyswitch, pitched per key      | a character landing in a text field                  |
 | `navigate`              | a latch throwing                  | going somewhere (route/scroll)                       |
 | `clickPop`              | full actuation, case and weight   | primary button press                                 |
@@ -104,12 +103,11 @@ inputs and other continuous or non-hover-feedback surfaces remain silent. Pick b
 | -------------------------- | ----------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Navigation link            | `hoverLink`             | Navbar items, home logo, hero profile picture, GitHub/RSS, footer license, `LinkText`, View All, Back, Carousel, prev/next arrows                                |
 | Large content / media card | `hoverCard`             | Blog/Project cards, photo tiles, the project demo video, MDX zoomable images, timeline rows                                                                      |
-| Spotlight card             | `spotlightSweep(state)` | Skill cards, Testimonial cards (matches their velocity-reactive spotlight reveal)                                                                                |
 | Discrete control           | `hoverTick`             | CTA `Button`, icon buttons, Select/Dropdown items + triggers, Tabs, Category filters, TOC headings, Copy, Back-to-Top, message-board actions, photos view toggle |
 
 - **Consistency rule:** within a category every element uses the same hover sound, no "card that sounds" vs "card that doesn't". Differentiation is _across_ categories only.
-- **Shared throttle:** `hoverTick`, `hoverLink`, and `hoverCard` share one 60 ms throttle, so a fast sweep across mixed elements never buzzes regardless of which textures it crosses. `spotlightSweep` is different: it plays one low entry bloom on pointer enter, then keeps one audible, low, non-tonal audio voice alive while the cursor moves, modulating filter, gain, and a very light stereo pan from spotlight position/intensity before fading out shortly after movement stops.
-- **Subtlety:** hover is the most frequent event, so all four stay lighter than action sounds; `hoverLink` remains the lightest since links are hovered most.
+- **Shared throttle:** `hoverTick`, `hoverLink`, and `hoverCard` share one 60 ms throttle, so a fast sweep across mixed elements never buzzes regardless of which textures it crosses.
+- **Subtlety:** hover is the most frequent event, so all three stay lighter than action sounds; `hoverLink` remains the lightest since links are hovered most.
 - **Do NOT use on:** Non-interactive elements, or controls that make no click sound. `PronounceMyName` uses `hoverTick` on hover and the real speech clip on click.
 
 ## 2. Navigation (`navigate`)

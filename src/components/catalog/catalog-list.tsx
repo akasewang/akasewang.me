@@ -10,7 +10,10 @@ import { catalog } from '@/data/static/catalog'
 import { useCategoryParam } from '@/hooks/use-category-param'
 import { usePageArriving } from '@/hooks/use-page-arrival'
 
-/** Everything read, watched and played, filtered by medium */
+/**
+ * Everything read, watched and played, filtered by medium. The filter is held in the URL by the
+ * hook, so a filtered view survives a reload and can be linked to.
+ */
 export function CatalogList() {
   const isArriving = usePageArriving()
   const [activeCategory, handleCategoryChange] = useCategoryParam(CATALOG_CATEGORIES)
@@ -40,7 +43,7 @@ export function CatalogList() {
             {filteredItems.map((item) => (
               <AnimatedListItem
                 key={`${item.category}-${item.title}`}
-                className="flex items-baseline justify-between gap-4 border-b border-border py-3 font-mono font-medium last:border-0"
+                className="flex items-baseline justify-between gap-4 border-b border-border py-3 font-mono font-medium last:border-0 retina:border-b-[0.5px]"
               >
                 <h3 className="line-clamp-2 flex-1 text-balance text-sm font-normal text-foreground">
                   {item.title}

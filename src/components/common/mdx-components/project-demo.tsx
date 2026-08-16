@@ -15,6 +15,7 @@ import { Icons } from '@/components/ui/icons'
 import { useMediaFallback } from '@/hooks/use-media-fallback'
 import { useSoundEffects } from '@/hooks/use-sound-effects'
 import { canUseHoverPointer } from '@/utils/pointer'
+import { scaledRem } from '@/utils/ui-scale'
 
 interface ProjectDemoProps {
   image?: string
@@ -50,6 +51,10 @@ export function ProjectDemo({ image, video, title }: ProjectDemoProps) {
     setState((prev) => ({ ...prev, ...updates }))
   }, [])
 
+  /**
+   * Shows the controls and starts the five seconds after which they go again. The override exists
+   * because a caller that has just toggled playback knows the new value before state does.
+   */
   const resetHideTimer = useCallback(
     (isPlayingOverride = state.isPlaying) => {
       if (hideTimerRef.current) clearTimeout(hideTimerRef.current)
@@ -65,6 +70,7 @@ export function ProjectDemo({ image, video, title }: ProjectDemoProps) {
     const isPlaying = !state.isPlaying
     media(isPlaying)
     if (isPlaying) {
+      /** A refused play leaves the control showing paused, which is what actually happened */
       videoRef.current.play().catch(() => {
         if (hideTimerRef.current) clearTimeout(hideTimerRef.current)
         updateState({ isPlaying: false, showControls: true })
@@ -89,6 +95,7 @@ export function ProjectDemo({ image, video, title }: ProjectDemoProps) {
     togglePlay()
   }
 
+  /** Where along the bar it was clicked, as a share of the duration */
   const handleSeek = (e: MouseEvent) => {
     e.stopPropagation()
     if (!videoRef.current || time.duration === 0) return
@@ -99,6 +106,7 @@ export function ProjectDemo({ image, video, title }: ProjectDemoProps) {
     resetHideTimer()
   }
 
+  /** Clicking away from the player puts the controls away, rather than waiting out the timer */
   useEffect(() => {
     const handleClickOutside = (e: globalThis.MouseEvent) => {
       if (containerRef.current && !containerRef.current.contains(e.target as Node))
@@ -118,7 +126,7 @@ export function ProjectDemo({ image, video, title }: ProjectDemoProps) {
   return (
     <div className="my-8 w-full not-prose" ref={containerRef}>
       <figure
-        className="group/demo relative isolate m-0 select-none overflow-hidden rounded-xl border border-border/60 bg-surface-40 motion-safe:animate-in motion-safe:fade-in-0 motion-safe:duration-500"
+        className="group/demo relative isolate m-0 select-none overflow-hidden rounded-xl border border-border/60 bg-surface-40 motion-safe:animate-in motion-safe:fade-in-0 motion-safe:duration-500 retina:border-[0.5px]"
         onPointerEnter={(event) => {
           if (!canUseHoverPointer(event.pointerType)) return
 
@@ -266,7 +274,7 @@ export function ProjectDemo({ image, video, title }: ProjectDemoProps) {
               src={image}
               alt={title}
               fill
-              sizes="(max-width: 800px) 100vw, 800px"
+              sizes={`(max-width: ${scaledRem(800)}) 100vw, ${scaledRem(800)}`}
               className="object-cover"
               priority
               ref={imageRef}

@@ -9,10 +9,13 @@ import { useKeyboardShortcut } from '@/hooks/use-keyboard-shortcut'
 import { useSoundEffects } from '@/hooks/use-sound-effects'
 import type { Skill } from '@/types/home'
 
+/** Free dragging with a slow drift that picks itself back up after being dragged */
 const CAROUSEL_OPTIONS = {
   embla: { dragFree: true },
   autoScroll: { stopOnInteraction: false, speed: 0.6 },
 }
+
+/** Both rows are the same carousel, differing only in their contents and which way they drift */
 
 const SHARED_CAROUSEL_PROPS = {
   className: '-my-4 py-4',
@@ -37,7 +40,7 @@ export function Skills() {
   return (
     <section id="skills">
       <div className="relative">
-        <div className="mask-fade-l relative flex flex-col gap-2 py-2">
+        <div className="mask-fade-x relative flex flex-col gap-2 py-2">
           <InfiniteCarousel
             items={skillRows.firstRow}
             direction="backward"

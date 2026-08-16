@@ -29,6 +29,7 @@ export function PronounceMyName({ className, namePronunciationUrl }: PronounceMy
     [hoverTick, preload],
   )
 
+  /** Forced past the sound preference, since pressing this is itself the request to hear it */
   const handlePlayClick = useCallback(() => {
     volumeIconRef.current?.startAnimation()
     play(1, true)
@@ -38,20 +39,22 @@ export function PronounceMyName({ className, namePronunciationUrl }: PronounceMy
 
   return (
     <Tooltip>
-      <TooltipTrigger asChild>
-        <button
-          type="button"
-          onPointerEnter={handlePointerEnter}
-          onClick={handlePlayClick}
-          aria-label={commonContent.pronounceName}
-          className={cn(
-            'relative select-none text-secondary transition-[color,scale] duration-300 after:absolute after:-inset-1 supports-hover:hover:text-primary active:text-primary active:scale-[0.95] active:duration-200',
-            className,
-          )}
-        >
-          <VolumeIcon ref={volumeIconRef} className="size-4.5" />
-        </button>
-      </TooltipTrigger>
+      <TooltipTrigger
+        render={
+          <button
+            type="button"
+            onPointerEnter={handlePointerEnter}
+            onClick={handlePlayClick}
+            aria-label={commonContent.pronounceName}
+            className={cn(
+              'relative select-none text-secondary transition-[color,scale] duration-300 after:absolute after:-inset-1 supports-hover:hover:text-primary active:text-primary active:scale-[0.95] active:duration-200',
+              className,
+            )}
+          >
+            <VolumeIcon ref={volumeIconRef} className="size-4.5" />
+          </button>
+        }
+      />
       <TooltipContent side="top" shortcut="P">
         {commonContent.pronounceName}
       </TooltipContent>

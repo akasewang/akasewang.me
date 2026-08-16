@@ -19,6 +19,7 @@ interface WeeklySummaryTemplateProps {
 
 const VISIBLE_SIGNUPS = 3
 
+/** The styles only this template needs, on top of the shared layout */
 const s = {
   address: {
     margin: 0,

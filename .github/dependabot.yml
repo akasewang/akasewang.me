@@ -15,7 +15,7 @@ updates:
       prefix: chore
       include: scope
     groups:
-      npm-minor-and-patch:
+      pnpm-minor-and-patch:
         applies-to: version-updates
         patterns:
           - "*"
@@ -26,6 +26,11 @@ updates:
       - dependency-name: "*"
         update-types:
           - version-update:semver-major
+      # Pinned to an exact version because a patch is applied to it, and the lockfile binds that
+      # patch to a hash of these exact contents. Any bump, however small, leaves the patch
+      # unappliable and the install fails outright. Raise it by hand together with a regenerated
+      # patch. See pnpm.patchedDependencies in package.json.
+      - dependency-name: brace-expansion
   - package-ecosystem: github-actions
     directory: /
     target-branch: main

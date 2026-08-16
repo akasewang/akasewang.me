@@ -58,6 +58,7 @@ export async function resolveMdxFilePath(baseDir: string, slug: string): Promise
 
     if (relativePath.startsWith('..') || path.isAbsolute(relativePath)) continue
 
+    /** access throws when the candidate is not there, which just means trying the next one */
     try {
       await fs.access(/* turbopackIgnore: true */ p)
       return p

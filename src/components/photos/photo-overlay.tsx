@@ -24,6 +24,8 @@ export function PhotoOverlay({ photo, isOpen, onClose }: PhotoOverlayProps) {
     zoom(false)
     onClose()
   }, [onClose, zoom])
+
+  /** Lets the listener below call the latest close without re-binding on every render */
   const closeFromEffect = useEffectEvent(handleClose)
 
   useEffect(() => {
@@ -55,6 +57,7 @@ export function PhotoOverlay({ photo, isOpen, onClose }: PhotoOverlayProps) {
               layoutId={`photo-${photo.id}`}
               transition={ZOOM_EASE}
               className="relative z-10 flex transform-gpu overflow-hidden bg-surface-20 shadow-2xl"
+              /** As large as it goes without cropping, bounded by whichever edge runs out first */
               style={{
                 aspectRatio: `${photo.width} / ${photo.height}`,
                 width: `min(90vw, calc(90vh * ${photo.width} / ${photo.height}))`,

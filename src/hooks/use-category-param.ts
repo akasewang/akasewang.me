@@ -37,6 +37,10 @@ export function useCategoryParam<T extends string>(categories: CategoryOptions<T
         params.set('category', category)
       }
 
+      /**
+       * replaceState rather than the router, since a filter is not a place to go back to and a
+       * navigation would re-render the route for what is only a change of query string.
+       */
       const query = params.toString()
       window.history.replaceState(null, '', query ? `${pathname}?${query}` : pathname)
     },

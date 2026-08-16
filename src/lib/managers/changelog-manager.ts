@@ -10,10 +10,12 @@ import { formatTime } from '@/utils/utils'
  * on a page that anyone can hit.
  */
 const COMMITS_API_URL = `${GITHUB_REPO_URL}/commits`
-const COMMITS_PER_PAGE = 100
 
+/** 100 is the most GitHub will return at once, and three pages is as far back as the page goes */
+const COMMITS_PER_PAGE = 100
 const MAX_PAGES = 3
 
+/** An hour, which is often enough for a changelog and rare enough to stay well inside the API quota */
 const REVALIDATE_SECONDS = 3600
 
 interface GithubCommitEntry {
@@ -45,6 +47,7 @@ function toChangelogCommit(entry: GithubCommitEntry, date: Date): ChangelogCommi
   for (let line of rest) {
     line = line.trim()
 
+    /** A blank line closes the block it follows and leaves one gap behind, never two */
     if (!line) {
       if (currentBlock.length > 0) {
         blocks.push(currentBlock.join('\n'))
@@ -53,11 +56,13 @@ function toChangelogCommit(entry: GithubCommitEntry, date: Date): ChangelogCommi
       if (blocks.length > 0 && blocks[blocks.length - 1] !== '') {
         blocks.push('')
       }
+      /** A bullet starts a block of its own, whatever came before it */
     } else if (line.startsWith('- ') || line.startsWith('* ')) {
       if (currentBlock.length > 0) {
         blocks.push(currentBlock.join('\n'))
       }
       currentBlock = [line]
+      /** Anything else is a continuation of the block being built */
     } else {
       currentBlock.push(line)
     }
@@ -67,6 +72,7 @@ function toChangelogCommit(entry: GithubCommitEntry, date: Date): ChangelogCommi
     blocks.push(currentBlock.join('\n'))
   }
 
+  /** A message ending in blank lines would otherwise render as trailing space */
   if (blocks.length > 0 && blocks[blocks.length - 1] === '') {
     blocks.pop()
   }

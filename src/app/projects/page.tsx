@@ -30,7 +30,7 @@ export default async function ProjectsPage() {
     <PageLayout
       title={projectsPageContent.title}
       subtitle={projectsPageContent.subtitle}
-      footerText="If you liked these, wait until you see what I build next."
+      footerText={projectsPageContent.footerText}
       breadcrumb={breadcrumbJsonLd}
     >
       <Suspense fallback={null}>

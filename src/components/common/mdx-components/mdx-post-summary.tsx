@@ -4,7 +4,7 @@ import { cn } from '@/utils/utils'
 import { MDX_COMPONENTS } from './mdx-config'
 
 interface MdxPostSummaryProps {
-  excerpt: string
+  excerpt?: string
   linkLabel: string
   links?: { label: string; url: string }[]
   keywords?: string[]
@@ -21,7 +21,9 @@ export function MdxPostSummary({
 }: MdxPostSummaryProps) {
   return (
     <div className="space-y-2">
-      <p className="text-pretty text-sm leading-relaxed text-muted-foreground">{excerpt}</p>
+      {excerpt && (
+        <p className="text-pretty text-sm leading-relaxed text-muted-foreground">{excerpt}</p>
+      )}
 
       {!!links?.length && (
         <div className="flex flex-wrap items-center text-sm leading-relaxed text-muted-foreground">

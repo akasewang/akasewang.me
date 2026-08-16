@@ -6,11 +6,13 @@ import { db } from '@/lib/db/drizzle'
 import { adminOtp } from '@/lib/db/schema'
 import { sha256Hex } from '@/lib/sha256'
 
+/** How long a code lives, how many guesses it allows, and how often a new one can be asked for */
 export const OTP_TTL_MINUTES = 10
 const OTP_TTL_MS = OTP_TTL_MINUTES * 60 * 1000
 export const OTP_MAX_ATTEMPTS = 5
 const REISSUE_INTERVAL_MS = 60 * 1000
 
+/** Compared in constant time, so the comparison itself gives nothing away about the code */
 const hashesMatch = (a: string, b: string) => {
   const left = Buffer.from(a, 'hex')
   const right = Buffer.from(b, 'hex')

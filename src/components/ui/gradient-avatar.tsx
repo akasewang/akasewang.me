@@ -7,6 +7,7 @@ const NOISE_BG = `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='ht
 
 interface GradientAvatarProps {
   name: string
+  /** What the avatar measures at the reader's base size, before the interface scale is applied */
   size?: number
   className?: string
 }
@@ -28,12 +29,13 @@ export const GradientAvatar = memo(function GradientAvatar({
   return (
     <div
       style={{
-        width: size,
-        height: size,
+        /** In rem so the avatar grows with the names beside it rather than holding a flat size */
+        width: `${size / 16}rem`,
+        height: `${size / 16}rem`,
         backgroundImage: `linear-gradient(${angle}deg, ${colors[0]}, ${colors[1]})`,
       }}
       className={cn(
-        'relative flex shrink-0 items-center justify-center overflow-hidden rounded-full ring-1 ring-inset ring-white/30',
+        'relative flex shrink-0 items-center justify-center overflow-hidden rounded-full ring-1 ring-inset ring-white/30 retina:ring-[0.5px]',
         className,
       )}
     >

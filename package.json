@@ -1,23 +1,26 @@
 {
   "name": "akashdewangan",
   "version": "2.0.0",
+  "packageManager": "pnpm@10.13.1",
   "license": "CC-BY-NC-SA-4.0",
   "private": true,
   "scripts": {
-    "dev": "tsx tools/dev-server.ts",
+    "dev": "node --import tsx tools/dev-server.ts",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint \"src/**/*.{ts,tsx}\"",
+    "lint": "eslint \"src/**/*.{ts,tsx}\" \"tools/**/*.{ts,tsx,mts}\"",
     "typecheck": "tsc --noEmit",
+    "test:dev-server": "tsx --test tools/dev-server.test.ts",
+    "test:initial-loader": "tsx --test tools/initial-loader.test.ts",
     "format": "biome format --write .",
-    "security:audit": "npm audit --package-lock-only --audit-level=info",
+    "format:check": "biome format .",
+    "security:audit": "pnpm audit --audit-level=low",
     "email": "tsx tools/email-preview.ts -p 3001",
     "db:push": "drizzle-kit push",
-    "postinstall": "node tools/patch-brace-expansion.mjs",
     "prepare": "git config core.hooksPath .githooks || exit 0"
   },
   "dependencies": {
-    "@base-ui/react": "^1.6.0",
+    "@base-ui/react": "^1.7.0",
     "@neondatabase/serverless": "^1.0.2",
     "@phosphor-icons/react": "^2.1.10",
     "@react-email/components": "^1.0.12",
@@ -29,45 +32,51 @@
     "embla-carousel": "^8.6.0",
     "embla-carousel-auto-scroll": "^8.6.0",
     "embla-carousel-react": "^8.6.0",
-    "framer-motion": "^12.35.2",
+    "framer-motion": "^12.43.0",
     "js-yaml": "^4.2.0",
-    "next": "^16.2.12",
+    "next": "^16.3.0",
     "next-mdx-remote": "^6.0.0",
-    "react": "^19.2.4",
-    "react-dom": "^19.2.4",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
     "rehype-highlight": "^7.0.2",
     "remark-gfm": "^4.0.1",
-    "resend": "^6.10.0",
+    "resend": "^6.18.1",
     "rss": "^1.2.2",
     "server-only": "^0.0.1",
-    "simplex-noise": "^4.0.3",
     "sonner": "^2.0.7",
     "tailwind-merge": "^3.5.0",
     "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.5.0",
+    "@biomejs/biome": "^2.5.7",
     "@tailwindcss/postcss": "^4.2.1",
     "@types/js-yaml": "^4.0.9",
-    "@types/node": "^24.13.2",
-    "@types/react": "^19.2.14",
-    "@types/react-dom": "^19.2.3",
+    "@types/node": "^24.13.3",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.4",
     "@types/rss": "^0.0.32",
-    "brace-expansion": "5.0.9",
     "drizzle-kit": "^0.31.10",
     "eslint": "^9.39.5",
-    "eslint-config-next": "^16.2.12",
+    "eslint-config-next": "^16.3.0",
     "postcss": "^8.5.15",
     "qrcode": "^1.5.4",
     "tailwindcss": "^4.2.1",
-    "tsx": "^4.22.4",
+    "tsx": "^4.23.7",
     "typescript": "^6.0.3"
   },
-  "overrides": {
-    "brace-expansion": "5.0.9",
-    "esbuild": "0.28.1",
-    "postcss": "^8.5.15",
-    "sharp": "0.35.3",
-    "ws": "^8.21.0"
+  "pnpm": {
+    "overrides": {
+      "brace-expansion": "5.0.9",
+      "esbuild": "0.28.1",
+      "postcss": "^8.5.15",
+      "sharp": "0.35.3"
+    },
+    "patchedDependencies": {
+      "brace-expansion@5.0.9": "patches/brace-expansion@5.0.9.patch"
+    },
+    "onlyBuiltDependencies": [
+      "esbuild",
+      "unrs-resolver"
+    ]
   }
 }

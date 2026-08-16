@@ -44,16 +44,23 @@ interface TabInteraction {
   source: 'hover' | 'press'
 }
 
+/** The corner the tabs sit against, and the room kept clear of it at either end of the strip */
 const PANEL_RADIUS = 10
-
 const EDGE_PADDING = PANEL_RADIUS + 4
 
+/** However tightly the tabs are stacked, this much of each one stays reachable */
 const MIN_TAB_VISIBLE = 24
 
+/** How far an unselected tab leans away when the pointer is on it */
 const HOVER_SLIDE = 12
 
+/** More tabs are tucked further under each other, up to a limit */
 const baseOverlap = (count: number) => Math.min(16, 8 + count * 2)
 
+/**
+ * How far a hovered tab can lean before it would run off its end of the strip, which is what stops
+ * the first and last tabs from leaning out of view.
+ */
 const hoverShift = (
   tab: HTMLElement,
   list: HTMLElement | null,
@@ -82,6 +89,7 @@ export const Tabs = ({ items, defaultIndex = 0, className, children }: TabsProps
   const [interaction, setInteraction] = useState<TabInteraction | null>(null)
   const [direction, setDirection] = useState(1)
   const [overlap, setOverlap] = useState(() => baseOverlap(2))
+
   const listRef = useRef<HTMLDivElement | null>(null)
 
   const validChildren = useMemo(
@@ -89,6 +97,7 @@ export const Tabs = ({ items, defaultIndex = 0, className, children }: TabsProps
     [children],
   )
 
+  /** Which way the panels travel is decided here, from the tab moved to against the one left */
   const handleValueChange = useCallback(
     (val: string) => {
       select()
@@ -100,6 +109,7 @@ export const Tabs = ({ items, defaultIndex = 0, className, children }: TabsProps
     [select, activeIndex],
   )
 
+  /** A default index past the end of the tabs given falls back to the first rather than nothing */
   const safeIndex = activeIndex >= 0 && activeIndex < validChildren.length ? activeIndex : 0
   const activeNode = validChildren[safeIndex]
 
@@ -195,7 +205,7 @@ export const Tabs = ({ items, defaultIndex = 0, className, children }: TabsProps
                     interaction?.source === 'press' ? SPRING_TRANSITION : SMOOTH_SPRING_TRANSITION
                   }
                   className={cn(
-                    'relative flex shrink-0 items-center justify-center whitespace-nowrap rounded-t-lg border border-b-0 border-border/60 px-5 pt-1.5 pb-2 font-mono text-xs font-medium lowercase transition-[color,background-color,box-shadow] duration-300',
+                    'relative flex shrink-0 items-center justify-center whitespace-nowrap rounded-t-lg border border-b-0 border-border/60 px-5 pt-1.5 pb-2 font-mono text-xs font-medium lowercase transition-[color,background-color,box-shadow] duration-300 retina:border-[0.5px] retina:border-b-0',
                     isSelected
                       ? 'bg-code-tab text-primary'
                       : 'bg-code-tab-bar text-muted-foreground supports-hover:hover:text-foreground active:text-foreground',
@@ -217,7 +227,7 @@ export const Tabs = ({ items, defaultIndex = 0, className, children }: TabsProps
       <m.div
         animate={{ height: panelHeight }}
         transition={SWIPE_TRANSITION}
-        className="relative z-[200] -mt-px overflow-hidden rounded-xl border border-border/60 bg-code-tab shadow-t-sm"
+        className="relative z-[200] -mt-px overflow-hidden rounded-xl border border-border/60 bg-code-tab retina:border-[0.5px]"
       >
         <AnimatePresence mode="popLayout" initial={false} custom={direction}>
           <BaseTabs.Panel

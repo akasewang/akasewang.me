@@ -2,19 +2,16 @@
 
 import { AnimatePresence, m, type Variants } from 'framer-motion'
 import { usePathname } from 'next/navigation'
-import { type ReactNode, useEffect, useLayoutEffect, useRef, useState } from 'react'
-import { NAV_AXIS } from '@/constants/navigation'
+import { type ReactNode, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import {
   PAGE_ARRIVAL_TIMEOUT_MS,
   PAGE_ENTER_TRANSITION,
   PAGE_EXIT_TRANSITION,
-  PAGE_REVEAL_TRANSITION,
   PAGE_SLIDE_X,
   PAGE_SLIDE_Y,
-  REVEAL_ARRIVAL_TIMEOUT_MS,
-  REVEAL_PAGE_LIFT,
 } from '@/constants/ui'
 import { PageArrivalContext } from '@/hooks/use-page-arrival'
+import { type PageTravel, resolvePageTravel } from '@/utils/page-transition'
 import { getSiblingDirection } from '@/utils/route-direction'
 import { flushScrollReset, markRouteChange, takeOverScrollRestoration } from '@/utils/route-scroll'
 import { FrozenRouter } from './frozen-router'
@@ -22,73 +19,29 @@ import { FrozenRouter } from './frozen-router'
 /** A layout effect on the client, a plain one on the server, where layout effects do not run */
 const useIsomorphicLayoutEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect
 
-/** Which way a page moves: along which axis, in which direction, and whether this is the first load */
-interface Travel {
-  axis: 'x' | 'y'
-  sign: number
-  opening: boolean
-}
-
-/** Where a path sits in the navbar's running order, matching a section and everything beneath it */
-const sectionIndexOf = (path: string) =>
-  NAV_AXIS.findIndex((route) =>
-    route === '/' ? path === '/' : path === route || path.startsWith(`${route}/`),
-  )
-
-/** 0 for a section's own page, 1 for anything inside it, which is what makes going in feel deeper */
-const depthOf = (path: string) => (NAV_AXIS.some((route) => route === path) ? 0 : 1)
-
-/**
- * Works out which way the page should travel, so movement matches where the visitor went.
- *
- * Moving between sections travels sideways in the order the navbar draws them, so a link to the
- * right of the current one arrives from the right. Moving into or out of a section travels
- * vertically instead, going down into a post and back up out of it. Between siblings, where
- * neither section nor depth changes, the direction is taken from whichever arrow was used.
- */
-const resolveTravel = (from: string | null, to: string): Travel => {
-  if (from === null) return { axis: 'y', sign: -1, opening: true }
-
-  const fromIndex = sectionIndexOf(from)
-  const toIndex = sectionIndexOf(to)
-
-  if (fromIndex !== -1 && toIndex !== -1 && fromIndex !== toIndex) {
-    return { axis: 'x', sign: toIndex > fromIndex ? 1 : -1, opening: false }
-  }
-
-  const depthDelta = depthOf(to) - depthOf(from)
-  if (depthDelta !== 0) return { axis: 'y', sign: depthDelta > 0 ? 1 : -1, opening: false }
-
-  if (fromIndex !== -1 && fromIndex === toIndex) {
-    return { axis: 'x', sign: getSiblingDirection(), opening: false }
-  }
-
-  return { axis: 'x', sign: to > from ? 1 : -1, opening: false }
-}
-
 /**
  * Where a page waits, rests and leaves for, read from the travel worked out above.
  *
- * The first load is its own case: the page lifts into place under the opening curtain instead of
- * sliding in from an edge. Otherwise a page enters from the side it is travelling from and leaves
- * towards the opposite one, so the outgoing and incoming pages move together as one.
+ * The first load is already in place beneath the fading loader. Otherwise a page enters from the
+ * side it is travelling from and leaves towards the opposite one, so the outgoing and incoming
+ * pages move together as one.
  */
 const PAGE_VARIANTS: Variants = {
-  enter: ({ axis, sign, opening }: Travel) =>
+  enter: ({ axis, sign, opening }: PageTravel) =>
     opening
-      ? { opacity: 0, x: 0, y: REVEAL_PAGE_LIFT }
+      ? { opacity: 1, x: 0, y: 0 }
       : {
           opacity: 1,
           x: axis === 'x' ? `${sign * PAGE_SLIDE_X}vw` : 0,
           y: axis === 'y' ? `${sign * PAGE_SLIDE_Y}vh` : 0,
         },
-  center: ({ opening }: Travel) => ({
+  center: ({ opening }: PageTravel) => ({
     opacity: 1,
     x: 0,
     y: 0,
-    transition: opening ? PAGE_REVEAL_TRANSITION : PAGE_ENTER_TRANSITION,
+    transition: opening ? { duration: 0 } : PAGE_ENTER_TRANSITION,
   }),
-  exit: ({ axis, sign }: Travel) => ({
+  exit: ({ axis, sign }: PageTravel) => ({
     opacity: 0,
     x: axis === 'x' ? `${-sign * PAGE_SLIDE_X}vw` : 0,
     y: axis === 'y' ? `${-sign * PAGE_SLIDE_Y}vh` : 0,
@@ -100,8 +53,11 @@ const PAGE_VARIANTS: Variants = {
  * Puts the arriving page at the scroll position it should open at, once it is actually mounted.
  * Renders nothing, existing only to run at the point in the tree where that is true.
  */
-function ArrivalScrollReset() {
-  useEffect(flushScrollReset, [])
+function ArrivalScrollReset({ path, onMount }: { path: string; onMount: (path: string) => void }) {
+  useIsomorphicLayoutEffect(() => {
+    onMount(path)
+    return flushScrollReset()
+  }, [onMount, path])
 
   return null
 }
@@ -118,16 +74,23 @@ function ArrivalScrollReset() {
 export function PageTransition({ children }: { children: ReactNode }) {
   const pathname = usePathname()
   const shellRef = useRef<HTMLDivElement>(null)
-  const leavingRef = useRef(pathname)
+  const requestedPathRef = useRef(pathname)
+  const visiblePathRef = useRef(pathname)
   const [entry, setEntry] = useState(() => ({
     path: pathname,
-    travel: resolveTravel(null, pathname),
+    travel: resolvePageTravel(null, pathname),
   }))
   const [isArriving, setIsArriving] = useState(true)
   const [settledPath, setSettledPath] = useState<string | null>(null)
+  const handleArrivalMount = useCallback((mountedPath: string) => {
+    visiblePathRef.current = mountedPath
+  }, [])
 
   if (entry.path !== pathname) {
-    setEntry({ path: pathname, travel: resolveTravel(entry.path, pathname) })
+    setEntry({
+      path: pathname,
+      travel: resolvePageTravel(entry.path, pathname, getSiblingDirection(entry.path, pathname)),
+    })
     setIsArriving(true)
     setSettledPath(null)
   }
@@ -135,10 +98,10 @@ export function PageTransition({ children }: { children: ReactNode }) {
   useEffect(takeOverScrollRestoration, [])
 
   useIsomorphicLayoutEffect(() => {
-    if (leavingRef.current === entry.path) return
+    if (requestedPathRef.current === entry.path) return
 
-    markRouteChange(leavingRef.current, entry.path)
-    leavingRef.current = entry.path
+    markRouteChange(visiblePathRef.current, entry.path)
+    requestedPathRef.current = entry.path
   }, [entry.path])
 
   useEffect(() => {
@@ -152,13 +115,13 @@ export function PageTransition({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!isArriving) return
 
-    const timer = setTimeout(
-      () => setIsArriving(false),
-      entry.travel.opening ? REVEAL_ARRIVAL_TIMEOUT_MS : PAGE_ARRIVAL_TIMEOUT_MS,
-    )
+    const arrivingPath = entry.path
+    const timer = setTimeout(() => {
+      if (requestedPathRef.current === arrivingPath) setIsArriving(false)
+    }, PAGE_ARRIVAL_TIMEOUT_MS)
 
     return () => clearTimeout(timer)
-  }, [isArriving, entry.travel.opening])
+  }, [isArriving, entry.path])
 
   const isTravellingVertically = isArriving && entry.travel.axis === 'y' && !entry.travel.opening
 
@@ -197,21 +160,22 @@ export function PageTransition({ children }: { children: ReactNode }) {
     <div ref={shellRef}>
       <AnimatePresence mode="wait" custom={entry.travel}>
         <m.div
-          key={pathname}
+          key={entry.path}
           custom={entry.travel}
           variants={PAGE_VARIANTS}
           initial="enter"
           animate="center"
           exit="exit"
-          className="w-full will-change-transform"
+          className="w-full"
+          style={{ willChange: isArriving ? 'transform, opacity' : undefined }}
           onAnimationComplete={(definition) => {
-            if (definition === 'center') setSettledPath(pathname)
+            if (definition === 'center') setSettledPath(entry.path)
           }}
         >
           <PageArrivalContext.Provider value={isArriving}>
             <FrozenRouter>{children}</FrozenRouter>
           </PageArrivalContext.Provider>
-          <ArrivalScrollReset />
+          <ArrivalScrollReset path={entry.path} onMount={handleArrivalMount} />
         </m.div>
       </AnimatePresence>
     </div>

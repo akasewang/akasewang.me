@@ -36,8 +36,9 @@ approach for category-only filters.
   lists. It synchronizes URL parameters and prefetches counts, taking each item's key from
   `countKeyFor` so a project that links away is prefetched and sorted on its visit count rather than
   on a page view count it can never accumulate.
-- **`useVisits`:** Records a project being opened, for projects that live somewhere else. See the
-  View Counter in the [overview](overview.md).
+- **`useVisits`:** Records an external project when a card or command result actually opens its
+  destination; rendering either surface does not count. See the View Counter in the
+  [overview](overview.md).
 - **`useCategoryParam`:** Shares category-only URL state across catalog, skills and photos. The
   first configured category is the default and is omitted from the URL.
 - **`useMediaFallback`:** Tracks whether a media file named in frontmatter actually loaded, which is
@@ -49,3 +50,16 @@ approach for category-only filters.
   element as custom properties and coalesced into an animation frame, so pointer movement re-renders
   nothing, and the drift is bounded by the hover zoom. See the Card Media Lean in the [UI
   notes](ui.md).
+- **`useScrollOverflow`:** Attaches a callback ref to a scroll viewport, marks it only while content
+  actually overflows and maintains the CSS mask variables required by browsers without scroll-driven
+  animation timelines. Resize and mutation observers cover content and container changes; teardown
+  removes observers, listeners and inline variables.
+- **`useKeyboardShortcut`:** Registers one document listener for a key combination and reads the
+  latest callback through an Effect Event. It ignores key repeat, IME composition and events already
+  claimed by another interaction. The command menu uses it for Ctrl/Command+K without duplicating
+  global listeners when state changes.
+- **`usePageArriving` and `useArrivedWithPage`:** Both read the route-transition context, and the
+  difference between them is when. `usePageArriving` follows it, so layout measurement, visibility
+  observers and media playback can wait until the incoming page has settled instead of reacting to
+  temporary translated geometry. `useArrivedWithPage` captures it once at mount, so an element that
+  came in on a page slide stays put rather than animating itself again the moment the slide ends.

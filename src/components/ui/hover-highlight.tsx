@@ -65,7 +65,7 @@ export function HoverHighlight({ parentRef }: HoverHighlightProps) {
   return (
     <m.div
       style={style}
-      className="pointer-events-none absolute left-0 top-0 z-0 rounded-xl bg-accent shadow-sm ring-1 ring-accent-border retina:ring-[0.5px]"
+      className="pointer-events-none absolute left-0 top-0 rounded-xl bg-accent shadow-sm ring-1 ring-accent-border retina:ring-[0.5px]"
     />
   )
 }

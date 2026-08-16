@@ -25,7 +25,7 @@ export function EmptyState({ title, message, children, className }: EmptyStatePr
         </h3>
       )}
 
-      <p className="max-w-[320px] text-balance text-sm font-medium leading-relaxed text-muted-foreground/50">
+      <p className="max-w-80 text-balance text-sm font-medium leading-relaxed text-muted-foreground/50">
         {message}
       </p>
 

@@ -1,6 +1,10 @@
 import { PageLayout } from '@/components/layout/page-layout'
+import { SkeletonCategoryFilter } from '@/components/skeletons/shared'
 import { Skeleton } from '@/components/ui/skeleton'
 import { catalogPageContent } from '@/data/content/catalog-content'
+
+const ENTRY_WIDTHS = ['w-1/2', 'w-2/5', 'w-3/5', 'w-[45%]']
+const AUTHOR_WIDTHS = ['w-24', 'w-32', 'w-20', 'w-28']
 
 /** Shown while the catalog loads, laid out to match it so nothing shifts when the real content arrives */
 export default function Loading() {
@@ -8,24 +12,22 @@ export default function Loading() {
     <PageLayout
       title={catalogPageContent.title}
       subtitle={catalogPageContent.subtitle}
-      footerText="That's a wrap. Now, what should I read or watch next?"
+      footerText={catalogPageContent.footerText}
     >
       <div className="space-y-8">
-        <div className="flex flex-wrap items-center gap-1.5 border-b border-border/40 pb-3">
-          <Skeleton className="h-7 w-16 rounded-full bg-surface-30" />
-          <Skeleton className="h-7 w-20 rounded-full bg-surface-20" />
-          <Skeleton className="h-7 w-24 rounded-full bg-surface-20" />
-          <Skeleton className="h-7 w-16 rounded-full bg-surface-20" />
-        </div>
+        <SkeletonCategoryFilter widths={['w-12', 'w-20', 'w-24', 'w-16']} />
 
-        <div className="flex flex-col">
-          {Array.from({ length: 8 }).map((_, i) => (
-            <div
-              key={i}
-              className="flex items-baseline justify-between gap-4 border-b border-border py-3 font-mono last:border-0"
-            >
-              <Skeleton className="h-4 w-1/2 rounded bg-surface-30" />
-              <Skeleton className="h-3.5 w-24 rounded bg-surface-20" />
+        <div className="flex flex-col gap-6">
+          {Array.from({ length: 9 }).map((_, index) => (
+            <div key={index} className="flex items-baseline justify-between gap-4">
+              <Skeleton
+                tone="strong"
+                className={`h-3.5 ${ENTRY_WIDTHS[index % ENTRY_WIDTHS.length]}`}
+              />
+              <Skeleton
+                tone="muted"
+                className={`h-3.5 shrink-0 ${AUTHOR_WIDTHS[index % AUTHOR_WIDTHS.length]}`}
+              />
             </div>
           ))}
         </div>

@@ -4,7 +4,7 @@ import { usePathname } from 'next/navigation'
 import { Icons } from '@/components/ui/icons'
 import { Link } from '@/components/ui/route-link'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
-import { SITE, USERNAME } from '@/constants/constants'
+import { GITHUB_URL } from '@/constants/constants'
 import { NAV_ROUTES, type NavRoute } from '@/constants/navigation'
 import { navbarContent } from '@/data/content/layout-content'
 import { useAudioPreference } from '@/hooks/use-audio-preference'
@@ -13,6 +13,10 @@ import { useKeyboardShortcut } from '@/hooks/use-keyboard-shortcut'
 import { useSoundEffects } from '@/hooks/use-sound-effects'
 import { cn } from '@/utils/utils'
 
+/**
+ * The routes come from the navigation constant, which also fixes the order the page transition
+ * travels in. Only the label and the icon are added here, so the two cannot fall out of step.
+ */
 const NAV_ITEM_DETAILS: Record<NavRoute, { label: string; Icon: typeof Icons.blogs }> = {
   '/blogs': { label: navbarContent.blogs, Icon: Icons.blogs },
   '/projects': { label: navbarContent.projects, Icon: Icons.projects },
@@ -34,8 +38,11 @@ export function Navbar() {
     shortCount: formattedStarsShort,
     fullCount: formattedStarsFull,
   } = useGithubStars()
-  const githubUrl = `https://github.com/${USERNAME}/${SITE}`
 
+  /**
+   * The order matters at both ends. Switching on has to happen before the sound so it is allowed to
+   * play, and switching off has to play first or the confirmation is silenced by its own action.
+   */
   const handleAudioToggle = () => {
     const nextAudioEnabled = !isAudioEnabled
 
@@ -49,11 +56,12 @@ export function Navbar() {
     setAudioEnabled(false)
   }
 
+  /** The three shortcuts the tooltips advertise: sound, the source and the feed */
   useKeyboardShortcut('f1', handleAudioToggle)
 
   useKeyboardShortcut('g', () => {
     navigateSound()
-    window.open(githubUrl, '_blank', 'noopener,noreferrer')
+    window.open(GITHUB_URL, '_blank', 'noopener,noreferrer')
   })
 
   useKeyboardShortcut('r', () => {
@@ -92,75 +100,82 @@ export function Navbar() {
                     : 'text-secondary supports-hover:hover:text-primary active:text-primary',
                 )}
               >
+                {/** Words where there is room for them, icons where there is not */}
                 <span className="hidden md:block">{label}</span>
                 <Icon className="size-4.5 md:hidden" />
               </Link>
             ))}
 
             <Tooltip>
-              <TooltipTrigger asChild>
-                <a
-                  href={githubUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="GitHub Repository"
-                  onMouseEnter={hoverLink}
-                  onClick={navigateSound}
-                  className={cn(
-                    ICON_BUTTON_STYLES,
-                    'group hidden md:flex',
-                    '-ml-[10px]',
-                    githubStars !== null && 'w-auto px-2.5',
-                  )}
-                >
-                  <div className="flex items-center gap-1.5">
-                    <Icons.github className="size-4.5" />
-                    {formattedStarsShort !== null && (
-                      <span className="inline-flex items-center justify-center rounded-none bg-muted px-1.5 py-0.5 font-mono text-[11px] font-medium leading-none text-secondary transition-colors duration-200 supports-hover:group-hover:bg-muted/80 supports-hover:group-hover:text-primary">
-                        {formattedStarsShort}
-                      </span>
+              <TooltipTrigger
+                render={
+                  <a
+                    href={GITHUB_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="GitHub Repository"
+                    onMouseEnter={hoverLink}
+                    onClick={navigateSound}
+                    className={cn(
+                      ICON_BUTTON_STYLES,
+                      'group hidden md:flex',
+                      '-ml-1.5',
+                      githubStars !== null && 'w-auto px-2.5',
                     )}
-                  </div>
-                </a>
-              </TooltipTrigger>
+                  >
+                    <div className="flex items-center gap-1.5">
+                      <Icons.github className="size-4.5" />
+                      {formattedStarsShort !== null && (
+                        <span className="inline-flex items-center justify-center rounded-none bg-muted px-1.5 py-0.5 font-mono text-2xs font-medium leading-none text-secondary transition-colors duration-200 supports-hover:group-hover:bg-muted/80 supports-hover:group-hover:text-primary">
+                          {formattedStarsShort}
+                        </span>
+                      )}
+                    </div>
+                  </a>
+                }
+              />
               <TooltipContent side="bottom" shortcut="G">
                 {formattedStarsFull !== null ? `${formattedStarsFull} Stars` : 'Source Code'}
               </TooltipContent>
             </Tooltip>
 
             <Tooltip>
-              <TooltipTrigger asChild>
-                <button
-                  type="button"
-                  aria-label={isAudioEnabled ? 'Turn sound effects off' : 'Turn sound effects on'}
-                  aria-pressed={isAudioEnabled}
-                  aria-keyshortcuts="f1"
-                  onMouseEnter={hoverLink}
-                  onClick={handleAudioToggle}
-                  className={cn(ICON_BUTTON_STYLES, '-ml-[7px] md:-ml-[17px]')}
-                >
-                  <AudioIcon className="size-4.5" />
-                </button>
-              </TooltipTrigger>
+              <TooltipTrigger
+                render={
+                  <button
+                    type="button"
+                    aria-label={isAudioEnabled ? 'Turn sound effects off' : 'Turn sound effects on'}
+                    aria-pressed={isAudioEnabled}
+                    aria-keyshortcuts="f1"
+                    onMouseEnter={hoverLink}
+                    onClick={handleAudioToggle}
+                    className={cn(ICON_BUTTON_STYLES, '-ml-1.75 md:-ml-4.25')}
+                  >
+                    <AudioIcon className="size-4.5" />
+                  </button>
+                }
+              />
               <TooltipContent side="bottom" shortcut="F1">
                 {isAudioEnabled ? 'Sound Effects On' : 'Sound Effects Off'}
               </TooltipContent>
             </Tooltip>
 
             <Tooltip>
-              <TooltipTrigger asChild>
-                <a
-                  href="/feed.xml"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="RSS Feed"
-                  onMouseEnter={hoverLink}
-                  onClick={navigateSound}
-                  className={cn(ICON_BUTTON_STYLES, '-ml-[15px]')}
-                >
-                  <Icons.rss className="size-[22px]" />
-                </a>
-              </TooltipTrigger>
+              <TooltipTrigger
+                render={
+                  <a
+                    href="/feed.xml"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="RSS Feed"
+                    onMouseEnter={hoverLink}
+                    onClick={navigateSound}
+                    className={cn(ICON_BUTTON_STYLES, '-ml-3.75')}
+                  >
+                    <Icons.rss className="size-5.5" />
+                  </a>
+                }
+              />
               <TooltipContent side="bottom" shortcut="R">
                 RSS Feed
               </TooltipContent>

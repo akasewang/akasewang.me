@@ -1,0 +1,11 @@
+diff --git a/dist/commonjs/index.js b/dist/commonjs/index.js
+index 869a6bee23807b9f01c18c99ab8e952b4b242f97..626c020f541f7a672075f7b64c36344f896f5460 100644
+--- a/dist/commonjs/index.js
++++ b/dist/commonjs/index.js	
+@@ -286,4 +286,6 @@ function expand_(str, max, maxLength, isTop) {
+     }
+     return acc;
+ }
++// Legacy minimatch compatibility: older releases expect the module itself to be callable.
++module.exports = Object.assign(exports.expand, exports);
+ //# sourceMappingURL=index.js.map

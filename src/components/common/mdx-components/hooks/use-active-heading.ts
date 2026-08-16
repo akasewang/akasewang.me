@@ -19,6 +19,7 @@ export function useActiveHeading(items: TocItem[], offset = 120): string {
   useEffect(() => {
     if (!items.length) return
 
+    /** Resolved once. A heading listed in the contents but missing from the page is dropped here */
     const headingElements = items
       .map((item) => ({ id: item.id, el: document.getElementById(item.id) }))
       .filter((h): h is { id: string; el: HTMLElement } => h.el !== null)
@@ -35,6 +36,7 @@ export function useActiveHeading(items: TocItem[], offset = 120): string {
 
           if (isAtBottom && headingElements.length > 0) {
             current = headingElements[headingElements.length - 1].id
+            /** Walked backwards, so the first match is the last heading to have passed the line */
           } else {
             for (let i = headingElements.length - 1; i >= 0; i--) {
               if (headingElements[i].el.getBoundingClientRect().top <= offset) {

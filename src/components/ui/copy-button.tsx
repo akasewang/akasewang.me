@@ -13,7 +13,10 @@ interface CopyButtonProps extends HTMLMotionProps<'button'> {
   copied?: boolean
 }
 
-/** Copies its value and briefly swaps to a tick, so the click is acknowledged */
+/**
+ * Copies its value and briefly swaps to a tick, so the click is acknowledged. Passing copied takes
+ * that state over, for a caller that copies something of its own and only wants the button's face.
+ */
 export function CopyButton({
   value,
   iconSize = 14,
@@ -27,6 +30,7 @@ export function CopyButton({
   const isCopied = controlledCopied ?? internalCopied
   const resetTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
+  /** Unmounting mid tick would otherwise leave the reset to fire on a gone component */
   useEffect(() => {
     return () => {
       if (resetTimerRef.current) clearTimeout(resetTimerRef.current)
@@ -35,6 +39,7 @@ export function CopyButton({
 
   const handleCopy = async (e: React.MouseEvent<HTMLButtonElement>) => {
     onClick?.(e)
+    /** Nothing to do if the caller handled it or owns the copied state itself */
     if (e.defaultPrevented || controlledCopied !== undefined) return
 
     try {

@@ -1,6 +1,6 @@
 import { type ClassValue, clsx } from 'clsx'
 import { format, isToday, isValid, isYesterday, parse } from 'date-fns'
-import { twMerge } from 'tailwind-merge'
+import { extendTailwindMerge } from 'tailwind-merge'
 import {
   CAPITALIZE_REGEX,
   DATE_DISPLAY_FORMAT,
@@ -13,6 +13,20 @@ import {
   TEXT_MONTH_YEAR_REGEX,
   YEAR_REGEX,
 } from '../constants/constants'
+
+/**
+ * The theme's own font sizes, which tailwind-merge has no way to know about.
+ *
+ * `text-` prefixes both a size and a colour, so an unlisted `text-2xs` is read as a colour and the
+ * `text-secondary` beside it silently wins. Listing them keeps the two from cancelling out.
+ */
+const twMerge = extendTailwindMerge({
+  extend: {
+    classGroups: {
+      'font-size': [{ text: ['4xs', '3xs', '2xs', 'xs-plus'] }],
+    },
+  },
+})
 
 /** Merges class strings and lets later Tailwind utilities win over earlier conflicting ones */
 export function cn(...inputs: ClassValue[]) {
@@ -61,10 +75,12 @@ export function parseDate(dateStr?: string | Date): string {
   return (parseAnyDate(dateStr) || new Date()).toISOString()
 }
 
+/** Capitalises what someone typed into a name field, without touching the rest of their spelling */
 export function capitalizeName(name: string): string {
   return name.replace(CAPITALIZE_REGEX, (c) => c.toUpperCase())
 }
 
+/** A clock time in the site's lowercase voice, as used on message board bubbles and commits */
 export function formatTime(date: Date): string {
   return format(date, 'h:mm a').toLowerCase()
 }
@@ -119,6 +135,7 @@ export function generateGradientFromName(name: string) {
   }
   hash = Math.abs(hash)
 
+  /** The fractional part of a large sine, which is a cheap deterministic spread from one seed */
   const random = (seedOffset: number) => {
     const x = Math.sin(hash + seedOffset) * 10000
     return x - Math.floor(x)
@@ -131,6 +148,7 @@ export function generateGradientFromName(name: string) {
   const c2 = getColor(20)
   const c3 = getColor(30)
 
+  /** One of three shapes, chosen by the same seed so a given name always gets the same one */
   const patternType = random(40)
   const angle = Math.floor(random(50) * 360)
   const posX = Math.floor(random(60) * 100)

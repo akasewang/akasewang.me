@@ -1,8 +1,7 @@
 import { PageLayout } from '@/components/layout/page-layout'
-import { Skeleton } from '@/components/ui/skeleton'
+import { SkeletonCategoryFilter } from '@/components/skeletons/shared'
+import { SKILL_CHIP_WIDTHS, SkillCardSkeleton } from '@/components/skeletons/skill-card'
 import { skillsPageContent } from '@/data/content/skills-content'
-
-const CHIP_WIDTHS = ['w-14', 'w-20', 'w-16', 'w-24', 'w-18', 'w-22', 'w-16', 'w-20']
 
 /** Shown while the skills grid loads, laid out to match it so nothing shifts when the real content arrives */
 export default function Loading() {
@@ -10,27 +9,17 @@ export default function Loading() {
     <PageLayout
       title={skillsPageContent.title}
       subtitle={skillsPageContent.subtitle}
-      footerText="That's the stack. No more, no less (well, maybe a little more)."
+      footerText={skillsPageContent.footerText}
     >
       <div className="space-y-8">
-        <div className="flex flex-wrap items-center gap-1.5 border-b border-border/40 pb-3">
-          <Skeleton className="h-7 w-16 rounded-full bg-surface-30" />
-          <Skeleton className="h-7 w-24 rounded-full bg-surface-20" />
-          <Skeleton className="h-7 w-20 rounded-full bg-surface-20" />
-          <Skeleton className="h-7 w-20 rounded-full bg-surface-20" />
-        </div>
+        <SkeletonCategoryFilter widths={['w-12', 'w-24', 'w-20', 'w-20']} />
 
         <div className="flex flex-wrap gap-2.5">
-          {Array.from({ length: 24 }).map((_, i) => (
-            <div
-              key={i}
-              className="inline-flex items-center gap-1.5 rounded-lg bg-surface-20/50 px-2.5 py-1.5 ring-1 ring-inset ring-ring/40"
-            >
-              <Skeleton className="size-[13px] shrink-0 rounded-sm bg-surface-30" />
-              <Skeleton
-                className={`h-3 rounded bg-surface-30/70 ${CHIP_WIDTHS[i % CHIP_WIDTHS.length]}`}
-              />
-            </div>
+          {Array.from({ length: 24 }).map((_, index) => (
+            <SkillCardSkeleton
+              key={index}
+              width={SKILL_CHIP_WIDTHS[index % SKILL_CHIP_WIDTHS.length]}
+            />
           ))}
         </div>
       </div>

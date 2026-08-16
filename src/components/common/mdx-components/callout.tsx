@@ -12,6 +12,10 @@ interface CalloutProps {
   className?: string
 }
 
+/**
+ * One hue per kind of note. Everything else about the callout, the tab, the border, the surface and
+ * the tint behind inline code, is mixed from that hue below rather than being listed per variant.
+ */
 const VARIANTS: Record<
   CalloutType,
   { icon: keyof typeof Icons; label: string; accent: string; hue: string }
@@ -71,7 +75,8 @@ export const Callout = ({ type = 'info', title, children, className }: CalloutPr
         className,
       )}
     >
-      <div className="relative z-0 ml-4 flex w-fit max-w-[calc(100%-2rem)] select-none items-center gap-2 self-start rounded-t-lg border border-b-0 border-[var(--callout-border)] bg-[var(--callout-tab)] px-3 py-1.5">
+      {/** The tab drops its bottom border and sits behind the body, so the two read as one shape */}
+      <div className="relative z-0 ml-4 flex w-fit max-w-[calc(100%-2rem)] select-none items-center gap-2 self-start rounded-t-lg border border-b-0 border-[var(--callout-border)] bg-[var(--callout-tab)] px-3 py-1.5 retina:border-[0.5px] retina:border-b-0">
         <Icon className={cn('size-3.5 shrink-0 opacity-80', accent)} aria-hidden />
         <span id={labelId} className="text-xs font-medium tracking-tight text-primary/90">
           {title ?? label}
@@ -79,7 +84,7 @@ export const Callout = ({ type = 'info', title, children, className }: CalloutPr
       </div>
       <div
         className={cn(
-          'relative z-10 overflow-hidden rounded-xl border border-[var(--callout-border)] bg-[var(--callout-surface)] px-4 py-3 text-pretty text-xs leading-relaxed text-foreground/90 shadow-t-sm',
+          'relative z-10 overflow-hidden rounded-xl border border-[var(--callout-border)] bg-[var(--callout-surface)] px-4 py-3 text-pretty text-xs leading-relaxed text-foreground/90 retina:border-[0.5px]',
           '[&>[role=paragraph]]:my-0 [&>[role=paragraph]+[role=paragraph]]:mt-3 [&_[role=paragraph]]:text-xs',
           '[&>ol]:ml-0 [&>ol]:my-0 [&>ol]:list-decimal [&>ol]:pl-5',
           '[&>ul]:ml-0 [&>ul]:my-0 [&>ul]:list-disc [&>ul]:pl-5',

@@ -4,7 +4,7 @@
  * Gmail, Outlook and Yahoo all drop inline SVG and refuse data URIs, so the one format that
  * actually reaches every inbox is a PNG served from a URL.
  *
- * Run with npx tsx tools/build-email-assets.mts after editing a source file.
+ * Run with pnpm exec tsx tools/build-email-assets.mts after editing a source file.
  *
  * brand-mark.svg sits beside these outputs and is deliberately not one of their sources. It was
  * rasterised for a header the templates no longer carry, and it is kept as the only copy of the

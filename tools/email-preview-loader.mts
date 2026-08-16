@@ -34,11 +34,17 @@ interface LoaderData {
 let generation: Int32Array | null = null
 let watchedPrefix = ''
 
+/** Node hands the loader its shared state here, the counter the watcher bumps on every save */
 export function initialize(data: LoaderData) {
   generation = data.generation
   watchedPrefix = data.watchedPrefix
 }
 
+/**
+ * Re-keys every module under the watched directory with the current generation, which is what makes
+ * a re-import pick a saved file up. Node caches by URL and never lets go, so a changing query is
+ * the only way to be handed a fresh copy.
+ */
 export async function resolve(
   specifier: string,
   context: ResolveContext,

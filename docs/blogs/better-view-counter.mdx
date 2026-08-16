@@ -1,199 +1,400 @@
 ---
 title: 'Building a Better View Counter'
-excerpt: 'How to track and display live post analytics on statically compiled Next.js routes using debounced client batching, session caching and atomic database upserts.'
+excerpt: 'How to add live counts to static Next.js pages with batched client reads, per-tab deduplication, Route Handlers and atomic PostgreSQL upserts.'
 date: '2026-01-05'
-slug: edge-view-counter
 type: technical
-tags: ['nextjs', 'serverless', 'drizzle-orm', 'database']
+
 ---
 
-Statically generated web applications (SSG) are incredibly fast. By compiling your pages into HTML and JSON during the build process, you can serve them directly from a global Content Delivery Network (CDN) with sub millisecond load times.
+A statically generated post can display a live view count without turning every card into a separate database request.
 
-But static sites have a major limitation: **they are static.**
-
-Adding dynamic features (like a view counter that increments every time a reader opens a post) requires bringing in server side operations.
-
-If you implement a view counter naively in Next.js, you'll run into serious performance issues:
-
-- **The Listing Page N+1 Problem**: If your blog listing page displays 10 posts, rendering a view counter for each card can trigger 10 independent database queries during page load, slamming your database connections.
-- **Double Counting**: If a reader refreshes the browser or opens multiple tabs, their view count will artificially tick up, skewing your metrics.
-- **Static Hydration Flashing**: If the page loads static HTML but queries the database on the client, you'll see a jarring visual flicker where the number suddenly jumps from a blank loader to the count.
-
-Here is how I engineered an end to end, edge ready view counting system in my Next.js portfolio that combines **client side debounced batching, session deduplication and atomic Drizzle ORM database upserts.**
-
-## The Core Architecture
-
-To keep the application highly responsive, we separate our view counter into three distinct layers:
+There are two distinct operations: listing cards read counts without changing them, while opening a post increments its count once per browser-tab session. A shared client provider batches the reads, and PostgreSQL handles concurrent writes.
 
 ```text
-[ React Component ] → [ Views Provider (Context) ]
-                            ↓ (Debounces & batches slugs for 50ms)
-                    [ Next.js Server Action ]
-                            ↓ (Single DB roundtrip via inArray)
-                    [ Neon Serverless Postgres ] (Atomic .onConflictDoUpdate)
+[ ViewCounter components ] → [ ViewsProvider ]
+                                  ↓ one batched request
+                          [ Route Handler ]
+                                  ↓ one query
+                            [ PostgreSQL ]
 ```
 
-## 1. Client Side Debounced Batching
+The standalone database examples use Drizzle with the `postgres` driver:
 
-When a user visits `/blogs`, we render a list of cards, each displaying its own view counter.
+```bash
+npm install drizzle-orm postgres server-only
+```
 
-Instead of allowing every [ViewCounter](https://github.com/akasewang/akasewang.me/blob/main/src/components/common/view-counter.tsx) component to fire a database call immediately, they register their slugs with a centralized [ViewsProvider](https://github.com/akasewang/akasewang.me/blob/main/src/components/providers/views-context.tsx).
+## Define the database boundary
 
-The provider waits for `50ms` (`BATCH_DELAY`). If multiple view requests arrive within that window, it aggregates their slugs into a `Set` and fires a **single, unified database query** rather than N individual calls.
+Keep the connection in a server-only module and fail clearly when its environment variable is absent:
 
-Let's examine how the [ViewsProvider](https://github.com/akasewang/akasewang.me/blob/main/src/components/providers/views-context.tsx) implements this:
+```ts title="lib/db.ts"
+import 'server-only'
 
-```tsx title="src/components/providers/views-context.tsx"
-const BATCH_DELAY = 50
+import { drizzle } from 'drizzle-orm/postgres-js'
+import postgres from 'postgres'
+
+const connectionString = process.env.DATABASE_URL
+if (!connectionString) throw new Error('DATABASE_URL is required')
+
+const client = postgres(connectionString, { max: 10 })
+export const db = drizzle(client)
+```
+
+The table has one row per routable slug:
+
+```ts title="lib/schema.ts"
+import { integer, pgTable, varchar } from 'drizzle-orm/pg-core'
+
+export const pageViews = pgTable('page_views', {
+  slug: varchar('slug', { length: 255 }).primaryKey(),
+  count: integer('count').notNull().default(0),
+})
+```
+
+Generate and apply a database migration for this schema before enabling either route. Declaring a Drizzle table in TypeScript does not create it in PostgreSQL.
+
+The data functions validate their input, cap batch size and keep missing rows distinct from failed requests:
+
+```ts title="lib/views.ts"
+import 'server-only'
+
+import { inArray, sql } from 'drizzle-orm'
+import { db } from './db'
+import { pageViews } from './schema'
+
+const slugPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
+
+export function normalizeSlug(value: string): string | null {
+  const slug = value.trim().toLowerCase()
+  return slug.length <= 255 && slugPattern.test(slug) ? slug : null
+}
+
+export async function readViewCounts(values: string[]): Promise<Record<string, number>> {
+  const slugs = [...new Set(values.map(normalizeSlug).filter((slug): slug is string => !!slug))]
+    .slice(0, 100)
+
+  if (slugs.length === 0) return {}
+
+  const rows = await db
+    .select({ slug: pageViews.slug, count: pageViews.count })
+    .from(pageViews)
+    .where(inArray(pageViews.slug, slugs))
+
+  const counts = Object.fromEntries(slugs.map((slug) => [slug, 0]))
+  for (const row of rows) counts[row.slug] = row.count
+  return counts
+}
+
+export async function incrementView(value: string): Promise<number> {
+  const slug = normalizeSlug(value)
+  if (!slug) throw new Error('Invalid slug')
+
+  const [row] = await db
+    .insert(pageViews)
+    .values({ slug, count: 1 })
+    .onConflictDoUpdate({
+      target: pageViews.slug,
+      set: { count: sql`${pageViews.count} + 1` },
+    })
+    .returning({ count: pageViews.count })
+
+  if (!row) throw new Error('View increment returned no row')
+  return row.count
+}
+```
+
+The upsert is one database statement. Two visitors cannot both read the same count and overwrite one another with the same successor.
+
+## Expose bounded Route Handlers
+
+One endpoint can serve batched reads through `POST` and atomic writes through `PUT`. Sending the read batch as JSON avoids request-line limits when many cards mount together:
+
+```ts title="app/api/views/route.ts"
+import { incrementView, normalizeSlug, readViewCounts } from '../../../lib/views'
+
+export async function POST(request: Request): Promise<Response> {
+  const body: unknown = await request.json().catch(() => null)
+  const slugs =
+    body && typeof body === 'object' && 'slugs' in body && Array.isArray(body.slugs)
+      ? body.slugs.filter((value): value is string => typeof value === 'string')
+      : []
+
+  try {
+    return Response.json(
+      { views: await readViewCounts(slugs) },
+      { headers: { 'Cache-Control': 'no-store' } },
+    )
+  } catch (error) {
+    console.error('Unable to read view counts', error)
+    return Response.json({ views: null }, { status: 503 })
+  }
+}
+
+export async function PUT(request: Request): Promise<Response> {
+  const body: unknown = await request.json().catch(() => null)
+  const rawSlug =
+    body && typeof body === 'object' && 'slug' in body && typeof body.slug === 'string'
+      ? body.slug
+      : ''
+  const slug = normalizeSlug(rawSlug)
+
+  if (!slug) return Response.json({ error: 'Invalid slug' }, { status: 400 })
+
+  try {
+    return Response.json({ views: await incrementView(slug) })
+  } catch (error) {
+    console.error('Unable to increment view count', error)
+    return Response.json({ views: null }, { status: 503 })
+  }
+}
+```
+
+Input validation is not abuse prevention. A public counter endpoint should also receive whatever rate limiting, bot filtering and observability match the value of the metric.
+
+## Batch counters that mount together
+
+The provider below is complete: it owns the queue, request lifecycle, result map and per-tab increment marker. Counters only register a slug and read its current state.
+
+```tsx title="views-provider.tsx"
+'use client'
+
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+} from 'react'
+
+type ViewValue = number | null
+type ViewMap = Record<string, ViewValue>
+
+type ViewsContextValue = {
+  views: ViewMap
+  requestViews: (slugs: string[]) => void
+  incrementView: (slug: string) => Promise<void>
+}
+
+const ViewsContext = createContext<ViewsContextValue | null>(null)
+const batchDelay = 50
+const slugPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
+
+function normalizeClientSlug(value: string): string | null {
+  const slug = value.trim().toLowerCase()
+  return slug.length <= 255 && slugPattern.test(slug) ? slug : null
+}
+
+function useViewsContext(): ViewsContextValue {
+  const context = useContext(ViewsContext)
+  if (!context) throw new Error('View counters must be rendered inside ViewsProvider')
+  return context
+}
+
 export function ViewsProvider({ children }: { children: ReactNode }) {
-  const [viewsMap, setViewsMap] = useState<Record<string, number | null>>({})
-  const viewsMapRef = useRef<Record<string, number | null>>({})
-  const [installsMap, setInstallsMap] = useState<Record<string, number | null>>({})
-  const installsMapRef = useRef<Record<string, number | null>>({})
-  const pendingSlugsRef = useRef<Set<string>>(new Set())
-  const fetchingRef = useRef<Set<string>>(new Set())
-  const batchTimeoutRef = useRef<NodeJS.Timeout | null>(null)
-  const prefetchViews = useCallback(
-    async (slugs: string[]) => {
-      let hasNew = false
-      for (const slug of slugs) {
-        if (
-          !(slug in viewsMapRef.current) &&
-          !fetchingRef.current.has(slug) &&
-          !pendingSlugsRef.current.has(slug)
-        ) {
-          pendingSlugsRef.current.add(slug)
-          hasNew = true
+  // My implementation also keeps a short-lived localStorage cache for successful
+  // values. It is an optional paint optimization, so this example omits it.
+  const [views, setViews] = useState<ViewMap>({})
+  const viewsRef = useRef<ViewMap>({})
+  const queued = useRef(new Set<string>())
+  const loading = useRef(new Set<string>())
+  const incrementing = useRef(new Set<string>())
+  const countedThisSession = useRef(new Set<string>())
+  const writeVersions = useRef<Record<string, number>>({})
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  const commit = useCallback((updates: ViewMap) => {
+    const next = { ...viewsRef.current, ...updates }
+    viewsRef.current = next
+    setViews(next)
+  }, [])
+
+  const fetchBatch = useCallback(
+    async (requestedSlugs: string[]) => {
+      const slugs = requestedSlugs.filter((slug) => !incrementing.current.has(slug))
+      if (slugs.length === 0) return
+
+      const versionsAtStart = Object.fromEntries(
+        slugs.map((slug) => [slug, writeVersions.current[slug] ?? 0]),
+      )
+      slugs.forEach((slug) => loading.current.add(slug))
+
+      try {
+        const response = await fetch('/api/views', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ slugs }),
+          cache: 'no-store',
+        })
+        if (!response.ok) throw new Error(`View request failed with ${response.status}`)
+
+        const payload: unknown = await response.json()
+        const rawViews =
+          payload && typeof payload === 'object' && 'views' in payload ? payload.views : null
+        if (!rawViews || typeof rawViews !== 'object') throw new Error('Invalid view response')
+
+        const freshSlugs = slugs.filter(
+          (slug) => (writeVersions.current[slug] ?? 0) === versionsAtStart[slug],
+        )
+        const next = Object.fromEntries(
+          freshSlugs.map((slug) => {
+            const value = (rawViews as Record<string, unknown>)[slug]
+            const validCount =
+              typeof value === 'number' && Number.isSafeInteger(value) && value >= 0
+            return [slug, validCount ? value : null]
+          }),
+        )
+        if (freshSlugs.length > 0) commit(next)
+      } catch {
+        const freshSlugs = slugs.filter(
+          (slug) => (writeVersions.current[slug] ?? 0) === versionsAtStart[slug],
+        )
+        if (freshSlugs.length > 0) {
+          commit(Object.fromEntries(freshSlugs.map((slug) => [slug, null])))
         }
+      } finally {
+        slugs.forEach((slug) => loading.current.delete(slug))
       }
-      if (!hasNew) return
-      if (batchTimeoutRef.current) clearTimeout(batchTimeoutRef.current)
-      batchTimeoutRef.current = setTimeout(() => {
-        const slugsToFetch = Array.from(pendingSlugsRef.current)
-        pendingSlugsRef.current.clear()
-        if (slugsToFetch.length) fetchBatch(slugsToFetch)
-      }, BATCH_DELAY)
+    },
+    [commit],
+  )
+
+  const requestViews = useCallback(
+    (rawSlugs: string[]) => {
+      let added = false
+
+      for (const rawSlug of rawSlugs) {
+        const slug = normalizeClientSlug(rawSlug)
+        if (
+          !slug ||
+          typeof viewsRef.current[slug] === 'number' ||
+          loading.current.has(slug) ||
+          incrementing.current.has(slug) ||
+          queued.current.has(slug)
+        ) {
+          continue
+        }
+        queued.current.add(slug)
+        added = true
+      }
+
+      if (!added || timer.current !== null) return
+
+      timer.current = setTimeout(() => {
+        timer.current = null
+        const slugs = [...queued.current]
+        queued.current.clear()
+        if (slugs.length > 0) void fetchBatch(slugs)
+      }, batchDelay)
     },
     [fetchBatch],
   )
-}
-```
 
-This simple debouncer reduces database connection pressure by up to 90% on high traffic listing pages.
+  const incrementViewForSession = useCallback(
+    async (rawSlug: string) => {
+      const slug = normalizeClientSlug(rawSlug)
+      if (!slug) return
 
-## 2. Preventing Reload Double Counting
+      const sessionKey = `viewed:${slug}`
+      let alreadyCounted = countedThisSession.current.has(slug)
 
-To prevent users from falsely inflating metrics by spamming the browser reload button, we implement a double layer cache system:
-
-1. **`localStorage` (Global Cache)**: We store retrieved view counts in `localStorage` with a `5 minute` TTL (`CACHE_DURATION = 5 * 60 * 1000`). If a user navigates back and forth between pages, we serve view counts instantly from the local cache, eliminating database queries entirely.
-2. **`sessionStorage` (Increment Lock)**: When a user visits an article, we attempt to increment the view count. We write a unique key (`viewed-${slug}`) to the browser's `sessionStorage`. If that key already exists, we know they've already viewed the post during this session, so we fall back to a safe, read only query.
-
-```tsx title="src/components/providers/views-context.tsx"
-const incrementViews = useCallback(
-  async (slug: string) => {
-    const sessionKey = `viewed-${slug}`
-    if (typeof window !== 'undefined' && sessionStorage.getItem(sessionKey)) {
-      requestView(slug)
-      return
-    }
-    try {
-      const data = await incrementViewAction(slug)
-      setViewsMap((prev) => {
-        viewsMapRef.current = { ...prev, [slug]: data.views ?? null }
-        syncCache(viewsMapRef.current, installsMapRef.current)
-        return viewsMapRef.current
-      })
-      if (data.views !== null && typeof window !== 'undefined') {
-        sessionStorage.setItem(sessionKey, 'true')
+      try {
+        alreadyCounted ||= sessionStorage.getItem(sessionKey) === 'true'
+      } catch {
+        // Storage can be unavailable in restricted browser contexts.
       }
-    } catch (error) {
-      console.error('Error incrementing views:', error)
+
+      if (alreadyCounted) {
+        requestViews([slug])
+        return
+      }
+      if (incrementing.current.has(slug)) return
+      incrementing.current.add(slug)
+      queued.current.delete(slug)
+      writeVersions.current[slug] = (writeVersions.current[slug] ?? 0) + 1
+
+      try {
+        const response = await fetch('/api/views', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ slug }),
+        })
+        if (!response.ok) throw new Error(`View increment failed with ${response.status}`)
+
+        const payload = (await response.json()) as { views?: unknown }
+        if (
+          typeof payload.views !== 'number' ||
+          !Number.isSafeInteger(payload.views) ||
+          payload.views < 0
+        ) {
+          throw new Error('Invalid increment response')
+        }
+
+        commit({ [slug]: payload.views })
+        countedThisSession.current.add(slug)
+        try {
+          sessionStorage.setItem(sessionKey, 'true')
+        } catch {
+          // The in-memory marker still prevents duplicates for this provider lifetime.
+        }
+      } catch {
+        commit({ [slug]: null })
+      } finally {
+        incrementing.current.delete(slug)
+      }
+    },
+    [commit, requestViews],
+  )
+
+  useEffect(() => {
+    return () => {
+      if (timer.current !== null) clearTimeout(timer.current)
     }
-  },
-  [requestView],
-)
-```
+  }, [])
 
-## 3. Atomic Database Upserts inside Server Actions
+  const value = useMemo(
+    () => ({ views, requestViews, incrementView: incrementViewForSession }),
+    [incrementViewForSession, requestViews, views],
+  )
 
-On the backend, our Next.js Server Action needs to handle writes securely.
+  return <ViewsContext.Provider value={value}>{children}</ViewsContext.Provider>
+}
 
-If multiple users open the same article simultaneously, standard read and then write code can cause a race condition, where one user overwrites another's increment, losing tracking counts.
+export function useViewCount(slug: string, shouldIncrement = false): ViewValue | undefined {
+  const { incrementView, requestViews, views } = useViewsContext()
+  const normalizedSlug = normalizeClientSlug(slug) ?? ''
 
-To make the operation atomic, we utilize Drizzle ORM to perform a high performance **Upsert** query (`.onConflictDoUpdate()`).
+  useEffect(() => {
+    if (!normalizedSlug) return
+    if (shouldIncrement) void incrementView(normalizedSlug)
+    else requestViews([normalizedSlug])
+  }, [incrementView, normalizedSlug, requestViews, shouldIncrement])
 
-If the slug has never been visited, we insert a new record with `count = 1`. If it has been visited, we increment the count atomically _in the database engine_ using raw SQL: `count = count + 1`.
-
-Let's check the Server Action code inside [views.ts](https://github.com/akasewang/akasewang.me/blob/main/src/lib/actions/views.ts):
-
-```ts title="src/lib/actions/views.ts"
-'use server'
-import { sql } from 'drizzle-orm'
-import { db } from '@/lib/db/drizzle'
-import { views } from '@/lib/db/schema'
-import { logContent } from '@/data/content/log-content'
-export async function incrementViewAction(slug: string) {
-  if (!slug) return { views: null }
-  try {
-    const [result] = await db
-      .insert(views)
-      .values({ slug, count: 1 })
-      .onConflictDoUpdate({
-        target: views.slug,
-        set: { count: sql`${views.count} + 1` },
-      })
-      .returning({ count: views.count })
-    return { views: result?.count ?? 0 }
-  } catch (error) {
-    console.error(logContent.view.incrementError, error)
-    return { views: null }
-  }
+  return normalizedSlug ? views[normalizedSlug] : null
 }
 ```
 
-This single roundtrip handles the insert, update and return queries inside a single, secure database transaction.
+```tsx title="view-counter.tsx"
+'use client'
 
-## 4. High Performance Batch Fetching
+import { useViewCount } from './views-provider'
 
-Similarly, our batch retrieval uses the SQL `IN` operator to fetch all post counts in a single database roundtrip, converting the database response array back into an optimized index map:
+export function ViewCounter({ slug, increment = false }: { slug: string; increment?: boolean }) {
+  const views = useViewCount(slug, increment)
 
-```ts title="src/lib/actions/views.ts"
-import { inArray } from 'drizzle-orm'
-import { logContent } from '@/data/content/log-content'
-export async function getViewsBatchAction(slugs: string[]) {
-  if (!slugs?.length) return { views: {}, installs: {} }
-  try {
-    const result = await db
-      .select({
-        slug: views.slug,
-        count: views.count,
-        installs: views.installs,
-      })
-      .from(views)
-      .where(inArray(views.slug, slugs))
-    const viewsMap: Record<string, number> = Object.fromEntries(slugs.map((slug) => [slug, 0]))
-    const installsMap: Record<string, number> = Object.fromEntries(slugs.map((slug) => [slug, 0]))
-    for (const row of result) {
-      viewsMap[row.slug] = row.count
-      installsMap[row.slug] = row.installs
-    }
-    return { views: viewsMap, installs: installsMap }
-  } catch (error) {
-    console.error(logContent.view.batchFetchError, error)
-    return { views: null, installs: null }
-  }
+  if (views === undefined) return <span aria-label="Loading views">—</span>
+  if (views === null) return <span>Views unavailable</span>
+  return <span>{views.toLocaleString()} views</span>
 }
 ```
 
-<Callout type="success" title="Performance Milestones">
-  * **Zero N+1 DB Queries**: Main blogs page loads arbitrary card lists in exactly one network call.
-  * **Race Condition Free**: Atomic `.onConflictDoUpdate()` protects database integrity from
-  concurrent traffic bursts. * **Offline Resilient**: If the database goes offline or network drops,
-  counters fall back gracefully to a silent, offline badge without throwing runtime page crashes.
-</Callout>
+The map intentionally has three states: `undefined` means no response yet, a number includes a valid zero, and `null` means the request failed. Failures are not mistaken for new posts with no views.
 
-## Summary
+`writeVersions` prevents an older batch read from overwriting a newer increment response. Starting an increment advances that slug's version; a read only commits if the version it captured is still current.
 
-Adding dynamic tracking to a static website doesn't require sacrificing page loading speed or database stability.
+The session marker is written only after a successful increment. This is deliberate deduplication, not unique-visitor analytics: a new tab, browser or cleared session can count again.
 
-By centralizing view state inside a debounced client context, caching counts locally and relying on atomic Upserts inside Server Actions, we can build a highly performant, serverless view tracking system that scales effortlessly from zero to millions of page views.
+Static delivery and live counts do not have to compete. The page remains cacheable because the small changing value arrives through a shared client store, while the server receives one bounded batch read or one atomic write for the work actually requested.

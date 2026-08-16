@@ -3,6 +3,7 @@
 import { m } from 'framer-motion'
 import { useEffect } from 'react'
 import { type HighlightBox, useHighlightBox } from '@/hooks/use-highlight-box'
+import { cn } from '@/utils/utils'
 
 /** The item under the pointer or the keyboard cursor, which is what the box follows */
 const HIGHLIGHTED_ITEM_SELECTOR = '[data-menu-highlight-item][data-highlighted]'
@@ -47,9 +48,11 @@ const boxOf = (el: HTMLElement): HighlightBox => {
 export function MenuHighlight({
   parentRef,
   returnToChecked = false,
+  className,
 }: {
   parentRef: React.RefObject<HTMLElement | null>
   returnToChecked?: boolean
+  className?: string
 }) {
   const { style, moveTo, hide } = useHighlightBox()
 
@@ -69,17 +72,26 @@ export function MenuHighlight({
     }
 
     function measure() {
+      /** What the pointer is on wins, and the checked item is what it falls back to */
       const active =
         root.querySelector<HTMLElement>(HIGHLIGHTED_ITEM_SELECTOR) ??
         root.querySelector<HTMLElement>(CHECKED_ITEM_SELECTOR)
 
       if (!active) {
+        if (activeItem) resizeObserver.unobserve(activeItem)
+        activeItem = null
+        activeBox = null
         zeroBoxRetries = 0
+        hide()
         return
       }
 
       const nextBox = boxOf(active)
 
+      /**
+       * A box with no area means the item is measured before it has been laid out, which happens
+       * on the frame a menu opens. Worth a few more frames rather than hiding on the first look.
+       */
       if (nextBox.right <= nextBox.left || nextBox.bottom <= nextBox.top) {
         if (zeroBoxRetries < MAX_ZERO_BOX_RETRIES) {
           zeroBoxRetries += 1
@@ -91,19 +103,28 @@ export function MenuHighlight({
       }
 
       zeroBoxRetries = 0
+      /** Nothing has actually moved, so the box is left where it is rather than re-animated */
       if (active === activeItem && sameBox(activeBox, nextBox)) return
 
+      /** Only the item being tracked is watched for resizing, and it changes as the box moves */
+      if (activeItem && active !== activeItem) resizeObserver.unobserve(activeItem)
+      if (active !== activeItem) resizeObserver.observe(active)
       activeItem = active
       activeBox = nextBox
       moveTo(nextBox)
     }
 
+    /** The library moves these attributes about, and they are the only signal that it has */
     const observer = new MutationObserver(schedule)
     observer.observe(root, {
       subtree: true,
+      childList: true,
       attributes: true,
       attributeFilter: ['data-highlighted', 'data-selected'],
     })
+
+    const resizeObserver = new ResizeObserver(schedule)
+    resizeObserver.observe(root)
 
     measure()
 
@@ -114,17 +135,25 @@ export function MenuHighlight({
         ? root.querySelector<HTMLElement>(CHECKED_ITEM_SELECTOR)
         : null
 
-      if (!checked) {
-        activeItem = null
-        activeBox = null
-        hide()
+      if (checked) {
+        const nextBox = boxOf(checked)
+        if (activeItem && checked !== activeItem) resizeObserver.unobserve(activeItem)
+        if (checked !== activeItem) resizeObserver.observe(checked)
+        activeItem = checked
+        activeBox = nextBox
+        moveTo(nextBox)
         return
       }
 
-      const nextBox = boxOf(checked)
-      activeItem = checked
-      activeBox = nextBox
-      moveTo(nextBox)
+      const highlighted = root.querySelector<HTMLElement>(HIGHLIGHTED_ITEM_SELECTOR)
+      if (highlighted) {
+        return
+      }
+
+      if (activeItem) resizeObserver.unobserve(activeItem)
+      activeItem = null
+      activeBox = null
+      hide()
     }
 
     root.addEventListener('pointerleave', handlePointerLeave)
@@ -134,6 +163,7 @@ export function MenuHighlight({
 
     return () => {
       observer.disconnect()
+      resizeObserver.disconnect()
       root.removeEventListener('pointerleave', handlePointerLeave)
       cancelAnimationFrame(frame)
       clearTimeout(t1)
@@ -144,7 +174,10 @@ export function MenuHighlight({
   return (
     <m.div
       style={style}
-      className="pointer-events-none absolute left-0 top-0 z-0 rounded-lg bg-overlay-accent ring-1 ring-overlay-accent-border retina:ring-[0.5px]"
+      className={cn(
+        'pointer-events-none absolute left-0 top-0 z-0 rounded-lg bg-overlay-accent ring-1 ring-overlay-accent-border retina:ring-[0.5px]',
+        className,
+      )}
     />
   )
 }

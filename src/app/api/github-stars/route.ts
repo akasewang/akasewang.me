@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { fetchGithub, GITHUB_REPO_URL } from '@/lib/github'
 
+/** One upstream call an hour however many visitors ask, which keeps well inside the API quota */
 export const revalidate = 3600
 
 /**

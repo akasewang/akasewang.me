@@ -5,14 +5,15 @@ import { useEffect, useMemo } from 'react'
 import { EmptyState } from '@/components/common/empty-state'
 import { SectionTitle } from '@/components/layout/section-title'
 import { ProjectCard } from '@/components/projects/project-card'
-import { PROJECT_GRID_CLASS } from '@/components/projects/project-card-skeleton'
 import { useViews } from '@/components/providers/views-context'
+import { PROJECT_GRID_CLASS } from '@/components/skeletons/project-card'
 import { AnimatedListItem } from '@/components/ui/animated-list-item'
 import { ViewAll } from '@/components/ui/view-all'
 import { landingPageContent } from '@/data/content/landing-content'
 import { usePageArriving } from '@/hooks/use-page-arrival'
 import { countKeyFor } from '@/hooks/use-visits'
 import type { ProjectCategory, ProjectPostData } from '@/types/project'
+import { matchesProjectSearch } from '@/utils/project'
 
 interface FeaturedProjectsProps {
   filterType?: ProjectCategory
@@ -33,15 +34,13 @@ export function FeaturedProjects({
   const isArriving = usePageArriving()
   const { prefetchViews } = useViews()
 
+  /** Filters run either way, and only the landing page cuts the result down to four */
   const displayed = useMemo(() => {
     let filtered =
       filterType && filterType !== 'all' ? projects.filter((p) => p.type === filterType) : projects
 
     if (searchQuery) {
-      const query = searchQuery.toLowerCase()
-      filtered = filtered.filter(
-        (p) => p.title.toLowerCase().includes(query) || p.slug.toLowerCase().includes(query),
-      )
+      filtered = filtered.filter((project) => matchesProjectSearch(project, searchQuery))
     }
 
     return isHomePage ? filtered.slice(0, 4) : filtered

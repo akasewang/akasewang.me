@@ -37,6 +37,7 @@ export async function GET() {
       })
     })
 
+    /** Cached at the edge for an hour, and served stale while the next one is built */
     return new Response(feed.xml({ indent: true }), {
       headers: {
         'Content-Type': 'application/xml',
@@ -44,6 +45,7 @@ export async function GET() {
       },
     })
   } catch {
+    /** A reader handles a failed fetch better than it handles a malformed feed */
     return new Response('Error generating feed', { status: 500 })
   }
 }

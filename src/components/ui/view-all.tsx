@@ -25,7 +25,7 @@ export function ViewAll({ href, label, className }: ViewAllProps) {
         className,
       )}
     >
-      <span className="relative after:absolute after:-bottom-0.5 after:left-0 after:h-px after:w-full after:origin-left after:scale-x-0 after:bg-primary after:transition-[transform,scale] after:duration-300 after:ease-out supports-hover:group-hover:after:scale-x-100 group-active:after:scale-x-100">
+      <span className="relative after:absolute after:-bottom-0.5 after:left-0 after:h-px after:w-full after:origin-left after:scale-x-0 after:bg-primary after:transition-[transform,scale] after:duration-300 after:ease-out supports-hover:group-hover:after:scale-x-100 group-active:after:scale-x-100 retina:after:h-[0.5px]">
         {label}
       </span>
       <Icons.arrowForward className="size-3.5 transition-[transform,translate] duration-300 ease-out supports-hover:group-hover:translate-x-0.5 group-active:translate-x-0.5" />

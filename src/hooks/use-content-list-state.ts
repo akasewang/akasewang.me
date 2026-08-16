@@ -57,6 +57,7 @@ export function useContentListState<TItem extends SluggedContent, TCategory exte
   const searchQuery = searchQueryParam
   const sortBy = useMemo(() => (isSortOption(sortParam) ? sortParam : DEFAULT_SORT), [sortParam])
 
+  /** One request for the whole list, so sorting by views has its numbers before it is asked for */
   useEffect(() => {
     prefetchViews(items.map(countKeyFor))
   }, [items, prefetchViews])

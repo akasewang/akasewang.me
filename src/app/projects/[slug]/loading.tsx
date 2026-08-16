@@ -1,53 +1,27 @@
-import { Skeleton } from '@/components/ui/skeleton'
+import { PROJECT_CARD_ASPECT } from '@/components/skeletons/project-card'
+import { SkeletonMdxBody, SkeletonMdxHeader, SkeletonTagRow } from '@/components/skeletons/shared'
+import { Skeleton, SkeletonText } from '@/components/ui/skeleton'
 
 /** Shown while a single project loads, laid out to match it so nothing shifts when the real content arrives */
 export default function Loading() {
   return (
     <div className="relative space-y-6">
-      <div className="flex items-start justify-between gap-4">
-        <div className="space-y-2 flex-1">
-          <Skeleton className="h-8 w-3/4 rounded-md bg-surface-30" />
-          <div className="flex items-center gap-2">
-            <Skeleton className="h-3.5 w-24 rounded bg-surface-20" />
-            <Skeleton className="h-3.5 w-16 rounded bg-surface-20" />
-          </div>
-        </div>
+      <SkeletonMdxHeader metaWidths={['w-24', 'w-16']} />
 
-        <div className="flex items-center gap-1.5 shrink-0">
-          <Skeleton className="size-8 rounded-md bg-surface-20" />
-          <Skeleton className="size-8 rounded-md bg-surface-20" />
-        </div>
+      <div className="space-y-2">
+        <SkeletonText lines={2} tone="muted" lastLineWidth="w-2/3" />
+        <SkeletonTagRow widths={['w-16', 'w-20', 'w-14', 'w-24']} className="pt-2" />
       </div>
-
-      <div className="space-y-3">
-        <Skeleton className="h-4 w-full rounded bg-surface-30/70" />
-        <Skeleton className="h-4 w-5/6 rounded bg-surface-30/70" />
-        <div className="flex items-center gap-2 pt-1">
-          <Skeleton className="h-3.5 w-32 rounded bg-surface-20" />
-          <Skeleton className="h-3.5 w-20 rounded bg-surface-30" />
-        </div>
-        <div className="flex flex-wrap gap-2 pt-1">
-          <Skeleton className="h-6 w-16 rounded-md bg-surface-20 ring-1 ring-inset ring-ring/30" />
-          <Skeleton className="h-6 w-20 rounded-md bg-surface-20 ring-1 ring-inset ring-ring/30" />
-          <Skeleton className="h-6 w-14 rounded-md bg-surface-20 ring-1 ring-inset ring-ring/30" />
-        </div>
-      </div>
-
-      <hr className="border-t border-border" />
 
       <div className="my-8 w-full">
-        <Skeleton className="aspect-video w-full rounded-xl bg-surface-20 ring-1 ring-inset ring-ring/40" />
+        <Skeleton
+          tone="panel"
+          className={`${PROJECT_CARD_ASPECT} w-full rounded-xl ring-1 ring-inset ring-ring/80 retina:ring-[0.5px]`}
+        />
       </div>
 
-      <div className="space-y-4 pt-2">
-        <Skeleton className="h-4 w-full rounded bg-surface-30/60" />
-        <Skeleton className="h-4 w-11/12 rounded bg-surface-30/60" />
-        <Skeleton className="h-4 w-4/5 rounded bg-surface-30/60" />
-        <div className="py-2">
-          <Skeleton className="h-32 w-full rounded-xl bg-surface-20/60 ring-1 ring-inset ring-ring/30" />
-        </div>
-        <Skeleton className="h-4 w-full rounded bg-surface-30/60" />
-        <Skeleton className="h-4 w-5/6 rounded bg-surface-30/60" />
+      <div className="pt-2">
+        <SkeletonMdxBody />
       </div>
     </div>
   )

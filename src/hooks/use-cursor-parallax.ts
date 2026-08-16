@@ -2,19 +2,8 @@
 
 import { type PointerEvent, useCallback, useEffect, useRef } from 'react'
 import { prefersReducedMotion } from '@/utils/motion'
+import { getParallaxOffset, PROJECT_MEDIA_ZOOM } from '@/utils/parallax'
 import { canUseHoverPointer } from '@/utils/pointer'
-
-/**
- * How far the medium drifts at the very edge of the card, as a fraction of the card itself.
- *
- * A fraction rather than a pixel count because the room to move is a fraction too. Scaling a medium
- * that already fills its frame is what creates the slack the drift moves into, and a zoom of 1.03
- * leaves half of that three percent, so 0.015, spare on each side. Drifting further than the zoom
- * has grown slides the medium off its own frame and shows the surface behind it, and since the
- * slack scales with the card while a fixed offset does not, pixels would hold on a wide card and
- * fail on a short one. Staying at four fifths of the slack holds at every size.
- */
-const DRIFT_RATIO = 0.012
 
 /**
  * Leans the medium toward the cursor while it crosses a card.
@@ -27,9 +16,10 @@ const DRIFT_RATIO = 0.012
  * write the paint will actually use, and only for a real mouse: a touch reports a position once on
  * tap, which would jump the medium and leave it there.
  */
-export function useCursorParallax<T extends HTMLElement>() {
+export function useCursorParallax<T extends HTMLElement>(zoom = PROJECT_MEDIA_ZOOM) {
   const ref = useRef<T>(null)
   const frame = useRef<number | null>(null)
+  const pointer = useRef({ x: 0, y: 0 })
 
   const write = useCallback((x: number, y: number) => {
     const element = ref.current
@@ -48,23 +38,27 @@ export function useCursorParallax<T extends HTMLElement>() {
 
   const onPointerMove = useCallback(
     (event: PointerEvent<T>) => {
-      if (!canUseHoverPointer(event.pointerType) || prefersReducedMotion()) return
+      if (!canUseHoverPointer(event.pointerType) || prefersReducedMotion()) {
+        cancel()
+        write(0, 0)
+        return
+      }
 
-      const element = ref.current
-      if (!element) return
+      pointer.current = { x: event.clientX, y: event.clientY }
+      if (frame.current !== null) return
 
-      const { left, top, width, height } = element.getBoundingClientRect()
-      /** -0.5 at one edge through 0 at the centre to 0.5 at the other */
-      const fromCentreX = (event.clientX - left) / width - 0.5
-      const fromCentreY = (event.clientY - top) / height - 0.5
-
-      cancel()
       frame.current = requestAnimationFrame(() => {
         frame.current = null
-        write(fromCentreX * width * DRIFT_RATIO * 2, fromCentreY * height * DRIFT_RATIO * 2)
+
+        const element = ref.current
+        if (!element) return
+
+        const bounds = element.getBoundingClientRect()
+        const offset = getParallaxOffset(pointer.current, bounds, zoom)
+        write(offset.x, offset.y)
       })
     },
-    [cancel, write],
+    [cancel, write, zoom],
   )
 
   /** Settles back to centre on the way out, on the same easing the zoom releases with */
@@ -73,7 +67,15 @@ export function useCursorParallax<T extends HTMLElement>() {
     write(0, 0)
   }, [cancel, write])
 
-  useEffect(() => cancel, [cancel])
+  useEffect(
+    () => () => {
+      cancel()
+      const element = ref.current
+      element?.style.removeProperty('--parallax-x')
+      element?.style.removeProperty('--parallax-y')
+    },
+    [cancel],
+  )
 
   return { ref, onPointerMove, onPointerLeave }
 }

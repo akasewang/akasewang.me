@@ -2,184 +2,115 @@
 title: Why I Avoid Prettier
 excerpt: An honest, developer to developer critique of the industry's default code formatter and why rigid automation sometimes hurts semantic readability, increases pull request noise and degrades developer experience.
 date: '2025-08-15'
-slug: why-i-dont-like-prettier
 type: technical
-tags: ['tooling', 'dx', 'prettier', 'eslint', 'formatting']
+
 ---
 
-If you write JavaScript, TypeScript, HTML or CSS today, you probably use Prettier. It is the undisputed industry standard, integrated by default into almost every repository, boilerplate and starter kit. It promised to solve a persistent developer problem: the endless, exhausting "bikeshedding" over style rules. No more arguments in Pull Requests about tab sizes, semicolon placement or trailing commas.
+Prettier solved a real problem. It gave JavaScript teams one dependable answer to arguments about indentation, semicolons and trailing commas, then made that answer easy to run in an editor or CI job.
 
-Prettier was a massive innovation when it arrived in 2017. But as the JavaScript ecosystem has matured, Prettier's "opinionated" philosophy has drifted from a convenient time saver into a rigid dogma. Its trade offs are rarely discussed, yet they shape how we write and read code every single day.
+I still avoid it in my own projects. This is not because automated formatting is bad; I format on every commit. My objection is narrower: Prettier deliberately discards most of the layout written by the author, and some code becomes harder to read when that layout carried useful information.
 
-Here is why I choose to avoid Prettier on my personal projects and why I advocate for alternative approaches on the teams I work with.
+## Uniform output can erase useful structure
 
-## 1. Uniformity is Not Readability
+Prettier parses a file and prints the resulting syntax tree according to its own rules. That produces consistent output, but it cannot know why an author aligned a configuration table or grouped related values.
 
-Prettier’s core design philosophy is: **there is only one way to print any given AST (Abstract Syntax Tree).** It ignores the original layout, formatting or spacing of the code you wrote, parses it into a syntax tree and prints it back according to its internal stylesheet rules.
+<Tabs items={["Semantic Layout", "Prettier's Output"]}>
+  <Tab title="Semantic Layout">
+    Alignment makes the coordinates and anchors easy to scan as columns:
 
-While this ensures total uniformity, it overlooks a crucial reality: **code formatting is semantic.**
-
-As developers, we use visual structure, vertical alignment and spacing to convey intent and highlight relationships in our logic. Prettier sees none of this. It only sees nodes in a tree.
-
-For example, when writing coordinate mappings, theme definitions or configuration objects, aligning elements vertically into a "table" makes the structure instantly readable. Prettier aggressively flattens and destroys these visual cues.
-
-<Tabs items={["My Semantic Layout", "Prettier's Output"]}>
-  <Tab title="My Semantic Layout">
-    We align keys and values so they can be easily scanned and cross referenced at a glance:
-
-    ```ts title="src/config/alignments.ts"
-    const VIEWPORT_ALIGNMENTS = {
-      top:    { x: 0.5, y: 0.0, anchor: 'center-top' },
-      center: { x: 0.5, y: 0.5, anchor: 'center'      },
-      bottom: { x: 0.5, y: 1.0, anchor: 'center-bottom' }
-    };
+    ```ts title="semantic-alignments.ts"
+    export const VIEWPORT_ALIGNMENTS = {
+      top:    { x: 0.5, y: 0.0, anchor: 'center-top'    },
+      center: { x: 0.5, y: 0.5, anchor: 'center'        },
+      bottom: { x: 0.5, y: 1.0, anchor: 'center-bottom' },
+    }
     ```
-
-    Each coordinate column forms a neat vertical line, making it trivial to spot mistakes or verify values.
-
   </Tab>
   <Tab title="Prettier's Output">
-    Prettier flattens the custom spacing, turning it into a uniform block:
+    The same object becomes a regular block:
 
-    ```ts title="src/config/alignments.ts"
-    const VIEWPORT_ALIGNMENTS = {
+    ```ts title="formatted-alignments.ts"
+    export const VIEWPORT_ALIGNMENTS = {
       top: { x: 0.5, y: 0.0, anchor: "center-top" },
       center: { x: 0.5, y: 0.5, anchor: "center" },
       bottom: { x: 0.5, y: 1.0, anchor: "center-bottom" },
     };
     ```
-
-    The columns collapse. Scanning down the `anchor` list now requires your eyes to jump back and forth horizontally.
-
   </Tab>
 </Tabs>
 
-In large configuration tables or state machines, losing vertical structure destroys your ability to skim. By prioritizing syntactic uniformity over human readability, Prettier forces you to read _more_ slowly.
+The second version is not objectively wrong. For ordinary application code, its predictability is often more valuable than manual alignment. In tables, matrices and state maps, however, the first version exposes relationships that syntax alone does not.
 
-## 2. The Line Length Cliff (The Print Width Tyranny)
+Recent Prettier versions do preserve a multiline object when there is a newline before its first property. That heuristic helps with compact-versus-expanded layout, but it does not retain column alignment or most spacing used to express relationships within the object.
 
-Prettier uses a strict line length limit (`printWidth`, defaulting to 80 characters) to determine when to wrap code. However, instead of treating this as a _maximum bound_, it treats it as a binary pivot point for formatting structures.
+Prettier offers `// prettier-ignore` for such cases, but that comment excludes the entire following syntax node. The formatter no longer fixes indentation, spacing or punctuation inside the ignored block. I would rather preserve an intentional multiline shape while still normalizing the details around it.
 
-If your statement fits in 79 characters, Prettier might keep it on a single line. If you add one character to make it 81, Prettier doesn't just wrap the final expression. It completely restructures the code, exploding it vertically into a cascade of single argument lines.
-
-This is known as the **"Line Length Cliff."**
-
-<Tabs items={["79 Characters", "81 Characters"]}>
-  <Tab title="79 Characters">
-    A concise, readable, single line function call that fits perfectly on your screen:
-
-    ```ts title="src/api/fetch-user.ts"
-    const response = await fetchUserData(userId, { includeProfile: true, active: false });
-    ```
-
-  </Tab>
-  <Tab title="81 Characters">
-    Adding a small parameter (`verbose: true`) pushes the line length to 81. Prettier violently breaks it apart:
-
-    ```ts title="src/api/fetch-user.ts"
-    const response = await fetchUserData(userId, {
-      includeProfile: true,
-      active: false,
-      verbose: true,
-    });
-    ```
-
-  </Tab>
-</Tabs>
-
-This vertical explosion leads to two major issues:
-
-1. **Unnecessary Vertical Churn**: It inflates the size of files, forcing you to scroll constantly. Simple nested structures turn into a sea of single closing braces and parentheses that occupy valuable screen real estate.
-2. **Noise in Pull Requests**: When a tiny edit pushes a line over the `printWidth` threshold, the resulting diff is massive. A simple variable rename can cause a 1 line change to register as a 10 line rewrite, making code reviews far more tedious.
-
-<Callout type="warn" title="Why other ecosystems don't have this problem">
-  Formatters in other modern languages, like Go's `gofmt` or Rust's `rustfmt`, are significantly
-  smarter. They respect developer authored line breaks. If you choose to put a list on one line,
-  they leave it. If you break it into multiple lines, they keep it multiline and align the spacing.
-  They clean up indentation and style *without* destroying the structural layout.
-</Callout>
-
-## 3. The All or Nothing "Ignore" Hammer
-
-When Prettier makes a block of code unreadable, how do you fix it? Your only choice is to add a disable comment:
-
-```ts title="src/utils/matrix.ts"
-const matrix = [
+```ts title="matrix.ts"
+// prettier-ignore
+export const matrix = [
   [1, 0, 0],
   [0, 1, 0],
-  [0, 0, 1]
-];
+  [0, 0, 1],
+]
 ```
 
-This works, but it is a blunt, all or nothing instrument. By putting `// prettier-ignore` above a block, you are telling the formatter to completely step away.
+## `printWidth` creates noisy diffs
 
-From that point onward, Prettier will not format spacing, trailing commas, quotes or alignment inside that block. If a developer makes a copy paste mistake or introduces messy indentation within the ignored block, it stays messy forever unless manually fixed.
+Prettier describes [`printWidth`](https://prettier.io/docs/options#print-width) as a target rather than a hard maximum, but crossing that target can still cause a structure to choose a different layout. A small edit may turn a compact constructor call into several lines:
 
-There is no middle ground. You cannot tell Prettier: _"Please format this block, but respect the line breaks I wrote."_
+<Tabs items={["Compact Call", "Expanded Call"]}>
+  <Tab title="Compact Call">
 
-It demands complete submission: either let Prettier rewrite the structure entirely or lose formatting assistance altogether.
+    ```ts title="compact-search-params.ts"
+    export const params = new URLSearchParams({ includeProfile: 'true', active: 'false' })
+    ```
+  </Tab>
+  <Tab title="Expanded Call">
 
-## 4. The ESLint and Tooling Tax
+    ```ts title="expanded-search-params.ts"
+    export const params = new URLSearchParams({
+      includeProfile: 'true',
+      active: 'false',
+      verbose: 'true',
+    })
+    ```
+  </Tab>
+</Tabs>
 
-Because Prettier insists on enforcing stylistic choices (like semicolon presence, quote styles and trailing commas) rather than strictly handling formatting (like indentation and whitespacing), it occupies the same conceptual space as a linter.
+The expanded form may be clearer, especially as the options grow. The cost appears in diffs: adding one property can replace the original line and introduce several new ones. Rename a symbol or change a type upstream and more unrelated lines may move. Reviewers then have to separate the semantic edit from formatter churn.
 
-This has resulted in a multi year coordination nightmare between ESLint and Prettier.
+This is not a reason to preserve every hand-wrapped line forever. It is a reason to prefer formatters that use existing line breaks as an input when the author has already chosen a readable shape.
 
-Historically, to get them to work together without fighting, developers had to install:
+## Formatting should not complicate linting
 
-1. `prettier`
-2. `eslint`
-3. `eslint-config-prettier` (to turn off ESLint's stylistic rules)
-4. `eslint-plugin-prettier` (to run Prettier _as_ an ESLint rule)
+ESLint and Prettier have different purposes. ESLint analyzes code for problems; Prettier prints code. Friction starts when stylistic ESLint rules disagree with Prettier's output.
 
-Running Prettier inside ESLint is notoriously slow. Because they both parse and build independent Abstract Syntax Trees, compiling huge projects under this setup adds significant overhead.
+A common setup has included several moving parts:
+
+1. `eslint` for analysis
+2. `prettier` for formatting
+3. `eslint-config-prettier` to disable conflicting lint rules
+4. sometimes `eslint-plugin-prettier` to report formatting differences through ESLint
+
+Running Prettier as an ESLint rule is no longer the only or recommended way to combine them, but repositories still inherit that arrangement. It makes failures less clear and asks two tools to parse the same files during one lint command.
 
 ```text
-  [ Source Code File ]
-           |
-     +-----|----------+
-     ↓ (Parse AST)    ↓ (Parse AST)
-[ ESLint Parser ]  [ Prettier Parser ]
-     ↓ (Reports to)   ↓ (Feeds errors to)
- [ ESLint CLI ]  ←  [ eslint-plugin-prettier ]
-     ↑
-     +-------- (Disables stylistic rules) ---- [ eslint-config-prettier ]
+  [ Source File ]
+       |       |
+       v       v
+  [ ESLint ] [ Prettier ]
+       |       |
+       +--- CI + editor integrations
 ```
 
-Furthermore, resolving IDE discrepancies where the VSCode ESLint plugin disagrees with the Prettier extension is a rite of passage for every modern web developer. This tooling friction is an unnecessary tax on development speed.
+A separate `format` command avoids much of this problem. A unified tool avoids it altogether.
 
-<Callout type="info" title="Linters vs. Formatters">
-  A linter's job is **semantic analysis** (finding bugs, unused variables, unsafe practices). A
-  formatter's job is **layout alignment** (fixing tabs, spaces, clean indentations). Prettier's
-  decision to overlap with styling rules is what caused this long standing battle.
-</Callout>
+## What I use instead
 
-## 5. What We Should Be Doing Instead
+My current preference is [Biome](https://biomejs.dev). It provides formatting, linting and import organization through one fast binary. The formatter is still opinionated, and it does not preserve every layout I write, but the combined setup is smaller and easier to keep consistent across the command line, editor and commit hooks.
 
-Fortunately, we are no longer in 2017. The tooling landscape has advanced dramatically and we have access to high performance, unified engines that respect developer intent while enforcing consistent standards.
+Projects that need ESLint's plugin ecosystem can keep ESLint and use [ESLint Stylistic](https://eslint.style) for configurable style rules. That approach offers more control, although a large rule set also means the team owns more configuration and must decide which rules are worth enforcing.
 
-If you are starting a new project, consider these alternatives:
+Neither option is universally better than Prettier. A large team may reasonably choose Prettier because eliminating formatting decisions is more valuable than preserving occasional semantic alignment. Generated code and broad open-source projects also benefit from a formatter contributors already know.
 
-### Alternative A: Biome
-
-[Biome](https://biomejs.dev) is a modern, unified toolchain for web projects, written in Rust. It does the job of ESLint, Prettier and import sorting in a single tool and it is incredibly fast (often 20x to 100x faster than Prettier).
-
-But more importantly, Biome's formatter is designed with deep empathy for developers:
-
-- It respects your line break layout: if you break code onto multiple lines, it preserves that layout while cleaning up spacing.
-- It features an incredibly robust, zero configuration linting and formatting setup.
-- It is a single CLI dependency, eliminating the config coordination nightmare.
-
-### Alternative B: ESLint Stylistic
-
-If you prefer to keep ESLint as your primary tool, you can migrate to [ESLint Stylistic](https://eslint.style). This is a community driven initiative that provides dedicated, non conflicting stylistic rules for formatting.
-
-By using ESLint Stylistic, you get formatting, linting and style enforcement in **a single pass** of a single AST parser. It gives you precise control over your code style, allowing you to configure the specific exceptions and alignment behaviors that Prettier outlaws.
-
-## Summary
-
-Automation is supposed to serve the developer, not the other way around.
-
-When a tool forces you to write worse code, verticalizes clean expressions and bloats Git history just to satisfy its rigid AST printing engine, it’s time to re evaluate why we adopted it.
-
-Uniformity is a noble goal, but it shouldn't come at the cost of clarity, readability and performance. By moving away from Prettier in favor of tools that respect developer intent, we can keep our codebases clean _and_ readable.
+For my projects, the balance falls elsewhere. I want automation to clean routine syntax without treating every author-selected line break as disposable. Consistency matters, but it is a means to readable code, not a substitute for it.

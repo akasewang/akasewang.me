@@ -1,6 +1,6 @@
 'use client'
 
-import { useRouter } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { SocialShare } from '@/components/common/mdx-components/social-share'
@@ -47,6 +47,7 @@ export function SlugNavigation({ prev, next, basePath, content, url, title }: Sl
     error: errorSound,
   } = useSoundEffects()
   const router = useRouter()
+  const pathname = usePathname()
   const [copied, setCopied] = useState(false)
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
@@ -56,6 +57,7 @@ export function SlugNavigation({ prev, next, basePath, content, url, title }: Sl
     }
   }, [])
 
+  /** Copies the post's own markdown rather than the rendered page, source and all */
   const handleCopy = async () => {
     try {
       await navigator.clipboard.writeText(content)
@@ -74,9 +76,14 @@ export function SlugNavigation({ prev, next, basePath, content, url, title }: Sl
   const navigateTo = (item: NavItem | undefined, direction: 1 | -1) => {
     if (!item) return
 
-    markSiblingDirection(direction)
+    /**
+     * Recorded before the push, since two posts are siblings and the router alone cannot tell
+     * which way the reader went. The page transition reads this to slide the right way.
+     */
+    const href = `${basePath}/${item.slug}`
+    markSiblingDirection(direction, pathname, href)
     navigateSound()
-    router.push(`${basePath}/${item.slug}`, { scroll: false })
+    router.push(href, { scroll: false })
   }
 
   useKeyboardShortcut('c', handleCopy, { shiftKey: true })
@@ -88,26 +95,35 @@ export function SlugNavigation({ prev, next, basePath, content, url, title }: Sl
 
     return (
       <Tooltip>
-        <TooltipTrigger asChild>
-          <Link
-            href={item ? `${basePath}/${item.slug}` : ''}
-            className={cn(BUTTON_BASE_STYLES, item ? BUTTON_ACTIVE_STYLES : BUTTON_DISABLED_STYLES)}
-            onClick={(e) => {
-              if (!item) e.preventDefault()
-              else {
-                markSiblingDirection(direction === 'next' ? 1 : -1)
-                navigateSound()
-              }
-            }}
-            onMouseEnter={item ? hoverTick : undefined}
-            aria-disabled={!item}
-          >
-            <Icon size={18} />
-          </Link>
-        </TooltipTrigger>
+        <TooltipTrigger
+          render={
+            <Link
+              href={item ? `${basePath}/${item.slug}` : ''}
+              className={cn(
+                BUTTON_BASE_STYLES,
+                item ? BUTTON_ACTIVE_STYLES : BUTTON_DISABLED_STYLES,
+              )}
+              onClick={(e) => {
+                if (!item) e.preventDefault()
+                else {
+                  markSiblingDirection(
+                    direction === 'next' ? 1 : -1,
+                    pathname,
+                    `${basePath}/${item.slug}`,
+                  )
+                  navigateSound()
+                }
+              }}
+              onMouseEnter={item ? hoverTick : undefined}
+              aria-disabled={!item}
+            >
+              <Icon size={18} />
+            </Link>
+          }
+        />
         {item && (
           <TooltipContent side="bottom" align="center" sideOffset={6} shortcut={<Icon size={10} />}>
-            <span className="max-w-[200px] line-clamp-1">{item.title}</span>
+            <span className="max-w-50 line-clamp-1">{item.title}</span>
           </TooltipContent>
         )}
       </Tooltip>
@@ -117,16 +133,18 @@ export function SlugNavigation({ prev, next, basePath, content, url, title }: Sl
   return (
     <div className="hidden md:flex items-center gap-1.5 shrink-0">
       <Tooltip>
-        <TooltipTrigger asChild>
-          <CopyButton
-            value={content}
-            copied={copied}
-            iconSize={18}
-            className={cn(BUTTON_BASE_STYLES, BUTTON_ACTIVE_STYLES)}
-            onClick={handleCopy}
-            aria-label="Copy content"
-          />
-        </TooltipTrigger>
+        <TooltipTrigger
+          render={
+            <CopyButton
+              value={content}
+              copied={copied}
+              iconSize={18}
+              className={cn(BUTTON_BASE_STYLES, BUTTON_ACTIVE_STYLES)}
+              onClick={handleCopy}
+              aria-label="Copy content"
+            />
+          }
+        />
         <TooltipContent side="bottom" align="center" sideOffset={6} shortcut={['Shift', 'C']}>
           Copy content
         </TooltipContent>
@@ -134,7 +152,7 @@ export function SlugNavigation({ prev, next, basePath, content, url, title }: Sl
 
       {url && title && <SocialShare url={url} title={title} />}
 
-      <div className="mx-1 h-4 border-l border-border" />
+      <div className="mx-1 h-4 border-l border-border retina:border-l-[0.5px]" />
 
       {renderNavButton(prev, 'prev')}
       {renderNavButton(next, 'next')}

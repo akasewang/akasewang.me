@@ -19,8 +19,7 @@ interface ProjectPeriod {
  * The frontmatter of one project, as written at the top of its MDX file. Everything optional may
  * simply be left out of the file.
  *
- * A project with external set opens there instead of at its own page, and one marked preview shows
- * as unreleased work rather than as a finished card.
+ * A project with external set opens there instead of at its own page.
  */
 export interface ProjectPostData {
   title: string
@@ -29,7 +28,6 @@ export interface ProjectPostData {
   slug: string
   type?: ProjectCategory
   period?: ProjectPeriod
-  preview?: boolean
   external?: string
   links?: ProjectLink[]
   tech?: string[]

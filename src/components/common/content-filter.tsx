@@ -16,7 +16,10 @@ interface ContentFilterProps<T extends string> {
   placeholder?: string
 }
 
-/** The search field and sort control above a filtered list */
+/**
+ * The whole filter bar above a list: search and sort on one line, categories under it. Holds no
+ * state of its own, so the page above it can keep all three in the URL.
+ */
 export function ContentFilter<T extends string>({
   searchQuery,
   onSearchChange,

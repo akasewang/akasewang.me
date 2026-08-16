@@ -29,7 +29,7 @@ export const education: TimelineItemProps[] = [
   },
   {
     id: 'general-k-12-education',
-    title: 'General [K-12] Education',
+    title: 'General (K-12) Education',
     startDate: '04.2007',
     endDate: '07.2021',
     description: [

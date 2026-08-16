@@ -29,6 +29,7 @@ export function useAdmin() {
 
     syncState()
     window.addEventListener(TOGGLE_EVENT, syncState)
+    /** The cookie can expire or be signed out elsewhere while the tab sits idle */
     window.addEventListener('focus', syncState)
 
     return () => {
@@ -38,6 +39,7 @@ export function useAdmin() {
     }
   }, [])
 
+  /** Both of these announce the change so every other copy of the hook in this tab re-syncs */
   const loginAdmin = useCallback(async (code: string) => {
     const result = await signInAdmin(code)
     setIsAdmin(result.success)

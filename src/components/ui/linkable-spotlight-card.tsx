@@ -1,7 +1,6 @@
 'use client'
 
 import type { ReactNode } from 'react'
-import type { SpotlightMoveState } from '@/hooks/use-spotlight'
 import { SpotlightCard } from './spotlight'
 
 interface LinkableSpotlightCardProps {
@@ -9,7 +8,6 @@ interface LinkableSpotlightCardProps {
   className?: string
   href?: string
   onActivate?: () => void
-  onSpotlightMove?: (state: SpotlightMoveState) => void
   outerSize?: number
   revealLayer?: ReactNode
 }
@@ -23,7 +21,6 @@ export function LinkableSpotlightCard({
   className,
   href,
   onActivate,
-  onSpotlightMove,
   outerSize,
   revealLayer,
 }: LinkableSpotlightCardProps) {
@@ -31,7 +28,6 @@ export function LinkableSpotlightCard({
     children,
     className,
     onClick: href ? onActivate : undefined,
-    onSpotlightMove,
     outerSize,
     revealLayer: href ? revealLayer : undefined,
   }

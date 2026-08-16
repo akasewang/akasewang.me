@@ -12,11 +12,16 @@ type DropdownSoundContextValue = {
 }
 
 const CONTENT_CLASS =
-  'dropdown-elegant relative z-50 min-w-[8rem] overflow-hidden rounded-xl bg-dropdown-background shadow-xl outline-none ring-1 ring-ring retina:ring-[0.5px]'
+  'dropdown-elegant relative z-50 min-w-32 overflow-hidden rounded-xl bg-dropdown-background shadow-xl outline-none ring-1 ring-ring retina:ring-[0.5px]'
 
 const ITEM_CLASS =
   'group relative z-10 flex w-full cursor-default select-none items-center gap-2.5 whitespace-nowrap rounded-lg px-2.5 py-1 text-left text-xs font-medium tracking-tight text-secondary outline-none transition-colors duration-200 ease-in-out data-[highlighted]:text-primary data-[disabled]:pointer-events-none data-[disabled]:opacity-50'
 
+/**
+ * Lets an item tell the root that the close about to happen was a choice, so the close sound is
+ * skipped and only the sound for what was picked is heard. Context rather than a prop, since items
+ * are written by the caller and never see the root directly.
+ */
 const DropdownSoundContext = React.createContext<DropdownSoundContextValue | null>(null)
 
 /** A dropdown styled to match the site, carrying the sliding highlight between its items */
@@ -41,26 +46,11 @@ const DropdownMenu: React.FC<React.ComponentProps<typeof DropdownMenuPrimitive.R
   )
 }
 
-type DropdownMenuTriggerProps = Omit<
-  React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Trigger>,
-  'ref' | 'render'
-> & {
-  asChild?: boolean
+function DropdownMenuTrigger(props: DropdownMenuPrimitive.Trigger.Props) {
+  return <DropdownMenuPrimitive.Trigger data-slot="dropdown-menu-trigger" {...props} />
 }
 
-const DropdownMenuTrigger = React.forwardRef<HTMLButtonElement, DropdownMenuTriggerProps>(
-  ({ asChild, children, ...props }, ref) => (
-    <DropdownMenuPrimitive.Trigger
-      ref={ref}
-      {...props}
-      render={asChild && React.isValidElement(children) ? children : undefined}
-    >
-      {asChild ? undefined : children}
-    </DropdownMenuPrimitive.Trigger>
-  ),
-)
-DropdownMenuTrigger.displayName = 'DropdownMenuTrigger'
-
+/** The box the highlight box measures itself against, wrapped around whatever items are given */
 function DropdownMenuViewport({ children }: { children: React.ReactNode }) {
   const viewportRef = React.useRef<HTMLDivElement>(null)
 
@@ -87,6 +77,7 @@ type DropdownMenuContentProps = Omit<
     className?: string
   }
 
+/** The open menu, portalled out of whatever it was opened from and positioned against the trigger */
 const DropdownMenuContent = React.forwardRef<HTMLDivElement, DropdownMenuContentProps>(
   (
     { align, alignOffset, children, className, collisionAvoidance, side, sideOffset = 4, ...props },
@@ -118,11 +109,7 @@ type DropdownMenuItemPrimitiveProps = React.ComponentPropsWithoutRef<
 >
 type DropdownMenuItemEvent = Parameters<NonNullable<DropdownMenuItemPrimitiveProps['onClick']>>[0]
 
-type DropdownMenuItemProps = Omit<
-  DropdownMenuItemPrimitiveProps,
-  'className' | 'onClick' | 'render'
-> & {
-  asChild?: boolean
+type DropdownMenuItemProps = Omit<DropdownMenuItemPrimitiveProps, 'className' | 'onClick'> & {
   className?: string
   inset?: boolean
   onClick?: (event: DropdownMenuItemEvent) => void
@@ -130,18 +117,18 @@ type DropdownMenuItemProps = Omit<
 }
 
 const DropdownMenuItem = React.forwardRef<HTMLElement, DropdownMenuItemProps>(
-  ({ asChild, className, inset, children, onClick, onSelect, ...props }, ref) => {
+  ({ className, inset, onClick, onMouseEnter, onSelect, ...props }, ref) => {
     const { select, hoverTick } = useSoundEffects()
     const soundContext = React.useContext(DropdownSoundContext)
 
     return (
       <DropdownMenuPrimitive.Item
+        data-slot="dropdown-menu-item"
         ref={ref}
         {...props}
-        render={asChild && React.isValidElement(children) ? children : undefined}
         onMouseEnter={(event) => {
           hoverTick()
-          props.onMouseEnter?.(event)
+          onMouseEnter?.(event)
         }}
         onClick={(event) => {
           select()
@@ -149,13 +136,12 @@ const DropdownMenuItem = React.forwardRef<HTMLElement, DropdownMenuItemProps>(
           onSelect?.(event)
           onClick?.(event)
 
+          /** A handler that cancelled the event means the menu should stay open too */
           if (event.defaultPrevented) event.preventBaseUIHandler()
         }}
         className={cn(ITEM_CLASS, '[&>svg]:size-4 [&>svg]:shrink-0', inset && 'pl-8', className)}
         data-menu-highlight-item
-      >
-        {asChild ? undefined : children}
-      </DropdownMenuPrimitive.Item>
+      />
     )
   },
 )

@@ -2,128 +2,190 @@
 title: 'Put Your State in the URL'
 excerpt: 'Why keeping dashboard filter states inside local state creates bad UX and how to build deep linkable, reload proof category and search queries using Next.js URL state synchronization.'
 date: '2026-02-22'
-slug: url-state-synchronization
 type: technical
-tags: ['nextjs', 'react', 'ux', 'dashboard']
+
 ---
 
-When building list grids or search dashboards (like a portfolio project grid, a product listing page or an article index) developers naturally reach for React’s `useState` hook.
+Searchable lists often begin with a few local state variables:
 
-It makes absolute sense at first. You create a state for the search query, another for the active category tab and a third for the sort dropdown:
+```tsx title="local-state-example.tsx"
+import { useState } from 'react'
 
-```tsx title="src/components/projects/project-tabs.tsx"
-const [searchQuery, setSearchQuery] = useState('')
-const [category, setCategory] = useState('all')
-const [sortBy, setSortBy] = useState('date-desc')
+export function useLocalListState() {
+  const [searchQuery, setSearchQuery] = useState('')
+  const [category, setCategory] = useState('all')
+  const [sortBy, setSortBy] = useState('date-desc')
+
+  return { searchQuery, category, sortBy, setSearchQuery, setCategory, setSortBy }
+}
 ```
 
-This works perfectly on your local machine. But as soon as you deploy your application, you'll spot a massive **UX friction point**:
+That is enough to filter the current render, but the state disappears at the browser boundary. A copied link opens the default list. Refreshing clears the selection. Returning from a detail page may lose the exact view the reader left.
 
-- **Unshareable Filters**: A user spends three minutes searching, sorting and narrowing down your list. They find a great set of results and copy the browser link to send to a teammate. When the teammate opens the link, the filters are gone and they are back to the default list.
-- **Lost History**: A user clicks into an item in the list, reads the page and clicks the browser's "Back" button. Instead of returning to their filtered list, the page reloads from scratch, forcing them to re enter their search.
-- **Stale Navigation**: Browser history acts as the ultimate state machine. If filtering your page doesn't update the URL, you are breaking the core mechanics of the web.
-
-Here is how to solve this by moving your interactive dashboard state entirely into the **URL query string**, utilizing Next.js App Router hooks to build reload proof, deep linkable grid systems.
-
-## The Core Concept: The URL as the Single Source of Truth
-
-Instead of storing search parameters in React state, we store them directly in the browser's address bar.
-
-When a user selects a filter or types a search query:
-
-1. We intercept the input event.
-2. We update the URL query string (`/projects?q=interactive&category=web&sort=views-desc`) without triggering a full page reload.
-3. Our list page reads the URL parameters during rendering and instantly filters the items.
+Search, category and sorting state belong in the query string when they describe the page being viewed:
 
 ```text
-[ User Interaction ] → [ Update URL Query String ]
-                                  ↓ (pushState / replaceState)
-[ Render Phase ]   ←   [ Read SearchParams from URL ]
+/projects?q=interactive&category=web&sort=views-desc
 ```
 
-This ensures that the URL is _always_ the single source of truth. Copying the link, refreshing the page or going backward and forward in history preserves the user's view exactly.
+The URL then becomes both the input to the list and a compact serialization of its current view. It can be shared, bookmarked and restored by browser history without a second persistence system.
 
-## The Next.js URL Sync Helper
+## A complete URL-state hook
 
-To implement this dynamically, we can write a reusable callback inside our layout that reads the active query string using `useSearchParams`, merges new updates and writes them back to the router using Next.js’s `useRouter` hook.
+The hook below reads the current parameters with `useSearchParams`, preserves the current route with `usePathname` and writes changes through the [native History API](https://nextjs.org/docs/app/getting-started/linking-and-navigating#native-history-api). Next.js keeps both navigation hooks synchronized with those native calls.
 
-To ensure that updating the URL doesn't cause a jarring vertical jump to the top of the page (which Next.js does by default on page changes), we pass `{ scroll: false }` to the router update:
-
-Let's examine how this parameter merging is structured in [project-tabs.tsx](https://github.com/akasewang/akasewang.me/blob/main/src/components/projects/project-tabs.tsx):
-
-```tsx title="src/components/projects/project-tabs.tsx"
+```tsx title="use-url-list-state.ts"
 'use client'
-import { useState, useEffect, useCallback } from 'react'
-import { useSearchParams, useRouter } from 'next/navigation'
-import type { ProjectPostData, ProjectCategory } from '@/types/project'
-export function ProjectTabs({ projects }: { projects: ProjectPostData[] }) {
+
+import { useCallback, useMemo } from 'react'
+import { usePathname, useSearchParams } from 'next/navigation'
+
+export type ListItem = {
+  id: string
+  title: string
+  category: string
+  publishedAt: string
+  // My implementation reads this value from a shared client cache. Keeping it on
+  // each item makes the standalone example independent of a particular data layer.
+  views: number
+}
+
+export type SortOrder = 'date-desc' | 'date-asc' | 'views-desc' | 'views-asc'
+
+const DEFAULT_CATEGORY = 'all'
+const DEFAULT_SORT: SortOrder = 'date-desc'
+const SORT_ORDERS = new Set<SortOrder>([
+  'date-desc',
+  'date-asc',
+  'views-desc',
+  'views-asc',
+])
+
+export function useUrlListState(items: ListItem[]) {
+  const pathname = usePathname()
   const searchParams = useSearchParams()
-  const router = useRouter()
-  const categoryParam = searchParams.get('category')
-  const [category, setCategory] = useState<ProjectCategory>(
-    categoryParam ? (categoryParam as ProjectCategory) : 'all',
-  )
+
+  const categories = useMemo(() => new Set(items.map((item) => item.category)), [items])
+  const requestedCategory = searchParams.get('category')
+  const category =
+    requestedCategory && categories.has(requestedCategory) ? requestedCategory : DEFAULT_CATEGORY
+  const searchQuery = searchParams.get('q') ?? ''
+  const requestedSort = searchParams.get('sort') as SortOrder | null
+  const sortBy = requestedSort && SORT_ORDERS.has(requestedSort) ? requestedSort : DEFAULT_SORT
+
   const updateParams = useCallback(
     (updates: Record<string, string | null>) => {
-      const params = new URLSearchParams(searchParams)
-      Object.entries(updates).forEach(([key, value]) => {
-        if (value === null || value === 'all' || (key === 'sort' && value === 'date-desc')) {
-          params.delete(key)
-        } else {
-          params.set(key, value)
-        }
-      })
-      router.replace(`/projects?${params.toString()}`, { scroll: false })
+      const next = new URLSearchParams(searchParams.toString())
+
+      for (const [key, value] of Object.entries(updates)) {
+        const isDefault =
+          (key === 'category' && value === DEFAULT_CATEGORY) ||
+          (key === 'sort' && value === DEFAULT_SORT)
+
+        if (!value || isDefault) next.delete(key)
+        else next.set(key, value)
+      }
+
+      const query = next.toString()
+      window.history.replaceState(null, '', query ? `${pathname}?${query}` : pathname)
     },
-    [searchParams, router],
+    [pathname, searchParams],
+  )
+
+  const visibleItems = useMemo(() => {
+    const normalizedQuery = searchQuery.trim().toLocaleLowerCase()
+    const result = items.filter((item) => {
+      const matchesCategory = category === DEFAULT_CATEGORY || item.category === category
+      const matchesSearch = !normalizedQuery || item.title.toLocaleLowerCase().includes(normalizedQuery)
+      return matchesCategory && matchesSearch
+    })
+
+    return result.toSorted((a, b) => {
+      if (sortBy === 'views-desc') return b.views - a.views
+      if (sortBy === 'views-asc') return a.views - b.views
+
+      const aTimestamp = Date.parse(a.publishedAt)
+      const bTimestamp = Date.parse(b.publishedAt)
+      const difference =
+        (Number.isNaN(bTimestamp) ? 0 : bTimestamp) -
+        (Number.isNaN(aTimestamp) ? 0 : aTimestamp)
+      return sortBy === 'date-asc' ? -difference : difference
+    })
+  }, [category, items, searchQuery, sortBy])
+
+  return {
+    category,
+    searchQuery,
+    sortBy,
+    visibleItems,
+    setCategory: (value: string) => updateParams({ category: value }),
+    setSearchQuery: (value: string) => updateParams({ q: value || null }),
+    setSortBy: (value: SortOrder) => updateParams({ sort: value }),
+  }
+}
+```
+
+Starting from `searchParams.toString()` preserves parameters owned by other features. Default values are removed rather than written as noise, so the default view stays `/projects` instead of `/projects?category=all&sort=date-desc`.
+
+`replaceState` is intentional here. Typing each character into a search box should not add a browser-history entry. Replacing the current entry also avoids a route transition and keeps the viewport in place. If each filter choice represents a meaningful navigation step, use `pushState` or `router.push` instead.
+
+The hook validates the sort parameter before using it. URLs are user input too, so an unexpected value should fall back to a known default rather than entering the sorting logic.
+
+## Connect controls to the same source
+
+There is no parallel `useState` copy to synchronize. The selected category, input value and sort order all come from the same parameters another reader receives when opening the link.
+
+```tsx title="project-list.tsx"
+'use client'
+
+import { type ListItem, type SortOrder, useUrlListState } from './use-url-list-state'
+
+export function ProjectList({ projects }: { projects: ListItem[] }) {
+  const state = useUrlListState(projects)
+
+  return (
+    <section>
+      <label>
+        Search
+        <input
+          type="search"
+          value={state.searchQuery}
+          onChange={(event) => state.setSearchQuery(event.target.value)}
+        />
+      </label>
+
+      <select value={state.category} onChange={(event) => state.setCategory(event.target.value)}>
+        <option value="all">All categories</option>
+        <option value="web">Web</option>
+        <option value="mobile">Mobile</option>
+      </select>
+
+      <select
+        value={state.sortBy}
+        onChange={(event) => state.setSortBy(event.target.value as SortOrder)}
+      >
+        <option value="date-desc">Newest</option>
+        <option value="date-asc">Oldest</option>
+        <option value="views-desc">Most viewed</option>
+        <option value="views-asc">Least viewed</option>
+      </select>
+
+      <ul>
+        {state.visibleItems.map((project) => (
+          <li key={project.id}>{project.title}</li>
+        ))}
+      </ul>
+    </section>
   )
 }
 ```
 
-## Reading URL State in UI Components
+`toSorted()` returns a new array, so the input collection is never mutated. If older browsers are part of the support target, use `[...items].sort(...)` for the same result. Memoization is a performance detail, not a second source of state.
 
-By binding our state triggers directly to this parameter merger, our inputs and tabs remain fully synchronized with the address bar.
-
-When a user types or clicks, we update the URL, Next.js re renders the component with the new `searchParams` and our layout filters the items.
-
-```tsx title="src/components/projects/project-tabs.tsx"
-const handleCategoryChange = (val: string) => {
-  updateParams({ category: val })
-}
-const handleSearchChange = (val: string) => {
-  updateParams({ q: val || null }) 
-}
-const handleSortChange = (val: string) => {
-  updateParams({ sort: val })
-}
-```
-
-## Filtering and Sorting on Render
-
-To keep the page lightning fast, we filter and sort our project array directly inside a React `useMemo` block, ensuring that we only recalculate list coordinates when the projects or active sorting parameters change:
-
-```tsx title="src/components/projects/project-tabs.tsx"
-  const sortedProjects = useMemo(() => {
-    let result = [...projects]
-    if (sortBy === 'date-asc') {
-      result.reverse()
-    } else if (sortBy === 'views-desc') {
-      result.sort((a, b) => (getViews(b.slug) || 0) - (getViews(a.slug) || 0))
-    } else if (sortBy === 'views-asc') {
-      result.sort((a, b) => (getViews(a.slug) || 0) - (getViews(b.slug) || 0))
-    }
-    return result
-  }, [projects, sortBy, getViews])
-```
-
-<Callout type="success" title="UX Advantages">
-* **True Deep linking**: Share your exact view state, active categories and search inputs with a single URL string.
-* **Native History Support**: Navigating back via browser gestures returns you to your exact layout coordinates without reloading search results.
-* **Scroll Boundary Protection**: Using `{ scroll: false }` guarantees the reader's viewport remains stationary during click filtering, avoiding unexpected vertical page jumping.
+<Callout type="success" title="What the URL now preserves">
+  * A shared link opens the same search, category and order. * Refreshing reconstructs the view from
+  the address. * Returning from a detail route restores the listing URL. * Filter changes do not
+  remount the route or reset scroll position.
 </Callout>
 
-## Summary
-
-Synchronizing interactive states directly with the browser URL is one of the easiest ways to elevate your application's user experience.
-
-By treating the URL query string as your single source of truth, merging changes dynamically with `URLSearchParams` and avoiding scroll shifts using router overlays, you can build bookmarkable, history resilient dashboards that feel fast, clean and perfectly suited to the web.
+Not every UI choice belongs in the address bar. Hover state, open tooltips and temporary form input usually do not. A useful test is whether another person opening the URL should see the same view. If the answer is yes, keeping that state only inside React leaves out part of the page's identity.

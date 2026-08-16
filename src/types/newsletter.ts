@@ -1,10 +1,4 @@
-/** Copy for the public newsletter page */
-export interface NewsletterPageContent {
-  title: string
-  subtitle: string
-}
-
-/** Copy for the signup block that appears at the end of a post */
+/** Copy for the homepage signup block */
 export interface NewsletterSectionContent {
   title: string
   descriptionPrefix: string
@@ -35,6 +29,8 @@ export interface AdminNewsletterContent {
 
 /** Copy for the page a reader lands on from the unsubscribe link in an email */
 export interface UnsubscribePageContent {
+  /** The closing line under the page */
+  footerText: string
   confirmTitle: string
   confirmDescription: string
   confirmButton: string

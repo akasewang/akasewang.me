@@ -15,13 +15,13 @@ security checks and protecting `main`.
 Security auditing is available locally through:
 
 ```bash
-npm run security:audit
+pnpm run security:audit
 ```
 
 That script runs:
 
 ```bash
-npm audit --package-lock-only --audit-level=info
+pnpm audit --audit-level=low
 ```
 
 The equivalent check is automated by `.github/workflows/security-audit.yml`:
@@ -31,24 +31,40 @@ The equivalent check is automated by `.github/workflows/security-audit.yml`:
 - Daily at `09:00` Asia/Kolkata (`03:30` UTC)
 - Manual runs through `workflow_dispatch`
 
-The workflow installs the locked dependency tree with Node 24 while disabling lifecycle scripts,
-verifies npm registry signatures and audits the committed lockfile at the `info` threshold. It has
-read-only repository permissions, does not persist checkout credentials and has a ten-minute
-timeout.
+The workflow uses the pnpm version declared in `package.json`, installs the frozen dependency tree
+with Node 24 while disabling lifecycle scripts, and audits it at pnpm's lowest supported threshold,
+`low`. It has read-only repository permissions, does not persist checkout credentials and has a
+ten-minute timeout.
+
+## pnpm Installation Policy
+
+- `package.json` pins `pnpm@10.13.1`; `pnpm-lock.yaml` is the only dependency lockfile and frozen
+  installs must succeed without changing it.
+- Security overrides live under `pnpm.overrides`, where pnpm applies them to the transitive graph.
+  An override is kept only when the package is reachable and the forced version protects or repairs
+  a real dependency path.
+- `brace-expansion@5.0.9` is patched through `pnpm.patchedDependencies` and the committed file under
+  `patches/`. This makes the CommonJS compatibility change part of resolution instead of mutating
+  `node_modules` from a project `postinstall` script.
+- Dependency lifecycle scripts are denied by default. `pnpm.onlyBuiltDependencies` permits only
+  `esbuild` and `unrs-resolver`, the installed native-tool packages that require their build steps.
+- The audit workflow deliberately adds `--ignore-scripts`: it checks the locked dependency graph
+  and does not need application or dependency lifecycle hooks. A normal developer install uses the
+  narrow allowlist above and still runs the repository `prepare` script that configures Git hooks.
 
 ## Dependabot
 
 Dependabot version updates are configured in `.github/dependabot.yml`.
 
-Current npm policy:
+Current pnpm dependency policy:
 
-- Ecosystem: `npm`
+- Ecosystem identifier: `npm` (GitHub uses this identifier for both npm and pnpm lockfiles)
 - Target branch: `main`
 - Schedule: weekly, Monday at `09:00` Asia/Kolkata
 - Open PR limit: `1`
 - Labels: `dependencies`
 - Commit prefix: `chore`, with dependency scope included
-- Grouping: all minor and patch npm updates are grouped into one version-update PR
+- Grouping: all minor and patch dependency updates are grouped into one version-update PR
 - Major version updates are ignored
 
 Current GitHub Actions policy:
@@ -62,8 +78,8 @@ Current GitHub Actions policy:
 - Grouping: all GitHub Actions updates are grouped into one version-update PR
 
 This keeps routine update PRs quiet while maintaining the workflow's immutable action references.
-Major npm upgrades, such as ESLint 10 or Node type major bumps, should be reviewed manually because
-they can break framework/tooling compatibility.
+Major dependency upgrades, such as ESLint 10 or Node type major bumps, should be reviewed manually
+because they can break framework/tooling compatibility.
 
 Security updates are separate from routine version updates. GitHub Dependabot security updates
 are triggered by vulnerability alerts against the default branch, not by the weekly version
@@ -110,7 +126,7 @@ admins, so the normal workflow below is self-enforced for them. Empty the bypass
 protection should apply to everyone. Because rulesets live in GitHub rather than this repository,
 verify the active bypass list in repository settings after changing it.
 
-Enable `Require status checks to pass` only after the automated `npm audit` check has completed
+Enable `Require status checks to pass` only after the automated `pnpm audit` check has completed
 successfully on a pull request. Requiring a check that has never run can block merges.
 
 Do not enable yet:
@@ -146,16 +162,16 @@ Then open a pull request into `main`.
 Before merging a dependency or security PR, run:
 
 ```bash
-npm run security:audit
-npm run lint
-npm run typecheck
-npm run build
+pnpm run security:audit
+pnpm run lint
+pnpm run typecheck
+pnpm run build
 ```
 
 If the change touches formatting-sensitive files, also run:
 
 ```bash
-npx biome check .
+pnpm exec biome check .
 ```
 
 ## Dependabot PR Triage
@@ -163,7 +179,7 @@ npx biome check .
 For routine minor or patch PRs:
 
 1. Read the changed packages.
-2. Run install if the lockfile changed.
+2. Run `pnpm install --frozen-lockfile` if the lockfile changed.
 3. Run audit, lint and build locally.
 4. Merge only if the codebase still passes.
 
@@ -177,7 +193,7 @@ For major upgrades:
 
 - Dependabot-created branches are normal; they are generated automatically for update PRs.
 - Existing Dependabot branches can be deleted after closing their PRs.
-- The repository intentionally keeps `npm run security:audit` for local verification and uses
-  the equivalent audit command in GitHub Actions after registry-signature verification.
+- The repository uses `pnpm run security:audit` locally and the equivalent pnpm audit command in
+  GitHub Actions.
 - Add broader CI checks separately so audit failures remain easy to distinguish from lint,
   type-check or build failures.

@@ -5,6 +5,7 @@ import Image from 'next/image'
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { CategoryFilter } from '@/components/common/category-filter'
 import { EmptyState } from '@/components/common/empty-state'
+import { PHOTOS_GRID_CLASS, PHOTOS_RAIL_CLASS } from '@/components/skeletons/photos'
 import { Icons } from '@/components/ui/icons'
 import { PHOTO_CATEGORIES } from '@/constants/categories'
 import { ZOOM_EASE } from '@/constants/ui'
@@ -19,7 +20,15 @@ import { PhotoOverlay } from './photo-overlay'
 
 const PHOTO_BY_ID = new Map(photos.map((p) => [p.id, p]))
 
-/** The photos page: the grid, its filter, and the overlay a photo opens into */
+/**
+ * The photos page: the grid, its filter and the overlay a photo opens into.
+ *
+ * Inspired by Anthony Fu's photos page, full width and opening into the picture rather than a
+ * gallery. The filter, the cover and contain toggle and the zoom overlay are this site's own.
+ *
+ * Anthony Fu: https://antfu.me/photos
+ * Source: https://github.com/antfu/antfu.me
+ */
 export function PhotosContent() {
   const { toggle, hoverTick } = useSoundEffects()
   const [activeCategory, handleCategoryChange] = useCategoryParam(PHOTO_CATEGORIES)
@@ -37,6 +46,7 @@ export function PhotosContent() {
     }
   }, [])
 
+  /** Full size versions are only fetched for photos that have been hovered or opened */
   const preloadPhoto = useCallback((id: string) => {
     setPreloadIds((prev) => (prev.has(id) ? prev : new Set(prev).add(id)))
   }, [])
@@ -48,6 +58,10 @@ export function PhotosContent() {
     setIsToggling(true)
     setView(nextView)
 
+    /**
+     * A frame or two with layout animation suppressed. Cropped and uncropped are different shapes,
+     * and animating between them would slide every photo in the grid rather than swap the fit.
+     */
     if (toggleTimerRef.current) clearTimeout(toggleTimerRef.current)
     toggleTimerRef.current = setTimeout(() => setIsToggling(false), 50)
   }, [toggle, view])
@@ -61,7 +75,7 @@ export function PhotosContent() {
 
   return (
     <>
-      <div className="z-50 mb-6 md:absolute md:inset-y-0 md:left-8 md:mb-0 md:w-8">
+      <div className={PHOTOS_RAIL_CLASS}>
         <button
           type="button"
           onClick={handleToggleView}
@@ -91,7 +105,7 @@ export function PhotosContent() {
             <m.div
               key="photo-grid"
               layout={!isArriving ? 'position' : false}
-              className="grid grid-cols-1 gap-2 sm:grid-cols-2 sm:gap-2.5 md:grid-cols-4"
+              className={PHOTOS_GRID_CLASS}
             >
               {filteredPhotos.map((photo) => (
                 <PhotoCard

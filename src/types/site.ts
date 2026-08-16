@@ -23,10 +23,12 @@ export interface CommonContent {
   backToTop: string
 }
 
-/** The heading and standfirst at the top of a page */
+/** The heading and standfirst at the top of a page, and the line that closes it */
 export interface PageContent {
   title: string
   subtitle: string
+  /** Shown by the page and by its loading state alike, so the two cannot say different things */
+  footerText: string
 }
 
 /** A landing page section that links through to a fuller page of its own */
@@ -57,6 +59,32 @@ export interface SocialGroup {
   value: SocialCategory
   label: string
   links: SocialLink[]
+}
+
+/**
+ * Any run of links under one heading, whatever they happen to be.
+ *
+ * The directory draws every row the same way, so what it needs from a group is a heading and the
+ * links beneath it, not what kind of thing they are. A social group satisfies this as it stands.
+ */
+export interface LinkGroup {
+  label: string
+  /** An entry with no href is written out as plain text, for something held but not yet standing up */
+  links: Array<{ href?: string; label: string }>
+}
+
+/**
+ * A site in the wider ecosystem, sitting apart from the profiles.
+ *
+ * These are somewhere the work itself lives rather than an account on someone else's platform,
+ * which is why they carry a line of their own: a reader deciding whether to follow one wants to
+ * know what is behind it, where a profile only has to say which service it is on.
+ */
+export interface EcosystemSite {
+  href: string
+  label: string
+  domain: string
+  description: string
 }
 
 /** Strings that belong to no single page */

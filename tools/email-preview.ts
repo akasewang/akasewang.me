@@ -3,7 +3,7 @@
  * sending anything. Templates are discovered from disk, rendered with their own PreviewProps and
  * served in a shell that reloads on save.
  *
- * Run with npm run email.
+ * Run with pnpm run email.
  */
 
 import { watch } from 'node:fs'
@@ -67,6 +67,7 @@ try {
   )
 }
 
+/** welcome-template becomes Welcome for the tab, and WelcomeTemplate for the export to look for */
 function toLabel(slug: string): string {
   return slug
     .replace(/-template$/, '')
@@ -115,6 +116,7 @@ function purgeCommonJsCache() {
 
 const reloadClients = new Set<http.ServerResponse>()
 
+/** Tells every open tab to reload itself */
 function broadcastReload() {
   for (const client of reloadClients) {
     client.write('event: reload\ndata: {}\n\n')
@@ -183,6 +185,7 @@ async function importTemplateModule(filePath: string): Promise<EmailTemplateExpo
   return (await import(pathToFileURL(filePath).href)) as EmailTemplateExports
 }
 
+/** Renders one template with its own PreviewProps, which is the sample data it ships for this */
 async function renderTemplate(template: TemplateDefinition): Promise<string> {
   const templateExports = await importTemplateModule(template.filePath)
   const Template = templateExports[template.exportName] ?? templateExports.default
@@ -206,6 +209,7 @@ async function renderTemplate(template: TemplateDefinition): Promise<string> {
     .replace(ABSOLUTE_EMAIL_ASSET, '/email/')
 }
 
+/** The page around the preview: the template switcher, and the iframe the email itself renders in */
 function renderShell(
   activeTemplate: TemplateDefinition,
   templates: TemplateDefinition[],

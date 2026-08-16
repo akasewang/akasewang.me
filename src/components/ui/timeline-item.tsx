@@ -4,14 +4,13 @@ import { memo, useMemo } from 'react'
 import { Bullet } from '@/components/ui/bullet'
 import { ExpandToggle } from '@/components/ui/expand-toggle'
 import { ExpandableContent } from '@/components/ui/expandable-content'
-import { LinkText } from '@/components/ui/link-text'
+import { LinkText, renderWithLinks } from '@/components/ui/link-text'
 import { SeparatorDate } from '@/components/ui/separator-date'
 import { SeparatorSlash } from '@/components/ui/separator-slash'
 import { Tag } from '@/components/ui/tag'
 import { useExpandableRow } from '@/hooks/use-expandable-row'
 import { useSoundEffects } from '@/hooks/use-sound-effects'
 import type { TimelineItemProps } from '@/types/site'
-import { renderWithLinks } from '@/utils/content-utils'
 import { cn, formatDateString } from '@/utils/utils'
 
 /**
@@ -34,6 +33,11 @@ export const TimelineItem = memo(function TimelineItem({
   const hasContent = !!description?.length
   const { hoverCard } = useSoundEffects()
 
+  /**
+   * The description, line by line. A line starting with a dash is a bullet and anything else is
+   * numbered, so an entry can mix the two without saying which it is using. Repeated lines get a
+   * counter appended to their key, since the text alone would collide.
+   */
   const parsedLines = useMemo(() => {
     if (!hasContent) return null
 
@@ -56,7 +60,7 @@ export const TimelineItem = memo(function TimelineItem({
         <div key={lineKey} className="flex items-start gap-3">
           {isBullet ? (
             <div className="flex w-5 shrink-0 justify-center">
-              <Bullet className="mt-[9px]" />
+              <Bullet className="mt-2.25" />
             </div>
           ) : (
             <span className="mt-[3px] sm:mt-[2px] w-5 shrink-0 select-none font-mono text-xs font-medium text-muted-foreground">
@@ -101,7 +105,7 @@ export const TimelineItem = memo(function TimelineItem({
           hasContent && 'pointer-events-none z-10',
         )}
       >
-        <div className="whitespace-nowrap font-mono text-[13px] text-muted-foreground">
+        <div className="whitespace-nowrap font-mono text-xs-plus text-muted-foreground">
           {formatDateString(startDate)}
           {endDate && (
             <>
@@ -128,6 +132,11 @@ export const TimelineItem = memo(function TimelineItem({
 
   return (
     <div id={id} className="scroll-mt-24">
+      {/**
+       * An expandable entry lays a button over the whole summary rather than wrapping it, so the
+       * links inside stay clickable in their own right. That is what the pointer-events juggling
+       * above is for: the summary ignores the pointer, the links take it back.
+       */}
       {hasContent ? (
         <div data-highlight-item className={itemSummaryClassName}>
           <button
@@ -153,7 +162,12 @@ export const TimelineItem = memo(function TimelineItem({
       )}
 
       {!!tech?.length && (
-        <div className="mt-3 flex flex-wrap gap-2 sm:mt-3.5">
+        <div
+          className={cn(
+            'flex flex-wrap gap-2 transition-all duration-300 ease-in-out',
+            isExpanded ? 'mt-2.5 sm:mt-3' : 'mt-3 sm:mt-3.5',
+          )}
+        >
           {tech.map((t) => (
             <Tag key={t}>{t}</Tag>
           ))}

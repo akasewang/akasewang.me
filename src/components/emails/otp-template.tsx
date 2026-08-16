@@ -17,6 +17,7 @@ interface OtpTemplateProps {
   requestedAt?: EmailDateInput
 }
 
+/** The styles only this template needs, on top of the shared layout */
 const s = {
   code: {
     margin: '0 0 26px',

@@ -14,7 +14,6 @@
 export const PROJECT_CATEGORIES = [
   { value: 'all', label: 'All' },
   { value: 'discovery', label: 'Discovery' },
-  { value: 'creative', label: 'Creative Tools' },
   { value: 'portfolio', label: 'Portfolio' },
 ] as const
 
@@ -61,7 +60,7 @@ export const SOCIAL_CATEGORIES = [
   { value: 'design', label: 'design' },
   { value: 'practice', label: 'practice' },
   { value: 'security', label: 'security' },
-  { value: 'network', label: 'network' },
+  { value: 'ecosystem', label: 'connections' },
   { value: 'social', label: 'social' },
   { value: 'media', label: 'media' },
 ] as const

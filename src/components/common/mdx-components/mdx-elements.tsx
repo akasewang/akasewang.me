@@ -17,6 +17,10 @@ const HEADING_SIZES = {
 
 const ICON_SIZES = { 1: 22, 2: 18, 3: 16, 4: 14, 5: 12, 6: 10 } as const
 
+/**
+ * One heading level. Each gets an id derived from its own text, matching what the table of contents
+ * generates, and an anchor sitting in the margin that appears on hover or on focus.
+ */
 const createHeading = (level: 1 | 2 | 3 | 4 | 5 | 6) => {
   const HeadingComponent = ({
     children,
@@ -56,11 +60,12 @@ export const mdxElements = {
   h4: createHeading(4),
   h5: createHeading(5),
   h6: createHeading(6),
+  /** Inline code only: a highlighted block arrives with its own class, which is left alone */
   code: ({ children, className, ...props }: React.HTMLAttributes<HTMLElement>) => (
     <code
       className={
         className ||
-        'rounded-md bg-surface-50 px-1.5 py-0.5 font-mono text-xs text-secondary whitespace-nowrap ring-1 ring-inset ring-border/40'
+        'rounded-md bg-surface-50 px-1.5 py-0.5 font-mono text-xs text-secondary whitespace-nowrap ring-1 ring-inset ring-border/40 retina:ring-[0.5px]'
       }
       {...props}
     >
@@ -68,6 +73,10 @@ export const mdxElements = {
     </code>
   ),
   pre: Pre,
+  /**
+   * A div rather than a p, since markdown puts images and code blocks inside paragraphs and a p
+   * cannot legally contain them. The role keeps it a paragraph to anything reading the page.
+   */
   p: ({ children, ...props }: React.HTMLAttributes<HTMLElement>) => (
     <div
       role="paragraph"
@@ -98,11 +107,12 @@ export const mdxElements = {
       {children}
     </li>
   ),
+  /**
+   * A pull quote, set off by a fill rather than a rule, the way a link chip is. The type is left to
+   * the paragraph inside it, which owns the size, leading and colour of everything in a post.
+   */
   blockquote: ({ children, ...props }: React.HTMLAttributes<HTMLQuoteElement>) => (
-    <blockquote
-      className="my-6 border-l-2 border-primary pl-5 text-pretty font-serif text-base italic leading-relaxed text-muted-foreground"
-      {...props}
-    >
+    <blockquote className="my-6 bg-surface-30 px-5 py-4 font-serif italic" {...props}>
       {children}
     </blockquote>
   ),

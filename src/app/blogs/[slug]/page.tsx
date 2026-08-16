@@ -6,6 +6,7 @@ import { MDX_COMPONENTS, MDX_OPTIONS } from '@/components/common/mdx-components/
 import { MdxFooter } from '@/components/common/mdx-components/mdx-footer'
 import { MdxPostHeader } from '@/components/common/mdx-components/mdx-post-header'
 import { MdxPostSummary } from '@/components/common/mdx-components/mdx-post-summary'
+import { PostMessageBoard } from '@/components/message-board/post-message-board'
 import { FULL_NAME, SITE_URL } from '@/constants/constants'
 import { getBlogPostingSchema, getBreadcrumbSchema, serializeJsonLd } from '@/lib/json-ld'
 import { getAllBlogPosts, getBlogPost, getBlogSlugs } from '@/lib/managers/blog-manager'
@@ -19,6 +20,7 @@ export function generateStaticParams() {
 
 type PageParams = Promise<{ slug: string }>
 
+/** Read from the post's own frontmatter, so a card shared anywhere carries the post's own words */
 export async function generateMetadata({ params }: { params: PageParams }): Promise<Metadata> {
   const { slug } = await params
   const post = await getBlogPost(slug)
@@ -44,7 +46,7 @@ export default async function BlogPost({ params }: { params: PageParams }) {
   if (!post) notFound()
 
   const { content, data } = post
-  const { title, excerpt, date, slug: postSlug, tags, links } = data
+  const { title, excerpt, date, slug: postSlug, links } = data
 
   const blogPostJsonLd = getBlogPostingSchema({
     title,
@@ -58,6 +60,7 @@ export default async function BlogPost({ params }: { params: PageParams }) {
     { name: title, url: `${SITE_URL}/blogs/${postSlug}` },
   ])
 
+  /** The posts either side of this one, which the header turns into its back and forward controls */
   const allPosts = await getAllBlogPosts()
   const { previous: prevPost, next: nextPost } = getAdjacentContent(allPosts, postSlug)
 
@@ -83,18 +86,13 @@ export default async function BlogPost({ params }: { params: PageParams }) {
           url={`${SITE_URL}/blogs/${postSlug}`}
         />
 
-        <MdxPostSummary
-          excerpt={excerpt}
-          linkLabel="You can also read this post on"
-          links={links}
-          keywords={tags}
-        />
-
-        <hr className="border-t border-border" />
+        <MdxPostSummary linkLabel="You can also read this post on" links={links} />
 
         <div className="mdx-content">
           <MDXRemote source={content} options={MDX_OPTIONS} components={MDX_COMPONENTS} />
         </div>
+
+        <PostMessageBoard scope="blogs" slug={postSlug} />
 
         <MdxFooter
           url={`${SITE_URL}/blogs/${postSlug}`}

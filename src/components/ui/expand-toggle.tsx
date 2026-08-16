@@ -11,7 +11,11 @@ interface ExpandToggleProps {
 
 const FLUID_SPRING = { type: 'spring', bounce: 0, duration: 0.4 } as const
 
-/** The chevron on an expandable row, which turns to point the way it will move */
+/**
+ * The control on an expandable row. Two chevrons rather than one turning: apart while the row is
+ * closed, meeting in the middle while it is open, so the mark reads as open and shut rather than as
+ * an arrow pointing somewhere.
+ */
 export function ExpandToggle({ isExpanded, className }: ExpandToggleProps) {
   return (
     <div

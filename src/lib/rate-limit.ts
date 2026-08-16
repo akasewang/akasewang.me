@@ -20,6 +20,7 @@ export async function claimRateLimit(
   const secret = process.env.RATE_LIMIT_SECRET
   if (!secret) throw new Error('Missing RATE_LIMIT_SECRET environment variable')
 
+  /** Keyed rather than plain, so the stored row cannot be walked back to the address it came from */
   const key = hmacSha256Hex(`${action}\0${clientIp}`, secret)
   const now = new Date()
   const expiresAt = new Date(now.getTime() + cooldownSeconds * 1000)
@@ -36,6 +37,7 @@ export async function claimRateLimit(
 
   if (claimed) return { allowed: true, retryAfterSeconds: 0 }
 
+  /** Nothing came back, so a live cooldown blocked the write and the caller is owed the wait */
   const [current] = await db
     .select({ expiresAt: actionRateLimit.expiresAt })
     .from(actionRateLimit)

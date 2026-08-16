@@ -13,8 +13,9 @@ import {
 } from '@react-email/components'
 import type { ReactNode } from 'react'
 import { FIRST_NAME, SITE, SITE_URL } from '@/constants/constants'
-import { activeSocials } from '@/data/static/social'
+import { activeSocials, type SocialLabel } from '@/data/static/social'
 
+/** Whatever a caller happens to hold a date as, since formatEmailDate takes it from there */
 export type EmailDateInput = string | number | Date
 
 /** Web fonts for the emails, with the stacks a client that blocks them falls back to */
@@ -36,6 +37,10 @@ export const emailTheme = {
 
 const EMAIL_GUTTER = '48px'
 
+/**
+ * Every image is an absolute URL on the site and is given its size in the markup. Mail clients do
+ * not run CSS the way a browser does, so anything drawn has to be a real image with real dimensions.
+ */
 const AVATAR_URL = `${SITE_URL}/email/avatar.png`
 const AVATAR_SIZE = 30
 const DISSOLVE_URL = `${SITE_URL}/email/footer-transition.png`
@@ -45,6 +50,7 @@ const WORDMARK_URL = `${SITE_URL}/email/wordmark-foot.png`
 const WORDMARK_WIDTH = 600
 const WORDMARK_HEIGHT = 58
 
+/** Three marks cycled down a list, since a bullet is a character a client may not have */
 const LIST_MARK_COUNT = 3
 export const LIST_MARK_SIZE = 16
 export const getListMarkUrl = (index: number) =>
@@ -56,6 +62,10 @@ const bodyType = {
   lineHeight: '27px',
 } as const
 
+/**
+ * Every style the templates use, as inline objects rather than classes. Mail clients strip style
+ * sheets and support wildly different subsets of CSS, so this is the whole design system for email.
+ */
 export const emailLayout = {
   page: { width: '100%', backgroundColor: emailTheme.page, padding: 0 },
   container: {
@@ -235,6 +245,7 @@ const darkModeCss = `
   }
 `
 
+/** An email may be opened weeks after it was sent, so dates are absolute rather than relative */
 export const formatEmailDate = (date?: EmailDateInput) => {
   const value = date ? new Date(date) : new Date()
   if (Number.isNaN(value.getTime())) return ''
@@ -246,6 +257,7 @@ export const formatEmailDate = (date?: EmailDateInput) => {
   }).format(value)
 }
 
+/** The document every email is built inside: the head, the dark scheme and the card */
 export function EmailShell({ preview, children }: { preview: string; children: ReactNode }) {
   return (
     <Html lang="en">
@@ -254,6 +266,10 @@ export function EmailShell({ preview, children }: { preview: string; children: R
         <meta name="supported-color-schemes" content="dark" />
         <style>{darkModeCss}</style>
       </Head>
+      {/**
+       * The padding is zero width spaces. Without them a client fills the preview line with
+       * whatever text comes next in the email, which is rarely what should be read first.
+       */}
       <Preview>
         {preview} {'​'.repeat(150)}
       </Preview>
@@ -268,6 +284,7 @@ export function EmailShell({ preview, children }: { preview: string; children: R
   )
 }
 
+/** The sign off: the avatar and a line beside it, as a table row since floats do not travel */
 export function EmailSignature({ text }: { text: string }) {
   return (
     <Row style={emailLayout.signatureRow}>
@@ -288,6 +305,7 @@ export function EmailSignature({ text }: { text: string }) {
   )
 }
 
+/** The graded band between the card and the footer, drawn as an image since gradients rarely work */
 export function EmailDissolve() {
   return (
     <Section className="e-card e-dissolve" style={emailLayout.dissolveSection}>
@@ -302,6 +320,7 @@ export function EmailDissolve() {
   )
 }
 
+/** The name at the foot of every email, as an image so it looks the same wherever it lands */
 export function EmailWordmark({ spaceAbove }: { spaceAbove?: string }) {
   return (
     <Section
@@ -319,7 +338,8 @@ export function EmailWordmark({ spaceAbove }: { spaceAbove?: string }) {
   )
 }
 
-const FOOTER_SOCIAL_LABELS = ['GitHub', 'LinkedIn', 'X [Twitter]']
+/** Typed against the labels themselves, so renaming one there breaks here rather than going quiet */
+const FOOTER_SOCIAL_LABELS: SocialLabel[] = ['GitHub', 'LinkedIn', 'X (Twitter)']
 
 const footerSocials = FOOTER_SOCIAL_LABELS.map((label) =>
   activeSocials.find((social) => social.label === label),
@@ -352,6 +372,10 @@ const subscriberFooterStyles = {
   },
 } as const
 
+/**
+ * The foot of anything sent to a subscriber: who this is from, and the way out. Only the mail that
+ * someone signed up for carries it, since an unsubscribe link on a sign in code makes no sense.
+ */
 export function EmailSubscriberFooter({ unsubscribeUrl }: { unsubscribeUrl: string }) {
   return (
     <Section className="e-page e-footer" style={emailLayout.footer}>
@@ -368,7 +392,7 @@ export function EmailSubscriberFooter({ unsubscribeUrl }: { unsubscribeUrl: stri
         <Column style={emailLayout.footerCol}>
           {footerSocials.map((social) => (
             <Link key={social.href} href={social.href} style={subscriberFooterStyles.social}>
-              {social.label.replace(' [Twitter]', '')}
+              {social.label.replace(' (Twitter)', '')}
             </Link>
           ))}
         </Column>

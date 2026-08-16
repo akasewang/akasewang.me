@@ -22,14 +22,6 @@ export const projectsSeoContent: SeoContent = {
   ogTitle: 'Selected projects and open source works.',
 }
 
-export const newsletterSeoContent: SeoContent = {
-  title: `Newsletter | ${FULL_NAME}`,
-  description:
-    "Drop your email to get occasional updates on what I am building or writing. I don't send emails often enough for it to be annoying.",
-  imageAlt: `Newsletter - ${FULL_NAME}`,
-  ogTitle: 'Join my weekly newsletter.',
-}
-
 export const messageBoardSeoContent: SeoContent = {
   title: `Message Board | ${FULL_NAME}`,
   description:
@@ -54,6 +46,14 @@ export const skillsSeoContent: SeoContent = {
   ogTitle: 'The tech stack I use to build things.',
 }
 
+export const linksSeoContent: SeoContent = {
+  title: `Links | ${FULL_NAME}`,
+  description:
+    'Everywhere you can find me online, from code and design profiles to social and media accounts.',
+  imageAlt: `Links - ${FULL_NAME}`,
+  ogTitle: 'Everywhere else you can find me online.',
+}
+
 export const testimonialsSeoContent: SeoContent = {
   title: `Testimonials | ${FULL_NAME}`,
   description:
@@ -68,6 +68,14 @@ export const catalogSeoContent: SeoContent = {
     'A curated log of media and entertainment I have consumed (or am just hoarding in my backlog to feel productive).',
   imageAlt: `Catalog - ${FULL_NAME}`,
   ogTitle: 'A curated log of media and entertainment.',
+}
+
+export const domainsSeoContent: SeoContent = {
+  title: `Registered Domains | ${FULL_NAME}`,
+  description:
+    'The domains registered under my name, the ones with something behind them and the ones still waiting for an idea worth the renewal fee.',
+  imageAlt: `Registered Domains - ${FULL_NAME}`,
+  ogTitle: 'Every domain I have talked myself into buying.',
 }
 
 export const changelogSeoContent: SeoContent = {

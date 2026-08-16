@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react'
 
+/** Versioned, so a change to the cached shape cannot be read back as the old one */
 const CACHE_KEY = 'github_stars_cache:v1'
 const CACHE_TTL = 15 * 60 * 1000
 const COMPACT_NUMBER_FORMATTER = new Intl.NumberFormat('en-US', {
@@ -37,6 +38,7 @@ export function useGithubStars() {
     let isMounted = true
 
     const fetchStars = async () => {
+      /** Storage throws in private modes and on quota, and a missed cache is only a refetch */
       try {
         const cached = localStorage.getItem(CACHE_KEY)
         if (cached) {
@@ -48,6 +50,7 @@ export function useGithubStars() {
         }
       } catch {}
 
+      /** Whoever gets here first owns the request and the rest await the same promise */
       try {
         if (!sharedFetchPromise) {
           sharedFetchPromise = fetch('/api/github-stars')

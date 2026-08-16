@@ -6,12 +6,16 @@ import { type ComponentProps, forwardRef, useImperativeHandle, useState } from '
 const VOLUME_SPEAKER_PATH =
   'M155.51 24.81a8 8 0 0 0-8.42.88L77.25 80H32a16 16 0 0 0-16 16v64a16 16 0 0 0 16 16h45.25l69.84 54.31A8 8 0 0 0 160 224V32a8 8 0 0 0-4.49-7.19M32 96h40v64H32Zm112 111.64l-56-43.55V91.91l56-43.55Z'
 
+/** The parent replays the waves through this rather than by holding a state of its own */
 export interface VolumeIconHandle {
   startAnimation: () => void
   stopAnimation: () => void
 }
 
-/** The sound toggle, whose waves animate in and out as sound is switched */
+/**
+ * The sound toggle. Both waves stay drawn and are only replayed on request, inner first, so the
+ * mark reads as sound leaving the speaker.
+ */
 export const VolumeIcon = forwardRef<VolumeIconHandle, ComponentProps<'svg'>>((props, ref) => {
   const [isPlaying, setIsPlaying] = useState(false)
 

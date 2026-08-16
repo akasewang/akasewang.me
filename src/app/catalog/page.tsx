@@ -27,7 +27,7 @@ export default function CatalogPage() {
     <PageLayout
       title={catalogPageContent.title}
       subtitle={catalogPageContent.subtitle}
-      footerText="That's a wrap. Now, what should I read or watch next?"
+      footerText={catalogPageContent.footerText}
       breadcrumb={breadcrumbJsonLd}
     >
       <section>

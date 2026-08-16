@@ -1,138 +1,187 @@
 'use client'
 
-import { AnimatePresence, m, useReducedMotion } from 'framer-motion'
-import { useEffect, useState } from 'react'
+import { m, useReducedMotion } from 'framer-motion'
+import { useEffect, useRef, useState } from 'react'
 import {
-  REVEAL_BOW,
-  REVEAL_BOW_PEAK,
-  REVEAL_COUNT_MS,
-  REVEAL_CURTAIN_MS,
-  REVEAL_EASE,
-  REVEAL_HOLD_MS,
-  REVEAL_LEAD_MS,
+  REVEAL_COUNT_IN_MS,
+  REVEAL_COUNT_OUT_EASE,
+  REVEAL_COUNT_OUT_MS,
+  REVEAL_DIGIT_STAGGER_MS,
+  REVEAL_FADE_EASE,
+  REVEAL_FADE_MS,
+  REVEAL_FOCUS_BLUR_PX,
+  REVEAL_FOCUS_MS,
 } from '@/constants/ui'
-import { cn } from '@/utils/utils'
+import {
+  getInitialLoaderCount,
+  INITIAL_LOADER_FINAL_COUNT,
+  INITIAL_LOADER_TIMELINE,
+} from '@/utils/initial-loader'
 
-/** Fast at first and slowing toward the end, which is how a real load tends to feel */
-const easeOutCubic = (t: number) => 1 - (1 - t) ** 3
+/** Both spellings read the one variable, so Safari's prefix needs no second animation */
+const FOCUS_FILTER = 'blur(var(--reveal-focus))'
 
 /**
- * The opening screen: a counter running to 100, then a curtain that drops away to show the page.
+ * The opening screen: a counter to 100, then a fade of three overlapping parts. The digits thin out
+ * one after another, the veil follows a beat later, and the page resolves out of a backdrop blur
+ * that clears first so nothing sharpens in full view.
  *
- * The count is driven off elapsed time on each frame rather than off a fixed step, so it takes the
- * same length of time regardless of the frame rate it gets. Scrolling is held for the duration so
- * the page cannot be moved underneath the curtain, and restoring it is guarded, since it has to
- * happen whether the sequence finishes or the component is torn down partway through.
- *
- * With reduced motion the whole thing is skipped and the page is shown immediately.
+ * The blurred layer is mounted only for the fade, and interaction is held until the veil is gone so
+ * nobody activates a page they cannot see. Reduced motion skips all of it.
  */
 export function InitialLoader() {
   const [count, setCount] = useState(1)
+  const [isCountLeaving, setIsCountLeaving] = useState(false)
+  const [isFading, setIsFading] = useState(false)
   const [isFinished, setIsFinished] = useState(false)
+  const hasFinishedRef = useRef(false)
   const prefersReducedMotion = useReducedMotion()
 
   useEffect(() => {
+    /** A live preference change after the one-shot sequence must not restart it behind the page */
+    if (hasFinishedRef.current) return
+
     if (prefersReducedMotion) {
-      const timer = setTimeout(() => setIsFinished(true), 0)
+      const timer = setTimeout(() => {
+        hasFinishedRef.current = true
+        setIsFinished(true)
+      }, 0)
       return () => clearTimeout(timer)
     }
 
     const originalOverflow = document.body.style.overflow
     document.body.style.overflow = 'hidden'
-    let overflowRestored = false
-    const restoreOverflow = () => {
-      if (overflowRestored) return
-      overflowRestored = true
+
+    /**
+     * The overlay catches pointers, while this capture listener keeps page-level shortcuts and
+     * keyboard activation from reaching the content behind it. Modified browser shortcuts retain
+     * their native behaviour; only propagation into the site is stopped for those combinations.
+     */
+    const holdKeyboardInteraction = (event: KeyboardEvent) => {
+      event.stopImmediatePropagation()
+      if (!event.ctrlKey && !event.metaKey && !event.altKey) event.preventDefault()
+    }
+    window.addEventListener('keydown', holdKeyboardInteraction, true)
+
+    let interactionRestored = false
+    const restoreInteraction = () => {
+      if (interactionRestored) return
+      interactionRestored = true
       document.body.style.overflow = originalOverflow
+      window.removeEventListener('keydown', holdKeyboardInteraction, true)
     }
 
     let animationFrameId: number
+    let displayedCount = 1
+    let countLeaving = false
+    let fadeStarted = false
     const startTime = performance.now()
 
     const tick = (now: number) => {
       const elapsed = now - startTime
 
-      if (elapsed < REVEAL_COUNT_MS) {
-        setCount(Math.min(100, Math.floor(easeOutCubic(elapsed / REVEAL_COUNT_MS) * 99) + 1))
+      if (elapsed < INITIAL_LOADER_TIMELINE.countEndsAt) {
+        const nextCount = getInitialLoaderCount(elapsed)
+
+        if (nextCount !== displayedCount) {
+          displayedCount = nextCount
+          setCount(nextCount)
+        }
+
         animationFrameId = requestAnimationFrame(tick)
         return
       }
 
-      setCount(100)
+      if (displayedCount !== INITIAL_LOADER_FINAL_COUNT) {
+        displayedCount = INITIAL_LOADER_FINAL_COUNT
+        setCount(INITIAL_LOADER_FINAL_COUNT)
+      }
 
-      if (elapsed < REVEAL_COUNT_MS + REVEAL_HOLD_MS) {
+      if (!countLeaving && elapsed >= INITIAL_LOADER_TIMELINE.countOutAt) {
+        countLeaving = true
+        setIsCountLeaving(true)
+      }
+
+      if (!fadeStarted && elapsed >= INITIAL_LOADER_TIMELINE.fadeAt) {
+        fadeStarted = true
+        setIsFading(true)
+      }
+
+      if (elapsed < INITIAL_LOADER_TIMELINE.finishAt) {
         animationFrameId = requestAnimationFrame(tick)
         return
       }
 
+      hasFinishedRef.current = true
+      restoreInteraction()
       setIsFinished(true)
-      restoreOverflow()
     }
 
     animationFrameId = requestAnimationFrame(tick)
 
     return () => {
       cancelAnimationFrame(animationFrameId)
-      restoreOverflow()
+      restoreInteraction()
     }
   }, [prefersReducedMotion])
 
   const displayCount = count < 10 ? `0${count}` : `${count}`
 
+  if (isFinished) return null
+
   return (
-    <AnimatePresence>
-      {!isFinished && (
+    <div
+      aria-hidden="true"
+      className="pointer-events-auto fixed inset-0 z-[9999] select-none motion-reduce:hidden"
+    >
+      {isFading && (
         <m.div
-          key="initial-loader"
-          aria-hidden="true"
-          exit={{
-            y: '100%',
-            transition: {
-              duration: REVEAL_CURTAIN_MS / 1000,
-              ease: REVEAL_EASE,
-              delay: REVEAL_LEAD_MS / 1000,
-            },
-          }}
-          className={cn(
-            'fixed inset-0 z-[9999] flex items-center justify-center bg-background select-none',
-            isFinished ? 'pointer-events-none' : 'pointer-events-auto',
-          )}
-        >
-          <m.div
-            initial={{ height: '0%', opacity: 0 }}
+          initial={{ '--reveal-focus': `${REVEAL_FOCUS_BLUR_PX}px` }}
+          animate={{ '--reveal-focus': '0px' }}
+          transition={{ duration: REVEAL_FOCUS_MS / 1000, ease: REVEAL_FADE_EASE }}
+          className="absolute inset-0"
+          style={{ backdropFilter: FOCUS_FILTER, WebkitBackdropFilter: FOCUS_FILTER }}
+        />
+      )}
+      <m.div
+        initial={{ opacity: 1 }}
+        animate={{ opacity: isFading ? 0 : 1 }}
+        transition={{ duration: isFading ? REVEAL_FADE_MS / 1000 : 0, ease: REVEAL_FADE_EASE }}
+        className="absolute inset-0 bg-background"
+        /** Keeps the veil on a layer of its own, so fading it repaints nothing but itself */
+        style={{ willChange: 'opacity' }}
+      />
+      <m.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: REVEAL_COUNT_IN_MS / 1000, ease: 'easeOut' }}
+        className="absolute inset-0 flex items-center justify-center font-mono text-xs font-light tracking-[0.25em] text-primary tabular-nums [font-feature-settings:'liga'_0,'calt'_0] [font-variant-ligatures:none]"
+      >
+        {/**
+         * A digit to an element, so they can leave a beat apart. The advance width is fixed by the
+         * tabular figures and the tracking sits after each character either way, so splitting the
+         * number up leaves it looking exactly as it did whole.
+         */}
+        {displayCount.split('').map((digit, index) => (
+          <m.span
+            key={index}
+            initial={false}
             animate={
-              isFinished
-                ? { height: ['0%', REVEAL_BOW, '0%'], opacity: 1 }
-                : { height: '0%', opacity: 0 }
+              isCountLeaving
+                ? { opacity: 0, filter: 'blur(5px)' }
+                : { opacity: 1, filter: 'blur(0px)' }
             }
             transition={{
-              height: {
-                duration: REVEAL_CURTAIN_MS / 1000,
-                delay: REVEAL_LEAD_MS / 1000,
-                times: [0, REVEAL_BOW_PEAK, 1],
-                ease: 'easeInOut',
-              },
-              opacity: { duration: 0.2, ease: 'easeOut', delay: REVEAL_LEAD_MS / 1000 },
+              duration: REVEAL_COUNT_OUT_MS / 1000,
+              ease: REVEAL_COUNT_OUT_EASE,
+              delay: isCountLeaving ? (index * REVEAL_DIGIT_STAGGER_MS) / 1000 : 0,
             }}
-            className="pointer-events-none absolute inset-x-0 bottom-full bg-background"
-            style={{
-              borderRadius: '50% 50% 0 0 / 100% 100% 0 0',
-              boxShadow: `0 -1px 0 0 color-mix(in oklab, var(--primary) 38%, transparent),
-                          0 -10px 30px -6px color-mix(in oklab, var(--primary) 10%, transparent)`,
-            }}
-          />
-
-          <m.span
-            initial={{ opacity: 0 }}
-            animate={{ opacity: isFinished ? 0 : 1 }}
-            transition={{ duration: 0.28, ease: 'easeOut' }}
-            className="font-mono text-xs font-light tracking-[0.25em] text-primary tabular-nums [font-feature-settings:'liga'_0,'calt'_0] [font-variant-ligatures:none]"
             suppressHydrationWarning
           >
-            {displayCount}
+            {digit}
           </m.span>
-        </m.div>
-      )}
-    </AnimatePresence>
+        ))}
+      </m.div>
+    </div>
   )
 }

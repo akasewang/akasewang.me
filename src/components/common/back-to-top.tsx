@@ -11,17 +11,21 @@ import {
 } from 'framer-motion'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Icons } from '@/components/ui/icons'
-import {
-  BACK_TO_TOP_CENTER,
-  BACK_TO_TOP_CIRCUMFERENCE,
-  BACK_TO_TOP_RADIUS,
-  BACK_TO_TOP_SIZE,
-} from '@/constants/constants'
 import { SMOOTH_SPRING_TRANSITION, SPRING_TRANSITION } from '@/constants/ui'
 import { commonContent } from '@/data/content/layout-content'
 import { useSoundEffects } from '@/hooks/use-sound-effects'
 
 import { cn } from '@/utils/utils'
+
+/** Geometry for the scroll progress ring, which draws its arc from the circumference */
+const BACK_TO_TOP_SIZE = 52
+const BACK_TO_TOP_CENTER = BACK_TO_TOP_SIZE / 2
+
+/** Short of half the size, so the ring sits inside the button's edge rather than on it */
+const BACK_TO_TOP_RADIUS = 23.5
+
+/** The full length of the stroke, which scroll progress is mapped onto as a dash offset */
+const BACK_TO_TOP_CIRCUMFERENCE = 2 * Math.PI * BACK_TO_TOP_RADIUS
 
 const buttonVariants: Variants = {
   initial: { opacity: 0, scale: 0.5, y: 20 },
@@ -71,6 +75,7 @@ export function BackToTop() {
     windowHeight: 0,
   })
 
+  /** Taken once and on resize, since these are what the scroll handler below reads every frame */
   const measureDOM = useCallback(() => {
     const sections = document.querySelectorAll('main section[id]')
     const lastSection = sections[sections.length - 1] as HTMLElement | undefined
@@ -91,6 +96,7 @@ export function BackToTop() {
       timeoutId = window.setTimeout(measureDOM, 150)
     }
 
+    /** The body rather than the window, so content growing counts as a resize as well */
     const observer = new ResizeObserver(handleResize)
     observer.observe(document.body)
 
@@ -100,6 +106,10 @@ export function BackToTop() {
     }
   }, [measureDOM])
 
+  /**
+   * Decides both whether the control shows and which way it points. It turns upward near the end of
+   * the page by any of three readings, since a short last section and a long one end differently.
+   */
   useMotionValueEvent(scrollYProgress, 'change', (latest) => {
     const { isScrollable, lastSectionOffset, windowHeight } = domMetrics.current
 
@@ -124,6 +134,7 @@ export function BackToTop() {
       return window.scrollTo({ top: 0, behavior: 'smooth' })
     }
 
+    /** Pointing down means stepping to the next section rather than to the bottom of the page */
     const currentScroll = window.scrollY
     const sections = document.querySelectorAll('main section[id]')
     let nextOffset: number | undefined
@@ -160,7 +171,7 @@ export function BackToTop() {
           exit="exit"
           transition={SMOOTH_SPRING_TRANSITION}
           whileTap={{ scale: 0.95 }}
-          className="group fixed bottom-[28px] right-[28px] z-50 flex size-[58px] items-center justify-center rounded-full bg-floating ring-1 ring-inset ring-ring retina:ring-[0.5px] shadow-md md:bottom-[36px]"
+          className="group fixed bottom-7 right-7 z-50 flex size-13 items-center justify-center rounded-full bg-floating ring-1 ring-inset ring-ring retina:ring-[0.5px] shadow-md md:bottom-9"
         >
           <svg
             viewBox={`0 0 ${BACK_TO_TOP_SIZE} ${BACK_TO_TOP_SIZE}`}
@@ -207,7 +218,7 @@ export function BackToTop() {
                 transition={SPRING_TRANSITION}
                 className="absolute flex items-center justify-center text-muted-foreground transition-colors duration-500 supports-hover:group-hover:text-primary group-active:text-primary"
               >
-                <Icon className="size-6.5" strokeWidth={2} />
+                <Icon className="size-6" strokeWidth={2} />
               </m.div>
             </AnimatePresence>
           </div>

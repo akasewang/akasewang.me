@@ -10,6 +10,10 @@ type CodeMetaNode = {
   children?: CodeMetaNode[]
 }
 
+/**
+ * Lifts a title out of a fence's info string and onto the element, so ```ts title="x.ts" reaches
+ * the code block as a prop. Markdown keeps everything after the language as free text otherwise.
+ */
 const remarkCodeMeta = () => (tree: CodeMetaNode) => {
   const visit = (node: CodeMetaNode) => {
     if (node.type === 'code' && node.meta) {

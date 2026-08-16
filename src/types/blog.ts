@@ -20,10 +20,12 @@ export interface BlogPost {
   slug: string
   type?: BlogCategory
   links?: BlogLink[]
-  tags?: string[]
 }
 
+/** Copy for the listing page, including what it says when a filter matches nothing */
 export interface BlogsListingContent {
+  /** The closing line under the page */
+  footerText: string
   title: string
   subtitle: string
   noTechnical: string

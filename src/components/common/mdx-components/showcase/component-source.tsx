@@ -36,7 +36,7 @@ export function ComponentSource({ src, title, className }: ComponentSourceProps)
 
   if (codeString === null) {
     return (
-      <div className="my-8 rounded-xl border border-border/60 bg-card p-6 text-center text-sm text-muted-foreground">
+      <div className="my-8 rounded-xl border border-border/60 bg-card p-6 text-center text-sm text-muted-foreground retina:border-[0.5px]">
         Source file <code>{src}</code> not found.
       </div>
     )

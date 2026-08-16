@@ -7,5 +7,5 @@
 files=$(git diff --cached --name-only --diff-filter=d)
 [ -z "$files" ] && exit 0
 
-npm run format || exit 1
+pnpm run format || exit 1
 printf '%s\n' "$files" | xargs git add --

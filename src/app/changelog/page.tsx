@@ -8,6 +8,7 @@ import { getBreadcrumbSchema } from '@/lib/json-ld'
 import { getChangelog } from '@/lib/managers/changelog-manager'
 import { constructMetadata, getOgImageUrl } from '@/lib/metadata'
 
+/** Rebuilt hourly, which is as often as a commit history is worth re-reading from GitHub */
 export const revalidate = 3600
 
 export const metadata: Metadata = constructMetadata({
@@ -31,7 +32,7 @@ export default async function ChangelogPage() {
     <PageLayout
       title={changelogPageContent.title}
       subtitle={changelogPageContent.subtitle}
-      footerText="That's everything shipped so far. This page writes itself, one commit at a time."
+      footerText={changelogPageContent.footerText}
       breadcrumb={breadcrumbJsonLd}
     >
       <section>

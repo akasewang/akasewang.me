@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { Fragment, type ReactNode } from 'react'
 import { NewsletterSubscription } from '@/components/common/newsletter-subscription'
 import { Achievements } from '@/components/sections/achievements'
 import { Bookmarks } from '@/components/sections/bookmarks'
@@ -9,6 +10,10 @@ import { FeaturedPosts } from '@/components/sections/featured-posts'
 import { FeaturedProjects } from '@/components/sections/featured-projects'
 import { HeroSection } from '@/components/sections/hero-section'
 import { Skills } from '@/components/sections/skills'
+import { TechnicalTraining } from '@/components/sections/technical-training'
+/* import { Testimonials } from '@/components/sections/testimonials' */
+/* import { Volunteer } from '@/components/sections/volunteer' */
+import { LANDING_SECTIONS, type LandingSection } from '@/constants/landing'
 import { homeSeoContent } from '@/data/content/seo-content'
 import { getAllBlogPosts } from '@/lib/managers/blog-manager'
 import { getAllProjects } from '@/lib/managers/project-manager'
@@ -24,21 +29,32 @@ export const metadata: Metadata = constructMetadata({
 
 /** The landing page, stacking every section of the site into one scroll */
 export default async function Home() {
+  /** Both read the filesystem, so they are read together rather than one after the other */
   const [blogPosts, projects] = await Promise.all([getAllBlogPosts(), getAllProjects()])
+
+  /** What each name in the running order draws. The skeleton keys the same names to its own shapes */
+  const sections: Record<LandingSection, ReactNode> = {
+    hero: <HeroSection />,
+    skills: <Skills />,
+    experience: <Experience />,
+    /* volunteer: <Volunteer />, */
+    technicalTraining: <TechnicalTraining />,
+    featuredProjects: <FeaturedProjects projects={projects} isHomePage />,
+    featuredPosts: <FeaturedPosts posts={blogPosts} isHomePage />,
+    /* testimonials: <Testimonials />, */
+    education: <Education />,
+    achievements: <Achievements />,
+    certifications: <Certifications />,
+    bookmarks: <Bookmarks />,
+    newsletter: <NewsletterSubscription />,
+  }
 
   return (
     <main className="flex-1">
       <section className="space-y-14">
-        <HeroSection />
-        <Skills />
-        <Experience />
-        <FeaturedProjects projects={projects} isHomePage />
-        <FeaturedPosts posts={blogPosts} isHomePage />
-        <Education />
-        <Achievements />
-        <Certifications />
-        <Bookmarks />
-        <NewsletterSubscription />
+        {LANDING_SECTIONS.map((section) => (
+          <Fragment key={section}>{sections[section]}</Fragment>
+        ))}
       </section>
     </main>
   )

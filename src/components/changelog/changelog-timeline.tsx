@@ -3,6 +3,15 @@
 import Image from 'next/image'
 import { useRef } from 'react'
 import { EmptyState } from '@/components/common/empty-state'
+import {
+  CHANGELOG_DAY_CLASS,
+  CHANGELOG_HEADING_CLASS,
+  CHANGELOG_MARK_CLASS,
+  CHANGELOG_RAIL_CLASS,
+  CHANGELOG_STUB_ABOVE,
+  CHANGELOG_STUB_BELOW,
+  CHANGELOG_STUB_CLASS,
+} from '@/components/skeletons/changelog'
 import { Bullet } from '@/components/ui/bullet'
 import { ExpandToggle } from '@/components/ui/expand-toggle'
 import { ExpandableContent } from '@/components/ui/expandable-content'
@@ -18,9 +27,13 @@ interface ChangelogTimelineProps {
   days: ChangelogDay[]
 }
 
-const MOBILE_STUB_CLASS =
-  'absolute left-1/2 h-3 w-px -translate-x-1/2 border-l border-dashed border-border'
+/** The colour the placeholder leaves out, this being the only thing the two of them differ on */
+const MOBILE_STUB_CLASS = cn(CHANGELOG_STUB_CLASS, 'border-border')
 
+/**
+ * One commit: its subject, its hash and the body it expands to. The button covers the whole row so
+ * anywhere on it toggles, with the hash taking the pointer back so it can still be followed.
+ */
 function CommitRow({ commit }: { commit: ChangelogCommit }) {
   const { isExpanded, handleToggle } = useExpandableRow()
   const { hoverCard, hoverLink, navigate: navigateSound } = useSoundEffects()
@@ -43,7 +56,7 @@ function CommitRow({ commit }: { commit: ChangelogCommit }) {
           {commit.subject}
         </h3>
 
-        <div className="pointer-events-none relative z-10 flex items-center gap-3 font-mono text-[13px] text-muted-foreground sm:shrink-0 sm:pt-px">
+        <div className="pointer-events-none relative z-10 flex items-center gap-3 font-mono text-xs-plus text-muted-foreground sm:shrink-0 sm:pt-px">
           <a
             href={commit.url}
             target="_blank"
@@ -65,6 +78,7 @@ function CommitRow({ commit }: { commit: ChangelogCommit }) {
       <ExpandableContent isExpanded={isExpanded}>
         <div className="flex flex-col gap-1.5 px-2 pb-2 pt-1 text-sm leading-relaxed text-foreground sm:px-3">
           {commit.body.map((block, index) => {
+            /** An empty block is the blank line the message had, kept as a gap */
             if (!block) {
               return <div key={`${commit.sha}-${index}`} aria-hidden />
             }
@@ -76,7 +90,7 @@ function CommitRow({ commit }: { commit: ChangelogCommit }) {
               <div key={`${commit.sha}-${index}`} className="flex items-start gap-3">
                 {isBullet && (
                   <div className="flex w-5 shrink-0 justify-center">
-                    <Bullet className="mt-[9px]" />
+                    <Bullet className="mt-2.25" />
                   </div>
                 )}
                 <p className="flex-1 text-pretty whitespace-pre-wrap">{content}</p>
@@ -84,7 +98,7 @@ function CommitRow({ commit }: { commit: ChangelogCommit }) {
             )
           })}
 
-          <div className="flex items-center gap-2 font-mono text-[13px] text-muted-foreground">
+          <div className="flex items-center gap-2 font-mono text-xs-plus text-muted-foreground">
             {commit.authorAvatar ? (
               <Image
                 src={commit.authorAvatar}
@@ -142,30 +156,37 @@ export function ChangelogTimeline({ days }: ChangelogTimelineProps) {
         const isLast = index === days.length - 1
 
         return (
-          <div key={day.date} className="relative pb-3 last:pb-2 sm:pb-6 sm:pl-8 sm:last:pb-2">
+          <div key={day.date} className={CHANGELOG_DAY_CLASS}>
+            {/**
+             * The rail down the side, drawn per day rather than once. The first starts below its
+             * own mark and the last turns a corner, so the line begins and ends deliberately.
+             */}
             <div
               aria-hidden
               className={cn(
-                'absolute bottom-0 left-[9.5px] hidden w-px border-l border-dashed border-border sm:block',
+                CHANGELOG_RAIL_CLASS,
+                'border-border',
                 isFirst ? 'top-3' : 'top-0',
-                isLast && 'w-4 border-b',
+                isLast && 'w-4 border-b retina:border-b-[0.5px]',
               )}
             />
 
-            <div className="absolute left-0 top-0.5 z-10 hidden bg-background text-muted-foreground sm:block">
+            <div className={cn(CHANGELOG_MARK_CLASS, 'text-muted-foreground')}>
               <Icons.gitCommit className="size-5" />
             </div>
 
-            <h2 className="flex items-center gap-2 pt-0.5 font-mono text-[13px] text-muted-foreground">
+            <h2
+              className={cn(
+                CHANGELOG_HEADING_CLASS,
+                'font-mono text-xs-plus text-muted-foreground',
+              )}
+            >
               <span className="relative inline-flex sm:hidden">
                 {!isFirst && (
-                  <span
-                    aria-hidden
-                    className={cn(MOBILE_STUB_CLASS, 'bottom-[calc(50%_+_10px)]')}
-                  />
+                  <span aria-hidden className={cn(MOBILE_STUB_CLASS, CHANGELOG_STUB_ABOVE)} />
                 )}
                 <Icons.gitCommit className="size-5" />
-                <span aria-hidden className={cn(MOBILE_STUB_CLASS, 'top-[calc(50%_+_10px)]')} />
+                <span aria-hidden className={cn(MOBILE_STUB_CLASS, CHANGELOG_STUB_BELOW)} />
               </span>
               Commits on {day.label}
             </h2>

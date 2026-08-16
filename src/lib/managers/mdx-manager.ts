@@ -19,6 +19,7 @@ export function createMdxManager<T extends { date?: string | Date; slug: string 
 ) {
   const getSlugs = () => getMdxSlugs(directory)
 
+  /** One entry with its body, for the page that renders it */
   const getPost = cache(async (slug: string) => {
     try {
       const filePath = await resolveMdxFilePath(directory, slug)
@@ -44,6 +45,7 @@ export function createMdxManager<T extends { date?: string | Date; slug: string 
     }
   })
 
+  /** Every entry newest first, frontmatter only, since a listing never needs the bodies */
   const getAll = cache(async (): Promise<T[]> => {
     try {
       const slugs = await getSlugs()

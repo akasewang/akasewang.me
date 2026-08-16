@@ -2,7 +2,8 @@ import { SITE_URL } from '@/constants/constants'
 import { photos } from '@/data/static/photos'
 import { getAllBlogPosts } from '@/lib/managers/blog-manager'
 import { getAllProjects, getPageProjects } from '@/lib/managers/project-manager'
-import { parseDate } from '@/utils/utils'
+import { getProjectEffectiveDate } from '@/utils/project'
+import { parseAnyDate, parseDate } from '@/utils/utils'
 
 interface SitemapUrl {
   url: string
@@ -17,10 +18,11 @@ const STATIC_PAGES = [
   { path: '/blogs', priority: '0.9', changefreq: 'daily' },
   { path: '/projects', priority: '0.8', changefreq: 'weekly' },
   { path: '/message-board', priority: '0.6', changefreq: 'monthly' },
-  { path: '/newsletter', priority: '0.8', changefreq: 'monthly' },
   { path: '/photos', priority: '0.4', changefreq: 'monthly' },
   { path: '/catalog', priority: '0.4', changefreq: 'monthly' },
   { path: '/skills', priority: '0.8', changefreq: 'monthly' },
+  { path: '/links', priority: '0.5', changefreq: 'monthly' },
+  { path: '/domains', priority: '0.3', changefreq: 'monthly' },
   { path: '/testimonials', priority: '0.7', changefreq: 'monthly' },
   { path: '/changelog', priority: '0.6', changefreq: 'daily' },
 ] as const
@@ -44,10 +46,14 @@ export async function GET(): Promise<Response> {
 
   const currentDate = new Date().toISOString()
 
+  const contentDates = [
+    ...blogPosts.map((post) => post.date),
+    ...projectPosts.map(getProjectEffectiveDate),
+  ]
   const newestContentDate =
-    [...blogPosts, ...projectPosts].reduce((latest, item) => {
-      const itemDate = parseDate(item.date)
-      return itemDate > latest ? itemDate : latest
+    contentDates.reduce<string>((latest, value) => {
+      const itemDate = parseAnyDate(value)?.toISOString()
+      return itemDate && itemDate > latest ? itemDate : latest
     }, '') || currentDate
 
   /** A post dated in the future must not advertise a lastmod that has not happened yet */
@@ -69,7 +75,7 @@ export async function GET(): Promise<Response> {
     })),
     ...pageProjects.map((project) => ({
       url: `${SITE_URL}/projects/${project.slug}`,
-      lastModified: parseDate(project.date),
+      lastModified: parseDate(getProjectEffectiveDate(project)),
       priority: '0.8',
       changefreq: 'weekly',
     })),

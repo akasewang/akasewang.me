@@ -18,13 +18,11 @@ import type { ActionResult } from '@/types/actions'
 
 /**
  * Mails a fresh admin code to the address held on the server, which is also the address the caller
- * has to name before anything happens.
+ * has to name before anything is sent. The code only ever goes to the stored address, so naming it
+ * correctly still leaves a caller with nothing to read unless they hold the inbox too.
  *
- * Every outcome that is not a misconfiguration answers with one line, and that is the whole point of
- * the gate. A wrong address, a right address, a code already sitting in the inbox and a request made
- * too soon are indistinguishable from out here, so the form cannot be used to find the address by
- * watching what it says back. The line stays true in all of them: where a code is not sent it is
- * because one is already there.
+ * The address is matched in constant time and a new code cannot be asked for more than once a
+ * minute, which is what stops the form being worked at speed.
  */
 export async function requestAdminOtp(email: string): Promise<ActionResult> {
   const toasts = toastContent.newsletter

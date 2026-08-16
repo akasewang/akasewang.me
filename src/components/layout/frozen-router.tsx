@@ -31,6 +31,7 @@ export function FrozenRouter({ children }: { children: ReactNode }) {
     pathParams: pathParamsContext,
   }))
 
+  /** While this page is the live one, the pin follows the router. Once it is leaving, it stops */
   if (
     isPresent &&
     (pinned.router !== routerContext ||

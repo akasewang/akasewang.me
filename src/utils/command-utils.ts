@@ -5,22 +5,50 @@ interface CommandLabelPart {
   match: boolean
 }
 
-/** Everything an item can be found by, so a search hits its date and keywords as well as its name */
+/**
+ * A query worked out once and reused across every row, rather than re-parsed per item. The patterns
+ * are what pick the matched run out of a label, and are null when there is nothing to match.
+ */
+export interface PreparedCommandQuery {
+  terms: readonly string[]
+  labelPattern: RegExp | null
+  exactLabelPattern: RegExp | null
+}
+
+/** Everything an item can be found by, including the preview copy attached to written content */
 function searchableText(item: CommandItem) {
-  return [item.label, item.meta, ...(item.keywords ?? [])].filter(Boolean).join(' ').toLowerCase()
+  return [item.label, item.meta, item.excerpt, ...(item.keywords ?? [])]
+    .filter(Boolean)
+    .join(' ')
+    .toLowerCase()
 }
 
 /** Words in the query, deduplicated so typing the same word twice does not narrow anything */
-function queryTerms(query: string) {
-  return [...new Set(query.trim().toLowerCase().split(/\s+/).filter(Boolean))]
+export function prepareCommandQuery(query: string): PreparedCommandQuery {
+  const terms = [...new Set(query.trim().toLowerCase().split(/\s+/).filter(Boolean))]
+
+  if (terms.length === 0) {
+    return { terms, labelPattern: null, exactLabelPattern: null }
+  }
+
+  const alternation = terms
+    .map((term) => term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
+    .sort((a, b) => b.length - a.length)
+    .join('|')
+
+  return {
+    terms,
+    labelPattern: new RegExp(`(${alternation})`, 'i'),
+    exactLabelPattern: new RegExp(`^(?:${alternation})$`, 'i'),
+  }
 }
 
 /**
  * Whether an item survives the query. Every word has to appear somewhere in the item, so words can
  * be typed in any order and each one narrows the list further.
  */
-export function matchesCommandQuery(item: CommandItem, query: string) {
-  const terms = queryTerms(query)
+export function matchesCommandQuery(item: CommandItem, query: PreparedCommandQuery) {
+  const { terms } = query
   if (terms.length === 0) return true
 
   const text = searchableText(item)
@@ -34,17 +62,13 @@ export function matchesCommandQuery(item: CommandItem, query: string) {
  * hold characters a regular expression reads as syntax. Longest first, so where one term is the
  * start of another the longer match wins and the highlight covers the whole of what was typed.
  */
-export function splitLabelByQuery(label: string, query: string): CommandLabelPart[] {
-  const terms = queryTerms(query)
-  if (terms.length === 0) return [{ text: label, match: false }]
+export function splitLabelByQuery(
+  label: string,
+  { labelPattern, exactLabelPattern }: PreparedCommandQuery,
+): CommandLabelPart[] {
+  if (!labelPattern || !exactLabelPattern) return [{ text: label, match: false }]
 
-  const escaped = terms
-    .map((term) => term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
-    .sort((a, b) => b.length - a.length)
+  const parts = label.split(labelPattern).filter(Boolean)
 
-  const alternation = escaped.join('|')
-  const parts = label.split(new RegExp(`(${alternation})`, 'gi')).filter(Boolean)
-  const isTerm = new RegExp(`^(?:${alternation})$`, 'i')
-
-  return parts.map((text) => ({ text, match: isTerm.test(text) }))
+  return parts.map((text) => ({ text, match: exactLabelPattern.test(text) }))
 }

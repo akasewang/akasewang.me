@@ -5,6 +5,7 @@
  */
 export const NAV_ROUTES = ['/blogs', '/projects', '/photos'] as const
 
+/** Derived, so nothing can name a nav route the bar does not actually have */
 export type NavRoute = (typeof NAV_ROUTES)[number]
 
 /**

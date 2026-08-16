@@ -1,5 +1,7 @@
 import path from 'node:path'
+import { cache } from 'react'
 import type { ProjectPostData } from '@/types/project'
+import { isValidExternalProjectUrl, projectHasPage, sortProjectsNewest } from '@/utils/project'
 import { createMdxManager } from './mdx-manager'
 
 /** The project instance of the shared MDX manager, reading from its own content directory */
@@ -8,9 +10,26 @@ const manager = createMdxManager<ProjectPostData>(
   'project',
 )
 
-export const getProject = manager.getPost
+function validateProject(project: ProjectPostData) {
+  const external = project.external?.trim()
+  if (external && !isValidExternalProjectUrl(external)) {
+    throw new Error(`Project "${project.slug}" has an invalid external URL: ${project.external}`)
+  }
+}
 
-export const getAllProjects = manager.getAll
+/** Reads one project and enforces the same destination invariant used by the full index. */
+export const getProject = cache(async (slug: string) => {
+  const post = await manager.getPost(slug)
+  if (post) validateProject(post.data)
+  return post
+})
+
+/** The validated project index used by every listing and generated surface. */
+export const getAllProjects = cache(async () => {
+  const projects = await manager.getAll()
+  projects.forEach(validateProject)
+  return sortProjectsNewest(projects)
+})
 
 /**
  * The projects that have a page here, which is not all of them.
@@ -23,5 +42,4 @@ export const getAllProjects = manager.getAll
  * and next links from. `getAllProjects` remains the list for anything that shows every project,
  * such as the listing itself.
  */
-export const getPageProjects = async () =>
-  (await getAllProjects()).filter(({ external }) => !external)
+export const getPageProjects = cache(async () => (await getAllProjects()).filter(projectHasPage))

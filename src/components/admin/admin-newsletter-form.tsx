@@ -28,7 +28,10 @@ import { signInAdmin } from '@/lib/actions/admin-session-actions'
 import { broadcastNewsletter } from '@/lib/actions/newsletter-actions'
 import type { BlogPost } from '@/types/blog'
 
-/** The owner's composer for a newsletter issue, with a preview and a test send */
+/**
+ * The owner's composer for a newsletter issue. Two steps: ask for a code by email, then use it to
+ * sign in and send. Nothing here is trusted, both actions check the session on the server as well.
+ */
 export function AdminNewsletterForm({ blogs }: { blogs: BlogPost[] }) {
   const [adminEmail, setAdminEmail] = useState('')
   const [adminSecret, setAdminSecret] = useState('')
@@ -47,6 +50,7 @@ export function AdminNewsletterForm({ blogs }: { blogs: BlogPost[] }) {
 
   const isDisabled = loading || countdown > 0
 
+  /** The button says what the step actually is: give an address, send a code, then enter one */
   const requestButtonText = !hasValidAdminEmail
     ? adminNewsletterContent.enterEmailDefault
     : codeSent
@@ -85,6 +89,7 @@ export function AdminNewsletterForm({ blogs }: { blogs: BlogPost[] }) {
     }
   }
 
+  /** Signs in with the code and, only if that lands, sends the issue */
   async function broadcast() {
     setLoading(true)
     resetStatus()
@@ -145,6 +150,7 @@ export function AdminNewsletterForm({ blogs }: { blogs: BlogPost[] }) {
         <Input
           type="email"
           autoComplete="email"
+          aria-label={adminNewsletterContent.adminEmailPlaceholder}
           value={adminEmail}
           onChange={(e) => {
             setAdminEmail(e.target.value)
@@ -157,6 +163,7 @@ export function AdminNewsletterForm({ blogs }: { blogs: BlogPost[] }) {
         <Input
           type="text"
           autoComplete="one-time-code"
+          aria-label={adminNewsletterContent.adminCodePlaceholder}
           spellCheck={false}
           autoCapitalize="off"
           maxLength={ADMIN_CODE_LENGTH}
@@ -168,29 +175,22 @@ export function AdminNewsletterForm({ blogs }: { blogs: BlogPost[] }) {
       </div>
 
       <div className="flex justify-end">
-        {isReadyToSend ? (
-          <Button
-            type="submit"
-            disabled={isDisabled}
-            isPending={loading}
-            isSuccess={success}
-            countdown={countdown}
-            loadingText={adminNewsletterContent.buttonLoading}
-            successText={adminNewsletterContent.buttonSuccess}
-            successIcon={Icons.mailCheck}
-            defaultText={adminNewsletterContent.buttonDefault}
-            defaultIcon={Icons.broadcast}
-          />
-        ) : (
-          <Button
-            type="submit"
-            disabled={isDisabled || !hasValidAdminEmail || codeSent}
-            isPending={loading}
-            loadingText={adminNewsletterContent.sendCodeLoading}
-            defaultText={requestButtonText}
-            defaultIcon={Icons.mail}
-          />
-        )}
+        <Button
+          type="submit"
+          disabled={isDisabled || (!isReadyToSend && (!hasValidAdminEmail || codeSent))}
+          isPending={loading}
+          isSuccess={success}
+          countdown={countdown}
+          loadingText={
+            isReadyToSend
+              ? adminNewsletterContent.buttonLoading
+              : adminNewsletterContent.sendCodeLoading
+          }
+          successText={adminNewsletterContent.buttonSuccess}
+          successIcon={Icons.mailCheck}
+          defaultText={isReadyToSend ? adminNewsletterContent.buttonDefault : requestButtonText}
+          defaultIcon={isReadyToSend ? Icons.broadcast : Icons.mail}
+        />
       </div>
     </form>
   )

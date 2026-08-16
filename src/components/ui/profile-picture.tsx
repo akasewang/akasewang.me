@@ -14,6 +14,7 @@ interface ProfilePictureProps {
   className?: string
 }
 
+/** How long one character takes to brighten and fade back, the shimmer travelling on a delay */
 const DURATION = 4
 
 /** The avatar in the hero, ringed by its own name turning slowly around it */
@@ -21,6 +22,7 @@ export function ProfilePicture({ src, alt, href, label, className }: ProfilePict
   const shouldReduceMotion = useReducedMotion()
   const { hoverLink, navigate: navigateSound } = useSoundEffects()
 
+  /** Twice around, so the ring reads as continuous rather than as one label with a gap */
   const textToSpin = `${label} `.repeat(2)
 
   return (
@@ -32,7 +34,7 @@ export function ProfilePicture({ src, alt, href, label, className }: ProfilePict
       onMouseEnter={hoverLink}
       onClick={navigateSound}
       className={cn(
-        'group relative z-10 flex size-[4.25rem] shrink-0 items-center justify-center overflow-visible rounded-full transition-transform duration-300 active:scale-[0.92]',
+        'group relative z-10 flex size-17 shrink-0 items-center justify-center overflow-visible rounded-full transition-transform duration-300 active:scale-[0.92]',
         className,
       )}
     >
@@ -43,6 +45,7 @@ export function ProfilePicture({ src, alt, href, label, className }: ProfilePict
           fontSize="11px"
           className="[--color:var(--secondary)] [--shimmering-color:color-mix(in_oklab,var(--foreground)_40%,var(--secondary))]"
           spinClassName="[animation-duration:20s] motion-reduce:animate-none"
+          /** Each character is delayed by its own position, which is what sends the shimmer round */
           renderChar={(char, index) =>
             shouldReduceMotion ? (
               <span className="text-[var(--shimmering-color)]">{char}</span>

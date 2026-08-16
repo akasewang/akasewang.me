@@ -43,7 +43,7 @@ export function MarqueeField({ text, label, className }: MarqueeFieldProps) {
           <div key={row} className="flex overflow-hidden">
             <div
               className={cn(
-                'marquee-row flex shrink-0 whitespace-nowrap font-mono text-[26px] font-black uppercase leading-[1.35] tracking-tight',
+                'marquee-row flex shrink-0 whitespace-nowrap font-mono text-[1.625rem] font-black uppercase leading-[1.35] tracking-tight',
                 row % 2 === 0 ? 'text-primary/[0.13]' : 'text-primary/[0.05]',
               )}
               style={{

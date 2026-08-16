@@ -2,35 +2,30 @@
 title: Why I Use WWW as my Canonical URL
 excerpt: The World Wide Web prefix is often viewed as a relic of the 90s but there are solid engineering and infrastructure reasons why keeping the www subdomain is the safest choice for a growing project.
 date: '2026-06-07'
-slug: why-i-use-www
 type: technical
-tags: ['dns', 'infrastructure', 'web development', 'architecture']
+
 ---
 
-If you look at the URL bar right now you will notice something that many modern web developers try to avoid: the `www` prefix. 
+This site uses `www.akasewang.me` as its canonical URL. The shorter apex domain still works, but it redirects here.
 
-In recent years the trend has heavily skewed toward naked or apex domains. After all `domain.com` looks significantly cleaner and shorter than `www.domain.com`. It fits nicely on business cards and gives off a modern minimalist aesthetic. The `www` prefix is often dismissed as a relic of the 1990s originally used to differentiate web traffic from FTP or mail servers.
+An apex URL looks cleaner, and modern hosting platforms make it easy to use one. I chose `www` because it gives the website its own DNS name and leaves the apex free to manage the domain as a whole. That distinction is small on a personal site, but useful once the same domain also serves APIs, assets, email and verification records.
 
-Despite the aesthetic appeal of the naked domain I intentionally chose to use `www` as the canonical URL for my site. Here is a deep dive into the technical and architectural reasons behind that decision.
+## Cookie scope
 
-## 1. The Cookie Leakage Problem
+Cookies do not automatically spread from an apex domain to every subdomain. Under [RFC 6265](https://www.rfc-editor.org/rfc/rfc6265), a cookie without a `Domain` attribute is host-only, so a cookie set by `akasewang.me` stays on that host. The broad scope appears when an application deliberately sets `Domain=akasewang.me`.
 
-One of the most compelling reasons to use a subdomain like `www` involves how browsers handle cookies according to RFC 6265.
+The practical benefit of `www` is that the narrow choice is obvious. Application cookies can be host-only or explicitly scoped to `www.akasewang.me`, while `api.akasewang.me` and `cdn.akasewang.me` remain outside that scope.
 
-When you set a cookie on a naked domain (`akasewang.me`) the browser automatically sends that cookie to all subdomains. If I were to spin up an API at `api.akasewang.me` or a static asset CDN at `cdn.akasewang.me` every single request to those subdomains would needlessly carry the cookies from my main website.
-
-Consider the HTTP headers when setting a session cookie on the root domain versus a specific subdomain:
-
-<Tabs items={["Root Domain Issue", "Subdomain Isolation"]}>
-  <Tab title="Root Domain Issue">
-    This directive tells the browser to include the cookie for `akasewang.me` and all subdomains. A request for a simple image at `cdn.akasewang.me/image.png` will now carry the session payload.
+<Tabs items={["Broad Domain Cookie", "Host-specific Cookie"]}>
+  <Tab title="Broad Domain Cookie">
+    This cookie is available to `akasewang.me` and its subdomains:
 
     ```http
     Set-Cookie: session_id=xyz123; Domain=akasewang.me; Path=/; HttpOnly; Secure
     ```
   </Tab>
-  <Tab title="Subdomain Isolation">
-    This restricts the cookie strictly to `www.akasewang.me` protecting your static assets and APIs from unnecessary payload overhead.
+  <Tab title="Host-specific Cookie">
+    This cookie is scoped to the website host:
 
     ```http
     Set-Cookie: session_id=xyz123; Domain=www.akasewang.me; Path=/; HttpOnly; Secure
@@ -38,71 +33,54 @@ Consider the HTTP headers when setting a session cookie on the root domain versu
   </Tab>
 </Tabs>
 
-This causes a few significant architectural problems:
+Omitting `Domain` from the second example would be stricter still because it would create a host-only cookie. Either form prevents website cookies from accompanying requests to unrelated subdomains. That matters for three reasons:
 
-- **Performance:** Appending unneeded cookies to every request wastes bandwidth especially for static assets like images and fonts. In high traffic real time applications this overhead compounds quickly.
-- **Security:** If your main site stores sensitive session data, leaking those cookies to third party subdomains or microservices increases your attack surface.
-- **Caching:** Content Delivery Networks often bypass cache entirely if they see a `Cookie` header on an incoming request because they assume the response is user specific. 
+- Cookies add request bytes, which is pointless overhead on asset hosts.
+- Sending credentials to more hosts increases the number of systems that must be trusted and secured.
+- Some CDN configurations treat requests with cookies as personalized and avoid serving a shared cached response.
 
-By using `www.akasewang.me` as the primary site any cookies set there stay strictly locked to the `www` subdomain. My other subdomains remain perfectly isolated and stateless.
+`www` does not create safe cookie policy by itself; the cookie attributes still have to be correct. It does give the web application a natural boundary to enforce.
 
-## 2. DNS Flexibility and the CNAME Limitation
+## DNS portability
 
-At the DNS level the apex domain (`akasewang.me`) comes with a strict limitation defined by RFC 1034: a `CNAME` record cannot coexist with any other record types for a given node.
-
-A `CNAME` (Canonical Name) record allows you to alias one name to another. This is critical for modern cloud infrastructure where load balancers (like AWS ALB or Heroku routers) give you a dynamic hostname rather than a static IP address.
-
-Because your root domain must hold your `SOA`, `NS` and usually `MX` or `TXT` records, you cannot place a `CNAME` on the apex. You are forced to use an `A` record which points to a hardcoded static IP address.
+The stronger reason is DNS. A `CNAME` record aliases one hostname to another, but [RFC 1034](https://www.rfc-editor.org/rfc/rfc1034) does not allow that record to coexist with other data at the same name. The zone apex already needs records such as `SOA` and `NS`, so a conventional `CNAME` cannot live there.
 
 <Tabs items={["Invalid Apex Config", "Valid WWW Config"]}>
   <Tab title="Invalid Apex Config">
-    DNS parsers will reject this zone file. You cannot alias the root node while it holds mandatory infrastructure records.
+    The apex cannot be both a `CNAME` and the owner of the zone's other records:
 
     ```text
     @   IN  SOA   ns1.provider.com. admin.provider.com.
     @   IN  MX    10 mail.provider.com.
-    @   IN  CNAME loadbalancer.cloudprovider.com.  ; ILLEGAL - Conflicts with SOA/MX
+    @   IN  CNAME loadbalancer.cloudprovider.com.  ; conflicts with other apex records
     ```
   </Tab>
   <Tab title="Valid WWW Config">
-    The `www` subdomain is free of root level conflicts allowing seamless load balancer aliasing.
+    A subdomain has no such conflict:
 
     ```text
     @   IN  SOA   ns1.provider.com. admin.provider.com.
     @   IN  MX    10 mail.provider.com.
-    www IN  CNAME loadbalancer.cloudprovider.com.  ; PERFECTLY VALID
+    www IN  CNAME loadbalancer.cloudprovider.com.
     ```
   </Tab>
 </Tabs>
 
-If you point an `A` record to a static IP and that server goes down, your site breaks until the DNS propagates. With a `www` subdomain you can freely use a CNAME. You can point `www.akasewang.me` directly to your cloud provider load balancer hostname allowing them to dynamically route traffic, cycle IP addresses and handle DDoS mitigation without you ever touching your DNS settings.
+A `www` record can therefore point at a load balancer or hosting provider without copying its current IP addresses into the zone. The provider can change those addresses while the alias stays the same.
 
-<Callout type="info" title="What about CNAME Flattening?">
-  Modern DNS providers like Cloudflare and Vercel solve this issue using a technique called CNAME Flattening or ALIAS records which simulate a CNAME at the root level by resolving the target IPs on the fly. While this is a great workaround it locks you into using specific DNS providers that support this non standard feature. Sticking with `www` means your DNS works flawlessly everywhere end to end.
+<Callout type="info" title="Apex aliases are widely available">
+  Providers including Cloudflare and Vercel offer CNAME flattening, `ALIAS` records or equivalent
+  apex-domain support. Those solutions are practical and remove most of the inconvenience. They are
+  provider-specific extensions, though, whereas a `www` CNAME uses ordinary DNS behavior and is easy
+  to move between providers.
 </Callout>
 
-## 3. Strict Origin Separation and CORS
+## Origins and service boundaries
 
-Using a naked domain often leads developers to host APIs under paths like `akasewang.me/api`. While this seems convenient it fundamentally alters how the browser enforces security policies.
+Putting the website on `www` and an API on `api` creates separate browser origins. CORS rules then decide which cross-origin requests the browser may expose to frontend code.
 
-The Same Origin Policy (SOP) considers `akasewang.me` and `akasewang.me/api` to be the exact same origin. If a malicious script executes on your front end, it has unfettered access to make authenticated requests to your API.
+The same separation is possible with an apex website and an `api` subdomain, so this is not a unique capability of `www`. What `www` changes is the naming model: the apex represents the domain, and the website, API and asset service are peers beneath it.
 
-By strictly separating the site to `www.akasewang.me` and the API to `api.akasewang.me` you force the browser to treat them as distinct origins. Cross Origin Resource Sharing (CORS) rules must be explicitly configured providing a vital layer of defense in depth against XSS and CSRF attacks.
+That model also makes configuration easier to reason about. Email routing and ownership records stay at `akasewang.me`; web deployment settings belong to `www.akasewang.me`; API policy belongs to `api.akasewang.me`. None of this is required for a small site, but it avoids treating the website as if it were the domain's only possible service.
 
-## 4. Separation of Concerns
-
-Using a naked domain conflates the concept of the organization with the website. 
-
-From an infrastructure perspective `akasewang.me` is my root entity. It owns my email routing, text verification and all my infrastructure routing. My website is simply one service hosted under that entity. 
-
-By explicitly placing the website at `www.akasewang.me` I establish a clean logical separation of concerns. The website has its own dedicated namespace just like a blog, a dashboard or an API would. This makes scaling a full stack application far more predictable.
-
-## Conclusion
-
-Choosing between a naked domain and a `www` domain usually boils down to a tradeoff between aesthetics and technical flexibility. 
-
-For a simple personal portfolio you can absolutely get away with a naked domain especially since modern edge providers handle the heavy lifting of DNS routing. However as an engineer I prefer setting up architecture that is robust, scalable and adheres to fundamental networking principles.
-
-By keeping the `www` I ensure strict cookie isolation, enforce proper CORS boundaries, maintain total freedom in my choice of DNS and hosting providers and leave the door wide open for future scaling without having to migrate my entire canonical URL structure.
-
-A few extra characters in the URL bar is a small price to pay for technical peace of mind.
+The choice is therefore less dramatic than it is sometimes presented. Apex domains are safe and capable when their DNS and cookie settings are configured well. I use `www` because the portable CNAME and explicit service boundary are worth more to me than removing four characters from the address bar.

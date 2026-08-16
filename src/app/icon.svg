@@ -1,3 +1,13 @@
+<!--
+  The site's mark, the same one Icons.initials draws in the navbar and the social card draws in its
+  corner. Those two share an outline from src/components/ui/icons/initials-path.ts; this file keeps
+  its own copy because the build rasterises it as a file, so a change to the mark belongs in both.
+
+  A mark that writes itself is Anthony Fu's idea. These strokes are this site's own initials.
+
+  Anthony Fu: https://antfu.me
+  Source: https://github.com/antfu/antfu.me
+-->
 <svg width="100%" viewBox="0 0 32 32" version="1.1" xmlns="http://www.w3.org/2000/svg" role="img" style="margin: auto; padding: 0px;">
   <title style="fill:rgb(0, 0, 0);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto">Animated initials</title>
   <desc style="fill:rgb(0, 0, 0);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto">Handwritten-style initials drawn and undrawn in a looping stroke animation</desc>

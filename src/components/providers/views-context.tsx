@@ -26,6 +26,11 @@ type ViewsContextType = {
 
 const ViewsContext = createContext<ViewsContextType | null>(null)
 
+/**
+ * Every storage call below is wrapped and its failure dropped. Storage can be turned off, full or
+ * refused outright, and none of that should stop a count being shown, since it is only a cache.
+ */
+
 /** Versioned, so a change to the stored shape is ignored rather than read as the old one */
 const CACHE_KEY = 'views-cache-all:v1'
 

@@ -2,13 +2,6 @@
 
 # dependencies
 /node_modules
-/.pnp
-.pnp.*
-.yarn/*
-!.yarn/patches
-!.yarn/plugins
-!.yarn/releases
-!.yarn/versions
 
 # testing
 /coverage
@@ -24,9 +17,6 @@
 *.pem
 
 # debug
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
 .pnpm-debug.log*
 
 # env files (can opt-in for committing if needed)
@@ -75,7 +65,30 @@ $RECYCLE.BIN/
 # AI Assistants & Tools
 .claude/
 .cursor/
-.aider/
+.cursorrules
+.aider*
+.windsurfrules
+.continue/
+.codeium/
+.roo/
+.junie/
+.clinerules
+.codex*
+
+# Agent instruction files. AGENTS.md and CLAUDE.md are written by `next dev` on every run, so they
+# come back on their own after being deleted and are ignored rather than removed for good. See
+# node_modules/next/dist/server/lib/generate-agent-files.js.
+AGENTS.md
+CLAUDE.md
+GEMINI.md
+
+# Scratch and crash artefacts
+.tmp*
+*.tmp
+*.bak
+*.orig
+*.rej
+*.stackdump
 
 # Databases
 *.sqlite

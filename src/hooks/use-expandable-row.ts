@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useSoundEffects } from '@/hooks/use-sound-effects'
 
+/** Open or shut for one row of a list, with the sound the toggle makes */
 export function useExpandableRow(defaultExpanded = false) {
   const [isExpanded, setIsExpanded] = useState(defaultExpanded)
   const { toggle } = useSoundEffects()

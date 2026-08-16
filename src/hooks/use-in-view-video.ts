@@ -1,7 +1,7 @@
 'use client'
 
-import { useInView } from 'framer-motion'
-import { useEffect, useRef } from 'react'
+import { useInView, useReducedMotion } from 'framer-motion'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { usePageArriving } from '@/hooks/use-page-arrival'
 
 /**
@@ -13,20 +13,37 @@ import { usePageArriving } from '@/hooks/use-page-arrival'
  */
 export function useInViewVideo() {
   const containerRef = useRef<HTMLDivElement>(null)
-  const videoRef = useRef<HTMLVideoElement>(null)
+  const [video, setVideo] = useState<HTMLVideoElement | null>(null)
+
+  /** A node change is state because playback effects must clean up when fallback media replaces it. */
+  const videoRef = useCallback((node: HTMLVideoElement | null) => {
+    setVideo((current) => (current === node ? current : node))
+  }, [])
 
   const isInView = useInView(containerRef, { amount: 0.5 })
   const isArriving = usePageArriving()
+  const shouldReduceMotion = useReducedMotion()
 
   useEffect(() => {
-    if (!videoRef.current || isArriving) return
+    if (!video) return
 
-    if (isInView) {
-      videoRef.current.play().catch(() => {})
-    } else {
-      videoRef.current.pause()
+    const syncPlayback = () => {
+      if (isArriving || !isInView || document.hidden || shouldReduceMotion) {
+        video.pause()
+        return
+      }
+
+      video.play().catch(() => {})
     }
-  }, [isInView, isArriving])
+
+    syncPlayback()
+    document.addEventListener('visibilitychange', syncPlayback)
+
+    return () => {
+      document.removeEventListener('visibilitychange', syncPlayback)
+      video.pause()
+    }
+  }, [video, isInView, isArriving, shouldReduceMotion])
 
   return { containerRef, videoRef }
 }

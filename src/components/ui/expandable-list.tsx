@@ -51,6 +51,7 @@ export function ExpandableList<T>({ items, renderItem, initialCount = 3 }: Expan
   const listRef = useRef<HTMLDivElement>(null)
   const hiddenRef = useRef<HTMLDivElement>(null)
 
+  /** Collapsing is what needs the room reserved, since the page is about to get shorter under it */
   const handleToggle = () => {
     if (showAll) reserveScrollRoom(occupiedHeight(hiddenRef.current))
     toggle(!showAll)
@@ -59,6 +60,7 @@ export function ExpandableList<T>({ items, renderItem, initialCount = 3 }: Expan
 
   return (
     <div ref={listRef} className="relative flex w-full flex-col">
+      {/** Remounted on expand, so the highlight measures the new list rather than the old one */}
       <HoverHighlight key={showAll ? 'expanded' : 'collapsed'} parentRef={listRef} />
       <div className="flex flex-col gap-6">{visibleItems.map(renderItem)}</div>
 
@@ -89,7 +91,8 @@ export function ExpandableList<T>({ items, renderItem, initialCount = 3 }: Expan
             className="group mt-6 inline-flex self-start items-center gap-1.5 text-sm text-muted-foreground transition-colors duration-300 supports-hover:hover:text-primary active:text-primary"
             aria-expanded={showAll}
           >
-            <span className="relative grid after:absolute after:-bottom-0.5 after:left-0 after:h-px after:w-full after:origin-left after:scale-x-0 after:bg-primary after:transition-transform after:duration-300 after:ease-out supports-hover:group-hover:after:scale-x-100 group-active:after:scale-x-100">
+            <span className="relative grid after:absolute after:-bottom-0.5 after:left-0 after:h-px after:w-full after:origin-left after:scale-x-0 after:bg-primary after:transition-transform after:duration-300 after:ease-out supports-hover:group-hover:after:scale-x-100 group-active:after:scale-x-100 retina:after:h-[0.5px]">
+              {/** Both labels are laid in the same grid cell, so the button cannot change width */}
               {TOGGLE_LABELS.map((label) => (
                 <span key={label} aria-hidden="true" className={cn(CELL_CLASS, 'invisible')}>
                   {label}

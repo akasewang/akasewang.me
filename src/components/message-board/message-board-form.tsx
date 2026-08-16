@@ -18,13 +18,29 @@ import { adminIntent } from '@/utils/admin-intent'
 
 const mbToast = toastContent.messageBoard
 
+interface MessageBoardFormProps {
+  /** Which board the message is filed against, left out for the site-wide one */
+  boardSlug?: string
+  /**
+   * Whether the box also serves as the owner's way in. Only the board's own page offers it: the
+   * session it creates is a cookie that every other board already reads, so putting the sign in
+   * under each post would be a second door into the same room.
+   */
+  allowAdminSignIn?: boolean
+  onPosted?: () => void
+}
+
 /**
- * The box at the foot of the board, which doubles as the owner's way in.
+ * The box at the foot of a board, which on the board's own page doubles as the owner's way in.
  *
  * An ordinary message is posted, while an email address or a sign in code typed into the same box
  * starts or finishes the owner's sign in, which is why the two can never be read as one another.
  */
-export function MessageBoardForm() {
+export function MessageBoardForm({
+  boardSlug,
+  allowAdminSignIn = true,
+  onPosted,
+}: MessageBoardFormProps) {
   const [isPending, setIsPending] = useState(false)
   const { success, countdown, startCountdown, showError, resetStatus } =
     useStatusTimer('message-board')
@@ -44,7 +60,17 @@ export function MessageBoardForm() {
     setAwaitingCode(false)
   }
 
-  const { intent } = adminIntent(nameDraft, messageDraft, awaitingCode)
+  /**
+   * What the box is currently for, read from what has been typed into it. The button then says so,
+   * which is the only signal that the form has quietly become a sign in. Where the sign in is not
+   * offered the box is only ever a message box, whatever happens to be typed into it.
+   */
+  const readIntent = (name: string, message: string) =>
+    allowAdminSignIn
+      ? adminIntent(name, message, awaitingCode)
+      : { intent: 'post' as const, argument: '' }
+
+  const { intent } = readIntent(nameDraft, messageDraft)
   const buttonDisabled = fieldsDisabled || intent === 'awaitCode'
 
   const buttonLabel = {
@@ -73,10 +99,10 @@ export function MessageBoardForm() {
   }
 
   async function action(formData: FormData) {
-    const { intent: submitted, argument } = adminIntent(
+    /** Read again from what was actually submitted, rather than trusting the drafts above */
+    const { intent: submitted, argument } = readIntent(
       (formData.get('name') as string) || '',
       (formData.get('message') as string) || '',
-      awaitingCode,
     )
 
     const failWith = (message: string) => {
@@ -98,6 +124,7 @@ export function MessageBoardForm() {
       }
     }
 
+    /** The code has been sent but not typed yet, so there is nothing to do with this submit */
     if (submitted === 'awaitCode') return
 
     if (submitted === 'signIn') {
@@ -112,6 +139,7 @@ export function MessageBoardForm() {
       }
     }
 
+    /** Everything above was the owner signing in. What is left is an ordinary message */
     setIsPending(true)
     resetStatus()
 
@@ -126,6 +154,7 @@ export function MessageBoardForm() {
         resetForm()
         startCountdown(MESSAGE_BOARD_COOLDOWN_SECONDS)
         toast.success(mbToast.success)
+        onPosted?.()
       }
     } catch {
       errorSound()
@@ -137,6 +166,10 @@ export function MessageBoardForm() {
 
   return (
     <form ref={formRef} action={action} className="flex flex-col gap-4">
+      {/** Which board this belongs to. The server checks it names a real page before filing it */}
+      {boardSlug && <input type="hidden" name="slug" value={boardSlug} />}
+
+      {/** The honeypot. Hidden and out of the tab order, so only something automated fills it */}
       <input
         type="text"
         name="honey"
@@ -150,6 +183,7 @@ export function MessageBoardForm() {
         id="name"
         name="name"
         type="text"
+        autoComplete="name"
         required
         value={nameDraft}
         onChange={(e) => setNameDraft(e.target.value)}
@@ -161,6 +195,7 @@ export function MessageBoardForm() {
       <TextArea
         id="message"
         name="message"
+        autoComplete="off"
         required={intent === 'post'}
         value={messageDraft}
         onChange={(e) => setMessageDraft(e.target.value)}

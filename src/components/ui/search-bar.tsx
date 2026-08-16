@@ -12,6 +12,7 @@ import {
 import { SPRING_TRANSITION } from '@/constants/ui'
 import { useSoundEffects } from '@/hooks/use-sound-effects'
 
+/** The four orders a list can be read in, matching the values kept in the URL */
 export type SortOption = 'date-desc' | 'date-asc' | 'views-desc' | 'views-asc'
 
 const SORT_OPTIONS: { value: SortOption; label: string }[] = [
@@ -29,7 +30,10 @@ interface SearchBarProps {
   placeholder?: string
 }
 
-/** The search field above a filtered list */
+/**
+ * The search field above a filtered list, with the sort control sharing its line. Both the query
+ * and the sort are owned by the caller, which keeps them in the URL rather than in this component.
+ */
 export function SearchBar({
   searchQuery,
   onSearchChange,
@@ -54,6 +58,7 @@ export function SearchBar({
       />
 
       <div className="flex shrink-0 items-center gap-1.5">
+        {/** The clear button exists only while there is something to clear */}
         <AnimatePresence initial={false}>
           {hasQuery && (
             <m.button
@@ -93,9 +98,12 @@ export function SearchBar({
         </Select>
       </div>
 
-      <span className="absolute inset-x-0 bottom-0 h-px bg-border" aria-hidden="true" />
       <span
-        className="absolute inset-x-0 bottom-0 h-px origin-left scale-x-0 bg-primary transition-transform duration-300 ease-out group-has-[input:focus]:scale-x-100 group-has-[[data-popup-open]]:scale-x-100"
+        className="absolute inset-x-0 bottom-0 h-px bg-border retina:h-[0.5px]"
+        aria-hidden="true"
+      />
+      <span
+        className="absolute inset-x-0 bottom-0 h-px origin-left scale-x-0 bg-primary transition-transform duration-300 ease-out group-has-[input:focus]:scale-x-100 group-has-[[data-popup-open]]:scale-x-100 retina:h-[0.5px]"
         aria-hidden="true"
       />
     </div>

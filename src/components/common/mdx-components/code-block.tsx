@@ -91,6 +91,7 @@ export const Pre = ({
   )
   const inTabPanel = useInTabPanel()
 
+  /** raw is the escape hatch for a caller that wants the plain element, frame and button included */
   if (raw)
     return (
       <pre className={className} {...props}>
@@ -102,6 +103,10 @@ export const Pre = ({
 
   const codeArea = (
     <div className={cn('relative grid', hasHeader && 'z-10')}>
+      {/**
+       * Stuck to the top of the block and laid over it in the same grid cell, so it stays put while
+       * a long snippet scrolls under it rather than travelling away with the code.
+       */}
       {copyable && (
         <div className="pointer-events-none sticky top-2.5 z-20 col-start-1 row-start-1 self-start justify-self-end pt-2.5 pr-2.5 pb-2.5">
           <CopyButton
@@ -121,9 +126,8 @@ export const Pre = ({
       )}
       <pre
         className={cn(
-          'col-start-1 row-start-1 overflow-x-auto rounded-xl border border-border/60 bg-code-block px-4.5 py-3.5 font-mono text-xs leading-relaxed',
+          'col-start-1 row-start-1 overflow-x-auto rounded-xl border border-border/60 bg-code-block px-4.5 py-3.5 font-mono text-xs leading-relaxed retina:border-[0.5px]',
           '[scrollbar-width:none] [&::-webkit-scrollbar]:hidden',
-          hasHeader && 'shadow-t-sm',
           className,
         )}
         {...props}
@@ -136,8 +140,8 @@ export const Pre = ({
   return (
     <figure className="group/pre relative isolate my-6 flex w-full max-w-full flex-col not-prose">
       {hasHeader && (
-        <figcaption className="relative z-0 ml-4 -mb-2 flex w-fit max-w-[calc(100%-2rem)] select-none items-center self-start rounded-t-lg border border-b-0 border-border/60 bg-floating px-4 pt-1 pb-3">
-          <span className="font-mono text-[10px] font-medium lowercase tracking-widest text-muted-foreground">
+        <figcaption className="relative z-0 ml-4 -mb-2 flex w-fit max-w-[calc(100%-2rem)] select-none items-center self-start rounded-t-lg border border-b-0 border-border/60 bg-floating px-4 pt-1 pb-3 retina:border-[0.5px] retina:border-b-0">
+          <span className="font-mono text-3xs font-medium lowercase tracking-widest text-muted-foreground">
             {label}
           </span>
         </figcaption>

@@ -1,3 +1,4 @@
+/** One heading in the contents, with the depth it is indented by */
 export interface TocItem {
   id: string
   text: string

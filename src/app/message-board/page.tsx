@@ -21,16 +21,21 @@ export const metadata: Metadata = constructMetadata({
   imageAlt: messageBoardSeoContent.imageAlt,
 })
 
-/** the public message board */
+/**
+ * The public message board. The first page of messages is read here so it arrives with the page,
+ * and the list picks up from that cursor for anything further.
+ */
 export default async function MessageBoardPage() {
   const breadcrumbJsonLd = getBreadcrumbSchema([
     { name: 'Home', url: SITE_URL },
     { name: 'Message Board', url: `${SITE_URL}/message-board` },
   ])
 
+  /** Null rather than empty, so the list can tell a quiet board from a database that is down */
   let messages: MessageBoardEntry[] | null = null
 
   try {
+    /** Newest first, which is the order the list renders and pages back from */
     messages = await db.query.messageBoard.findMany({
       orderBy: [desc(messageBoard.id)],
       limit: MESSAGES_PER_PAGE,
@@ -43,7 +48,7 @@ export default async function MessageBoardPage() {
     <PageLayout
       title={messageBoardContent.title}
       subtitle={messageBoardContent.subtitle}
-      footerText="Parting is such sweet sorrow... unless you leave a message first."
+      footerText={messageBoardContent.footerText}
       breadcrumb={breadcrumbJsonLd}
     >
       <div className="space-y-14">

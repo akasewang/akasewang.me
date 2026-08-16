@@ -27,7 +27,7 @@ export function BlogPostCard({
       onClick={navigateSound}
       data-highlight-item
       className={cn(
-        'group relative z-10 -mx-2 -my-1.5 flex flex-col rounded-xl px-2 py-1.5 transition-[transform,scale] duration-300 ease-out active:scale-[0.99] active:duration-200 sm:-mx-3 sm:-my-2 sm:px-3 sm:py-2',
+        'group relative -mx-2 -my-1.5 flex flex-col rounded-xl px-2 py-1.5 transition-[transform,scale] duration-300 ease-out active:scale-[0.99] active:duration-200 sm:-mx-3 sm:-my-2 sm:px-3 sm:py-2',
         className,
       )}
     >
@@ -35,7 +35,7 @@ export function BlogPostCard({
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between sm:gap-6">
           <h3 className="text-balance text-base tracking-tight text-primary">{title}</h3>
 
-          <div className="mt-1 flex shrink-0 items-center font-mono tabular-nums text-[12.5px] text-muted-foreground sm:mt-0.5">
+          <div className="mt-1 flex shrink-0 items-center font-mono tabular-nums text-[0.78125rem] text-muted-foreground sm:mt-0.5">
             <time className="whitespace-nowrap">{formatDateString(date)}</time>
             <SeparatorBullet />
             <ViewCounter slug={slug} readOnly />

@@ -7,6 +7,7 @@ import { Resend } from 'resend'
  */
 let resendInstance: Resend | null = null
 
+/** The mail client, built on the first send and kept for the ones after it */
 export function getResend(): Resend {
   if (!resendInstance) {
     if (!process.env.RESEND_API_KEY) throw new Error('Missing RESEND_API_KEY')
@@ -15,4 +16,5 @@ export function getResend(): Resend {
   return resendInstance
 }
 
+/** The from address for the newsletter, or null when none is configured to send from */
 export const getNewsletterSender = () => process.env.RESEND_NEWSLETTER_EMAIL?.trim() || null

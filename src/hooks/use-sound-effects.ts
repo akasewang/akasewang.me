@@ -34,22 +34,6 @@ type SharedOutput = {
   compressor: DynamicsCompressorNode
 }
 
-type SpotlightVoice = {
-  noise: AudioBufferSourceNode
-  noiseFilter: BiquadFilterNode
-  noiseGain: GainNode
-  pan: StereoPannerNode | null
-}
-
-type SpotlightSweepInput =
-  | number
-  | {
-      phase?: 'enter' | 'move'
-      intensity: number
-      ratioX?: number
-      ratioY?: number
-    }
-
 type ToneOptions = {
   type?: OscillatorType
   from: number
@@ -77,10 +61,7 @@ type NoiseOptions = {
 /** One context and one output chain for the whole page, reused by every cue */
 let sharedCtx: AudioContext | null = null
 let sharedOutput: SharedOutput | null = null
-let spotlightVoice: SpotlightVoice | null = null
-let spotlightReleaseTimer: number | null = null
 let lastHoverAt = 0
-let lastSpotlightEntryAt = 0
 
 function getCtx(): AudioContext | null {
   if (typeof window === 'undefined') return null
@@ -142,96 +123,9 @@ function getNoiseBuffer(ctx: AudioContext) {
   return buffer
 }
 
-/**
- * The spotlight sweep is one continuous filtered noise voice that is kept alive between pointer
- * moves and re-aimed, because starting a fresh source per move would click.
- */
-function getSpotlightVoice(ctx: AudioContext) {
-  if (spotlightReleaseTimer !== null) {
-    window.clearTimeout(spotlightReleaseTimer)
-    spotlightReleaseTimer = null
-  }
-
-  if (spotlightVoice) return spotlightVoice
-
-  const output = getOutput(ctx)
-  const noise = ctx.createBufferSource()
-  const noiseFilter = ctx.createBiquadFilter()
-  const noiseGain = ctx.createGain()
-  const pan = typeof ctx.createStereoPanner === 'function' ? ctx.createStereoPanner() : null
-
-  noise.buffer = getNoiseBuffer(ctx)
-  noise.loop = true
-  noiseFilter.type = 'lowpass'
-  noiseFilter.frequency.value = 420
-  noiseFilter.Q.value = 0.7
-  noiseGain.gain.value = MIN_GAIN
-
-  noise.connect(noiseFilter)
-  noiseFilter.connect(noiseGain)
-  if (pan) {
-    noiseGain.connect(pan)
-    pan.connect(output)
-  } else {
-    noiseGain.connect(output)
-  }
-
-  noise.start()
-
-  spotlightVoice = {
-    noise,
-    noiseFilter,
-    noiseGain,
-    pan,
-  }
-
-  return spotlightVoice
-}
-
-/**
- * Fades the sweep out once the pointer settles, then tears the nodes down. Both stages check that
- * the voice is still the current one, so a pointer returning mid fade is not left silent.
- */
-function releaseSpotlightVoice(ctx: AudioContext, idleDelay = 140) {
-  const voice = spotlightVoice
-  if (!voice || typeof window === 'undefined') return
-
-  if (spotlightReleaseTimer !== null) {
-    window.clearTimeout(spotlightReleaseTimer)
-  }
-
-  spotlightReleaseTimer = window.setTimeout(() => {
-    if (spotlightVoice !== voice) return
-
-    const now = ctx.currentTime
-    voice.noiseGain.gain.cancelScheduledValues(now)
-    voice.noiseGain.gain.setTargetAtTime(MIN_GAIN, now, 0.055)
-
-    spotlightReleaseTimer = window.setTimeout(() => {
-      if (spotlightVoice !== voice) return
-
-      try {
-        voice.noise.stop()
-      } catch {}
-
-      voice.noise.disconnect()
-      voice.noiseFilter.disconnect()
-      voice.noiseGain.disconnect()
-      voice.pan?.disconnect()
-
-      spotlightVoice = null
-      spotlightReleaseTimer = null
-    }, 320)
-  }, idleDelay)
-}
-
 /** Browsers suspend a context until a gesture, and again whenever the tab is backgrounded */
 function resumeIfNeeded(ctx: AudioContext) {
   if (ctx.state === 'suspended') ctx.resume().catch(() => {})
-}
-
-function clamp01(value: number) {
-  return Math.min(Math.max(value, 0), 1)
 }
 
 /**
@@ -320,6 +214,7 @@ type KeyVoice = {
   rattle?: boolean
 }
 
+/** Keys grouped by the sound they make rather than by what they do */
 export type KeyKind = 'letter' | 'space' | 'enter' | 'delete' | 'modifier'
 
 const KEY_VOICES: Record<KeyKind, KeyVoice> = {
@@ -456,63 +351,6 @@ function playHoverCard(ctx: AudioContext) {
     duration: 0.032,
     delay: 0.0015,
   })
-}
-
-function getSpotlightState(input: SpotlightSweepInput = 0.4) {
-  if (typeof input === 'number') {
-    return {
-      phase: 'move',
-      intensity: input,
-      ratioX: 0.5,
-      ratioY: 0.5,
-    }
-  }
-
-  return {
-    phase: input.phase ?? 'move',
-    intensity: input.intensity,
-    ratioX: input.ratioX ?? 0.5,
-    ratioY: input.ratioY ?? 0.5,
-  }
-}
-
-function playSpotlightEntry(ctx: AudioContext, horizontal: number, verticalLift: number) {
-  const now = Date.now()
-  if (now - lastSpotlightEntryAt < 90) return
-  lastSpotlightEntryAt = now
-
-  playTone(ctx, {
-    type: 'triangle',
-    from: 430 + verticalLift * 70,
-    to: 340 + horizontal * 40,
-    gain: HOVER_GAIN * 1.18,
-    duration: STANDARD_DURATION,
-  })
-}
-
-function playSpotlightSweep(ctx: AudioContext, input: SpotlightSweepInput = 0.4) {
-  resumeIfNeeded(ctx)
-  const now = ctx.currentTime
-  const { phase, intensity, ratioX, ratioY } = getSpotlightState(input)
-  const motion = clamp01((intensity - 0.4) / 0.6)
-  const sweep = 1 - (1 - motion) ** 2
-  const audibleMotion = Math.max(sweep ** 1.35, phase === 'enter' ? 0.38 : 0)
-  const horizontal = clamp01(ratioX)
-  const verticalLift = 1 - clamp01(ratioY)
-  const voice = getSpotlightVoice(ctx)
-
-  if (phase === 'enter') playSpotlightEntry(ctx, horizontal, verticalLift)
-
-  voice.noiseFilter.frequency.setTargetAtTime(
-    340 + verticalLift * 120 + audibleMotion * 560,
-    now,
-    0.045,
-  )
-  voice.noiseFilter.Q.setTargetAtTime(0.65 + audibleMotion * 0.65, now, 0.05)
-  voice.noiseGain.gain.setTargetAtTime(HOVER_GAIN * (0.075 + audibleMotion * 0.3), now, 0.055)
-  voice.pan?.pan.setTargetAtTime((horizontal - 0.5) * 0.16, now, 0.065)
-
-  releaseSpotlightVoice(ctx)
 }
 
 /**
@@ -800,20 +638,10 @@ export function useSoundEffects() {
   const hoverLink = useCallback(() => throttledHover(playHoverLink), [throttledHover])
   const hoverCard = useCallback(() => throttledHover(playHoverCard), [throttledHover])
 
-  const spotlightSweep = useCallback((input: SpotlightSweepInput = 0.4) => {
-    if (!isAudioEnabled()) {
-      if (sharedCtx && spotlightVoice) releaseSpotlightVoice(sharedCtx, 0)
-      return
-    }
-
-    const ctx = getCtx()
-    if (ctx) playSpotlightSweep(ctx, input)
-  }, [])
-
   /**
    * Typing is the one cue that fires without a deliberate decision behind it, so it checks the
-   * preference on every press rather than trusting a subscription, and stays silent for keys that
-   * put nothing on the screen.
+   * preference on every press rather than trusting a subscription. Which keys are audible at all is
+   * settled by the caller, this only voices whichever kind it is handed.
    */
   const typeKey = useCallback((kind: KeyKind, key: string, softer = false) => {
     if (!isAudioEnabled()) return
@@ -837,7 +665,6 @@ export function useSoundEffects() {
     hoverTick,
     hoverLink,
     hoverCard,
-    spotlightSweep,
     typeKey,
     clickPop,
     navigate,

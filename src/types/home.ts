@@ -1,6 +1,7 @@
 import type { SKILL_CATEGORIES } from '@/constants/categories'
 import type { LinkableSectionContent } from './site'
 
+/** Every string in the opening block, so the copy lives in the content files rather than the markup */
 interface HeroContent {
   firstName: string
   lastName: string
@@ -56,6 +57,7 @@ export interface LandingPageContent {
   hero: HeroContent
   sections: {
     experience: string
+    technicalTraining: string
     volunteer: string
     education: string
     certifications: string

@@ -2,7 +2,9 @@ import type { Metadata } from 'next'
 import { Suspense } from 'react'
 import { PageLayout } from '@/components/layout/page-layout'
 import { PhotosContent } from '@/components/photos/photos-content'
+import { PHOTOS_PAGE_CLASS } from '@/components/skeletons/photos'
 import { SITE_URL } from '@/constants/constants'
+import { photosPageContent } from '@/data/content/photos-content'
 import { photosSeoContent } from '@/data/content/seo-content'
 import { getBreadcrumbSchema } from '@/lib/json-ld'
 import { constructMetadata, getOgImageUrl } from '@/lib/metadata'
@@ -24,9 +26,9 @@ export default function PhotosPage() {
 
   return (
     <PageLayout
-      footerText="Taking photos so I don't have to remember things."
+      footerText={photosPageContent.footerText}
       breadcrumb={breadcrumbJsonLd}
-      className="relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] min-h-screen w-screen px-8 pb-12 pt-2 md:px-28 md:pt-12"
+      className={PHOTOS_PAGE_CLASS}
     >
       <h1 className="sr-only">photos.</h1>
       <Suspense fallback={null}>

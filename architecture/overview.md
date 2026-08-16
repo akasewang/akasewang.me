@@ -5,9 +5,21 @@ A high level look at how the site runs, handles data and manages SEO.
 ## Hosting & Edge
 
 - The site runs on Vercel, built with the Next.js App Router (React Server Components by default).
-- `/api/og`, which generates social preview images, runs on the Edge runtime so it responds close to the visitor worldwide.
-- Content pages like blog posts and projects are prerendered at build time via `generateStaticParams`, so they ship as static HTML and load instantly.
+- `/api/og`, which generates social preview images, runs on the Node runtime. It builds the branching pattern and base64 encodes it with `Buffer`, which the Edge runtime does not provide.
+- Blog posts and projects without an external destination are prerendered via
+  `generateStaticParams`, so they ship as static HTML and load instantly. External projects are
+  excluded from local detail routes and the sitemap.
 - Routes that depend on live external data use Incremental Static Regeneration: they serve a cached static page and rebuild it in the background on a `revalidate` interval (e.g. `/changelog` and `/api/github-stars` at 3600s).
+
+## Application Shell
+
+- `RootLayout` reads blog and project command groups on the server, emits site metadata and JSON-LD,
+  then mounts the shared motion, tooltip and view-count providers around the page shell.
+- `SiteBackground` renders one lazy, client-only procedural canvas for the whole site. It is mounted
+  in the root layout, so every route shares the same background and no page selects its own.
+- `PageTransition` owns routed content and scroll restoration. The global command menu sits beside
+  the page shell so it can open from any route; it receives serializable content groups from the
+  server and handles section drill-down, search and executable actions on the client.
 
 ## Database & Views
 
@@ -16,7 +28,9 @@ A high level look at how the site runs, handles data and manages SEO.
   - `views` stores one aggregate counter per content slug.
   - `newsletter_subscribers` stores normalized email addresses, stable unsubscribe UUIDs, active
     state and the current subscription date.
-  - `message_board` stores public messages and optional admin replies.
+  - `message_board` stores public messages and optional admin replies, each reply carrying the time
+    it was written alongside the message's own. A `slug` column says which board a message belongs
+    to: a post's path, or null for the site-wide one.
   - `admin_otp` stores the current short-lived admin-code hash, expiry and failed-attempt count.
   - `admin_session` stores hashes and expiries for revocable browser sessions.
   - `action_rate_limit` stores expiring HMAC keys for public-action cooldowns.
@@ -29,9 +43,9 @@ A high level look at how the site runs, handles data and manages SEO.
   - Lists batch their reads: `ViewsProvider` coalesces `prefetchViews` calls within a 50 ms window
     into one `getViewsBatchAction` (`WHERE slug IN (...)`) and caches the result in `localStorage`
     for five minutes. Incremented counts update from the value returned by the database.
-  - **Visits**: a project that carries an `external` link has no page here to be viewed, so its card
-    counts being opened instead, recorded by the card itself through `recordVisit` when it is
-    followed. The tally is kept in the same table under a `visit:` prefixed key, which cannot
+  - **Visits**: a project that carries an `external` link has no page here to be viewed, so its
+    outbound opens are counted instead. Project cards and command results call `recordVisit` only
+    when their destination is followed. The tally uses a `visit:` prefixed key, which cannot
     collide with a page view: a content slug is validated against `[a-z0-9][a-z0-9_-]*` and can
     never contain a colon. Everything else is shared unchanged, including the once per session
     guard, so opening a project twice in a session counts once.
@@ -71,7 +85,7 @@ node -e "console.log('CRON_SECRET=' + require('crypto').randomBytes(32).toString
 ```
 
 Configure both secrets in local `.env` and in Vercel, then redeploy after adding or rotating them.
-Run `npm run db:push` whenever the Drizzle schema changes, including before deploying the admin and
+Run `pnpm run db:push` whenever the Drizzle schema changes, including before deploying the admin and
 cooldown tables for the first time.
 
 ## Admin Authentication
@@ -93,6 +107,6 @@ cooldown tables for the first time.
 
 ## SEO
 
-- **Open Graph Images**: Social previews are generated dynamically from code (`/api/og`, Edge runtime) instead of static image files.
+- **Open Graph Images**: Social previews are generated dynamically from code (`/api/og`, Node runtime) instead of static image files. Each card draws the same branching pattern as the site background, seeded from the card's own text so a page keeps one image across requests while different pages differ. The foot of the card carries the domain at one end and the site's mark at the other. The mark's outline lives in `src/constants/constants.ts` as `INITIALS_PATH` so the card and the navbar icon draw the same one, and it is held there rather than beside the icon because the card is drawn without React and cannot import that component; the card states it as a plain stroked path, having no stylesheet to animate it with, which renders it fully drawn.
 - **Structured Data (JSON-LD)**: The site emits schema.org markup (blog posts, breadcrumbs and more) so search engines understand the content.
 - **Sitemap & Feeds**: `/sitemap.xml` and `/feed.xml` are built from the same content managers that render the pages, so they stay in sync with what is published.

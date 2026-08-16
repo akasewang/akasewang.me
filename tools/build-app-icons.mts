@@ -6,7 +6,7 @@
  * A site that leaves those out does not go without an icon, it gets whichever other image the
  * platform can find, which is how a portrait ends up on a home screen or a bookmark tile.
  *
- * Run with npx tsx tools/build-app-icons.mts after editing the mark.
+ * Run with pnpm exec tsx tools/build-app-icons.mts after editing the mark.
  */
 
 import { readFile, writeFile } from 'node:fs/promises'

@@ -11,6 +11,7 @@ import {
 } from '@/constants/ui'
 import { prefersReducedMotion } from '@/utils/motion'
 
+/** A target measured against the box's own positioned parent, since that is what it is drawn in */
 export interface HighlightBox {
   left: number
   top: number
@@ -69,6 +70,7 @@ export function useHighlightBox() {
     [left, top, width, height, opacity, scale],
   )
 
+  /** Shrinking a touch on the way out reads as the box letting go rather than blinking off */
   const hide = useCallback(() => {
     visibleRef.current = false
     if (prefersReducedMotion()) {

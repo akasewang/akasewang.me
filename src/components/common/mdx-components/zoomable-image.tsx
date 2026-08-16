@@ -21,9 +21,11 @@ export function ZoomableImage({
   const { zoom, hoverCard } = useSoundEffects()
   const [isOpen, setIsOpen] = useState(false)
 
+  /** Markdown rarely states a size, and next/image needs one to reserve the space */
   const parsedWidth = width ? Number(width) : 1920
   const parsedHeight = height ? Number(height) : 1080
 
+  /** Dressed as a photo so it can reuse the photos page overlay rather than a second one */
   const photo: Photo = {
     id: (src as string) || 'mdx-image',
     url: (src as string) || '',
@@ -41,8 +43,9 @@ export function ZoomableImage({
           setIsOpen(true)
         }}
         onMouseEnter={hoverCard}
-        className="block w-full cursor-zoom-in overflow-hidden rounded-xl border border-border/60 text-left"
+        className="block w-full cursor-zoom-in overflow-hidden rounded-xl border border-border/60 text-left retina:border-[0.5px]"
       >
+        {/** The shared id is what lets the image travel into the overlay rather than cross fade */}
         <m.div
           layoutId={`photo-${photo.id}`}
           transition={ZOOM_EASE}

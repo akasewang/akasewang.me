@@ -27,7 +27,7 @@ export default function SkillsPage() {
     <PageLayout
       title={skillsPageContent.title}
       subtitle={skillsPageContent.subtitle}
-      footerText="That's the stack. No more, no less (well, maybe a little more)."
+      footerText={skillsPageContent.footerText}
       breadcrumb={breadcrumbJsonLd}
     >
       <Suspense fallback={null}>

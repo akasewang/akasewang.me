@@ -21,13 +21,13 @@ export default async function UnsubscribePage({ searchParams }: Props) {
       <PageLayout
         title={unsubscribeContent.invalidTitle}
         subtitle={unsubscribeContent.invalidDescription}
-        footerText="Sad to see you go, but I still like you."
+        footerText={unsubscribeContent.footerText}
       />
     )
   }
 
   return (
-    <PageLayout footerText="Sad to see you go, but I still like you.">
+    <PageLayout footerText={unsubscribeContent.footerText}>
       <UnsubscribeConfirm token={token} content={unsubscribeContent} />
     </PageLayout>
   )

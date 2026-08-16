@@ -1,0 +1,69 @@
+name: Verify
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: types, tests, lint, format, build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@fc06bc1257f339d1d5d8b3a19a8cae5388b55320 # v4.4.0
+
+      - name: Setup Node
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+          cache: pnpm
+
+      # Lifecycle scripts run here, unlike the audit job, because the build needs them: with
+      # --ignore-scripts the compile and typecheck still pass and prerendering then fails on an
+      # internal invariant, the same way every time. Linting does not need them, so only this job
+      # takes them, and onlyBuiltDependencies in package.json still holds the set to two packages.
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # Cheapest check first, so a stray space fails in seconds rather than after a build.
+      - name: Check formatting
+        run: pnpm run format:check
+
+      - name: Typecheck
+        run: pnpm run typecheck
+
+      - name: Test development server
+        run: pnpm run test:dev-server
+
+      - name: Test initial loader timeline
+        run: pnpm run test:initial-loader
+
+      - name: Lint
+        run: pnpm run lint
+
+      # A placeholder rather than a secret. src/lib/db/drizzle.ts throws while loading if this is
+      # unset, which would fail the build before it compiled anything, but nothing here needs the
+      # database to answer: the client connects lazily and the one page that queries during
+      # prerender already renders a failure as its offline state. Giving CI real credentials would buy
+      # nothing and expose them to every fork.
+      - name: Build
+        env:
+          NEON_DATABASE_URL: postgres://placeholder:placeholder@localhost:5432/placeholder
+        run: pnpm run build

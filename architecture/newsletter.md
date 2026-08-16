@@ -20,9 +20,10 @@ share Neon Postgres and Resend, but each has a separate entry point and failure 
 
 ## Unsubscribe
 
-- `/unsubscribe/[token]` calls `unsubscribeAction`, which validates the UUID shape before comparing
-  it with the Postgres UUID column. Malformed and unknown tokens therefore return `invalid` instead
-  of becoming database errors.
+- `/unsubscribe?token=<uuid>` reads the token from the query string and presents an explicit
+  confirmation before its client component calls `unsubscribeAction`. The action validates the UUID
+  shape before comparing it with the Postgres UUID column, so malformed and unknown tokens return
+  `invalid` instead of becoming database errors.
 - Unsubscribing flips `isActive` rather than deleting the row. Broadcasts and weekly summaries query
   active subscribers only.
 
@@ -65,6 +66,6 @@ share Neon Postgres and Resend, but each has a separate entry point and failure 
   is zero.
 - The same job deletes expired `action_rate_limit` rows. These rows contain action-scoped HMAC
   digests rather than raw IP addresses and otherwise have no value after expiry.
-- Deploying this design requires `npm run db:push` for `admin_otp`, `admin_session` and
+- Deploying this design requires `pnpm run db:push` for `admin_otp`, `admin_session` and
   `action_rate_limit`, plus independent `RATE_LIMIT_SECRET` and `CRON_SECRET` values. Generation
   commands and the complete environment table are in the [README](../README.md#environment-variables).

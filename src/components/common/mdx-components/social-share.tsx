@@ -31,12 +31,15 @@ const SHARE_NETWORKS: ShareOption[] = [
   { name: 'X', icon: Icons.x },
   { name: 'LinkedIn', icon: Icons.linkedin },
   { name: 'Reddit', icon: Icons.reddit },
-  { name: 'Hacker News', icon: Icons.hackerNews },
   { name: 'Facebook', icon: Icons.facebook },
   { name: 'WhatsApp', icon: Icons.whatsapp, actionText: 'share via' },
   { name: 'Email', icon: Icons.mail, actionText: 'share via' },
 ]
 
+/**
+ * Each network's composer URL. They agree on almost nothing, so this is a lookup rather than a
+ * pattern: some take a title, some only a link, and X gets a written line rather than the bare one.
+ */
 const getShareUrl = (network: string, url: string, title: string) => {
   const encodedUrl = encodeURIComponent(url)
   const encodedTitle = encodeURIComponent(title)
@@ -68,6 +71,7 @@ export function SocialShare({ url, title, className }: SocialShareProps) {
   const [copied, setCopied] = useState(false)
   const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
+  /** The menu can be closed before the copied state times out, taking this component with it */
   useEffect(() => {
     return () => {
       if (closeTimerRef.current) clearTimeout(closeTimerRef.current)
@@ -86,6 +90,7 @@ export function SocialShare({ url, title, className }: SocialShareProps) {
       setCopied(true)
       toast.success('Link copied to clipboard')
 
+      /** Held open for a beat so the tick is seen, then closed on its own */
       if (closeTimerRef.current) clearTimeout(closeTimerRef.current)
       closeTimerRef.current = setTimeout(() => {
         setCopied(false)
@@ -117,15 +122,14 @@ export function SocialShare({ url, title, className }: SocialShareProps) {
     <div className={cn('relative inline-block', className)}>
       <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
         <Tooltip>
-          <TooltipTrigger asChild>
-            <DropdownMenuTrigger asChild>{triggerButton}</DropdownMenuTrigger>
-          </TooltipTrigger>
+          <TooltipTrigger render={<DropdownMenuTrigger render={triggerButton} />} />
           <TooltipContent side="bottom" align="center" sideOffset={6}>
             Share post
           </TooltipContent>
         </Tooltip>
 
         <DropdownMenuContent align="center" sideOffset={6}>
+          {/** Cancelling the select keeps the menu open, which is what lets the tick be seen */}
           <DropdownMenuItem
             onSelect={(e) => {
               e.preventDefault()
@@ -142,14 +146,17 @@ export function SocialShare({ url, title, className }: SocialShareProps) {
             const actionText = option.actionText || 'share on'
 
             return (
-              <DropdownMenuItem key={option.name} asChild>
-                <a href={option.href} target="_blank" rel="noopener noreferrer">
-                  <Icon />
-                  <span>
-                    {actionText} {option.name.toLowerCase()}
-                  </span>
-                </a>
-              </DropdownMenuItem>
+              <DropdownMenuItem
+                key={option.name}
+                render={
+                  <a href={option.href} target="_blank" rel="noopener noreferrer">
+                    <Icon />
+                    <span>
+                      {actionText} {option.name.toLowerCase()}
+                    </span>
+                  </a>
+                }
+              />
             )
           })}
         </DropdownMenuContent>

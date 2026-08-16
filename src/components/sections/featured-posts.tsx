@@ -39,12 +39,17 @@ export function FeaturedPosts({
   const { prefetchViews } = useViews()
   const listRef = useRef<HTMLDivElement>(null)
 
+  /**
+   * The same component serves the landing page and the full listing, so the filters run either way
+   * and only the home page cuts the result down to three.
+   */
   const displayed = useMemo(() => {
     let filtered = posts
 
     const isFiltering = filterType && filterType !== 'all'
     if (isFiltering) {
       filtered = filtered.filter((p) => {
+        /** A post that never says which it is counts as technical */
         const postType = p.type || 'technical'
         return postType === filterType
       })
@@ -75,6 +80,7 @@ export function FeaturedPosts({
           <m.div
             key="post-list"
             ref={listRef}
+            /** Layout animation is off while the page is still travelling, or the list fights it */
             layout={!isArriving ? 'position' : false}
             className="relative space-y-4"
           >

@@ -18,8 +18,10 @@ interface BackButtonProps {
 export function BackButton({ href = '/', label, className }: BackButtonProps) {
   const router = useRouter()
   const { hoverLink, navigate: navigateSound } = useSoundEffects()
+  /** Falls back to the first segment of the destination, so /blogs reads as blogs */
   const resolvedLabel = (label || href.split('/')[1] || 'home').toLowerCase()
 
+  /** Escape goes back as well, which is the shortcut the button advertises to screen readers */
   useKeyboardShortcut('Escape', () => {
     navigateSound()
     router.push(href, { scroll: false })
@@ -38,6 +40,7 @@ export function BackButton({ href = '/', label, className }: BackButtonProps) {
     >
       <Icons.doubleChevronRight className="mr-1 size-4 shrink-0 transition-transform duration-300 ease-out supports-hover:group-hover:translate-x-px group-active:translate-x-px" />
 
+      {/** A grid column animated from 0fr to 1fr, which is how the label widens from nothing */}
       <div className="grid grid-cols-[0fr] opacity-0 transition-[grid-template-columns,opacity] duration-500 ease-[cubic-bezier(0.25,1,0.5,1)] supports-hover:group-hover:grid-cols-[1fr] group-active:grid-cols-[1fr] supports-hover:group-hover:opacity-100 group-active:opacity-100">
         <div className="flex items-center overflow-hidden whitespace-nowrap">
           <span className="font-medium tracking-tight">{resolvedLabel}</span>

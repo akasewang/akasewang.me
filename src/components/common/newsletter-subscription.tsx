@@ -13,8 +13,8 @@ import { SectionTitle } from '../layout/section-title'
 import { Button } from '../ui/button'
 import { Input } from '../ui/input'
 
-/** The signup form at the end of a post, reporting back through a toast */
-export function NewsletterSubscription({ hideHeader = false }: { hideHeader?: boolean }) {
+/** The homepage signup form, reporting back through a toast */
+export function NewsletterSubscription() {
   const [email, setEmail] = useState('')
   const [loading, setLoading] = useState(false)
   const { success, countdown, startCountdown, showError, resetStatus } =
@@ -36,9 +36,11 @@ export function NewsletterSubscription({ hideHeader = false }: { hideHeader?: bo
         return
       }
 
+      /** The same cooldown the server enforces, so the button cannot ask for what would be refused */
       startCountdown(SUBSCRIBE_COOLDOWN_SECONDS)
       setEmail('')
 
+      /** Someone already on the list is told so rather than thanked for joining again */
       const successMessage = result.data.isNew
         ? toastContent.subscribe.successNew
         : toastContent.subscribe.successReturning
@@ -56,21 +58,18 @@ export function NewsletterSubscription({ hideHeader = false }: { hideHeader?: bo
 
   return (
     <section id="newsletter" className="space-y-4">
-      {!hideHeader && (
-        <>
-          <SectionTitle>{newsletterContent.title}</SectionTitle>
-          <p className="text-pretty text-sm font-normal leading-relaxed text-muted-foreground">
-            {newsletterContent.descriptionPrefix}
-            <span className="font-medium text-green-600">
-              {newsletterContent.descriptionHighlight}
-            </span>
-            {newsletterContent.descriptionSuffix}
-          </p>
-        </>
-      )}
+      <SectionTitle>{newsletterContent.title}</SectionTitle>
+      <p className="text-pretty text-sm font-normal leading-relaxed text-muted-foreground">
+        {newsletterContent.descriptionPrefix}
+        <span className="font-medium text-green-600">{newsletterContent.descriptionHighlight}</span>
+        {newsletterContent.descriptionSuffix}
+      </p>
       <form onSubmit={handleSubmit} className="flex flex-col gap-2 sm:flex-row">
         <Input
           type="email"
+          name="email"
+          autoComplete="email"
+          aria-label={newsletterContent.emailPlaceholder}
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           disabled={loading || countdown > 0}
@@ -88,7 +87,7 @@ export function NewsletterSubscription({ hideHeader = false }: { hideHeader?: bo
           successIcon={Icons.calendarCheck}
           defaultText={newsletterContent.buttonDefault}
           defaultIcon={Icons.bell}
-          className="h-10 min-w-[140px]"
+          className="h-10 min-w-35"
         />
       </form>
     </section>

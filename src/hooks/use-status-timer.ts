@@ -22,6 +22,7 @@ export function useStatusTimer(storageKey?: string) {
   const countdown = expiresAt ? Math.max(0, Math.ceil((expiresAt - now) / 1000)) : 0
   const timerStorageKey = storageKey ? `status-timer-${storageKey}` : null
 
+  /** The one second tick that moves the countdown, running only while there is a deadline */
   useEffect(() => {
     if (!expiresAt) return
 
@@ -30,11 +31,13 @@ export function useStatusTimer(storageKey?: string) {
     return () => clearInterval(interval)
   }, [expiresAt])
 
+  /** Picks up a deadline left by an earlier load, and follows one set in another tab */
   useEffect(() => {
     if (!timerStorageKey) return
 
     const syncFromStorage = (valueStr: string | null) => {
       if (valueStr) {
+        /** An entry that will not parse is treated as no timer, falling through to the reset below */
         try {
           const stored = JSON.parse(valueStr)
           /** A deadline that has already passed is cleared rather than restored */
@@ -72,6 +75,7 @@ export function useStatusTimer(storageKey?: string) {
     return () => window.removeEventListener('storage', handleStorageEvent)
   }, [timerStorageKey])
 
+  /** Clears the message and the cooldown together the moment the deadline lands */
   useEffect(() => {
     if (!expiresAt) return
 
@@ -88,6 +92,7 @@ export function useStatusTimer(storageKey?: string) {
     return () => clearTimeout(timeout)
   }, [expiresAt, timerStorageKey])
 
+  /** Writes the deadline to state and, when there is a key, to storage for the next load */
   const persistState = useCallback(
     (sec: number, isSuccess: boolean, errMsg: string | null) => {
       setNow(Date.now())
@@ -118,6 +123,7 @@ export function useStatusTimer(storageKey?: string) {
     [timerStorageKey],
   )
 
+  /** Success with a cooldown, an error with an optional one, and the manual way out of both */
   const startCountdown = useCallback(
     (seconds: number) => {
       setSuccess(true)

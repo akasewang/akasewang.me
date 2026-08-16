@@ -1,6 +1,7 @@
 'use client'
 
 import { m } from 'framer-motion'
+import { TESTIMONIAL_GRID_CLASS } from '@/components/skeletons/testimonial-card'
 import { TestimonialCard } from '@/components/testimonials/testimonial-card'
 import { testimonials } from '@/data/static/testimonials'
 import { useArrivedWithPage } from '@/hooks/use-page-arrival'
@@ -12,7 +13,7 @@ export function TestimonialsGrid() {
   const arrivedWithPage = useArrivedWithPage()
 
   return (
-    <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,320px),1fr))] gap-4">
+    <div className={TESTIMONIAL_GRID_CLASS}>
       {allTestimonials.map((item) => (
         <m.div
           key={item.id}

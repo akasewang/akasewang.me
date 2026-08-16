@@ -67,10 +67,35 @@ export const newsletterSubscribers = pgTable('newsletter_subscribers', {
   createdAt: timestamp('created_at').defaultNow().notNull(),
 })
 
-export const messageBoard = pgTable('message_board', {
-  id: serial('id').primaryKey(),
-  name: text('name').notNull(),
-  message: text('message').notNull(),
-  adminReply: text('admin_reply'),
-  createdAt: timestamp('created_at').defaultNow().notNull(),
-})
+/**
+ * Serial keyed, since the id is what the list pages on. A reply is a column rather than a second
+ * row, because a message can only ever have the one and it is always from the same person.
+ *
+ * Every board lives in this one table, told apart by slug. One table means moderation, paging and
+ * rate limiting are written once and behave the same wherever a board is shown.
+ */
+export const messageBoard = pgTable(
+  'message_board',
+  {
+    id: serial('id').primaryKey(),
+    name: text('name').notNull(),
+    message: text('message').notNull(),
+    /**
+     * Which board the message belongs to: a post's slug, or null for the site-wide one. Null rather
+     * than a reserved slug so the rows that predate scoping are already on the right board.
+     */
+    slug: text('slug'),
+    adminReply: text('admin_reply'),
+    /**
+     * When the reply was written, which is rarely when the message was. Null both where there is no
+     * reply and where there is one that predates this column, so the board falls back rather than
+     * inventing a time for the replies it cannot date.
+     */
+    adminReplyAt: timestamp('admin_reply_at'),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+  },
+  (table) => ({
+    /** Every read filters by board and pages by descending id, which is exactly this index */
+    boardIndex: index('message_board_slug_id_idx').on(table.slug, table.id),
+  }),
+)

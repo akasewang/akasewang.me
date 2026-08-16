@@ -1,14 +1,33 @@
 'use client'
 
-import { AnimatePresence, type HTMLMotionProps, m } from 'framer-motion'
+import { type HTMLMotionProps, m } from 'framer-motion'
 import { type ElementType, useEffect, useRef } from 'react'
 import { toast } from 'sonner'
-import { AnimatedArrow } from '@/components/ui/animated-arrow'
 import { Icons } from '@/components/ui/icons'
+import { TEXT_FLIP_SWAP_VARIANTS, TextFlip } from '@/components/ui/text-flip'
 import { BUTTON_SWAP_TRANSITION, SPRING_TRANSITION } from '@/constants/ui'
 import { toastContent } from '@/data/content/toast-content'
 import { useSoundEffects } from '@/hooks/use-sound-effects'
 import { cn } from '@/utils/utils'
+
+/**
+ * Where a button leads, told in the colour it lights up when hovered, pressed or focused.
+ *
+ * `onsite` stays on this site and `offsite` hands the reader to another one. A reader learns the
+ * pair without being told: the two sit side by side under the introduction, one of them opens a
+ * booking page elsewhere and the other moves to a page here, and after that the colour answers the
+ * question before the click does.
+ *
+ * Named for the destination rather than the hue because the hue is the part that might change. The
+ * tokens beneath them are still called `warning` and `verified`, which say what colour they are
+ * rather than what they mean here, so a button asks for the meaning and the theme decides how it
+ * looks.
+ *
+ * This governs only the resting button. The states it enters on its own, meaning working, done and
+ * blocked, keep their own colours whichever accent is chosen, since amber for busy and green for
+ * done and red for refused say the same thing wherever they appear.
+ */
+type ButtonAccent = 'onsite' | 'offsite'
 
 interface ButtonProps extends HTMLMotionProps<'button'> {
   isPending?: boolean
@@ -19,29 +38,55 @@ interface ButtonProps extends HTMLMotionProps<'button'> {
   successIcon?: ElementType
   defaultText: string
   defaultIcon?: ElementType
-  showArrow?: boolean
-  variant?: 'primary' | 'secondary' | 'minimal'
+  accent?: ButtonAccent
 }
 
-const VARIANT_STYLES = {
-  primary:
-    'ring-1 ring-inset ring-primary/20 retina:ring-[0.5px] bg-primary text-primary-foreground shadow-[0_2px_4px_rgb(0_0_0/0.2),inset_0_1px_1px_rgb(255_255_255/1),inset_0_-1px_1px_rgb(0_0_0/0.2)] supports-hover:group-[:hover:not(:active)]:bg-primary/95 supports-hover:group-[:hover:not(:active)]:shadow-[0_4px_8px_rgb(0_0_0/0.3),inset_0_1px_1px_rgb(255_255_255/1),inset_0_-1px_1px_rgb(0_0_0/0.2)] group-active:bg-primary/85 group-active:shadow-inner',
-  secondary:
-    'ring-1 ring-inset ring-ring retina:ring-[0.5px] bg-gradient-to-b from-muted/60 to-muted/20 text-foreground shadow-[0_2px_4px_rgb(0_0_0/0.2),inset_0_1px_1px_rgb(255_255_255/0.1),inset_0_-1px_1px_rgb(0_0_0/0.4)] backdrop-blur-md supports-hover:group-[:hover:not(:active)]:from-muted/80 supports-hover:group-[:hover:not(:active)]:to-muted/40 supports-hover:group-[:hover:not(:active)]:shadow-[0_4px_8px_rgb(0_0_0/0.3),inset_0_1px_1px_rgb(255_255_255/0.15),inset_0_-1px_1px_rgb(0_0_0/0.4)] group-active:bg-muted/80 group-active:shadow-inner',
-  minimal:
-    'ring-1 ring-inset ring-ring retina:ring-[0.5px] bg-background text-secondary supports-hover:group-[:hover:not(:active)]:bg-surface-40 supports-hover:group-[:hover:not(:active)]:text-primary supports-hover:group-[:hover:not(:active)]:shadow-sm group-active:bg-surface-30 group-active:text-primary group-active:shadow-inner-sm',
+/**
+ * Every class spelled out per accent, `onsite` in the golden token and `offsite` in the blue one.
+ *
+ * Written out in full rather than assembled from the accent name, because Tailwind reads these
+ * files as plain text and generates only the classes it can literally see. A name put together at
+ * runtime would leave the button with no styles at all.
+ */
+const ACCENT_STYLES: Record<ButtonAccent, string> = {
+  onsite:
+    'supports-hover:hover:ring-warning/30 supports-hover:hover:bg-warning/10 supports-hover:hover:text-warning active:ring-warning/40 active:bg-warning/15 active:text-warning focus-visible:bg-warning/10 focus-visible:text-warning focus-visible:ring-warning/30',
+  offsite:
+    'supports-hover:hover:ring-verified/30 supports-hover:hover:bg-verified/10 supports-hover:hover:text-verified active:ring-verified/40 active:bg-verified/15 active:text-verified focus-visible:bg-verified/10 focus-visible:text-verified focus-visible:ring-verified/30',
 }
+
+/** What every resting button shares, before its accent decides how it lights up */
+const RESTING_STYLES = 'ring-ring bg-transparent text-secondary'
 
 const SUCCESS_STYLES =
-  'ring-1 ring-inset ring-success/30 retina:ring-[0.5px] bg-success/10 text-success shadow-[0_2px_4px_rgb(0_0_0/0.2),inset_0_1px_1px_rgb(255_255_255/0.1)]'
+  'ring-success/30 bg-success/10 text-success opacity-100 supports-hover:hover:ring-success/40 supports-hover:hover:bg-success/15'
 
-const BUTTON_CONTENT_SWAP = {
-  initial: { y: '110%' },
-  animate: { y: '0%', transition: BUTTON_SWAP_TRANSITION },
-  exit: { y: '-110%', transition: BUTTON_SWAP_TRANSITION },
+const PENDING_STYLES = 'ring-warning/30 bg-warning/10 text-warning opacity-100'
+
+const BLOCKED_STYLES = 'ring-destructive/30 bg-destructive/10 text-destructive opacity-100'
+
+function ButtonIcon({ icon: Icon, filled = false }: { icon: ElementType; filled?: boolean }) {
+  return (
+    <span className="relative inline-grid size-[1.25em] shrink-0 place-items-center">
+      <Icon
+        weight={filled ? 'fill' : 'duotone'}
+        className={cn(
+          'col-start-1 row-start-1 size-full transition-all duration-200 ease-out',
+          !filled &&
+            'supports-hover:group-hover:scale-90 supports-hover:group-hover:opacity-0 group-active:scale-90 group-active:opacity-0',
+        )}
+      />
+      {!filled && (
+        <Icon
+          weight="fill"
+          className="col-start-1 row-start-1 size-full scale-90 opacity-0 transition-all duration-200 ease-out supports-hover:group-hover:scale-100 supports-hover:group-hover:opacity-100 group-active:scale-100 group-active:opacity-100"
+        />
+      )}
+    </span>
+  )
 }
 
-/** The site's button, in the sizes and variants the rest of the interface draws from */
+/** The shared action button used by forms and homepage calls to action */
 export function Button({
   isPending = false,
   isSuccess = false,
@@ -51,8 +96,8 @@ export function Button({
   successIcon: SuccessIcon = Icons.check,
   defaultText,
   defaultIcon: DefaultIcon,
-  showArrow = true,
-  variant = 'primary',
+  /** Most buttons submit a form or move within the site, so staying is what a button does unasked */
+  accent = 'onsite',
   className,
   disabled,
   onClick,
@@ -60,8 +105,6 @@ export function Button({
 }: ButtonProps) {
   const { clickPop, hoverTick, error, success: successSound } = useSoundEffects()
   const isSuccessState = isSuccess && countdown > 0
-  const isActionActive = isPending || countdown > 0
-  const hasRightBox = showArrow || isActionActive
   const isDisabled = disabled || isPending || (countdown > 0 && !isSuccess)
   const wasSuccessRef = useRef(isSuccessState)
 
@@ -82,11 +125,6 @@ export function Button({
     onClick?.(e)
   }
 
-  const segmentClasses = cn(
-    'relative inline-flex h-10 items-center justify-center transition-[color,background-color,border-color,box-shadow,translate,transform] duration-300 ease-out',
-    isSuccessState ? SUCCESS_STYLES : VARIANT_STYLES[variant],
-  )
-
   const contentKey = isPending
     ? 'pending'
     : isSuccessState
@@ -95,43 +133,21 @@ export function Button({
         ? 'wait'
         : defaultText
 
-  const rightKey = isPending ? 'pending' : countdown > 0 ? 'countdown' : 'arrow'
+  const activeText = isPending
+    ? loadingText
+    : isSuccessState
+      ? successText
+      : countdown > 0
+        ? 'wait'
+        : defaultText
 
-  const renderContent = () => {
-    if (isPending) return <span>{loadingText}</span>
-    if (isSuccessState) {
-      return (
-        <>
-          <SuccessIcon className="size-4" />
-          <span>{successText}</span>
-        </>
-      )
-    }
-    if (countdown > 0) return <span>wait</span>
-    return (
-      <>
-        {DefaultIcon && <DefaultIcon className="size-4" />}
-        <span>{defaultText}</span>
-      </>
-    )
-  }
-
-  const renderRightContent = () => {
-    if (isPending) {
-      return (
-        <div className="size-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
-      )
-    }
-    if (countdown > 0) {
-      return (
-        <span className={cn('font-mono text-xs', !isSuccessState && 'opacity-50')}>
-          {countdown}
-        </span>
-      )
-    }
-    if (showArrow) return <AnimatedArrow />
-    return null
-  }
+  const stateStyles = isPending
+    ? PENDING_STYLES
+    : isSuccessState
+      ? SUCCESS_STYLES
+      : countdown > 0
+        ? BLOCKED_STYLES
+        : `${RESTING_STYLES} ${ACCENT_STYLES[accent]}`
 
   return (
     <m.button
@@ -145,58 +161,34 @@ export function Button({
       whileTap={isDisabled ? undefined : { scale: 0.99 }}
       transition={SPRING_TRANSITION}
       className={cn(
-        'group relative inline-flex w-full shrink-0 items-stretch justify-center gap-1 text-sm font-medium lowercase outline-none disabled:pointer-events-none disabled:opacity-50 sm:w-auto',
+        'group relative inline-flex min-h-9 w-full shrink-0 items-center justify-center gap-2 overflow-hidden rounded-lg px-3.5 py-2 text-sm font-normal leading-4 lowercase ring-1 ring-inset outline-none transition-all duration-200 ease-out retina:ring-[0.5px] focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 sm:w-auto',
+        stateStyles,
         className,
       )}
     >
-      <span
-        className={cn(
-          segmentClasses,
-          'flex-1 rounded-l-xl',
-          variant === 'minimal' ? 'px-4' : 'px-5',
-          hasRightBox ? 'rounded-r-md' : 'rounded-r-xl',
-          isActionActive
-            ? 'translate-x-px'
-            : hasRightBox &&
-                'supports-hover:group-hover:translate-x-px group-active:translate-x-px',
-        )}
-      >
-        <span className="relative grid overflow-hidden">
-          <AnimatePresence mode="popLayout" initial={false}>
-            <m.span
-              key={contentKey}
-              {...BUTTON_CONTENT_SWAP}
-              className="col-start-1 row-start-1 inline-flex items-center gap-1.5 whitespace-nowrap"
-            >
-              {renderContent()}
-            </m.span>
-          </AnimatePresence>
-        </span>
-      </span>
-
-      {hasRightBox && (
-        <span
-          className={cn(
-            segmentClasses,
-            'aspect-square w-10 overflow-hidden rounded-l-md rounded-r-xl',
-            isActionActive
-              ? '-translate-x-px'
-              : 'supports-hover:group-hover:-translate-x-px group-active:-translate-x-px',
-          )}
+      <span className="relative grid overflow-hidden">
+        <TextFlip
+          activeKey={contentKey}
+          layout={false}
+          variants={TEXT_FLIP_SWAP_VARIANTS}
+          transition={BUTTON_SWAP_TRANSITION}
+          className="col-start-1 row-start-1 inline-flex items-center gap-1.5 whitespace-nowrap"
         >
-          <span className="relative grid size-full place-items-center overflow-hidden">
-            <AnimatePresence mode="popLayout" initial={false}>
-              <m.span
-                key={rightKey}
-                {...BUTTON_CONTENT_SWAP}
-                className="col-start-1 row-start-1 inline-flex items-center justify-center"
-              >
-                {renderRightContent()}
-              </m.span>
-            </AnimatePresence>
-          </span>
-        </span>
-      )}
+          {isPending ? (
+            <span className="size-[1.25em] shrink-0 animate-spin rounded-full border-2 border-current border-t-transparent motion-reduce:animate-none" />
+          ) : isSuccessState ? (
+            <ButtonIcon icon={SuccessIcon} filled />
+          ) : countdown > 0 ? (
+            <ButtonIcon icon={Icons.alertCircle} filled />
+          ) : (
+            DefaultIcon && <ButtonIcon icon={DefaultIcon} />
+          )}
+          <span>{activeText}</span>
+          {countdown > 0 && (
+            <span className="font-mono text-xs tabular-nums opacity-70">{countdown}</span>
+          )}
+        </TextFlip>
+      </span>
     </m.button>
   )
 }

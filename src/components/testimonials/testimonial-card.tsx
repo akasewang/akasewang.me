@@ -1,6 +1,7 @@
 'use client'
 
 import Image from 'next/image'
+import { TESTIMONIAL_CAPTION_CLASS } from '@/components/skeletons/testimonial-card'
 import { GradientAvatar } from '@/components/ui/gradient-avatar'
 import { VerifiedIcon } from '@/components/ui/icons'
 import { LinkableSpotlightCard } from '@/components/ui/linkable-spotlight-card'
@@ -29,8 +30,12 @@ export function TestimonialCard({
   className,
 }: TestimonialCardProps) {
   const isLink = !!url
-  const { spotlightSweep, navigate: navigateSound } = useSoundEffects()
+  const { navigate: navigateSound } = useSoundEffects()
 
+  /**
+   * Drawn twice, once plainly and once as the brighter layer the spotlight reveals through its
+   * mask. The reveal copy leaves a blank where the avatar goes rather than loading the image again.
+   */
   const renderContent = (isReveal: boolean = false) => (
     <figure className={cn(TESTIMONIAL_FIGURE_CLASSES, isReveal ? 'px-6 py-5' : 'relative z-10')}>
       <blockquote
@@ -39,7 +44,7 @@ export function TestimonialCard({
         {quote}
       </blockquote>
 
-      <figcaption className="mt-4 grid grid-cols-[auto_1fr] items-center gap-x-3">
+      <figcaption className={TESTIMONIAL_CAPTION_CLASS}>
         {isReveal ? (
           <div className="size-9 shrink-0" />
         ) : (
@@ -47,7 +52,7 @@ export function TestimonialCard({
         )}
 
         <div className="flex min-w-0 flex-col">
-          <div className="flex items-center gap-1.5 text-[13px] font-semibold leading-relaxed tracking-tight text-primary">
+          <div className="flex items-center gap-1.5 text-xs-plus font-semibold leading-relaxed tracking-tight text-primary">
             <span className="truncate">{author}</span>
             {verified && <VerifiedIcon className="size-3 -mt-[1px] shrink-0 text-verified" />}
           </div>
@@ -77,7 +82,6 @@ export function TestimonialCard({
         isLink && 'active:scale-[0.98] active:duration-200',
         className,
       )}
-      onSpotlightMove={spotlightSweep}
       onActivate={navigateSound}
     >
       {renderContent()}
